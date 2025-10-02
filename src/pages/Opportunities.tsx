@@ -41,6 +41,7 @@ const Opportunities = () => {
   const { user, profile } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
@@ -160,8 +161,12 @@ const Opportunities = () => {
   ]);
 
   // Fetch first page (or refreshed) set
-  const fetchFirstPage = useCallback(async () => {
-    setLoading(true);
+  const fetchFirstPage = useCallback(async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
     setHasMore(true);
     try {
       const q = buildBaseQuery();
@@ -175,6 +180,7 @@ const Opportunities = () => {
       setHasMore(false);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   }, [buildBaseQuery]);
 
@@ -198,10 +204,27 @@ const Opportunities = () => {
     }
   }, [jobs.length, hasMore, pageLoading, buildBaseQuery]);
 
-  // Initial + on filter/search change (NOTICE: deps use *debounced* values)
+  // Initial load
   useEffect(() => {
-    fetchFirstPage();
-  }, [fetchFirstPage]);
+    fetchFirstPage(true);
+  }, []);
+
+  // On filter/search change (deps use *debounced* values)
+  useEffect(() => {
+    if (!loading) {
+      fetchFirstPage(false);
+    }
+  }, [
+    filterIndustry,
+    filterSeniority,
+    filterEmploymentType,
+    filterPosted,
+    filterCurrency,
+    debouncedLocation,
+    debouncedSalaryMin,
+    debouncedSalaryMax,
+    debouncedQuery
+  ]);
 
   // Realtime: throttle bursts
   useEffect(() => {
@@ -366,7 +389,7 @@ const Opportunities = () => {
                   <div key={i} className="h-80 bg-card rounded-2xl animate-pulse" />
                 ))}
               </div>
-            ) : filteredJobs.length === 0 ? (
+            ) : filteredJobs.length === 0 && !isRefreshing ? (
               <div className="bg-gradient-to-br from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 rounded-2xl p-12 text-center">
                 <h3 className="text-2xl font-semibold mb-2">No opportunities match your filters</h3>
                 <p className="text-muted-foreground mb-6">Try adjusting your search criteria</p>
@@ -376,7 +399,7 @@ const Opportunities = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className={`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 transition-opacity duration-200 ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}>
                   {filteredJobs.map(job => (
                     <OpportunityCard
                       key={job.id}
