@@ -115,7 +115,7 @@ export function FeaturedHeadhunters() {
   };
 
   const handleViewProfile = (headhunterId: string) => {
-    navigate(`/headhunter/${headhunterId}`);
+    navigate(`/profile/headhunter/${headhunterId}`);
   };
 
   const getInitials = (name: string | null) => {
