@@ -390,7 +390,7 @@ const Opportunities = () => {
               </div>
             ) : (
               <>
-                <div className={`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 transition-opacity duration-200 ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredJobs.map(job => (
                     <OpportunityCard
                       key={job.id}
@@ -404,8 +404,8 @@ const Opportunities = () => {
 
                 {/* Pagination - reserved space to prevent layout shift */}
                 <div className="flex justify-center mt-8 h-12">
-                  {!isRefreshing && hasMore && debouncedQuery === '' ? (
-                    <Button onClick={fetchNextPage} disabled={pageLoading}>
+                  {hasMore && debouncedQuery === '' ? (
+                    <Button onClick={fetchNextPage} disabled={pageLoading || isRefreshing}>
                       {pageLoading ? 'Loading...' : 'Load more'}
                     </Button>
                   ) : null}
