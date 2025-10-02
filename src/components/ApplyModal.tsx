@@ -113,15 +113,39 @@ export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }
         throw new Error('Failed to submit application');
       }
 
-      // Get job details for email notification
+      // Get job details and employer info
       const { data: job, error: jobError } = await supabase
         .from('jobs')
-        .select('title')
+        .select('title, created_by')
         .eq('id', jobId)
         .single();
 
-      // Send email to employer
       if (job) {
+        // Create notification for employer
+        try {
+          const { error: notifError } = await supabase
+            .from('notifications')
+            .insert({
+              user_id: job.created_by,
+              type: 'application_received',
+              title: 'New Application Received',
+              message: `You received a new application for ${job.title}`,
+              payload: { 
+                job_id: jobId, 
+                application_id: newApp.id,
+                headhunter_id: headhunterId 
+              },
+              related_id: newApp.id,
+            } as any);
+
+          if (notifError) {
+            console.error('Error creating notification:', notifError);
+          }
+        } catch (notifErr) {
+          console.error('Notification error:', notifErr);
+        }
+
+        // Send email to employer
         try {
           const { error: emailError } = await supabase.functions.invoke('send-application-email', {
             body: {

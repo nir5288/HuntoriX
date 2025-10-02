@@ -151,6 +151,25 @@ const Messages = () => {
       throw error;
     }
 
+    // Create notification for receiver
+    try {
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: otherUserId,
+          type: 'new_message',
+          title: 'New Message',
+          message: `You have a new message from ${user?.user_metadata?.name || 'a user'}`,
+          payload: { 
+            job_id: jobId,
+            from_user: user.id,
+          },
+        } as any);
+    } catch (notifErr) {
+      console.error('Error creating notification:', notifErr);
+    }
+
+    loadMessages();
   };
 
   return (
