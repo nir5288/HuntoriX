@@ -31,6 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) throw error;
+      
+      // Check if headhunter account is verified and active
+      if (data.role === 'headhunter' && data.account_status === 'deactivated') {
+        await supabase.auth.signOut();
+        toast.error('Your account has been deactivated. Please contact support.');
+        return;
+      }
+      
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);

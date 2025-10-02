@@ -16,6 +16,8 @@ import HeadhunterDirectory from "./pages/HeadhunterDirectory";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
+import { VerificationWrapper } from './components/VerificationWrapper';
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -24,22 +26,24 @@ const App = () => (
     <Sonner />
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard/employer" element={<EmployerDashboard />} />
-          <Route path="/dashboard/headhunter" element={<HeadhunterDashboard />} />
-          <Route path="/opportunities" element={<Opportunities />} />
-          <Route path="/jobs" element={<Opportunities />} />
-          <Route path="/jobs/:id" element={<JobDetail />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/profile/headhunter/:id" element={<HeadhunterProfile />} />
-          <Route path="/profile/employer/:id" element={<EmployerProfile />} />
-          <Route path="/headhunters" element={<HeadhunterDirectory />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <VerificationWrapper>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard/employer" element={<EmployerDashboard />} />
+            <Route path="/dashboard/headhunter" element={<HeadhunterDashboard />} />
+            <Route path="/opportunities" element={<Opportunities />} />
+            <Route path="/jobs" element={<Opportunities />} />
+            <Route path="/jobs/:id" element={<JobDetail />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/profile/headhunter/:id" element={<HeadhunterProfile />} />
+            <Route path="/profile/employer/:id" element={<EmployerProfile />} />
+            <Route path="/headhunters" element={<HeadhunterDirectory />} />
+            <Route path="/settings" element={<Settings />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </VerificationWrapper>
       </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>

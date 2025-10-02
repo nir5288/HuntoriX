@@ -101,31 +101,43 @@ const Auth = () => {
           toast.success('Welcome back!');
         }
       } else {
-        const redirectUrl = `${window.location.origin}/`;
-        
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
-            emailRedirectTo: redirectUrl,
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
-              role: activeTab,
               name: formData.name,
+              role: activeTab,
             },
           },
         });
 
-        if (error) {
-          if (error.message.includes('already registered')) {
+        if (signUpError) {
+          if (signUpError.message.includes('already registered')) {
             toast.error('This email is already registered. Please sign in instead.');
           } else {
-            toast.error(error.message);
+            toast.error(signUpError.message);
           }
           return;
         }
 
         if (data.user) {
-          toast.success('Account created! Redirecting...');
+          // Send verification email for headhunters
+          if (activeTab === 'headhunter') {
+            try {
+              await supabase.functions.invoke('send-verification-email', {
+                body: {
+                  userId: data.user.id,
+                  email: formData.email,
+                  name: formData.name,
+                },
+              });
+            } catch (emailError) {
+              console.error('Error sending verification email:', emailError);
+            }
+          }
+          toast.success('Account created! Please check your email to verify your account.');
         }
       }
     } catch (error) {

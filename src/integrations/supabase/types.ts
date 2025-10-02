@@ -301,6 +301,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string | null
           active_searches: number | null
           availability: string | null
           avatar_url: string | null
@@ -318,7 +319,9 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           email: string
+          email_verified: boolean | null
           expertise: string[] | null
+          first_reminder_sent_at: string | null
           founded_year: number | null
           hourly_rate: number | null
           id: string
@@ -327,6 +330,7 @@ export type Database = {
           linkedin: string | null
           location: string | null
           name: string | null
+          onboarding_completed: boolean | null
           open_positions: number | null
           placement_fee_percent: number | null
           placements_count: number | null
@@ -336,16 +340,19 @@ export type Database = {
           response_time: string | null
           response_time_hours: number | null
           role: string
+          second_reminder_sent_at: string | null
           skills: string[] | null
           specializations: string[] | null
           success_rate: number | null
           team_size: number | null
           updated_at: string
+          verification_sent_at: string | null
           verified: boolean | null
           website: string | null
           years_experience: number | null
         }
         Insert: {
+          account_status?: string | null
           active_searches?: number | null
           availability?: string | null
           avatar_url?: string | null
@@ -363,7 +370,9 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           email: string
+          email_verified?: boolean | null
           expertise?: string[] | null
+          first_reminder_sent_at?: string | null
           founded_year?: number | null
           hourly_rate?: number | null
           id: string
@@ -372,6 +381,7 @@ export type Database = {
           linkedin?: string | null
           location?: string | null
           name?: string | null
+          onboarding_completed?: boolean | null
           open_positions?: number | null
           placement_fee_percent?: number | null
           placements_count?: number | null
@@ -381,16 +391,19 @@ export type Database = {
           response_time?: string | null
           response_time_hours?: number | null
           role: string
+          second_reminder_sent_at?: string | null
           skills?: string[] | null
           specializations?: string[] | null
           success_rate?: number | null
           team_size?: number | null
           updated_at?: string
+          verification_sent_at?: string | null
           verified?: boolean | null
           website?: string | null
           years_experience?: number | null
         }
         Update: {
+          account_status?: string | null
           active_searches?: number | null
           availability?: string | null
           avatar_url?: string | null
@@ -408,7 +421,9 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           email?: string
+          email_verified?: boolean | null
           expertise?: string[] | null
+          first_reminder_sent_at?: string | null
           founded_year?: number | null
           hourly_rate?: number | null
           id?: string
@@ -417,6 +432,7 @@ export type Database = {
           linkedin?: string | null
           location?: string | null
           name?: string | null
+          onboarding_completed?: boolean | null
           open_positions?: number | null
           placement_fee_percent?: number | null
           placements_count?: number | null
@@ -426,11 +442,13 @@ export type Database = {
           response_time?: string | null
           response_time_hours?: number | null
           role?: string
+          second_reminder_sent_at?: string | null
           skills?: string[] | null
           specializations?: string[] | null
           success_rate?: number | null
           team_size?: number | null
           updated_at?: string
+          verification_sent_at?: string | null
           verified?: boolean | null
           website?: string | null
           years_experience?: number | null
