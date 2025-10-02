@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
 const applicationSchema = z.object({
-  coverNote: z.string().min(280, 'Cover note must be at least 280 characters').max(800, 'Cover note must not exceed 800 characters'),
+  coverNote: z.string().min(50, 'Cover note must be at least 50 characters').max(800, 'Cover note must not exceed 800 characters'),
   feeModel: z.enum(['percent_fee', 'flat', 'hourly'], { required_error: 'Please select a fee model' }),
   feeValue: z.number().positive('Fee value must be greater than 0'),
   etaDays: z.number().min(1, 'ETA must be at least 1 day').max(60, 'ETA cannot exceed 60 days'),
@@ -197,7 +197,7 @@ export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }
             <Label htmlFor="cover-note">Cover Note *</Label>
             <Textarea
               id="cover-note"
-              placeholder="Tell the employer why you're the perfect match for this role... (280-800 characters)"
+              placeholder="Tell the employer why you're the perfect match for this role... (50-800 characters)"
               value={coverNote}
               onChange={(e) => setCoverNote(e.target.value)}
               className="min-h-[120px] mt-2"
@@ -205,8 +205,8 @@ export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }
             />
             <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>{coverNote.length} / 800 characters</span>
-              {coverNote.length < 280 && coverNote.length > 0 && (
-                <span className="text-destructive">Minimum 280 characters</span>
+              {coverNote.length < 50 && coverNote.length > 0 && (
+                <span className="text-destructive">Minimum 50 characters</span>
               )}
             </div>
             {errors.coverNote && <p className="text-xs text-destructive mt-1">{errors.coverNote}</p>}
