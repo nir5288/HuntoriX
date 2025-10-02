@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { Briefcase, LogOut, LayoutDashboard, Settings, MessageSquare, User } from 'lucide-react';
@@ -19,6 +19,7 @@ import { useState } from 'react';
 export function Header() {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -70,6 +71,18 @@ export function Header() {
     return '/';
   };
 
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
+  const getNavLinkClass = (path: string) => {
+    return `text-sm font-medium transition-colors ${
+      isActive(path) 
+        ? 'text-primary font-bold' 
+        : 'text-muted-foreground hover:text-primary'
+    }`;
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -80,15 +93,15 @@ export function Header() {
           </Link>
           
           <nav className="hidden md:flex items-center gap-6">
-            <Link to="/opportunities" className="text-sm font-medium hover:text-primary transition">
+            <Link to="/opportunities" className={getNavLinkClass('/opportunities')}>
               Opportunities
             </Link>
-            <Link to="/headhunters" className="text-sm font-medium hover:text-primary transition">
+            <Link to="/headhunters" className={getNavLinkClass('/headhunters')}>
               Find a Headhunter
             </Link>
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
-              className="text-sm font-medium hover:text-primary transition"
+              className={getNavLinkClass('/dashboard')}
             >
               Dashboard
             </Link>

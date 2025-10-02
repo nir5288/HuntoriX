@@ -265,13 +265,15 @@ const Opportunities = () => {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Opportunities</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+            Browse Opportunities
+          </h1>
 
           {/* Search + Mobile Filters */}
           <div className="flex gap-4">

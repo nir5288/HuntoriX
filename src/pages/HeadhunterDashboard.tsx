@@ -92,13 +92,15 @@ const HeadhunterDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Headhunter Dashboard</h1>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+              Headhunter Dashboard
+            </h1>
             <p className="text-muted-foreground">Browse jobs and manage your applications</p>
             {!profile?.verified && (
               <Badge variant="outline" className="mt-2 bg-[hsl(var(--warning))]/10">
@@ -106,7 +108,11 @@ const HeadhunterDashboard = () => {
               </Badge>
             )}
           </div>
-          <Button variant="mint" size="lg" onClick={() => navigate('/opportunities')}>
+          <Button 
+            size="lg" 
+            onClick={() => navigate('/opportunities')}
+            className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+          >
             <Search className="mr-2 h-5 w-5" />
             Browse All Jobs
           </Button>

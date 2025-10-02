@@ -158,16 +158,22 @@ const EmployerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Employer Dashboard</h1>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+              Employer Dashboard
+            </h1>
             <p className="text-muted-foreground">Manage your job postings and applications</p>
           </div>
-          <Button variant="hero" size="lg" onClick={() => setPostJobModalOpen(true)}>
+          <Button 
+            size="lg" 
+            onClick={() => setPostJobModalOpen(true)}
+            className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+          >
             <Plus className="mr-2 h-5 w-5" />
             Post a Job
           </Button>
