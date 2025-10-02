@@ -412,7 +412,7 @@ const EmployerProfile = () => {
         )}
 
         {/* Industries */}
-        {profile.industries.length > 0 && (
+        {profile.industries && profile.industries.length > 0 && (
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
