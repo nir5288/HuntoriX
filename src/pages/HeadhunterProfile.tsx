@@ -207,7 +207,7 @@ const HeadhunterProfile = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {profile.expertise.length > 0 ? (
+              {profile.expertise && profile.expertise.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {profile.expertise.map((skill) => (
                     <Badge key={skill} variant="secondary">
@@ -219,7 +219,7 @@ const HeadhunterProfile = () => {
                 <p className="text-sm text-muted-foreground">No expertise listed</p>
               )}
 
-              {profile.industries.length > 0 && (
+              {profile.industries && profile.industries.length > 0 && (
                 <>
                   <h4 className="font-semibold mt-4 mb-2">Industries</h4>
                   <div className="flex flex-wrap gap-2">
@@ -321,7 +321,7 @@ const HeadhunterProfile = () => {
         </div>
 
         {/* Portfolio Links */}
-        {profile.portfolio_links.length > 0 && (
+        {profile.portfolio_links && profile.portfolio_links.length > 0 && (
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Portfolio & Links</CardTitle>
