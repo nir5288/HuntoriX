@@ -164,10 +164,8 @@ const EmployerDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-                Employer Dashboard
-              </span>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+              Employer Dashboard
             </h1>
             <p className="text-muted-foreground">Manage your job postings and applications</p>
           </div>

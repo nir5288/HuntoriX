@@ -98,10 +98,8 @@ const HeadhunterDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-                Headhunter Dashboard
-              </span>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+              Headhunter Dashboard
             </h1>
             <p className="text-muted-foreground">Browse jobs and manage your applications</p>
             {!profile?.verified && (
