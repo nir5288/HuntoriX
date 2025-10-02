@@ -167,7 +167,7 @@ const Opportunities = () => {
     } else {
       setIsRefreshing(true);
     }
-    setHasMore(true);
+    
     try {
       const q = buildBaseQuery();
       const { data, error } = await q.range(0, PAGE_SIZE - 1);
@@ -248,16 +248,7 @@ const Opportunities = () => {
   }, [fetchFirstPage]);
 
   // Optional client-side fuzzy skill filter as a secondary pass
-  const filteredJobs = useMemo(() => {
-    if (!debouncedQuery) return jobs;
-    const q = debouncedQuery.toLowerCase();
-    return jobs.filter(job =>
-      job.title?.toLowerCase().includes(q) ||
-      job.industry?.toLowerCase().includes(q) ||
-      (Array.isArray(job.skills_must) &&
-        job.skills_must.some(s => typeof s === 'string' && s.toLowerCase().includes(q)))
-    );
-  }, [jobs, debouncedQuery]);
+  const filteredJobs = useMemo(() => jobs, [jobs]);
 
   const resetFilters = () => {
     setFilterIndustry([]);
@@ -411,14 +402,14 @@ const Opportunities = () => {
                   ))}
                 </div>
 
-                {/* Pagination */}
-                {hasMore && (
-                  <div className="flex justify-center mt-8">
+                {/* Pagination - reserved space to prevent layout shift */}
+                <div className="flex justify-center mt-8 h-12">
+                  {!isRefreshing && hasMore && debouncedQuery === '' ? (
                     <Button onClick={fetchNextPage} disabled={pageLoading}>
                       {pageLoading ? 'Loading...' : 'Load more'}
                     </Button>
-                  </div>
-                )}
+                  ) : null}
+                </div>
               </>
             )}
           </div>
