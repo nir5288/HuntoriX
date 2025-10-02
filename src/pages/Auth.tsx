@@ -98,6 +98,26 @@ const Auth = () => {
         }
 
         if (data.user) {
+          // Fetch the user's profile to check their role
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+
+          if (profileError) {
+            console.error('Error fetching profile:', profileError);
+            toast.error('Error loading profile');
+            return;
+          }
+
+          // Verify the selected role matches their profile role
+          if (profileData.role !== activeTab) {
+            await supabase.auth.signOut();
+            toast.error(`This account is registered as a ${profileData.role}. Please select the correct role and try again.`);
+            return;
+          }
+
           toast.success('Welcome back!');
         }
       } else {
