@@ -140,6 +140,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          visibility: string | null
         }
         Insert: {
           benefits?: string[] | null
@@ -160,6 +161,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          visibility?: string | null
         }
         Update: {
           benefits?: string[] | null
@@ -180,6 +182,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          visibility?: string | null
         }
         Relationships: [
           {
