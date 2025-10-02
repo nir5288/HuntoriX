@@ -14,13 +14,494 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          cover_note: string | null
+          created_at: string
+          eta_days: number
+          headhunter_id: string
+          id: string
+          job_id: string
+          proposed_fee_model: string
+          proposed_fee_value: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cover_note?: string | null
+          created_at?: string
+          eta_days: number
+          headhunter_id: string
+          id?: string
+          job_id: string
+          proposed_fee_model: string
+          proposed_fee_value: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cover_note?: string | null
+          created_at?: string
+          eta_days?: number
+          headhunter_id?: string
+          id?: string
+          job_id?: string
+          proposed_fee_model?: string
+          proposed_fee_value?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_headhunter_id_fkey"
+            columns: ["headhunter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_invitations: {
+        Row: {
+          created_at: string
+          employer_id: string
+          headhunter_id: string
+          id: string
+          job_id: string
+          message: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          employer_id: string
+          headhunter_id: string
+          id?: string
+          job_id: string
+          message?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          employer_id?: string
+          headhunter_id?: string
+          id?: string
+          job_id?: string
+          message?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_invitations_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_invitations_headhunter_id_fkey"
+            columns: ["headhunter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_invitations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          benefits: string[] | null
+          company_name: string | null
+          created_at: string
+          created_by: string
+          description: string
+          employment_type: string | null
+          id: string
+          industry: string | null
+          location: string | null
+          remote_policy: string | null
+          required_skills: string[] | null
+          salary_range: string | null
+          seniority: string | null
+          skills_must: string[] | null
+          skills_nice: string[] | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          benefits?: string[] | null
+          company_name?: string | null
+          created_at?: string
+          created_by: string
+          description: string
+          employment_type?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          remote_policy?: string | null
+          required_skills?: string[] | null
+          salary_range?: string | null
+          seniority?: string | null
+          skills_must?: string[] | null
+          skills_nice?: string[] | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          benefits?: string[] | null
+          company_name?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          employment_type?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          remote_policy?: string | null
+          required_skills?: string[] | null
+          salary_range?: string | null
+          seniority?: string | null
+          skills_must?: string[] | null
+          skills_nice?: string[] | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          payload: Json | null
+          related_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          payload?: Json | null
+          related_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          payload?: Json | null
+          related_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          active_searches: number | null
+          availability: string | null
+          avatar_url: string | null
+          avg_time_to_fill_days: number | null
+          bio: string | null
+          certifications: string[] | null
+          company: string | null
+          company_benefits: string[] | null
+          company_culture: string | null
+          company_hq: string | null
+          company_mission: string | null
+          company_name: string | null
+          company_sector: string | null
+          company_size: string | null
+          cover_image_url: string | null
+          created_at: string
+          email: string
+          expertise: string[] | null
+          founded_year: number | null
+          hourly_rate: number | null
+          id: string
+          industries: string[] | null
+          languages: string[] | null
+          linkedin: string | null
+          location: string | null
+          name: string | null
+          open_positions: number | null
+          placement_fee_percent: number | null
+          placements_count: number | null
+          portfolio_links: string[] | null
+          rating_avg: number | null
+          regions: string[] | null
+          response_time: string | null
+          response_time_hours: number | null
+          role: string
+          skills: string[] | null
+          specializations: string[] | null
+          success_rate: number | null
+          team_size: number | null
+          updated_at: string
+          verified: boolean | null
+          website: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          active_searches?: number | null
+          availability?: string | null
+          avatar_url?: string | null
+          avg_time_to_fill_days?: number | null
+          bio?: string | null
+          certifications?: string[] | null
+          company?: string | null
+          company_benefits?: string[] | null
+          company_culture?: string | null
+          company_hq?: string | null
+          company_mission?: string | null
+          company_name?: string | null
+          company_sector?: string | null
+          company_size?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          email: string
+          expertise?: string[] | null
+          founded_year?: number | null
+          hourly_rate?: number | null
+          id: string
+          industries?: string[] | null
+          languages?: string[] | null
+          linkedin?: string | null
+          location?: string | null
+          name?: string | null
+          open_positions?: number | null
+          placement_fee_percent?: number | null
+          placements_count?: number | null
+          portfolio_links?: string[] | null
+          rating_avg?: number | null
+          regions?: string[] | null
+          response_time?: string | null
+          response_time_hours?: number | null
+          role: string
+          skills?: string[] | null
+          specializations?: string[] | null
+          success_rate?: number | null
+          team_size?: number | null
+          updated_at?: string
+          verified?: boolean | null
+          website?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          active_searches?: number | null
+          availability?: string | null
+          avatar_url?: string | null
+          avg_time_to_fill_days?: number | null
+          bio?: string | null
+          certifications?: string[] | null
+          company?: string | null
+          company_benefits?: string[] | null
+          company_culture?: string | null
+          company_hq?: string | null
+          company_mission?: string | null
+          company_name?: string | null
+          company_sector?: string | null
+          company_size?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          email?: string
+          expertise?: string[] | null
+          founded_year?: number | null
+          hourly_rate?: number | null
+          id?: string
+          industries?: string[] | null
+          languages?: string[] | null
+          linkedin?: string | null
+          location?: string | null
+          name?: string | null
+          open_positions?: number | null
+          placement_fee_percent?: number | null
+          placements_count?: number | null
+          portfolio_links?: string[] | null
+          rating_avg?: number | null
+          regions?: string[] | null
+          response_time?: string | null
+          response_time_hours?: number | null
+          role?: string
+          skills?: string[] | null
+          specializations?: string[] | null
+          success_rate?: number | null
+          team_size?: number | null
+          updated_at?: string
+          verified?: boolean | null
+          website?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_public_profile: {
+        Args: { profile_id: string }
+        Returns: {
+          active_searches: number
+          avatar_url: string
+          bio: string
+          certifications: string[]
+          company: string
+          company_benefits: string[]
+          company_culture: string
+          company_mission: string
+          company_name: string
+          company_sector: string
+          company_size: string
+          cover_image_url: string
+          created_at: string
+          email: string
+          expertise: string[]
+          founded_year: number
+          hourly_rate: number
+          id: string
+          industries: string[]
+          languages: string[]
+          linkedin: string
+          location: string
+          name: string
+          open_positions: number
+          placement_fee_percent: number
+          placements_count: number
+          rating_avg: number
+          response_time: string
+          role: string
+          skills: string[]
+          specializations: string[]
+          success_rate: number
+          team_size: number
+          verified: boolean
+          website: string
+          years_experience: number
+        }[]
+      }
+      get_public_profiles: {
+        Args: { profile_role?: string }
+        Returns: {
+          active_searches: number
+          avatar_url: string
+          bio: string
+          certifications: string[]
+          company: string
+          company_benefits: string[]
+          company_culture: string
+          company_mission: string
+          company_name: string
+          company_sector: string
+          company_size: string
+          cover_image_url: string
+          created_at: string
+          email: string
+          expertise: string[]
+          founded_year: number
+          hourly_rate: number
+          id: string
+          industries: string[]
+          languages: string[]
+          linkedin: string
+          location: string
+          name: string
+          open_positions: number
+          placement_fee_percent: number
+          placements_count: number
+          rating_avg: number
+          response_time: string
+          role: string
+          skills: string[]
+          specializations: string[]
+          success_rate: number
+          team_size: number
+          verified: boolean
+          website: string
+          years_experience: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
