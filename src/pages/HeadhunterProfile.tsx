@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +16,9 @@ import {
   Clock, 
   Award,
   MessageSquare,
-  ArrowLeft
+  ArrowLeft,
+  Camera,
+  Upload
 } from "lucide-react";
 
 interface HeadhunterProfile {
@@ -23,6 +26,7 @@ interface HeadhunterProfile {
   name: string;
   email?: string;
   avatar_url: string | null;
+  cover_image_url: string | null;
   bio: string | null;
   industries: string[];
   expertise: string[];
@@ -46,8 +50,14 @@ const HeadhunterProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<HeadhunterProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const isOwnProfile = user?.id === id;
 
   useEffect(() => {
     loadProfile();
@@ -79,6 +89,77 @@ const HeadhunterProfile = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (file: File, type: 'avatar' | 'cover') => {
+    if (!user || !id) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${type}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(fileName);
+
+      const updateField = type === 'avatar' ? 'avatar_url' : 'cover_image_url';
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ [updateField]: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Reload profile
+      await loadProfile();
+
+      toast({
+        title: "Success",
+        description: `${type === 'avatar' ? 'Profile photo' : 'Cover image'} updated successfully`,
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleCoverClick = () => {
+    if (isOwnProfile && coverInputRef.current) {
+      coverInputRef.current.click();
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (isOwnProfile && avatarInputRef.current) {
+      avatarInputRef.current.click();
+    }
+  };
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file, 'cover');
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file, 'avatar');
     }
   };
 
@@ -121,16 +202,73 @@ const HeadhunterProfile = () => {
           Back
         </Button>
 
+        {/* Hidden file inputs */}
+        <input
+          ref={coverInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleCoverChange}
+          className="hidden"
+        />
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleAvatarChange}
+          className="hidden"
+        />
+
+        {/* Cover Image */}
+        <div 
+          className={`mb-6 rounded-lg overflow-hidden relative group ${isOwnProfile ? 'cursor-pointer' : ''}`}
+          onClick={handleCoverClick}
+        >
+          {profile.cover_image_url ? (
+            <>
+              <img
+                src={profile.cover_image_url}
+                alt="Profile cover"
+                className="w-full h-64 object-cover"
+              />
+              {isOwnProfile && (
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <Upload className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-sm font-medium">Click to upload cover image</p>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : isOwnProfile ? (
+            <div className="w-full h-64 bg-muted flex items-center justify-center border-2 border-dashed border-border hover:border-primary transition-colors">
+              <div className="text-center text-muted-foreground">
+                <Upload className="h-8 w-8 mx-auto mb-2" />
+                <p className="text-sm font-medium">Click to upload cover image</p>
+              </div>
+            </div>
+          ) : null}
+        </div>
+
         {/* Header Section */}
         <Card className="mb-6 border-2">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row gap-6 items-start">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={profile.avatar_url || undefined} />
-                <AvatarFallback className="text-2xl bg-gradient-to-br from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
-                  {profile.name?.[0]?.toUpperCase() || "H"}
-                </AvatarFallback>
-              </Avatar>
+              <div 
+                className={`relative group ${isOwnProfile ? 'cursor-pointer' : ''}`}
+                onClick={handleAvatarClick}
+              >
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={profile.avatar_url || undefined} />
+                  <AvatarFallback className="text-2xl bg-gradient-to-br from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
+                    {profile.name?.[0]?.toUpperCase() || "H"}
+                  </AvatarFallback>
+                </Avatar>
+                {isOwnProfile && (
+                  <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="h-6 w-6 text-white" />
+                  </div>
+                )}
+              </div>
 
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -160,14 +298,16 @@ const HeadhunterProfile = () => {
 
                 <p className="text-muted-foreground mb-4">{profile.bio || "No bio provided"}</p>
 
-                <Button
-                  variant="default"
-                  onClick={() => navigate(`/messages?with=${profile.id}`)}
-                  className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Send Message
-                </Button>
+                {!isOwnProfile && (
+                  <Button
+                    variant="default"
+                    onClick={() => navigate(`/messages?with=${profile.id}`)}
+                    className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Send Message
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
