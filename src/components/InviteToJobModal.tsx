@@ -93,6 +93,28 @@ export const InviteToJobModal = ({
           throw error;
         }
       } else {
+        // Get job title for notification
+        const selectedJob = jobs.find(j => j.id === selectedJobId);
+        
+        // Create notification for headhunter
+        try {
+          await supabase
+            .from('notifications')
+            .insert({
+              user_id: headhunterId,
+              type: 'job_invitation',
+              title: 'Job Invitation',
+              message: `You've been invited to apply for ${selectedJob?.title || 'a job'}`,
+              payload: { 
+                job_id: selectedJobId,
+                employer_id: employerId,
+              },
+              related_id: selectedJobId,
+            } as any);
+        } catch (notifErr) {
+          console.error('Error creating notification:', notifErr);
+        }
+
         toast({
           title: "Invitation Sent",
           description: `Successfully invited ${headhunterName} to collaborate`,
