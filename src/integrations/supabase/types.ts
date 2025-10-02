@@ -123,6 +123,9 @@ export type Database = {
       jobs: {
         Row: {
           benefits: string[] | null
+          budget_currency: string | null
+          budget_max: number | null
+          budget_min: number | null
           company_name: string | null
           created_at: string
           created_by: string
@@ -144,6 +147,9 @@ export type Database = {
         }
         Insert: {
           benefits?: string[] | null
+          budget_currency?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
           company_name?: string | null
           created_at?: string
           created_by: string
@@ -165,6 +171,9 @@ export type Database = {
         }
         Update: {
           benefits?: string[] | null
+          budget_currency?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
           company_name?: string | null
           created_at?: string
           created_by?: string
@@ -196,40 +205,50 @@ export type Database = {
       }
       messages: {
         Row: {
-          content: string
+          body: string
           created_at: string
+          from_user: string
           id: string
           is_read: boolean
-          receiver_id: string
-          sender_id: string
+          job_id: string | null
+          to_user: string
         }
         Insert: {
-          content: string
+          body: string
           created_at?: string
+          from_user: string
           id?: string
           is_read?: boolean
-          receiver_id: string
-          sender_id: string
+          job_id?: string | null
+          to_user: string
         }
         Update: {
-          content?: string
+          body?: string
           created_at?: string
+          from_user?: string
           id?: string
           is_read?: boolean
-          receiver_id?: string
-          sender_id?: string
+          job_id?: string | null
+          to_user?: string
         }
         Relationships: [
           {
-            foreignKeyName: "messages_receiver_id_fkey"
-            columns: ["receiver_id"]
+            foreignKeyName: "messages_from_user_fkey"
+            columns: ["from_user"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "messages_sender_id_fkey"
-            columns: ["sender_id"]
+            foreignKeyName: "messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_to_user_fkey"
+            columns: ["to_user"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

@@ -94,7 +94,9 @@ const EmployerDashboard = () => {
           type: 'status_change',
           payload: { job_id: jobId, application_id: applicationId, status: 'shortlisted' },
           is_read: false,
-        });
+          title: 'Application Shortlisted',
+          message: 'Your application has been shortlisted',
+        } as any);
 
       if (notifError) console.error('Notification error:', notifError);
 
@@ -123,7 +125,9 @@ const EmployerDashboard = () => {
           type: 'status_change',
           payload: { job_id: jobId, application_id: applicationId, status: 'rejected' },
           is_read: false,
-        });
+          title: 'Application Rejected',
+          message: 'Your application has been rejected',
+        } as any);
 
       if (notifError) console.error('Notification error:', notifError);
 

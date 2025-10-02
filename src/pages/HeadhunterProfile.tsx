@@ -69,7 +69,7 @@ const HeadhunterProfile = () => {
         throw new Error('Profile not found');
       }
       
-      setProfile(profileData);
+      setProfile(profileData as any);
     } catch (error) {
       console.error("Error loading profile:", error);
       toast({

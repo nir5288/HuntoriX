@@ -98,8 +98,8 @@ const EmployerProfile = () => {
       
       setProfile({
         ...profileData,
-        team_members: (profileData.team_members as unknown) as TeamMember[] | null
-      });
+        team_members: null
+      } as any);
     } catch (error) {
       console.error("Error loading profile:", error);
       toast({

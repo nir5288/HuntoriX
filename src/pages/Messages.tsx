@@ -140,7 +140,7 @@ const Messages = () => {
       from_user: user.id,
       to_user: otherUserId,
       body: messageText,
-    });
+    } as any);
 
     if (error) {
       toast({

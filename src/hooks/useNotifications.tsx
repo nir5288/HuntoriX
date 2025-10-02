@@ -3,11 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { Database } from '@/integrations/supabase/types';
 
-type NotificationType = Database['public']['Enums']['notification_type'] | 'job_invitation';
 type DbNotification = Database['public']['Tables']['notifications']['Row'];
 
-export interface Notification extends Omit<DbNotification, 'type'> {
-  type: NotificationType;
+export interface Notification extends DbNotification {
 }
 
 export const useNotifications = () => {

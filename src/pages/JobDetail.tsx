@@ -82,7 +82,10 @@ const JobDetail = () => {
           job_id: id,
           headhunter_id: user.id,
           status: 'submitted',
-        });
+          eta_days: 30,
+          proposed_fee_model: 'percentage',
+          proposed_fee_value: 15,
+        } as any);
 
       if (error) throw error;
 
@@ -121,7 +124,9 @@ const JobDetail = () => {
           type: 'status_change',
           payload: { job_id: id, application_id: applicationId, status: 'shortlisted' },
           is_read: false,
-        });
+          title: 'Application Shortlisted',
+          message: 'Your application has been shortlisted',
+        } as any);
 
       if (notifError) console.error('Notification error:', notifError);
 
@@ -150,7 +155,9 @@ const JobDetail = () => {
           type: 'status_change',
           payload: { job_id: id, application_id: applicationId, status: 'rejected' },
           is_read: false,
-        });
+          title: 'Application Rejected',
+          message: 'Your application has been rejected',
+        } as any);
 
       if (notifError) console.error('Notification error:', notifError);
 

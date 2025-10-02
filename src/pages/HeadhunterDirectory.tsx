@@ -71,7 +71,7 @@ const HeadhunterDirectory = () => {
         (profile: any) => profile.role === 'headhunter' && profile.status !== 'suspended'
       );
       
-      setHeadhunters(filteredData);
+      setHeadhunters(filteredData as any);
     } catch (error) {
       console.error("Error loading headhunters:", error);
     } finally {
