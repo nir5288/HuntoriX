@@ -134,9 +134,9 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const getCTAText = () => {
     if (!currentUser) return 'Sign in to Apply';
     if (currentUserRole !== 'headhunter') return 'Apply';
-    if (checkingApplication) return 'Apply';
-    if (hasApplied) return 'Applied';
     if (job.status === 'closed') return 'Closed';
+    if (checkingApplication) return '...';
+    if (hasApplied) return 'Applied';
     return 'Apply';
   };
 
