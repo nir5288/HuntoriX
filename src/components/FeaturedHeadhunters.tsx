@@ -91,7 +91,7 @@ export function FeaturedHeadhunters() {
 
     // Filter and sort headhunters client-side
     const filteredData = (data || [])
-      .filter((h: any) => h.role === 'headhunter' && h.availability === true)
+      .filter((h: any) => h.role === 'headhunter')
       .sort((a: any, b: any) => {
         // Sort by verified first
         if (a.verified !== b.verified) return b.verified ? 1 : -1;
