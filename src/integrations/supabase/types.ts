@@ -163,6 +163,48 @@ export type Database = {
           },
         ]
       }
+      job_edit_history: {
+        Row: {
+          changes: Json
+          created_at: string
+          edited_at: string
+          edited_by: string
+          id: string
+          job_id: string
+        }
+        Insert: {
+          changes: Json
+          created_at?: string
+          edited_at?: string
+          edited_by: string
+          id?: string
+          job_id: string
+        }
+        Update: {
+          changes?: Json
+          created_at?: string
+          edited_at?: string
+          edited_by?: string
+          id?: string
+          job_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_edit_history_edited_by_fkey"
+            columns: ["edited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_edit_history_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_invitations: {
         Row: {
           created_at: string

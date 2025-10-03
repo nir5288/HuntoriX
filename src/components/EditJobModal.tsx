@@ -171,27 +171,72 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
 
     try {
       const finalTitle = data.title === 'Other' ? data.custom_title : data.title;
+      
+      // Track changes
+      const changes: Array<{field: string; old_value: any; new_value: any}> = [];
+      
+      const newData = {
+        title: finalTitle,
+        industry: data.industry,
+        seniority: data.seniority,
+        employment_type: data.employment_type,
+        location: data.location_type === 'remote' ? '' : data.location,
+        budget_currency: data.budget_currency,
+        budget_min: data.budget_min ? Number(data.budget_min) : null,
+        budget_max: data.budget_max ? Number(data.budget_max) : null,
+        description: data.description,
+        skills_must: skillsMust,
+        skills_nice: skillsNice,
+        visibility: isPublic ? 'public' : 'private',
+        status: data.status,
+      };
 
+      // Compare and track changes
+      Object.entries(newData).forEach(([key, newValue]) => {
+        const oldValue = job[key];
+        
+        // Special handling for arrays
+        if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+          if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+            changes.push({ field: key, old_value: oldValue, new_value: newValue });
+          }
+        } else if (oldValue !== newValue) {
+          changes.push({ field: key, old_value: oldValue, new_value: newValue });
+        }
+      });
+
+      // Only proceed if there are changes
+      if (changes.length === 0) {
+        toast.info('No changes detected');
+        onOpenChange(false);
+        return;
+      }
+
+      // Update the job
       const { error } = await supabase
         .from('jobs')
-        .update({
-          title: finalTitle,
-          industry: data.industry,
-          seniority: data.seniority,
-          employment_type: data.employment_type,
-          location: data.location_type === 'remote' ? '' : data.location,
-          budget_currency: data.budget_currency,
-          budget_min: data.budget_min ? Number(data.budget_min) : null,
-          budget_max: data.budget_max ? Number(data.budget_max) : null,
-          description: data.description,
-          skills_must: skillsMust,
-          skills_nice: skillsNice,
-          visibility: isPublic ? 'public' : 'private',
-          status: data.status,
-        })
+        .update(newData)
         .eq('id', job.id);
 
       if (error) throw error;
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Save edit history
+        const { error: historyError } = await supabase
+          .from('job_edit_history')
+          .insert({
+            job_id: job.id,
+            edited_by: user.id,
+            changes: changes,
+          });
+
+        if (historyError) {
+          console.error('Error saving edit history:', historyError);
+        }
+      }
 
       toast.success('Job updated successfully');
       onOpenChange(false);

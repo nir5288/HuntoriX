@@ -10,9 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PostJobModal } from '@/components/PostJobModal';
 import { EditJobModal } from '@/components/EditJobModal';
+import { JobEditHistory } from '@/components/JobEditHistory';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { format } from 'date-fns';
 const EmployerDashboard = () => {
   const {
     user,
@@ -26,11 +28,14 @@ const EmployerDashboard = () => {
   const [postJobModalOpen, setPostJobModalOpen] = useState(false);
   const [editJobModalOpen, setEditJobModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [editHistoryModalOpen, setEditHistoryModalOpen] = useState(false);
+  const [editHistory, setEditHistory] = useState<any[]>([]);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [savedHeadhuntersCount, setSavedHeadhuntersCount] = useState(0);
   const [sortBy, setSortBy] = useState<'latest' | 'oldest'>('latest');
   const [showPendingOnly, setShowPendingOnly] = useState(false);
   const [showPrivateOnly, setShowPrivateOnly] = useState(false);
+  const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -47,6 +52,24 @@ const EmployerDashboard = () => {
       });
       if (jobsError) throw jobsError;
       setJobs(jobsData || []);
+
+      // Fetch edit counts for all jobs
+      if (jobsData && jobsData.length > 0) {
+        const jobIds = jobsData.map(job => job.id);
+        
+        const { data: editCountsData } = await supabase
+          .from('job_edit_history')
+          .select('job_id')
+          .in('job_id', jobIds);
+        
+        if (editCountsData) {
+          const counts: Record<string, number> = {};
+          editCountsData.forEach(entry => {
+            counts[entry.job_id] = (counts[entry.job_id] || 0) + 1;
+          });
+          setJobEditCounts(counts);
+        }
+      }
 
       // Fetch applications for those jobs
       if (jobsData && jobsData.length > 0) {
@@ -196,6 +219,35 @@ const EmployerDashboard = () => {
     e.stopPropagation();
     setSelectedJob(job);
     setEditJobModalOpen(true);
+  };
+
+  const handleViewEditHistory = async (job: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      const { data, error } = await supabase
+        .from('job_edit_history')
+        .select('*, editor:profiles!job_edit_history_edited_by_fkey(name)')
+        .eq('job_id', job.id)
+        .order('edited_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      const formattedHistory = data?.map(entry => ({
+        id: entry.id,
+        edited_at: entry.edited_at,
+        edited_by: entry.edited_by,
+        changes: entry.changes as any,
+        editor_name: (entry.editor as any)?.name,
+      })) || [];
+      
+      setEditHistory(formattedHistory);
+      setSelectedJob(job);
+      setEditHistoryModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching edit history:', error);
+      toast.error('Failed to load edit history');
+    }
   };
   if (loading || loadingData) {
     return <div className="min-h-screen bg-background">
@@ -424,7 +476,18 @@ const EmployerDashboard = () => {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span>{jobApplications.length} applications</span>
                           <span>•</span>
-                          <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+                          <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
+                          {jobEditCounts[job.id] > 0 && (
+                            <>
+                              <span>•</span>
+                              <span 
+                                className="underline cursor-pointer hover:text-[hsl(var(--accent-pink))] transition-colors"
+                                onClick={(e) => handleViewEditHistory(job, e)}
+                              >
+                                Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
+                              </span>
+                            </>
+                          )}
                         </div>
                       </CardContent>
                     </Card>;
@@ -437,12 +500,20 @@ const EmployerDashboard = () => {
 
       <PostJobModal open={postJobModalOpen} onOpenChange={setPostJobModalOpen} userId={user?.id || ''} />
       {selectedJob && (
-        <EditJobModal 
-          open={editJobModalOpen} 
-          onOpenChange={setEditJobModalOpen} 
-          job={selectedJob}
-          onSuccess={fetchDashboardData}
-        />
+        <>
+          <EditJobModal 
+            open={editJobModalOpen} 
+            onOpenChange={setEditJobModalOpen} 
+            job={selectedJob}
+            onSuccess={fetchDashboardData}
+          />
+          <JobEditHistory
+            open={editHistoryModalOpen}
+            onOpenChange={setEditHistoryModalOpen}
+            history={editHistory}
+            jobTitle={selectedJob.title}
+          />
+        </>
       )}
     </div>;
 };
