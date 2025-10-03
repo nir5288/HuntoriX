@@ -113,21 +113,19 @@ export function Header() {
           {user && profile ? (
             <TooltipProvider>
               <NotificationDropdown />
-              {profile.role === 'headhunter' && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate('/saved-jobs')}
-                      className="relative"
-                    >
-                      <Heart className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>My Saved Jobs</TooltipContent>
-                </Tooltip>
-              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate('/saved-jobs')}
+                    className="relative"
+                  >
+                    <Heart className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>My Saved Jobs</TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button

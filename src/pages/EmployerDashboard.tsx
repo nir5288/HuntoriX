@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff } from 'lucide-react';
+import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -20,6 +20,7 @@ const EmployerDashboard = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [postJobModalOpen, setPostJobModalOpen] = useState(false);
+  const [savedJobsCount, setSavedJobsCount] = useState(0);
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -49,6 +50,15 @@ const EmployerDashboard = () => {
         if (appsError) throw appsError;
         setApplications(appsData || []);
       }
+
+      // Fetch saved jobs count
+      const { count, error: savedError } = await supabase
+        .from('saved_jobs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user?.id);
+      
+      if (savedError) throw savedError;
+      setSavedJobsCount(count || 0);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data');
@@ -228,8 +238,25 @@ const EmployerDashboard = () => {
         {/* Jobs List */}
         <Card>
           <CardHeader>
-            <CardTitle>My Jobs</CardTitle>
-            <CardDescription>View and manage your job postings</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>My Jobs</CardTitle>
+                <CardDescription>View and manage your job postings</CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/saved-jobs')}
+                className="gap-2"
+              >
+                <Heart className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
+                My Saved Jobs
+                {savedJobsCount > 0 && (
+                  <Badge className="bg-[hsl(var(--accent-pink))] text-white">
+                    {savedJobsCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {jobs.length === 0 ? <div className="text-center py-12">

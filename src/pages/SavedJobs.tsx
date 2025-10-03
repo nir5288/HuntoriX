@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const SavedJobs = () => {
-  const { user, loading } = useRequireAuth('headhunter');
+  const { user, loading } = useRequireAuth();
   const navigate = useNavigate();
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
