@@ -97,7 +97,7 @@ const Opportunities = () => {
   const buildBaseQuery = useCallback(() => {
     let q = supabase
       .from('jobs')
-      .select('*')
+      .select('*', { count: 'exact' })
       .in('status', ['open', 'shortlisted', 'awarded'])
       .eq('visibility', 'public')
       .order('created_at', { ascending: false });
