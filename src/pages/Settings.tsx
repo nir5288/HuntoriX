@@ -36,11 +36,8 @@ const Settings = () => {
   const [companyHq, setCompanyHq] = useState("");
   const [companySize, setCompanySize] = useState("");
   const [companyCulture, setCompanyCulture] = useState("");
-  const [contactPerson, setContactPerson] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
   const [industries, setIndustries] = useState<string[]>([]);
   const [industryInput, setIndustryInput] = useState("");
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   // Headhunter fields
   const [name, setName] = useState("");
@@ -81,10 +78,7 @@ const Settings = () => {
       setCompanyHq(profile.company_hq || "");
       setCompanySize(profile.company_size || "");
       setCompanyCulture(profile.company_culture || "");
-      setContactPerson(profile.contact_person || "");
-      setContactPhone(profile.contact_phone || "");
       setIndustries(profile.industries || []);
-      setTeamMembers((profile.team_members as unknown as TeamMember[]) || []);
     } else if (profile.role === "headhunter") {
       setName(profile.name || "");
       setAvatarUrl(profile.avatar_url || "");
@@ -120,10 +114,7 @@ const Settings = () => {
         updates.company_hq = companyHq;
         updates.company_size = companySize;
         updates.company_culture = companyCulture;
-        updates.contact_person = contactPerson;
-        updates.contact_phone = contactPhone;
         updates.industries = industries;
-        updates.team_members = teamMembers;
       } else if (profile?.role === "headhunter") {
         updates.name = name;
         updates.avatar_url = avatarUrl;
@@ -226,19 +217,6 @@ const Settings = () => {
     setRegions(regions.filter((r) => r !== region));
   };
 
-  const addTeamMember = () => {
-    setTeamMembers([...teamMembers, { name: "", role: "", email: "", phone: "" }]);
-  };
-
-  const updateTeamMember = (index: number, field: keyof TeamMember, value: string) => {
-    const updated = [...teamMembers];
-    updated[index] = { ...updated[index], [field]: value };
-    setTeamMembers(updated);
-  };
-
-  const removeTeamMember = (index: number) => {
-    setTeamMembers(teamMembers.filter((_, i) => i !== index));
-  };
 
   if (!profile) {
     return (
@@ -270,9 +248,9 @@ const Settings = () => {
         {profile.role === "employer" ? (
           // Employer Settings
           <div className="space-y-6">
-            <Card>
+            <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Company Information</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Company Information</CardTitle>
                 <CardDescription>Update your company details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -371,33 +349,12 @@ const Settings = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="contactPerson">Contact Person</Label>
-                    <Input
-                      id="contactPerson"
-                      value={contactPerson}
-                      onChange={(e) => setContactPerson(e.target.value)}
-                      placeholder="Name"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="contactPhone">Contact Phone</Label>
-                    <Input
-                      id="contactPhone"
-                      value={contactPhone}
-                      onChange={(e) => setContactPhone(e.target.value)}
-                      placeholder="+1 234 567 8900"
-                    />
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Industries</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Industries</CardTitle>
                 <CardDescription>Add industries you hire for</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -426,62 +383,13 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Team Members</CardTitle>
-                <CardDescription>Add HR contacts and team members</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {teamMembers.map((member, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-medium">Team Member {index + 1}</h4>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeTeamMember(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <Input
-                        value={member.name}
-                        onChange={(e) => updateTeamMember(index, "name", e.target.value)}
-                        placeholder="Name"
-                      />
-                      <Input
-                        value={member.role}
-                        onChange={(e) => updateTeamMember(index, "role", e.target.value)}
-                        placeholder="Role"
-                      />
-                      <Input
-                        value={member.email || ""}
-                        onChange={(e) => updateTeamMember(index, "email", e.target.value)}
-                        placeholder="Email (optional)"
-                      />
-                      <Input
-                        value={member.phone || ""}
-                        onChange={(e) => updateTeamMember(index, "phone", e.target.value)}
-                        placeholder="Phone (optional)"
-                      />
-                    </div>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addTeamMember} className="w-full">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Team Member
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         ) : (
           // Headhunter Settings
           <div className="space-y-6">
-            <Card>
+            <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Personal Information</CardTitle>
                 <CardDescription>Update your personal details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -566,9 +474,9 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Expertise</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Expertise</CardTitle>
                 <CardDescription>Add your areas of expertise</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -597,9 +505,9 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Skills</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Skills</CardTitle>
                 <CardDescription>Add your recruiting skills</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -628,9 +536,9 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Languages</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Languages</CardTitle>
                 <CardDescription>Languages you speak</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -659,9 +567,9 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Regions</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Regions</CardTitle>
                 <CardDescription>Regions where you work</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -690,9 +598,9 @@ const Settings = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
-                <CardTitle>Industries</CardTitle>
+                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Industries</CardTitle>
                 <CardDescription>Industries you focus on</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -727,7 +635,11 @@ const Settings = () => {
           <Button variant="outline" onClick={() => navigate(-1)}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={loading}>
+          <Button 
+            onClick={handleSave} 
+            disabled={loading}
+            className="bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 transition-opacity"
+          >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
