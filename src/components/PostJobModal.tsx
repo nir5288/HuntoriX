@@ -183,16 +183,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         jobDescriptionText = parseData.text;
       }
 
-      const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-document', {
-        body: { 
-          fileData: base64,
-          fileName: file.name,
-          mimeType: file.type
-        }
-      });
-
-      if (parseError) throw parseError;
-      const jobDescriptionText = parseData.text as string;
+      // Removed duplicate parse call; using jobDescriptionText from above
 
       const { data, error } = await supabase.functions.invoke('parse-job-description', {
         body: { jobDescription: jobDescriptionText }
@@ -233,19 +224,22 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         filledFields.add('industry');
       }
       if (jobInfo.seniority) {
-        setValue('seniority', jobInfo.seniority);
+        setValue('seniority', jobInfo.seniority as any);
         filledFields.add('seniority');
       } else {
         const inferred = detectSeniority(combinedText);
         if (inferred) {
-          setValue('seniority', inferred);
+          setValue('seniority', inferred as any);
           filledFields.add('seniority');
         }
       }
-      // If title says Senior but seniority was mid/junior, override to senior
-      if ((jobInfo.title?.toLowerCase().includes('senior') || /5\+\s*years/i.test(combinedText)) && (watch('seniority') === 'mid' || watch('seniority') === 'junior')) {
-        setValue('seniority', 'senior');
-        filledFields.add('seniority');
+      // If title says Senior or 5+ years but field is mid/junior, override to senior
+      {
+        const current = watch('seniority') as any;
+        if ((jobInfo.title?.toLowerCase().includes('senior') || /5\+\s*years/i.test(combinedText)) && (current === 'mid' || current === 'junior')) {
+          setValue('seniority', 'senior' as any);
+          filledFields.add('seniority');
+        }
       }
       if (jobInfo.employment_type) {
         setValue('employment_type', jobInfo.employment_type);
@@ -466,7 +460,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             
             <div className="space-y-2">
               <Label>Location Type</Label>
-              <RadioGroup defaultValue="remote" onValueChange={(value) => setValue('location_type', value)}>
+              <RadioGroup
+                defaultValue="remote"
+                onValueChange={(value) => setValue('location_type', value)}
+                className={autoFilledFields.has('location_type') ? 'bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded' : ''}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="on_site" id="on_site" />
                   <Label htmlFor="on_site">On-site</Label>

@@ -39,11 +39,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at parsing job descriptions and extracting structured information. Be very precise with job titles - extract exactly what is written. For seniority, look for keywords like "Senior", "Junior", "Mid", "Lead", "Executive" in the job title or requirements. If experience is mentioned (e.g., "5+ years"), map it appropriately: 0-2 years = junior, 2-5 years = mid, 5+ years = senior, 8+ years = lead, 10+ years = exec.'
+            content: 'You are an expert at mapping job descriptions into structured fields. Rules: 1) Job Title: extract EXACT title text from the first heading or an explicit "Job Title" field; do not reword. 2) Industry: infer domain such as Software/Tech, Biotech/Healthcare, Finance/Fintech, Energy/Cleantech, Public/Non-profit. 3) Seniority: detect Junior/Mid/Senior/Lead/Exec using title keywords and experience thresholds (0-2y=juni, 2-5y=mid, 5-7y=senior, 8-9y=lead, 10+y=exec). 4) Employment Type: map Full-time/Part-time/Contract/Temporary to full_time/contract/temp. 5) Location Type: map On-site/Hybrid/Remote to on_site/hybrid/remote. 6) Compensation: extract currency and numeric min/max if any. 7) Role Description: include mission, summary, and responsibilities sections like "Your Mission", "What You’ll Do". Do NOT include benefits, perks, or legal/EEO text here. 8) Must-Have Skills: take from sections named "Requirements", "What You’ll Bring", strictly core qualifications; exclude benefits/perks. 9) Nice-to-Have Skills: take from "Bonus Points"/"Nice to Have". 10) Ignore EEO/legal compliance statements entirely for description and skills. Keep arrays concise, deduplicated, and trimmed.'
           },
           {
             role: 'user',
-            content: `Parse this job description and extract the following information. Be precise with job titles and match seniority based on experience requirements:\n\n${jobDescription}`
+            content: `Parse this job description with the rules above and return the structured fields. Be precise with titles and apply the section mapping accurately.\n\n${jobDescription}`
           }
         ],
         tools: [

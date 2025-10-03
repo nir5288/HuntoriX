@@ -28,17 +28,21 @@ async function parseDocx(base64Data: string): Promise<string> {
     const xmlContent = await (docEntry as any).getData(new TextWriter());
     await zipReader.close();
 
-    // Extract text from XML (content inside <w:t> tags)
-    const textMatches = xmlContent.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
-    const extractedText = textMatches
-      .map((match: string) => {
-        const textMatch = match.match(/<w:t[^>]*>([^<]*)<\/w:t>/);
-        return textMatch ? textMatch[1] : '';
-      })
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+    // Preserve paragraph boundaries and list items for better section detection
+    const paragraphs = xmlContent.match(/<w:p[\s\S]*?<\/w:p>/g) || [];
+    const lines = paragraphs.map((p: string) => {
+      const isList = /<w:numPr>/.test(p);
+      const runs = p.match(/<w:t[^>]*>[\s\S]*?<\/w:t>/g) || [];
+      const text = runs
+        .map((r: string) => (r.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/)?.[1] ?? ''))
+        .join('')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!text) return '';
+      return isList ? `- ${text}` : text;
+    }).filter(Boolean);
 
+    const extractedText = lines.join('\n');
     return extractedText;
   } catch (error) {
     console.error('Error parsing DOCX:', error);
