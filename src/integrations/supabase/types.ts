@@ -270,6 +270,7 @@ export type Database = {
           employment_type: string | null
           id: string
           industry: string | null
+          job_id_number: number
           location: string | null
           remote_policy: string | null
           required_skills: string[] | null
@@ -294,6 +295,7 @@ export type Database = {
           employment_type?: string | null
           id?: string
           industry?: string | null
+          job_id_number: number
           location?: string | null
           remote_policy?: string | null
           required_skills?: string[] | null
@@ -318,6 +320,7 @@ export type Database = {
           employment_type?: string | null
           id?: string
           industry?: string | null
+          job_id_number?: number
           location?: string | null
           remote_policy?: string | null
           required_skills?: string[] | null
@@ -838,6 +841,10 @@ export type Database = {
       delete_conversation: {
         Args: { p_job_id: string; p_user1_id: string; p_user2_id: string }
         Returns: undefined
+      }
+      generate_job_id_number: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       get_public_profile: {
         Args: { profile_id: string }

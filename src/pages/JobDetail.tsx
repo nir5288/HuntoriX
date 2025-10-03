@@ -72,12 +72,16 @@ const JobDetail = () => {
       if (user && profile?.role === 'headhunter') {
         const { data: appData } = await supabase
           .from('applications')
-          .select('id')
+          .select('id, status')
           .eq('job_id', id)
           .eq('headhunter_id', user.id)
           .maybeSingle();
 
         setHasApplied(!!appData);
+        // Store the application status for display
+        if (appData) {
+          setJob((prev: any) => ({ ...prev, userApplicationStatus: appData.status }));
+        }
       }
 
       // If user is the employer who created this job, fetch applications
@@ -467,8 +471,28 @@ const JobDetail = () => {
                 <CardContent className="pt-6">
                   {hasApplied ? (
                     <div className="text-center space-y-2">
-                      <Badge className="bg-[hsl(var(--success))] text-white">Applied</Badge>
-                      <p className="text-sm text-muted-foreground">You have already applied to this job</p>
+                      <Badge className={
+                        job?.userApplicationStatus === 'rejected' 
+                          ? 'bg-[hsl(var(--destructive))] text-white' 
+                          : job?.userApplicationStatus === 'selected'
+                          ? 'bg-[hsl(var(--success))] text-white'
+                          : job?.userApplicationStatus === 'shortlisted'
+                          ? 'bg-[hsl(var(--accent-lilac))] text-white'
+                          : 'bg-[hsl(var(--success))] text-white'
+                      }>
+                        {job?.userApplicationStatus === 'rejected' 
+                          ? 'Rejected' 
+                          : job?.userApplicationStatus === 'selected'
+                          ? 'Selected'
+                          : job?.userApplicationStatus === 'shortlisted'
+                          ? 'Shortlisted'
+                          : 'Applied'}
+                      </Badge>
+                      <p className="text-sm text-muted-foreground">
+                        {job?.userApplicationStatus === 'rejected' 
+                          ? 'Your application was not successful for this position' 
+                          : 'You have already applied to this job'}
+                      </p>
                     </div>
                   ) : (
                     <Button variant="hero" size="lg" className="w-full" onClick={handleApply}>

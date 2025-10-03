@@ -4,10 +4,13 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Briefcase, Clock, CheckCircle, MessageCircle, Heart } from 'lucide-react';
+import { Search, Briefcase, Clock, CheckCircle, MessageCircle, Heart, AlertCircle, Filter, ArrowUpDown, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const HeadhunterDashboard = () => {
   const { user, profile, loading } = useRequireAuth('headhunter');
@@ -16,6 +19,9 @@ const HeadhunterDashboard = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [loadingData, setLoadingData] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('newest');
+  const [resendingVerification, setResendingVerification] = useState(false);
 
   useEffect(() => {
     if (user && !loading) {
@@ -87,6 +93,60 @@ const HeadhunterDashboard = () => {
     }
   };
 
+  const handleResendVerification = async () => {
+    setResendingVerification(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-verification-email', {
+        body: {
+          userId: user?.id,
+          email: user?.email,
+          name: profile?.name || 'there',
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.error || data?.emailResponse?.error) {
+        toast.error('Failed to send email. Please try again.');
+      } else {
+        toast.success('Verification email sent! Please check your inbox.');
+      }
+    } catch (error: any) {
+      console.error('Error resending verification email:', error);
+      toast.error('Failed to resend verification email. Please try again.');
+    } finally {
+      setResendingVerification(false);
+    }
+  };
+
+  // Filter and sort applications
+  const getFilteredAndSortedApplications = () => {
+    let filtered = applications;
+
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(app => app.status === statusFilter);
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'status':
+          return a.status.localeCompare(b.status);
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  };
+
+  const filteredApplications = getFilteredAndSortedApplications();
+
   if (loading || loadingData) {
     return (
       <div className="min-h-screen bg-background">
@@ -106,17 +166,31 @@ const HeadhunterDashboard = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
+        {/* Verification Banner */}
+        {!profile?.email_verified && (
+          <Alert className="mb-6 border-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10">
+            <Mail className="h-4 w-4" />
+            <AlertTitle>Verify your email to unlock full access</AlertTitle>
+            <AlertDescription className="flex items-center gap-3 mt-2">
+              <span>Please check your inbox and verify your email address.</span>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleResendVerification}
+                disabled={resendingVerification}
+              >
+                {resendingVerification ? 'Sending...' : 'Resend verification link'}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
               Headhunter Dashboard
             </h1>
             <p className="text-muted-foreground">Browse jobs and manage your applications</p>
-            {!profile?.verified && (
-              <Badge variant="outline" className="mt-2 bg-[hsl(var(--warning))]/10">
-                Pending Verification
-              </Badge>
-            )}
           </div>
           <div className="flex gap-3">
             <Button 
@@ -145,65 +219,151 @@ const HeadhunterDashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium opacity-90">Active Applications</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground opacity-80" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {applications.filter(a => ['submitted', 'shortlisted'].includes(a.status)).length}
-              </div>
-            </CardContent>
-          </Card>
+        <TooltipProvider>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-sm font-medium opacity-90 cursor-help flex items-center gap-1">
+                      Active Applications
+                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Applications that are currently submitted or shortlisted</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Briefcase className="h-4 w-4 text-muted-foreground opacity-80" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {applications.filter(a => ['submitted', 'shortlisted'].includes(a.status)).length}
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium opacity-90">Successful Placements</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground opacity-80" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {applications.filter(a => a.status === 'selected').length}
-              </div>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-sm font-medium opacity-90 cursor-help flex items-center gap-1">
+                      Successful Placements
+                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Applications where you were selected for the position</p>
+                  </TooltipContent>
+                </Tooltip>
+                <CheckCircle className="h-4 w-4 text-muted-foreground opacity-80" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {applications.filter(a => a.status === 'selected').length}
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium opacity-90">Response Rate</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {applications.length > 0 
-                  ? `${Math.round((applications.filter(a => a.status !== 'submitted').length / applications.length) * 100)}%`
-                  : '0%'}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-sm font-medium opacity-90 cursor-help flex items-center gap-1">
+                      Response Rate
+                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Percentage of applications that received a response</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {applications.length > 0 
+                    ? `${Math.round((applications.filter(a => a.status !== 'submitted').length / applications.length) * 100)}%`
+                    : '0%'}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TooltipProvider>
 
         {/* My Applications */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="opacity-90">My Applications</CardTitle>
-            <CardDescription>Track your application status</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="opacity-90">My Applications</CardTitle>
+                <CardDescription>Track your application status</CardDescription>
+              </div>
+              {applications.length > 5 && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/applications')}
+                >
+                  View All Applications
+                </Button>
+              )}
+            </div>
+            
+            {/* Filters */}
+            {applications.length > 0 && (
+              <div className="flex gap-3 mt-4">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <Filter className="mr-2 h-4 w-4" />
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="submitted">Submitted</SelectItem>
+                    <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                    <SelectItem value="selected">Selected</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[180px]">
+                    <ArrowUpDown className="mr-2 h-4 w-4" />
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                    <SelectItem value="status">By Status</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             {applications.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No applications yet</p>
               </div>
+            ) : filteredApplications.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No applications match your filters</p>
+              </div>
             ) : (
               <div className="space-y-4">
-                {applications.slice(0, 5).map((app) => (
+                {filteredApplications.slice(0, 5).map((app) => (
                   <Card key={app.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1" onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'dashboard' } })} style={{ cursor: 'pointer' }}>
-                          <CardTitle className="text-lg opacity-90">{app.job?.title}</CardTitle>
+                          <div className="flex items-center gap-2 mb-1">
+                            <CardTitle className="text-lg opacity-90">{app.job?.title}</CardTitle>
+                            <Badge variant="outline" className="text-xs">
+                              #{app.job?.job_id_number}
+                            </Badge>
+                          </div>
                           <CardDescription className="mt-1">
                             Applied {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
