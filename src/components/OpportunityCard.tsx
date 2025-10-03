@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Carousel, CarouselContent, CarouselItem, CarouselApi } from '@/components/ui/carousel';
-import { MapPin, DollarSign, Calendar, Briefcase, Sparkles } from 'lucide-react';
+import { MapPin, DollarSign, Calendar, Briefcase, Sparkles, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,6 +44,8 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const [checkingApplication, setCheckingApplication] = useState(true);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [isHoveringSkills, setIsHoveringSkills] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingJob, setSavingJob] = useState(false);
 
   // Auto-scroll carousel with bidirectional movement - pause on hover
   useEffect(() => {
@@ -81,6 +83,29 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
 
     return () => clearInterval(timer);
   }, [carouselApi, job.skills_must, isHoveringSkills]);
+
+  // Check if job is saved
+  useEffect(() => {
+    const checkSaved = async () => {
+      if (!currentUser) return;
+      
+      const { data, error } = await supabase
+        .from('saved_jobs')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .eq('job_id', job.id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error checking saved job:', error);
+        return;
+      }
+      
+      setIsSaved(!!data);
+    };
+    
+    checkSaved();
+  }, [currentUser, job.id]);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -264,17 +289,100 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     return button;
   };
 
+  const handleSaveToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!currentUser) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in to save jobs',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setSavingJob(true);
+    
+    try {
+      if (isSaved) {
+        // Unsave
+        const { error } = await supabase
+          .from('saved_jobs')
+          .delete()
+          .eq('user_id', currentUser.id)
+          .eq('job_id', job.id);
+        
+        if (error) throw error;
+        
+        setIsSaved(false);
+        toast({
+          title: 'Job removed',
+          description: 'Job removed from your saved list',
+        });
+      } else {
+        // Save
+        const { error } = await supabase
+          .from('saved_jobs')
+          .insert({
+            user_id: currentUser.id,
+            job_id: job.id,
+          });
+        
+        if (error) throw error;
+        
+        setIsSaved(true);
+        toast({
+          title: 'Job saved',
+          description: 'Job added to your saved list',
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save job',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingJob(false);
+    }
+  };
+
   return (
     <Card className="rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
-          {isNewJob() && (
-            <Badge className="bg-[hsl(var(--warning))] text-white border-0 flex items-center gap-1 shrink-0">
-              <Sparkles className="h-3 w-3" />
-              NEW
-            </Badge>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={handleSaveToggle}
+                    disabled={savingJob}
+                  >
+                    <Heart
+                      className={`h-4 w-4 transition-colors ${
+                        isSaved ? 'fill-[hsl(var(--accent-pink))] text-[hsl(var(--accent-pink))]' : ''
+                      }`}
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isSaved ? 'Remove from saved' : 'Save job'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            {isNewJob() && (
+              <Badge className="bg-[hsl(var(--warning))] text-white border-0 flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                NEW
+              </Badge>
+            )}
+          </div>
         </div>
         
         <div className="flex flex-wrap gap-2">

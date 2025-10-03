@@ -5,7 +5,8 @@ import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, Check, X, MessageCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, Check, X, MessageCircle, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -18,6 +19,8 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true);
   const [hasApplied, setHasApplied] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingJob, setSavingJob] = useState(false);
   
   // Determine back button text based on navigation state
   const getBackButtonText = () => {
@@ -30,7 +33,26 @@ const JobDetail = () => {
 
   useEffect(() => {
     fetchJob();
+    checkSaved();
   }, [id, user]);
+
+  const checkSaved = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('saved_jobs')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('job_id', id)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('Error checking saved job:', error);
+      return;
+    }
+    
+    setIsSaved(!!data);
+  };
 
   const fetchJob = async () => {
     try {
@@ -183,6 +205,49 @@ const JobDetail = () => {
     navigate(`/messages?job=${id}&with=${headhunterId}`);
   };
 
+  const handleSaveToggle = async () => {
+    if (!user) {
+      toast.error('Please sign in to save jobs');
+      return;
+    }
+    
+    setSavingJob(true);
+    
+    try {
+      if (isSaved) {
+        // Unsave
+        const { error } = await supabase
+          .from('saved_jobs')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('job_id', id);
+        
+        if (error) throw error;
+        
+        setIsSaved(false);
+        toast.success('Job removed from your saved list');
+      } else {
+        // Save
+        const { error } = await supabase
+          .from('saved_jobs')
+          .insert({
+            user_id: user.id,
+            job_id: id,
+          });
+        
+        if (error) throw error;
+        
+        setIsSaved(true);
+        toast.success('Job added to your saved list');
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      toast.error('Failed to save job');
+    } finally {
+      setSavingJob(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -264,6 +329,28 @@ const JobDetail = () => {
                       )}
                     </div>
                   </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10"
+                          onClick={handleSaveToggle}
+                          disabled={savingJob}
+                        >
+                          <Heart
+                            className={`h-5 w-5 transition-colors ${
+                              isSaved ? 'fill-[hsl(var(--accent-pink))] text-[hsl(var(--accent-pink))]' : ''
+                            }`}
+                          />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{isSaved ? 'Remove from saved' : 'Save job'}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
 
                 <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">

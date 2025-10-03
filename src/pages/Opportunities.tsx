@@ -13,6 +13,7 @@ import { Filter, Search } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { ApplyModal } from '@/components/ApplyModal';
 import { OpportunitiesFilters } from '@/components/OpportunitiesFilters';
+import { Switch } from '@/components/ui/switch';
 
 type Job = {
   id: string;
@@ -70,6 +71,11 @@ const Opportunities = () => {
   const [filterSeniority, setFilterSeniority] = useState(searchParams.get('seniority') || 'all');
   const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
   const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');
+  
+  // Sort and applied filters
+  const [sortBy, setSortBy] = useState<'recent' | 'relevance'>(searchParams.get('sort') as any || 'recent');
+  const [showAppliedJobs, setShowAppliedJobs] = useState(searchParams.get('showApplied') === 'true');
+  const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(new Set());
 
   // Debounced mirrors (to avoid re-fetching on every keystroke)
   const [debouncedLocation, setDebouncedLocation] = useState('');
@@ -99,14 +105,42 @@ const Opportunities = () => {
     return () => clearTimeout(t);
   }, [filterSalaryMax]);
 
+  // Fetch applied jobs for current user
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
+      if (!user || profile?.role !== 'headhunter') return;
+      
+      const { data, error } = await supabase
+        .from('applications')
+        .select('job_id')
+        .eq('headhunter_id', user.id);
+      
+      if (error) {
+        console.error('Error fetching applied jobs:', error);
+        return;
+      }
+      
+      setAppliedJobIds(new Set(data.map(app => app.job_id)));
+    };
+    
+    fetchAppliedJobs();
+  }, [user, profile]);
+
   // Build base query with *debounced* filters
   const buildBaseQuery = useCallback(() => {
     let q = supabase
       .from('jobs')
       .select('*', { count: 'exact' })
       .in('status', ['open', 'shortlisted', 'awarded'])
-      .eq('visibility', 'public')
-      .order('created_at', { ascending: false });
+      .eq('visibility', 'public');
+    
+    // Sort order
+    if (sortBy === 'recent') {
+      q = q.order('created_at', { ascending: false });
+    } else {
+      // For relevance, still order by created_at but we can enhance this later
+      q = q.order('created_at', { ascending: false });
+    }
 
     // Industry
     if (filterIndustry.length > 0) {
@@ -165,7 +199,8 @@ const Opportunities = () => {
     debouncedLocation,
     debouncedSalaryMin,
     debouncedSalaryMax,
-    debouncedQuery
+    debouncedQuery,
+    sortBy
   ]);
 
   // Fetch page with count
@@ -199,6 +234,8 @@ const Opportunities = () => {
       if (filterSeniority !== 'all') params.set('seniority', filterSeniority);
       if (filterEmploymentType !== 'all') params.set('employmentType', filterEmploymentType);
       if (filterPosted !== 'all') params.set('posted', filterPosted);
+      if (sortBy !== 'recent') params.set('sort', sortBy);
+      if (showAppliedJobs) params.set('showApplied', 'true');
       setSearchParams(params, { replace: true });
     } catch (err) {
       console.error('Error fetching jobs:', err);
@@ -229,7 +266,8 @@ const Opportunities = () => {
     debouncedLocation,
     debouncedSalaryMin,
     debouncedSalaryMax,
-    debouncedQuery
+    debouncedQuery,
+    sortBy
   ]);
 
   // Realtime: throttle bursts
@@ -253,8 +291,13 @@ const Opportunities = () => {
     };
   }, [fetchPage, currentPage]);
 
-  // Optional client-side fuzzy skill filter as a secondary pass
-  const filteredJobs = useMemo(() => jobs, [jobs]);
+  // Filter out applied jobs if toggle is off
+  const filteredJobs = useMemo(() => {
+    if (showAppliedJobs || !user || profile?.role !== 'headhunter') {
+      return jobs;
+    }
+    return jobs.filter(job => !appliedJobIds.has(job.id));
+  }, [jobs, showAppliedJobs, appliedJobIds, user, profile]);
   
   // Calculate total pages
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -269,6 +312,8 @@ const Opportunities = () => {
     setFilterEmploymentType('all');
     setFilterPosted('all');
     setSearchQuery('');
+    setSortBy('recent');
+    setShowAppliedJobs(false);
     setSearchParams({}, { replace: true });
   };
 
@@ -357,6 +402,35 @@ const Opportunities = () => {
                 </div>
               </SheetContent>
             </Sheet>
+          </div>
+
+          {/* Sort and Applied Jobs Filter */}
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">Sort by:</Label>
+              <Select value={sortBy} onValueChange={(value: 'recent' | 'relevance') => setSortBy(value)}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Most Recent</SelectItem>
+                  <SelectItem value="relevance">Relevance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {user && profile?.role === 'headhunter' && (
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="show-applied"
+                  checked={showAppliedJobs}
+                  onCheckedChange={setShowAppliedJobs}
+                />
+                <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">
+                  Show applied jobs
+                </Label>
+              </div>
+            )}
           </div>
         </div>
 
