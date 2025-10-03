@@ -42,6 +42,9 @@ const Messages = () => {
 
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
+  
+  // Handle "null" string from URL
+  const validJobId = jobId && jobId !== "null" ? jobId : null;
 
   useEffect(() => {
     if (!user) {
@@ -49,20 +52,20 @@ const Messages = () => {
       return;
     }
 
-    if (jobId && otherUserId) {
+    if (otherUserId) {
       loadMessages();
       loadConversationDetails();
       markMessagesAsRead();
 
       const channel = supabase
-        .channel(`messages-${jobId}-${otherUserId}`)
+        .channel(`messages-${validJobId || 'direct'}-${otherUserId}`)
         .on(
           "postgres_changes",
           {
             event: "INSERT",
             schema: "public",
             table: "messages",
-            filter: `job_id=eq.${jobId}`,
+            filter: validJobId ? `job_id=eq.${validJobId}` : `job_id=is.null`,
           },
           (payload) => {
             const newMessage = payload.new as Message;
@@ -84,20 +87,28 @@ const Messages = () => {
         supabase.removeChannel(channel);
       };
     }
-  }, [jobId, otherUserId, user]);
+  }, [validJobId, otherUserId, user]);
 
   const loadMessages = async () => {
-    if (!jobId || !otherUserId || !user) return;
+    if (!otherUserId || !user) return;
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("messages")
         .select(`
           *,
           from_profile:profiles!messages_from_user_fkey(name, avatar_url)
-        `)
-        .eq("job_id", jobId)
+        `);
+      
+      // Filter by job_id if present
+      if (validJobId) {
+        query = query.eq("job_id", validJobId);
+      } else {
+        query = query.is("job_id", null);
+      }
+      
+      const { data, error } = await query
         .or(`and(from_user.eq.${user.id},to_user.eq.${otherUserId}),and(from_user.eq.${otherUserId},to_user.eq.${user.id})`)
         .order("created_at", { ascending: true });
 
@@ -116,13 +127,20 @@ const Messages = () => {
   };
 
   const markMessagesAsRead = async () => {
-    if (!jobId || !otherUserId || !user) return;
+    if (!otherUserId || !user) return;
 
     try {
-      await supabase
+      let query = supabase
         .from("messages")
-        .update({ is_read: true })
-        .eq("job_id", jobId)
+        .update({ is_read: true });
+      
+      if (validJobId) {
+        query = query.eq("job_id", validJobId);
+      } else {
+        query = query.is("job_id", null);
+      }
+      
+      await query
         .eq("from_user", otherUserId)
         .eq("to_user", user.id)
         .eq("is_read", false);
@@ -132,13 +150,22 @@ const Messages = () => {
   };
 
   const loadConversationDetails = async () => {
-    if (!jobId || !otherUserId) return;
+    if (!otherUserId) return;
 
     try {
-      const [{ data: profileData }, { data: job }] = await Promise.all([
-        supabase.rpc('get_public_profile', { profile_id: otherUserId }),
-        supabase.from("jobs").select("title").eq("id", jobId).single(),
+      const profilePromise = supabase.rpc('get_public_profile', { profile_id: otherUserId });
+      
+      let jobPromise = null;
+      if (validJobId) {
+        jobPromise = supabase.from("jobs").select("title").eq("id", validJobId).single();
+      }
+      
+      const [{ data: profileData }, jobResult] = await Promise.all([
+        profilePromise,
+        jobPromise || Promise.resolve({ data: null }),
       ]);
+      
+      const job = jobResult?.data;
       
       // get_public_profile returns an array, get first item
       const profile = profileData && profileData.length > 0 ? profileData[0] : null;
@@ -176,7 +203,7 @@ const Messages = () => {
   };
 
   const handleSendMessage = async (messageText: string, files: File[]) => {
-    if (!user || !jobId || !otherUserId) return;
+    if (!user || !otherUserId) return;
 
     // Upload files to storage if any
     const attachments: Array<{ name: string; url: string; type: string; size: number }> = [];
@@ -213,7 +240,7 @@ const Messages = () => {
     }
 
     const { error } = await supabase.from("messages").insert({
-      job_id: jobId,
+      job_id: validJobId,
       from_user: user.id,
       to_user: otherUserId,
       body: messageText,
@@ -248,7 +275,7 @@ const Messages = () => {
           title: `New message from ${senderName}`,
           message: messageText.length > 100 ? messageText.substring(0, 100) + '...' : messageText,
           payload: { 
-            job_id: jobId,
+            job_id: validJobId,
             from_user: user.id,
           },
         } as any);
@@ -270,7 +297,7 @@ const Messages = () => {
         }`}
       >
         <div className="h-[calc(100vh-64px)] flex flex-col">
-          {jobId && otherUserId ? (
+          {otherUserId ? (
             <>
               <div className="p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
                 {!sidebarOpen && (
@@ -329,7 +356,7 @@ const Messages = () => {
 
               <MessageInput
                 onSend={handleSendMessage}
-                disabled={!user || !jobId || !otherUserId}
+                disabled={!user || !otherUserId}
               />
             </>
           ) : (
