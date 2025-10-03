@@ -4,11 +4,12 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star } from 'lucide-react';
+import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star, Pencil } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PostJobModal } from '@/components/PostJobModal';
+import { EditJobModal } from '@/components/EditJobModal';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,8 @@ const EmployerDashboard = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [postJobModalOpen, setPostJobModalOpen] = useState(false);
+  const [editJobModalOpen, setEditJobModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [savedHeadhuntersCount, setSavedHeadhuntersCount] = useState(0);
   const [sortBy, setSortBy] = useState<'latest' | 'oldest'>('latest');
@@ -187,6 +190,12 @@ const EmployerDashboard = () => {
       console.error('Error updating visibility:', error);
       toast.error('Failed to update job visibility');
     }
+  };
+
+  const handleEditJob = (job: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedJob(job);
+    setEditJobModalOpen(true);
   };
   if (loading || loadingData) {
     return <div className="min-h-screen bg-background">
@@ -368,7 +377,7 @@ const EmployerDashboard = () => {
                   return filteredJobs.map(job => {
               const jobApplications = applications.filter(a => a.job_id === job.id);
               const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
-              return <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
+              return <Card key={job.id} className="group hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -383,6 +392,15 @@ const EmployerDashboard = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => handleEditJob(job, e)}
+                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Edit job"
+                            >
+                              <Pencil className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -418,6 +436,14 @@ const EmployerDashboard = () => {
       </div>
 
       <PostJobModal open={postJobModalOpen} onOpenChange={setPostJobModalOpen} userId={user?.id || ''} />
+      {selectedJob && (
+        <EditJobModal 
+          open={editJobModalOpen} 
+          onOpenChange={setEditJobModalOpen} 
+          job={selectedJob}
+          onSuccess={fetchDashboardData}
+        />
+      )}
     </div>;
 };
 export default EmployerDashboard;
