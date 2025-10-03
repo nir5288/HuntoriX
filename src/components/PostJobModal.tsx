@@ -303,7 +303,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
       const { data: newJob, error } = await supabase
         .from('jobs')
-        .insert({
+        .insert([{
           title: finalTitle,
           industry: data.industry,
           seniority: data.seniority,
@@ -318,7 +318,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           created_by: userId,
           visibility: isPublic ? 'public' : 'private',
           status: 'open'
-        })
+        } as any])
         .select()
         .single();
 
