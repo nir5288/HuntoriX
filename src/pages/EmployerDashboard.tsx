@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle } from 'lucide-react';
+import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -142,6 +142,26 @@ const EmployerDashboard = () => {
   const handleChat = (jobId: string, headhunterId: string) => {
     navigate(`/messages?job=${jobId}&with=${headhunterId}`);
   };
+
+  const toggleVisibility = async (jobId: string, currentVisibility: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation to job detail
+    const newVisibility = currentVisibility === 'public' ? 'private' : 'public';
+    
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({ visibility: newVisibility })
+        .eq('id', jobId);
+      
+      if (error) throw error;
+      
+      toast.success(`Job is now ${newVisibility}`);
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error updating visibility:', error);
+      toast.error('Failed to update job visibility');
+    }
+  };
   if (loading || loadingData) {
     return <div className="min-h-screen bg-background">
         <Header />
@@ -238,9 +258,24 @@ const EmployerDashboard = () => {
                               {job.location} • {job.employment_type?.replace('_', ' ')}
                             </CardDescription>
                           </div>
-                          <Badge className={getStatusColor(job.status)}>
-                            {job.status}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
+                              className="h-8 w-8"
+                              title={job.visibility === 'public' ? 'Make private' : 'Make public'}
+                            >
+                              {job.visibility === 'public' ? (
+                                <Eye className="h-4 w-4 text-[hsl(var(--accent-mint))]" />
+                              ) : (
+                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </Button>
+                            <Badge className={getStatusColor(job.status)}>
+                              {job.status}
+                            </Badge>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>

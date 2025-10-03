@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -84,6 +85,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [skillMustInput, setSkillMustInput] = useState('');
   const [skillNiceInput, setSkillNiceInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -159,7 +161,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           skills_must: skillsMust,
           skills_nice: skillsNice,
           created_by: userId,
-          visibility: 'public',
+          visibility: isPublic ? 'public' : 'private',
           status: 'open'
         })
         .select()
@@ -392,6 +394,32 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillNice(skill)} />
                   </Badge>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Visibility */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Visibility</h3>
+            
+            <div className="flex items-start space-x-3 rounded-lg border p-4 bg-gradient-to-br from-[hsl(var(--accent-mint))]/5 to-[hsl(var(--accent-lilac))]/5">
+              <Checkbox 
+                id="visibility" 
+                checked={isPublic}
+                onCheckedChange={(checked) => setIsPublic(checked as boolean)}
+              />
+              <div className="space-y-1 leading-none">
+                <Label 
+                  htmlFor="visibility"
+                  className="text-sm font-medium cursor-pointer"
+                >
+                  Make this job public
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  {isPublic 
+                    ? "This job will appear in the opportunities page and headhunters can apply to it" 
+                    : "This job will be private and won't appear in the opportunities page"}
+                </p>
               </div>
             </div>
           </div>

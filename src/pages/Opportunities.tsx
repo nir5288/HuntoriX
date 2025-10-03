@@ -98,6 +98,7 @@ const Opportunities = () => {
       .from('jobs')
       .select('*')
       .in('status', ['open', 'shortlisted', 'awarded'])
+      .eq('visibility', 'public')
       .order('created_at', { ascending: false });
 
     // Industry
