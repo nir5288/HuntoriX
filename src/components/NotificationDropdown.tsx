@@ -1,4 +1,4 @@
-import { Bell, Check, Mail, UserPlus, AlertCircle, Briefcase } from 'lucide-react';
+import { Bell, Check, Mail, UserPlus, AlertCircle, Briefcase, CheckCircle, Circle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -123,7 +123,7 @@ export const NotificationDropdown = () => {
               {notifications.map((notification) => (
                 <DropdownMenuItem
                   key={notification.id}
-                  className={`flex items-start gap-3 p-3 cursor-pointer group relative ${
+                  className={`flex items-start gap-3 p-3 cursor-pointer group relative hover:bg-accent/30 ${
                     !notification.is_read ? 'bg-accent/50' : ''
                   }`}
                   onClick={() => handleNotificationClick(notification)}
@@ -131,7 +131,7 @@ export const NotificationDropdown = () => {
                   <div className="mt-0.5">
                     {getNotificationIcon(notification.type)}
                   </div>
-                  <div className="flex-1 space-y-1 pr-8">
+                  <div className="flex-1 space-y-1 pr-10 min-w-0">
                     <p className={`text-sm ${!notification.is_read ? 'font-semibold' : ''}`}>
                       {notification.title}
                     </p>
@@ -142,26 +142,33 @@ export const NotificationDropdown = () => {
                       {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                     </p>
                   </div>
-                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {!notification.is_read ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleMarkAsRead(e, notification.id)}
-                        className="h-auto p-1 text-xs"
-                      >
-                        Mark as Read
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleMarkAsUnread(e, notification.id)}
-                        className="h-auto p-1 text-xs"
-                      >
-                        Mark as Unread
-                      </Button>
-                    )}
+                  <div className="absolute right-2 top-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {!notification.is_read ? (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => handleMarkAsRead(e, notification.id)}
+                            className="h-7 w-7"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => handleMarkAsUnread(e, notification.id)}
+                            className="h-7 w-7"
+                          >
+                            <Circle className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {!notification.is_read ? 'Mark as read' : 'Mark as unread'}
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </DropdownMenuItem>
               ))}
