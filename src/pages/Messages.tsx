@@ -81,7 +81,7 @@ const Messages = () => {
               (newMessage.from_user === user.id && newMessage.to_user === otherUserId) ||
               (newMessage.from_user === otherUserId && newMessage.to_user === user.id)
             ) {
-              loadMessages();
+              loadMessages(true);
               // Mark as read if I'm the recipient
               if (newMessage.to_user === user.id) {
                 markMessagesAsRead();
@@ -97,10 +97,10 @@ const Messages = () => {
     }
   }, [validJobId, otherUserId, user]);
 
-  const loadMessages = async () => {
+  const loadMessages = async (silent: boolean = false) => {
     if (!otherUserId || !user) return;
 
-    setLoading(true);
+    if (!silent && messages.length === 0) setLoading(true);
     try {
       let query = supabase
         .from("messages")
@@ -146,7 +146,7 @@ const Messages = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      if (!silent && messages.length === 0) setLoading(false);
     }
   };
 
@@ -308,7 +308,7 @@ const Messages = () => {
       console.error('Error creating notification:', notifErr);
     }
 
-    loadMessages();
+    loadMessages(true);
   };
 
   return (
