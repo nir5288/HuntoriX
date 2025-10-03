@@ -1,10 +1,77 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { decompress } from "https://deno.land/x/zip@v1.2.5/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+async function parseDocx(base64Data: string): Promise<string> {
+  try {
+    // Convert base64 to Uint8Array
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    
+    // Write to temp file
+    const tempPath = await Deno.makeTempFile({ suffix: '.docx' });
+    await Deno.writeFile(tempPath, binaryData);
+    
+    // Create temp directory for extraction
+    const extractPath = await Deno.makeTempDir();
+    
+    // Decompress the docx file
+    await decompress(tempPath, extractPath);
+    
+    // Read document.xml from word directory
+    const documentPath = `${extractPath}/word/document.xml`;
+    const xmlContent = await Deno.readTextFile(documentPath);
+    
+    // Extract text from XML (simple regex approach)
+    // This extracts content between <w:t> tags which contain the actual text
+    const textMatches = xmlContent.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
+    const extractedText = textMatches
+      .map(match => {
+        const textMatch = match.match(/<w:t[^>]*>([^<]*)<\/w:t>/);
+        return textMatch ? textMatch[1] : '';
+      })
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Clean up temp files
+    await Deno.remove(tempPath);
+    await Deno.remove(extractPath, { recursive: true });
+    
+    return extractedText;
+  } catch (error) {
+    console.error('Error parsing DOCX:', error);
+    throw new Error('Failed to parse DOCX file');
+  }
+}
+
+async function parsePdf(base64Data: string): Promise<string> {
+  // For PDF, we'll use a simple text extraction
+  // Note: This is a basic implementation and may not work for all PDFs
+  try {
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    const text = new TextDecoder().decode(binaryData);
+    
+    // Try to extract readable text from PDF
+    // PDFs contain text between BT and ET operators
+    const textMatches = text.match(/\(([^)]+)\)/g) || [];
+    const extractedText = textMatches
+      .map(match => match.slice(1, -1))
+      .join(' ')
+      .replace(/\\n/g, '\n')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    return extractedText || 'Unable to extract text from PDF. Please try converting to a text file or DOCX.';
+  } catch (error) {
+    console.error('Error parsing PDF:', error);
+    return 'Unable to extract text from PDF. Please try converting to a text file or DOCX.';
+  }
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -23,64 +90,17 @@ serve(async (req) => {
 
     console.log(`Parsing document: ${fileName} (${mimeType})`);
 
-    // Use Llamaparse API to parse the document
-    const LLAMAPARSE_API_KEY = Deno.env.get('LLAMAPARSE_API_KEY') || 'llx-vIRtjpIwE6QmAWVt5tO3bVhCJxFy64hVgIOhSEZ05R9uGwX7';
-    
-    // Convert base64 to blob
-    const binaryData = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
-    const blob = new Blob([binaryData], { type: mimeType });
-
-    // Create form data
-    const formData = new FormData();
-    formData.append('file', blob, fileName);
-
-    const response = await fetch('https://api.cloud.llamaindex.ai/api/parsing/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LLAMAPARSE_API_KEY}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Llamaparse API error:', response.status, errorText);
-      throw new Error(`Failed to parse document: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log('Document parsed successfully');
-
-    // Get the job ID and poll for results
-    const jobId = result.id;
     let parsedText = '';
-    let attempts = 0;
-    const maxAttempts = 30;
 
-    while (attempts < maxAttempts) {
-      const statusResponse = await fetch(`https://api.cloud.llamaindex.ai/api/parsing/job/${jobId}/result/markdown`, {
-        headers: {
-          'Authorization': `Bearer ${LLAMAPARSE_API_KEY}`,
-        },
-      });
-
-      if (statusResponse.ok) {
-        parsedText = await statusResponse.text();
-        break;
-      }
-
-      if (statusResponse.status === 404 || statusResponse.status === 400) {
-        // Still processing, wait and try again
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        attempts++;
-      } else {
-        throw new Error(`Failed to get parse results: ${statusResponse.status}`);
-      }
+    if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      parsedText = await parseDocx(fileData);
+    } else if (mimeType === 'application/pdf') {
+      parsedText = await parsePdf(fileData);
+    } else {
+      throw new Error(`Unsupported file type: ${mimeType}`);
     }
 
-    if (!parsedText) {
-      throw new Error('Failed to parse document after multiple attempts');
-    }
+    console.log(`Successfully parsed document. Text length: ${parsedText.length}`);
 
     return new Response(
       JSON.stringify({ success: true, text: parsedText }),
