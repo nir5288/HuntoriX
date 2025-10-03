@@ -1,4 +1,4 @@
-import { Bell, Check, Mail, UserPlus, AlertCircle, Briefcase, CheckCircle, Circle } from 'lucide-react';
+import { Bell, Check, Mail, UserPlus, AlertCircle, Briefcase, MailOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -152,7 +152,7 @@ export const NotificationDropdown = () => {
                             onClick={(e) => handleMarkAsRead(e, notification.id)}
                             className="h-7 w-7"
                           >
-                            <CheckCircle className="h-4 w-4" />
+                            <MailOpen className="h-4 w-4" />
                           </Button>
                         ) : (
                           <Button
@@ -161,7 +161,7 @@ export const NotificationDropdown = () => {
                             onClick={(e) => handleMarkAsUnread(e, notification.id)}
                             className="h-7 w-7"
                           >
-                            <Circle className="h-4 w-4" />
+                            <Mail className="h-4 w-4" />
                           </Button>
                         )}
                       </TooltipTrigger>
