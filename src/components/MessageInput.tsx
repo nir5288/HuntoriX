@@ -5,19 +5,11 @@ import { Send, Paperclip, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MessageInputProps {
-  onSend: (message: string, files: File[], replyTo?: string | null) => Promise<void>;
+  onSend: (message: string, files: File[]) => Promise<void>;
   disabled?: boolean;
-  replyingTo?: {
-    id: string;
-    body: string;
-    from_profile?: {
-      name: string;
-    };
-  } | null;
-  onCancelReply?: () => void;
 }
 
-export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: MessageInputProps) => {
+export const MessageInput = ({ onSend, disabled }: MessageInputProps) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
@@ -29,7 +21,7 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
 
     setSending(true);
     try {
-      await onSend(message.trim(), attachedFiles, replyingTo?.id || null);
+      await onSend(message.trim(), attachedFiles);
       setMessage("");
       setAttachedFiles([]);
     } catch (error) {
@@ -65,27 +57,6 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
 
   return (
     <div className="p-4 border-t bg-background">
-      {replyingTo && (
-        <div className="mb-2 flex items-start gap-2 bg-muted/50 p-2 rounded-lg border-l-2 border-primary">
-          <div className="flex-1">
-            <p className="text-xs font-semibold text-muted-foreground mb-1">
-              Replying to {replyingTo.from_profile?.name || "User"}
-            </p>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              {replyingTo.body}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={onCancelReply}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </div>
-      )}
-      
       {attachedFiles.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-2">
           {attachedFiles.map((file, index) => (

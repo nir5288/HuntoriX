@@ -309,7 +309,6 @@ export type Database = {
           id: string
           is_read: boolean
           job_id: string | null
-          reply_to: string | null
           to_user: string
         }
         Insert: {
@@ -322,7 +321,6 @@ export type Database = {
           id?: string
           is_read?: boolean
           job_id?: string | null
-          reply_to?: string | null
           to_user: string
         }
         Update: {
@@ -335,7 +333,6 @@ export type Database = {
           id?: string
           is_read?: boolean
           job_id?: string | null
-          reply_to?: string | null
           to_user?: string
         }
         Relationships: [
@@ -358,13 +355,6 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_reply_to_fkey"
-            columns: ["reply_to"]
-            isOneToOne: false
-            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
           {

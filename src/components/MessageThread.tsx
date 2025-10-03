@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Pencil, Check, X, Paperclip, Reply } from "lucide-react";
+import { Pencil, Check, X, Paperclip } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,17 +17,9 @@ interface Message {
   created_at: string;
   edited_at?: string | null;
   attachments?: any[];
-  reply_to?: string | null;
   from_profile?: {
     name: string;
     avatar_url: string | null;
-  };
-  replied_message?: {
-    id: string;
-    body: string;
-    from_profile?: {
-      name: string;
-    };
   };
 }
 
@@ -36,7 +28,6 @@ interface MessageThreadProps {
   currentUserId: string;
   currentUserProfile: any;
   loading: boolean;
-  onReply?: (message: Message) => void;
 }
 
 const formatName = (fullName: string | undefined) => {
@@ -48,7 +39,7 @@ const formatName = (fullName: string | undefined) => {
   return `${firstName} ${lastInitial}`;
 };
 
-export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading, onReply }: MessageThreadProps) => {
+export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading }: MessageThreadProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
@@ -159,24 +150,12 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                   <span className="font-semibold text-sm">
                     {isFromMe ? "Me" : formatName(message.from_profile?.name)}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {format(new Date(message.created_at), "d MMM yyyy, HH:mm")}
-                    </span>
-                    {onReply && !isEditing && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => onReply(message)}
-                      >
-                        <Reply className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </div>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {format(new Date(message.created_at), "d MMM yyyy, HH:mm")}
+                  </span>
                 </div>
                 
-                <div className="bg-muted rounded-lg px-4 py-2 relative group-hover:bg-muted/80 transition-colors">
+                <div className="bg-muted rounded-lg px-4 py-2">
                   {isEditing ? (
                     <div className="flex items-center gap-2">
                       <Input
@@ -207,16 +186,6 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                     </div>
                   ) : (
                     <>
-                      {message.replied_message && (
-                        <div className="mb-2 pl-2 border-l-2 border-primary/50 bg-background/50 rounded p-2">
-                          <p className="text-xs font-semibold text-muted-foreground">
-                            Replying to {message.replied_message.from_profile?.name || "User"}
-                          </p>
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {message.replied_message.body}
-                          </p>
-                        </div>
-                      )}
                       <p className="text-sm break-words">{message.body}</p>
                       
                       {message.attachments && message.attachments.length > 0 && (
