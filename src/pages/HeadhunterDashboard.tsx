@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Briefcase, Clock, CheckCircle, MessageCircle } from 'lucide-react';
+import { Search, Briefcase, Clock, CheckCircle, MessageCircle, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ const HeadhunterDashboard = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
+  const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -51,6 +52,15 @@ const HeadhunterDashboard = () => {
       // Filter out jobs user has already applied to
       const filteredJobs = (jobsData || []).filter(job => !appliedJobIds.has(job.id));
       setJobs(filteredJobs);
+
+      // Fetch saved jobs count
+      const { count, error: savedError } = await supabase
+        .from('saved_jobs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user?.id);
+
+      if (savedError) throw savedError;
+      setSavedJobsCount(count || 0);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data');
@@ -108,14 +118,30 @@ const HeadhunterDashboard = () => {
               </Badge>
             )}
           </div>
-          <Button 
-            size="lg" 
-            onClick={() => navigate('/opportunities')}
-            className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 opacity-95"
-          >
-            <Search className="mr-2 h-5 w-5" />
-            Browse All Jobs
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              size="lg" 
+              variant="outline"
+              onClick={() => navigate('/saved-jobs')}
+              className="relative"
+            >
+              <Heart className="mr-2 h-5 w-5" />
+              My Saved Jobs
+              {savedJobsCount > 0 && (
+                <Badge className="ml-2 bg-[hsl(var(--accent-pink))] opacity-95">
+                  {savedJobsCount}
+                </Badge>
+              )}
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/opportunities')}
+              className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 opacity-95"
+            >
+              <Search className="mr-2 h-5 w-5" />
+              Browse All Jobs
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
