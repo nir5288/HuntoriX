@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const SavedJobs = () => {
-  const { user, loading } = useRequireAuth();
+  const { user, profile, loading } = useRequireAuth();
   const navigate = useNavigate();
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -78,11 +78,11 @@ const SavedJobs = () => {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(profile?.role === 'employer' ? '/employer/dashboard' : '/headhunter/dashboard')}
           className="mb-4 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back
+          Back to Dashboard
         </Button>
 
         {/* Header Section with Stats */}

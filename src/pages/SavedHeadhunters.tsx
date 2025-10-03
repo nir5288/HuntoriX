@@ -79,11 +79,11 @@ const SavedHeadhunters = () => {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/employer/dashboard')}
           className="mb-4 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back
+          Back to Dashboard
         </Button>
 
         {/* Header Section with Stats */}
