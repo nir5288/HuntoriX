@@ -275,6 +275,16 @@ const Opportunities = () => {
     // Real-time updates will handle state changes automatically
   };
 
+  const handleIndustryClick = (industry: string) => {
+    setFilterIndustry(prev => 
+      prev.includes(industry) ? prev.filter(i => i !== industry) : [...prev, industry]
+    );
+  };
+
+  const handleSkillClick = (skill: string) => {
+    setSearchQuery(skill);
+  };
+
   // Filters extracted into <OpportunitiesFilters /> component to prevent remounting and focus loss.
 
 
@@ -398,6 +408,8 @@ const Opportunities = () => {
                       currentUser={user}
                       currentUserRole={profile?.role}
                       onApply={handleApply}
+                      onIndustryClick={handleIndustryClick}
+                      onSkillClick={handleSkillClick}
                     />
                   ))}
                 </div>

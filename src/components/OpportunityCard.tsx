@@ -3,9 +3,10 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MapPin, DollarSign, Calendar, Briefcase } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { MapPin, DollarSign, Calendar, Briefcase, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,9 +33,11 @@ type OpportunityCardProps = {
   currentUserRole?: string;
   onApply: (jobId: string) => void;
   refreshTrigger?: number;
+  onIndustryClick?: (industry: string) => void;
+  onSkillClick?: (skill: string) => void;
 };
 
-export function OpportunityCard({ job, currentUser, currentUserRole, onApply, refreshTrigger }: OpportunityCardProps) {
+export function OpportunityCard({ job, currentUser, currentUserRole, onApply, refreshTrigger, onIndustryClick, onSkillClick }: OpportunityCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [hasApplied, setHasApplied] = useState(false);
@@ -124,6 +127,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const getPreviewDescription = (text: string) => {
     // Truncate to 150 characters for consistent preview length
     return truncateText(text, 150);
+  };
+
+  const isNewJob = () => {
+    const hoursSincePosted = differenceInHours(new Date(), new Date(job.created_at));
+    return hoursSincePosted < 24;
   };
 
   const handleCTA = () => {
@@ -222,13 +230,23 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
+          {isNewJob() && (
+            <Badge className="bg-[hsl(var(--accent-pink))] text-white border-0 flex items-center gap-1 shrink-0">
+              <Sparkles className="h-3 w-3" />
+              NEW
+            </Badge>
+          )}
         </div>
         
         <div className="flex flex-wrap gap-2">
           {job.industry && (
             <Badge 
               style={{ backgroundColor: getIndustryColor(job.industry) }}
-              className="text-foreground border-0"
+              className="text-foreground border-0 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                onIndustryClick?.(job.industry!);
+              }}
             >
               {job.industry}
             </Badge>
@@ -283,19 +301,42 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
           {getPreviewDescription(job.description)}
         </p>
-        {/* Skills - single-row, fixed height */}
-        <div className="flex gap-2 overflow-hidden flex-nowrap h-8 items-center">
-          {(job.skills_must || []).slice(0, 4).map((skill, idx) => (
-            <Badge key={idx} variant="secondary" className="text-xs whitespace-nowrap">
-              {skill}
-            </Badge>
-          ))}
-          {job.skills_must && job.skills_must.length > 4 && (
-            <Badge variant="secondary" className="text-xs whitespace-nowrap">
-              +{job.skills_must.length - 4} more
-            </Badge>
-          )}
-        </div>
+        
+        {/* Skills carousel */}
+        {job.skills_must && job.skills_must.length > 0 && (
+          <div className="relative">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: false,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2">
+                {job.skills_must.map((skill, idx) => (
+                  <CarouselItem key={idx} className="pl-2 basis-auto">
+                    <Badge 
+                      variant="secondary" 
+                      className="text-xs whitespace-nowrap cursor-pointer hover:bg-secondary/80 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSkillClick?.(skill);
+                      }}
+                    >
+                      {skill}
+                    </Badge>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {job.skills_must.length > 3 && (
+                <>
+                  <CarouselPrevious className="h-6 w-6 -left-2" />
+                  <CarouselNext className="h-6 w-6 -right-2" />
+                </>
+              )}
+            </Carousel>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="flex items-center justify-between gap-2 pt-4 border-t">
