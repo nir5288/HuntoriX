@@ -68,101 +68,6 @@ export type Database = {
           },
         ]
       }
-      engagements: {
-        Row: {
-          application_id: string
-          candidate_cap: number
-          created_at: string
-          deposit_amount: number | null
-          deposit_required: boolean
-          due_at: string | null
-          employer_id: string
-          fee_amount: number
-          fee_model: string
-          headhunter_id: string
-          id: string
-          job_id: string
-          notes: string | null
-          sla_days: number
-          sow_confirmed_employer: boolean | null
-          sow_confirmed_headhunter: boolean | null
-          start_at: string
-          status: Database["public"]["Enums"]["engagement_status"]
-          updated_at: string
-        }
-        Insert: {
-          application_id: string
-          candidate_cap?: number
-          created_at?: string
-          deposit_amount?: number | null
-          deposit_required?: boolean
-          due_at?: string | null
-          employer_id: string
-          fee_amount: number
-          fee_model?: string
-          headhunter_id: string
-          id?: string
-          job_id: string
-          notes?: string | null
-          sla_days?: number
-          sow_confirmed_employer?: boolean | null
-          sow_confirmed_headhunter?: boolean | null
-          start_at?: string
-          status?: Database["public"]["Enums"]["engagement_status"]
-          updated_at?: string
-        }
-        Update: {
-          application_id?: string
-          candidate_cap?: number
-          created_at?: string
-          deposit_amount?: number | null
-          deposit_required?: boolean
-          due_at?: string | null
-          employer_id?: string
-          fee_amount?: number
-          fee_model?: string
-          headhunter_id?: string
-          id?: string
-          job_id?: string
-          notes?: string | null
-          sla_days?: number
-          sow_confirmed_employer?: boolean | null
-          sow_confirmed_headhunter?: boolean | null
-          start_at?: string
-          status?: Database["public"]["Enums"]["engagement_status"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "engagements_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: false
-            referencedRelation: "applications"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "engagements_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "engagements_headhunter_id_fkey"
-            columns: ["headhunter_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "engagements_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       job_invitations: {
         Row: {
           created_at: string
@@ -304,7 +209,6 @@ export type Database = {
           body: string
           created_at: string
           edited_at: string | null
-          engagement_id: string | null
           from_user: string
           id: string
           is_read: boolean
@@ -316,7 +220,6 @@ export type Database = {
           body: string
           created_at?: string
           edited_at?: string | null
-          engagement_id?: string | null
           from_user: string
           id?: string
           is_read?: boolean
@@ -328,7 +231,6 @@ export type Database = {
           body?: string
           created_at?: string
           edited_at?: string | null
-          engagement_id?: string | null
           from_user?: string
           id?: string
           is_read?: boolean
@@ -336,13 +238,6 @@ export type Database = {
           to_user?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "messages_engagement_id_fkey"
-            columns: ["engagement_id"]
-            isOneToOne: false
-            referencedRelation: "engagements"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "messages_from_user_fkey"
             columns: ["from_user"]
@@ -362,44 +257,6 @@ export type Database = {
             columns: ["to_user"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      milestones: {
-        Row: {
-          completed_at: string | null
-          created_at: string
-          due_at: string
-          engagement_id: string
-          id: string
-          notes: string | null
-          type: Database["public"]["Enums"]["milestone_type"]
-        }
-        Insert: {
-          completed_at?: string | null
-          created_at?: string
-          due_at: string
-          engagement_id: string
-          id?: string
-          notes?: string | null
-          type: Database["public"]["Enums"]["milestone_type"]
-        }
-        Update: {
-          completed_at?: string | null
-          created_at?: string
-          due_at?: string
-          engagement_id?: string
-          id?: string
-          notes?: string | null
-          type?: Database["public"]["Enums"]["milestone_type"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "milestones_engagement_id_fkey"
-            columns: ["engagement_id"]
-            isOneToOne: false
-            referencedRelation: "engagements"
             referencedColumns: ["id"]
           },
         ]
@@ -444,50 +301,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payments: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string
-          engagement_id: string
-          id: string
-          status: Database["public"]["Enums"]["payment_status"]
-          stripe_payment_intent_id: string | null
-          type: Database["public"]["Enums"]["payment_type"]
-          updated_at: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
-          engagement_id: string
-          id?: string
-          status?: Database["public"]["Enums"]["payment_status"]
-          stripe_payment_intent_id?: string | null
-          type: Database["public"]["Enums"]["payment_type"]
-          updated_at?: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          engagement_id?: string
-          id?: string
-          status?: Database["public"]["Enums"]["payment_status"]
-          stripe_payment_intent_id?: string | null
-          type?: Database["public"]["Enums"]["payment_type"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payments_engagement_id_fkey"
-            columns: ["engagement_id"]
-            isOneToOne: false
-            referencedRelation: "engagements"
             referencedColumns: ["id"]
           },
         ]
@@ -651,62 +464,6 @@ export type Database = {
         }
         Relationships: []
       }
-      submissions: {
-        Row: {
-          candidate_email: string | null
-          candidate_name: string
-          candidate_phone: string | null
-          cv_url: string | null
-          engagement_id: string
-          id: string
-          notes: string | null
-          notice_period: string | null
-          right_to_work: boolean | null
-          salary_expectation: string | null
-          status: Database["public"]["Enums"]["submission_status"]
-          submitted_at: string
-          updated_at: string
-        }
-        Insert: {
-          candidate_email?: string | null
-          candidate_name: string
-          candidate_phone?: string | null
-          cv_url?: string | null
-          engagement_id: string
-          id?: string
-          notes?: string | null
-          notice_period?: string | null
-          right_to_work?: boolean | null
-          salary_expectation?: string | null
-          status?: Database["public"]["Enums"]["submission_status"]
-          submitted_at?: string
-          updated_at?: string
-        }
-        Update: {
-          candidate_email?: string | null
-          candidate_name?: string
-          candidate_phone?: string | null
-          cv_url?: string | null
-          engagement_id?: string
-          id?: string
-          notes?: string | null
-          notice_period?: string | null
-          right_to_work?: boolean | null
-          salary_expectation?: string | null
-          status?: Database["public"]["Enums"]["submission_status"]
-          submitted_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "submissions_engagement_id_fkey"
-            columns: ["engagement_id"]
-            isOneToOne: false
-            referencedRelation: "engagements"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -802,25 +559,7 @@ export type Database = {
       }
     }
     Enums: {
-      engagement_status:
-        | "Proposed"
-        | "Active"
-        | "ShortlistDue"
-        | "Interviewing"
-        | "Offer"
-        | "Completed"
-        | "Closed"
-        | "Cancelled"
-      milestone_type: "Kickoff" | "Shortlist" | "Interview" | "Offer" | "Hire"
-      payment_status: "Pending" | "Authorized" | "Captured" | "Refunded"
-      payment_type: "Deposit" | "Success"
-      submission_status:
-        | "New"
-        | "Shortlisted"
-        | "Client-Interview"
-        | "Rejected"
-        | "Offer"
-        | "Hired"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -947,28 +686,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      engagement_status: [
-        "Proposed",
-        "Active",
-        "ShortlistDue",
-        "Interviewing",
-        "Offer",
-        "Completed",
-        "Closed",
-        "Cancelled",
-      ],
-      milestone_type: ["Kickoff", "Shortlist", "Interview", "Offer", "Hire"],
-      payment_status: ["Pending", "Authorized", "Captured", "Refunded"],
-      payment_type: ["Deposit", "Success"],
-      submission_status: [
-        "New",
-        "Shortlisted",
-        "Client-Interview",
-        "Rejected",
-        "Offer",
-        "Hired",
-      ],
-    },
+    Enums: {},
   },
 } as const

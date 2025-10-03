@@ -17,7 +17,6 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true);
   const [hasApplied, setHasApplied] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
-  const [accepting, setAccepting] = useState(false);
 
   useEffect(() => {
     fetchJob();
@@ -109,62 +108,7 @@ const JobDetail = () => {
   };
 
   const handleAccept = async (applicationId: string, headhunterId: string) => {
-    setAccepting(true);
     try {
-      // If an engagement already exists for this job + headhunter, go to it
-      const { data: existing } = await supabase
-        .from('engagements')
-        .select('id')
-        .eq('job_id', id)
-        .eq('headhunter_id', headhunterId)
-        .maybeSingle();
-
-      if (existing?.id) {
-        toast.success('Engagement already exists. Redirecting...');
-        navigate(`/engagement/${existing.id}`);
-        return;
-      }
-
-      // Get the application details
-      const { data: application, error: appError } = await supabase
-        .from('applications')
-        .select('*')
-        .eq('id', applicationId)
-        .single();
-
-      if (appError) throw appError;
-
-      // Create engagement
-      const { data: engagement, error: engagementError } = await supabase
-        .from('engagements')
-        .insert({
-          job_id: id,
-          application_id: applicationId,
-          employer_id: user?.id,
-          headhunter_id: headhunterId,
-          status: 'Proposed',
-          fee_model: application.proposed_fee_model || 'Percent',
-          fee_amount: application.proposed_fee_value || 15,
-          deposit_required: false,
-          candidate_cap: 5,
-          sla_days: application.eta_days || 3,
-        })
-        .select()
-        .single();
-
-      if (engagementError) throw engagementError;
-
-      // Create initial kickoff milestone
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + (application.eta_days || 3));
-      
-      await supabase.from('milestones').insert({
-        engagement_id: engagement.id,
-        type: 'Kickoff',
-        due_at: dueDate.toISOString(),
-      });
-
-      // Update application status
       const { error: updateError } = await supabase
         .from('applications')
         .update({ status: 'shortlisted' })
@@ -177,37 +121,20 @@ const JobDetail = () => {
         .from('notifications')
         .insert({
           user_id: headhunterId,
-          type: 'engagement_created',
-          related_id: engagement.id,
-          payload: { job_id: id, engagement_id: engagement.id },
+          type: 'status_change',
+          payload: { job_id: id, application_id: applicationId, status: 'shortlisted' },
           is_read: false,
-          title: 'Engagement Started',
-          message: 'An employer has accepted your application and started an engagement'
+          title: 'Application Shortlisted',
+          message: 'Your application has been shortlisted',
         } as any);
 
       if (notifError) console.error('Notification error:', notifError);
 
-      toast.success('Engagement created! Redirecting...');
-      navigate(`/engagement/${engagement.id}`);
-    } catch (error: any) {
-      // If duplicate, fetch and redirect to existing engagement
-      if (error?.code === '23505') {
-        const { data: existing } = await supabase
-          .from('engagements')
-          .select('id')
-          .eq('job_id', id)
-          .eq('headhunter_id', headhunterId)
-          .maybeSingle();
-        if (existing?.id) {
-          toast.success('Engagement already exists. Redirecting...');
-          navigate(`/engagement/${existing.id}`);
-          return;
-        }
-      }
+      toast.success('Application accepted');
+      fetchJob();
+    } catch (error) {
       console.error('Error accepting application:', error);
       toast.error('Failed to accept application');
-    } finally {
-      setAccepting(false);
     }
   };
 
@@ -456,11 +383,10 @@ const JobDetail = () => {
                             <Button 
                               size="sm" 
                               variant="default"
-                              disabled={accepting}
                               onClick={() => handleAccept(app.id, app.headhunter_id)}
                             >
                               <Check className="mr-2 h-4 w-4" />
-                              {accepting ? 'Accepting…' : 'Accept'}
+                              Accept
                             </Button>
                             <Button 
                               size="sm" 
