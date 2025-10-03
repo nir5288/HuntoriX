@@ -36,6 +36,7 @@ interface MessageThreadProps {
   currentUserProfile: any;
   loading: boolean;
   onReply: (message: Message) => void;
+  onEdited?: () => void;
 }
 
 const formatName = (fullName: string | undefined) => {
@@ -47,7 +48,7 @@ const formatName = (fullName: string | undefined) => {
   return `${firstName} ${lastInitial}`;
 };
 
-export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading, onReply }: MessageThreadProps) => {
+export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading, onReply, onEdited }: MessageThreadProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
@@ -106,6 +107,7 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
 
       setEditingMessageId(null);
       setEditText("");
+      onEdited?.();
     } catch (error) {
       console.error("Error editing message:", error);
       toast({

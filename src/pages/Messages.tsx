@@ -70,7 +70,7 @@ const Messages = () => {
         .on(
           "postgres_changes",
           {
-            event: "INSERT",
+            event: "*",
             schema: "public",
             table: "messages",
             filter: validJobId ? `job_id=eq.${validJobId}` : `job_id=is.null`,
@@ -378,6 +378,7 @@ const Messages = () => {
                 currentUserId={user?.id || ""}
                 currentUserProfile={profile}
                 loading={loading}
+                onEdited={loadMessages}
                 onReply={(message) => {
                   const isFromMe = message.from_user === user.id;
                   setReplyingTo({
