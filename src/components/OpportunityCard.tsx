@@ -63,6 +63,30 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     };
 
     checkApplication();
+
+    // Set up real-time subscription for this job's applications
+    if (currentUser && currentUserRole === 'headhunter') {
+      const channel = supabase
+        .channel(`applications-${job.id}-${currentUser.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'applications',
+            filter: `job_id=eq.${job.id},headhunter_id=eq.${currentUser.id}`
+          },
+          () => {
+            // Application created - update state immediately
+            setHasApplied(true);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [job.id, currentUser, currentUserRole, refreshTrigger]);
 
   const getIndustryColor = (industry: string | null) => {
