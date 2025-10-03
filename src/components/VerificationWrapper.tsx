@@ -45,16 +45,7 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
     </div>;
   }
 
-  // Show verification pending for unverified headhunters
-  if (
-    user &&
-    profile &&
-    profile.role === 'headhunter' &&
-    !profile.email_verified &&
-    profile.account_status === 'pending_verification'
-  ) {
-    return <VerificationPending email={user.email || ''} userName={profile.name || 'there'} />;
-  }
+  // Verification disabled - all users can access immediately
 
   // Show welcome screen for newly verified headhunters
   if (showWelcome && profile) {
