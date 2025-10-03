@@ -19,6 +19,13 @@ interface Message {
   to_user: string;
   body: string;
   created_at: string;
+  reply_to?: string | null;
+  replied_message?: {
+    body: string;
+    from_profile?: {
+      name: string;
+    };
+  };
   from_profile?: {
     name: string;
     avatar_url: string | null;
@@ -39,6 +46,7 @@ const Messages = () => {
   const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState("");
+  const [replyingTo, setReplyingTo] = useState<{ id: string; body: string; senderName: string } | null>(null);
 
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
@@ -113,7 +121,23 @@ const Messages = () => {
         .order("created_at", { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Fetch replied messages separately
+      const messagesWithReplies = await Promise.all(
+        (data || []).map(async (msg: any) => {
+          if (msg.reply_to) {
+            const { data: repliedMsg } = await supabase
+              .from("messages")
+              .select("body, from_profile:profiles!messages_from_user_fkey(name)")
+              .eq("id", msg.reply_to)
+              .single();
+            return { ...msg, replied_message: repliedMsg };
+          }
+          return msg;
+        })
+      );
+      
+      setMessages(messagesWithReplies);
     } catch (error) {
       console.error("Error loading messages:", error);
       toast({
@@ -202,7 +226,7 @@ const Messages = () => {
     }
   };
 
-  const handleSendMessage = async (messageText: string, files: File[]) => {
+  const handleSendMessage = async (messageText: string, files: File[], replyToId?: string) => {
     if (!user || !otherUserId) return;
 
     // Upload files to storage if any
@@ -245,6 +269,7 @@ const Messages = () => {
       to_user: otherUserId,
       body: messageText,
       attachments: attachments.length > 0 ? attachments : null,
+      reply_to: replyToId || null,
     } as any);
 
     if (error) {
@@ -353,11 +378,21 @@ const Messages = () => {
                 currentUserId={user?.id || ""}
                 currentUserProfile={profile}
                 loading={loading}
+                onReply={(message) => {
+                  const isFromMe = message.from_user === user.id;
+                  setReplyingTo({
+                    id: message.id,
+                    body: message.body,
+                    senderName: isFromMe ? "yourself" : (message.from_profile?.name || "User"),
+                  });
+                }}
               />
 
               <MessageInput
                 onSend={handleSendMessage}
                 disabled={!user || !otherUserId}
+                replyingTo={replyingTo}
+                onCancelReply={() => setReplyingTo(null)}
               />
             </>
           ) : (
