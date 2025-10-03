@@ -19,10 +19,10 @@ const JobDetail = () => {
   const [hasApplied, setHasApplied] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
   
-  // Determine back button text based on referrer
+  // Determine back button text based on navigation state
   const getBackButtonText = () => {
-    const referrer = document.referrer;
-    if (referrer.includes('/dashboard') || referrer.includes('/employer-dashboard') || referrer.includes('/headhunter-dashboard')) {
+    const from = location.state?.from;
+    if (from === 'dashboard') {
       return 'Back to Dashboard';
     }
     return 'Back to Opportunities';

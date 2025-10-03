@@ -176,7 +176,7 @@ const HeadhunterDashboard = () => {
                   <Card key={app.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between">
-                        <div className="flex-1" onClick={() => navigate(`/jobs/${app.job_id}`)} style={{ cursor: 'pointer' }}>
+                        <div className="flex-1" onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'dashboard' } })} style={{ cursor: 'pointer' }}>
                           <CardTitle className="text-lg opacity-90">{app.job?.title}</CardTitle>
                           <CardDescription className="mt-1">
                             Applied {new Date(app.created_at).toLocaleDateString()}
@@ -223,7 +223,7 @@ const HeadhunterDashboard = () => {
             ) : (
               <div className="space-y-4">
                 {jobs.map((job) => (
-                  <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`)}>
+                  <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

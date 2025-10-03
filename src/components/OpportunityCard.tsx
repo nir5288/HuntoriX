@@ -387,7 +387,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <Button 
           variant="outline" 
           size="sm"
-          onClick={() => navigate(`/job/${job.id}`)}
+          onClick={() => navigate(`/job/${job.id}`, { state: { from: 'opportunities' } })}
         >
           View Details
         </Button>

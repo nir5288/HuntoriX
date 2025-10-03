@@ -244,7 +244,7 @@ const EmployerDashboard = () => {
                 {jobs.map(job => {
               const jobApplications = applications.filter(a => a.job_id === job.id);
               const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
-              return <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`)}>
+              return <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">

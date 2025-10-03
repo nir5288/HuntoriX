@@ -104,11 +104,11 @@ export function HotOpportunities() {
   };
 
   const handleManage = (jobId: string) => {
-    navigate(`/job/${jobId}`);
+    navigate(`/job/${jobId}`, { state: { from: 'dashboard' } });
   };
 
   const handleView = (jobId: string) => {
-    navigate(`/job/${jobId}`);
+    navigate(`/job/${jobId}`, { state: { from: 'dashboard' } });
   };
 
   const getIndustryColor = (industry: string | null) => {
