@@ -9,6 +9,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PostJobModal } from '@/components/PostJobModal';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 const EmployerDashboard = () => {
   const {
     user,
@@ -22,6 +25,9 @@ const EmployerDashboard = () => {
   const [postJobModalOpen, setPostJobModalOpen] = useState(false);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [savedHeadhuntersCount, setSavedHeadhuntersCount] = useState(0);
+  const [sortBy, setSortBy] = useState<'latest' | 'oldest'>('latest');
+  const [showPendingOnly, setShowPendingOnly] = useState(false);
+  const [showPrivateOnly, setShowPrivateOnly] = useState(false);
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -282,6 +288,40 @@ const EmployerDashboard = () => {
                 )}
               </Button>
             </div>
+            <div className="flex flex-wrap items-center gap-4 pt-4 border-t">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="sort-jobs" className="text-sm font-medium">Sort by:</Label>
+                <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
+                  <SelectTrigger id="sort-jobs" className="w-[140px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="latest">Latest</SelectItem>
+                    <SelectItem value="oldest">Oldest</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="pending-only" 
+                  checked={showPendingOnly} 
+                  onCheckedChange={(checked) => setShowPendingOnly(checked as boolean)}
+                />
+                <Label htmlFor="pending-only" className="text-sm font-medium cursor-pointer">
+                  Pending Review Only
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="private-only" 
+                  checked={showPrivateOnly} 
+                  onCheckedChange={(checked) => setShowPrivateOnly(checked as boolean)}
+                />
+                <Label htmlFor="private-only" className="text-sm font-medium cursor-pointer">
+                  Private Only
+                </Label>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {jobs.length === 0 ? <div className="text-center py-12">
@@ -293,7 +333,39 @@ const EmployerDashboard = () => {
                   Post a Job
                 </Button>
               </div> : <div className="space-y-4">
-                {jobs.map(job => {
+                {(() => {
+                  // Filter jobs
+                  let filteredJobs = [...jobs];
+                  
+                  // Filter by pending review
+                  if (showPendingOnly) {
+                    filteredJobs = filteredJobs.filter(job => {
+                      const jobApplications = applications.filter(a => a.job_id === job.id);
+                      return jobApplications.some(a => a.status === 'submitted');
+                    });
+                  }
+                  
+                  // Filter by private visibility
+                  if (showPrivateOnly) {
+                    filteredJobs = filteredJobs.filter(job => job.visibility === 'private');
+                  }
+                  
+                  // Sort jobs
+                  filteredJobs.sort((a, b) => {
+                    const dateA = new Date(a.created_at).getTime();
+                    const dateB = new Date(b.created_at).getTime();
+                    return sortBy === 'latest' ? dateB - dateA : dateA - dateB;
+                  });
+                  
+                  if (filteredJobs.length === 0) {
+                    return (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No jobs match your filters
+                      </div>
+                    );
+                  }
+                  
+                  return filteredJobs.map(job => {
               const jobApplications = applications.filter(a => a.job_id === job.id);
               const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
               return <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
@@ -338,7 +410,8 @@ const EmployerDashboard = () => {
                         </div>
                       </CardContent>
                     </Card>;
-            })}
+                  });
+                })()}
               </div>}
           </CardContent>
         </Card>
