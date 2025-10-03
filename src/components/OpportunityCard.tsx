@@ -178,6 +178,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   const renderButton = () => {
+    // Don't show Apply button for employers at all
+    if (currentUserRole === 'employer') {
+      return null;
+    }
+
     const button = (
       <Button 
         onClick={handleCTA} 
