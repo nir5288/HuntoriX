@@ -370,9 +370,12 @@ const Opportunities = () => {
     setApplyModalOpen(true);
   };
 
-  const handleApplyClose = () => {
+  const handleApplyClose = (applied?: boolean) => {
     setApplyModalOpen(false);
-    // Real-time updates will handle state changes automatically
+    // If successfully applied, update local state immediately
+    if (applied && selectedJobId) {
+      setAppliedJobIds(prev => new Set([...prev, selectedJobId]));
+    }
   };
 
   const handleIndustryClick = (industry: string) => {
@@ -609,6 +612,7 @@ const Opportunities = () => {
               setApplyModalOpen(true);
             }
           }}
+          onSuccess={() => handleApplyClose(true)}
           jobId={selectedJobId}
           jobTitle={selectedJobTitle}
           headhunterId={user?.id || ''}

@@ -16,15 +16,16 @@ const applicationSchema = z.object({
   etaDays: z.number().min(1, 'ETA must be at least 1 day').max(60, 'ETA cannot exceed 60 days'),
 });
 
-type ApplyModalProps = {
+interface ApplyModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
   jobId: string;
   jobTitle: string;
   headhunterId: string;
-};
+}
 
-export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }: ApplyModalProps) {
+export function ApplyModal({ open, onOpenChange, onSuccess, jobId, jobTitle, headhunterId }: ApplyModalProps) {
   const { toast } = useToast();
   const [coverNote, setCoverNote] = useState('');
   const [feeModel, setFeeModel] = useState<'percent_fee' | 'flat' | 'hourly' | ''>('');
@@ -180,6 +181,10 @@ export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }
         title: 'Application Sent',
         description: "We'll notify you about updates",
       });
+
+      if (onSuccess) {
+        onSuccess();
+      }
 
       onOpenChange(false);
     } catch (error: any) {

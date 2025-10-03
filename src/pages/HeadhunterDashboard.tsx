@@ -220,7 +220,7 @@ const HeadhunterDashboard = () => {
 
         {/* Stats */}
         <TooltipProvider>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <Tooltip>
@@ -275,7 +275,7 @@ const HeadhunterDashboard = () => {
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Percentage of applications that received a response</p>
+                    <p>Your response rate for chats and job invitations from employers</p>
                   </TooltipContent>
                 </Tooltip>
                 <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
@@ -288,22 +288,55 @@ const HeadhunterDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-sm font-medium opacity-90 cursor-help flex items-center gap-1">
+                      Response SLA
+                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Your response time performance for employer communications</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Under 2h:</span>
+                    <span className="font-semibold text-[hsl(var(--success))]">0</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Under 24h:</span>
+                    <span className="font-semibold text-[hsl(var(--accent-mint))]">0</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Over 24h:</span>
+                    <span className="font-semibold text-[hsl(var(--warning))]">0</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TooltipProvider>
 
         {/* My Applications */}
         <Card className="mb-8">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <CardTitle className="opacity-90">My Applications</CardTitle>
+                <CardTitle className="opacity-90 mb-2">My Applications</CardTitle>
                 <CardDescription>Track your application status</CardDescription>
               </div>
               {applications.length > 5 && (
                 <Button 
-                  variant="outline" 
                   size="sm"
                   onClick={() => navigate('/applications')}
+                  className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 opacity-95"
                 >
                   View All Applications
                 </Button>
