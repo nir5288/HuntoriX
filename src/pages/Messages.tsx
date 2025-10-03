@@ -19,9 +19,17 @@ interface Message {
   to_user: string;
   body: string;
   created_at: string;
+  reply_to?: string | null;
   from_profile?: {
     name: string;
     avatar_url: string | null;
+  };
+  replied_message?: {
+    id: string;
+    body: string;
+    from_profile?: {
+      name: string;
+    };
   };
 }
 
@@ -39,6 +47,8 @@ const Messages = () => {
   const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState("");
+  const [replyingTo, setReplyingTo] = useState<any>(null);
+  const [isSending, setIsSending] = useState(false);
 
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
@@ -98,7 +108,12 @@ const Messages = () => {
         .from("messages")
         .select(`
           *,
-          from_profile:profiles!messages_from_user_fkey(name, avatar_url)
+          from_profile:profiles!messages_from_user_fkey(name, avatar_url),
+          replied_message:messages!messages_reply_to_fkey(
+            id,
+            body,
+            from_profile:profiles!messages_from_user_fkey(name)
+          )
         `);
       
       // Filter by job_id if present
@@ -113,7 +128,14 @@ const Messages = () => {
         .order("created_at", { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Transform replied_message from array to single object
+      const transformedData = (data || []).map((msg: any) => ({
+        ...msg,
+        replied_message: msg.replied_message?.[0] || null,
+      }));
+      
+      setMessages(transformedData);
     } catch (error) {
       console.error("Error loading messages:", error);
       toast({
@@ -202,8 +224,10 @@ const Messages = () => {
     }
   };
 
-  const handleSendMessage = async (messageText: string, files: File[]) => {
+  const handleSendMessage = async (messageText: string, files: File[], replyToId?: string | null) => {
     if (!user || !otherUserId) return;
+
+    setIsSending(true);
 
     // Upload files to storage if any
     const attachments: Array<{ name: string; url: string; type: string; size: number }> = [];
@@ -245,6 +269,7 @@ const Messages = () => {
       to_user: otherUserId,
       body: messageText,
       attachments: attachments.length > 0 ? attachments : null,
+      reply_to: replyToId,
     } as any);
 
     if (error) {
@@ -284,6 +309,8 @@ const Messages = () => {
     }
 
     loadMessages();
+    setReplyingTo(null);
+    setIsSending(false);
   };
 
   return (
@@ -353,11 +380,14 @@ const Messages = () => {
                 currentUserId={user?.id || ""}
                 currentUserProfile={profile}
                 loading={loading}
+                onReply={(message) => setReplyingTo(message)}
               />
 
               <MessageInput
                 onSend={handleSendMessage}
-                disabled={!user || !otherUserId}
+                disabled={!user || !otherUserId || isSending}
+                replyingTo={replyingTo}
+                onCancelReply={() => setReplyingTo(null)}
               />
             </>
           ) : (
