@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { OpportunityCard } from '@/components/OpportunityCard';
 import { Button } from '@/components/ui/button';
@@ -40,14 +41,17 @@ const currencies = ['ILS', 'USD', 'EUR', 'GBP', 'INR'];
 
 const Opportunities = () => {
   const { user, profile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  
+  // Initialize from URL params
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  // Search (debounced)
-  const [searchQuery, setSearchQuery] = useState('');
+  // Search (debounced) - initialize from URL
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   // Apply flow
@@ -55,15 +59,17 @@ const Opportunities = () => {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedJobTitle, setSelectedJobTitle] = useState<string>('');
 
-  // Filters (raw)
-  const [filterIndustry, setFilterIndustry] = useState<string[]>([]);
-  const [filterLocation, setFilterLocation] = useState('');
-  const [filterSalaryMin, setFilterSalaryMin] = useState('');
-  const [filterSalaryMax, setFilterSalaryMax] = useState('');
-  const [filterCurrency, setFilterCurrency] = useState('ILS');
-  const [filterSeniority, setFilterSeniority] = useState('all');
-  const [filterEmploymentType, setFilterEmploymentType] = useState('all');
-  const [filterPosted, setFilterPosted] = useState('all');
+  // Filters (raw) - initialize from URL
+  const [filterIndustry, setFilterIndustry] = useState<string[]>(
+    searchParams.get('industries')?.split(',').filter(Boolean) || []
+  );
+  const [filterLocation, setFilterLocation] = useState(searchParams.get('location') || '');
+  const [filterSalaryMin, setFilterSalaryMin] = useState(searchParams.get('salaryMin') || '');
+  const [filterSalaryMax, setFilterSalaryMax] = useState(searchParams.get('salaryMax') || '');
+  const [filterCurrency, setFilterCurrency] = useState(searchParams.get('currency') || 'ILS');
+  const [filterSeniority, setFilterSeniority] = useState(searchParams.get('seniority') || 'all');
+  const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
+  const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');
 
   // Debounced mirrors (to avoid re-fetching on every keystroke)
   const [debouncedLocation, setDebouncedLocation] = useState('');
@@ -180,7 +186,20 @@ const Opportunities = () => {
       
       setJobs(data || []);
       setTotalCount(count || 0);
-      setCurrentPage(page);
+      
+      // Update URL params
+      const params = new URLSearchParams();
+      params.set('page', page.toString());
+      if (searchQuery) params.set('q', searchQuery);
+      if (filterIndustry.length > 0) params.set('industries', filterIndustry.join(','));
+      if (filterLocation) params.set('location', filterLocation);
+      if (filterSalaryMin) params.set('salaryMin', filterSalaryMin);
+      if (filterSalaryMax) params.set('salaryMax', filterSalaryMax);
+      if (filterCurrency !== 'ILS') params.set('currency', filterCurrency);
+      if (filterSeniority !== 'all') params.set('seniority', filterSeniority);
+      if (filterEmploymentType !== 'all') params.set('employmentType', filterEmploymentType);
+      if (filterPosted !== 'all') params.set('posted', filterPosted);
+      setSearchParams(params, { replace: true });
     } catch (err) {
       console.error('Error fetching jobs:', err);
       setJobs([]);
@@ -189,11 +208,11 @@ const Opportunities = () => {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [buildBaseQuery]);
+  }, [buildBaseQuery, searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, setSearchParams]);
 
-  // Initial load
+  // Initial load - use page from URL
   useEffect(() => {
-    fetchPage(1, true);
+    fetchPage(currentPage, true);
   }, []);
 
   // On filter/search change (deps use *debounced* values) - reset to page 1
@@ -250,6 +269,7 @@ const Opportunities = () => {
     setFilterEmploymentType('all');
     setFilterPosted('all');
     setSearchQuery('');
+    setSearchParams({}, { replace: true });
   };
 
   const handleApply = (jobId: string) => {
