@@ -44,19 +44,39 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const [checkingApplication, setCheckingApplication] = useState(true);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 
-  // Auto-scroll carousel
+  // Auto-scroll carousel with bidirectional movement
   useEffect(() => {
     if (!carouselApi || !job.skills_must || job.skills_must.length <= 3) {
       return;
     }
 
-    const timer = setInterval(() => {
-      if (carouselApi.canScrollNext()) {
-        carouselApi.scrollNext();
+    let direction: 'next' | 'prev' = 'next';
+    const scrollInterval = 3000; // Time between scrolls
+    const pauseInterval = 1500; // Pause at ends
+
+    const scroll = () => {
+      if (direction === 'next') {
+        if (carouselApi.canScrollNext()) {
+          carouselApi.scrollNext();
+        } else {
+          // Reached the end, pause then reverse
+          setTimeout(() => {
+            direction = 'prev';
+          }, pauseInterval);
+        }
       } else {
-        carouselApi.scrollTo(0);
+        if (carouselApi.canScrollPrev()) {
+          carouselApi.scrollPrev();
+        } else {
+          // Reached the start, pause then go forward
+          setTimeout(() => {
+            direction = 'next';
+          }, pauseInterval);
+        }
       }
-    }, 2000);
+    };
+
+    const timer = setInterval(scroll, scrollInterval);
 
     return () => clearInterval(timer);
   }, [carouselApi, job.skills_must]);
@@ -316,41 +336,43 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
 
         {/* Description teaser - fixed preview length */}
-        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem] mb-4">
           {getPreviewDescription(job.description)}
         </p>
         
-        {/* Skills carousel - auto-scroll */}
-        {job.skills_must && job.skills_must.length > 0 && (
-          <div className="relative overflow-hidden">
-            <Carousel
-              setApi={setCarouselApi}
-              opts={{
-                align: "start",
-                loop: true,
-                dragFree: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2">
-                {job.skills_must.map((skill, idx) => (
-                  <CarouselItem key={idx} className="pl-2 basis-auto">
-                    <Badge 
-                      variant="secondary" 
-                      className="text-xs whitespace-nowrap cursor-pointer hover:bg-secondary/80 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSkillClick?.(skill);
-                      }}
-                    >
-                      {skill}
-                    </Badge>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </div>
-        )}
+        {/* Skills carousel - auto-scroll with consistent height */}
+        <div className="h-10 flex items-center">
+          {job.skills_must && job.skills_must.length > 0 && (
+            <div className="relative overflow-hidden w-full">
+              <Carousel
+                setApi={setCarouselApi}
+                opts={{
+                  align: "start",
+                  loop: false,
+                  dragFree: true,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2">
+                  {job.skills_must.map((skill, idx) => (
+                    <CarouselItem key={idx} className="pl-2 basis-auto">
+                      <Badge 
+                        variant="secondary" 
+                        className="text-xs whitespace-nowrap cursor-pointer hover:bg-secondary/80 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSkillClick?.(skill);
+                        }}
+                      >
+                        {skill}
+                      </Badge>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+            </div>
+          )}
+        </div>
       </CardContent>
 
       <CardFooter className="flex items-center justify-between gap-2 pt-4 border-t">
