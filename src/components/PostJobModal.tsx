@@ -12,9 +12,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { X } from 'lucide-react';
+import { X, Upload, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@/components/ui/card';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -86,6 +87,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [skillNiceInput, setSkillNiceInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
+  const [isParsing, setIsParsing] = useState(false);
+  const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -133,6 +136,106 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
   const removeSkillNice = (skill: string) => {
     setSkillsNice(skillsNice.filter(s => s !== skill));
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please upload a PDF, DOCX, or TXT file');
+      return;
+    }
+
+    setIsParsing(true);
+    const filledFields = new Set<string>();
+
+    try {
+      let jobDescriptionText = '';
+
+      if (file.type === 'text/plain') {
+        jobDescriptionText = await file.text();
+      } else {
+        // For PDF and DOCX, we'll need to read as text (simplified for now)
+        // In production, you'd use a proper PDF/DOCX parser
+        const reader = new FileReader();
+        jobDescriptionText = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsText(file);
+        });
+      }
+
+      const { data, error } = await supabase.functions.invoke('parse-job-description', {
+        body: { jobDescription: jobDescriptionText }
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+
+      const jobInfo = data.jobInfo;
+      
+      // Auto-fill fields
+      if (jobInfo.title) {
+        setValue('title', jobInfo.title);
+        filledFields.add('title');
+      }
+      if (jobInfo.industry) {
+        setValue('industry', jobInfo.industry);
+        filledFields.add('industry');
+      }
+      if (jobInfo.seniority) {
+        setValue('seniority', jobInfo.seniority);
+        filledFields.add('seniority');
+      }
+      if (jobInfo.employment_type) {
+        setValue('employment_type', jobInfo.employment_type);
+        filledFields.add('employment_type');
+      }
+      if (jobInfo.location_type) {
+        setValue('location_type', jobInfo.location_type);
+        filledFields.add('location_type');
+      }
+      if (jobInfo.location) {
+        setValue('location', jobInfo.location);
+        filledFields.add('location');
+      }
+      if (jobInfo.budget_currency) {
+        setValue('budget_currency', jobInfo.budget_currency);
+        filledFields.add('budget_currency');
+      }
+      if (jobInfo.budget_min) {
+        setValue('budget_min', jobInfo.budget_min.toString());
+        filledFields.add('budget_min');
+      }
+      if (jobInfo.budget_max) {
+        setValue('budget_max', jobInfo.budget_max.toString());
+        filledFields.add('budget_max');
+      }
+      if (jobInfo.description) {
+        setValue('description', jobInfo.description);
+        filledFields.add('description');
+      }
+      if (jobInfo.skills_must?.length > 0) {
+        setSkillsMust(jobInfo.skills_must);
+        filledFields.add('skills_must');
+      }
+      if (jobInfo.skills_nice?.length > 0) {
+        setSkillsNice(jobInfo.skills_nice);
+        filledFields.add('skills_nice');
+      }
+
+      setAutoFilledFields(filledFields);
+      toast.success('Job description parsed successfully! Review and edit the fields as needed.');
+
+    } catch (error) {
+      console.error('Error parsing job description:', error);
+      toast.error('Failed to parse job description. Please fill in manually.');
+    } finally {
+      setIsParsing(false);
+      event.target.value = ''; // Reset file input
+    }
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -195,14 +298,42 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Upload Job Description */}
+          <Card className="p-4 border-2 border-dashed border-[hsl(var(--accent-mint))] bg-gradient-to-br from-[hsl(var(--accent-mint))]/5 to-[hsl(var(--accent-lilac))]/5">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Upload className="h-5 w-5 text-[hsl(var(--accent-pink))]" />
+                <h3 className="font-semibold">Upload Job Description (Optional)</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Upload a PDF, DOCX, or TXT file and let AI auto-fill the form for you
+              </p>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  onChange={handleFileUpload}
+                  disabled={isParsing}
+                  className="cursor-pointer"
+                />
+                {isParsing && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+
           {/* A. Basics */}
           <div className="space-y-4">
             <h3 className="font-semibold">Basics</h3>
             
             <div className="space-y-2">
               <Label htmlFor="title">Job Title <span className="text-destructive">• Required</span></Label>
-              <Select onValueChange={(value) => setValue('title', value)}>
-                <SelectTrigger>
+              <Select onValueChange={(value) => setValue('title', value)} value={selectedTitle}>
+                <SelectTrigger className={autoFilledFields.has('title') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                   <SelectValue placeholder="Select job title" />
                 </SelectTrigger>
                 <SelectContent>
@@ -223,8 +354,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
             <div className="space-y-2">
               <Label htmlFor="industry">Industry <span className="text-destructive">• Required</span></Label>
-              <Select onValueChange={(value) => setValue('industry', value)}>
-                <SelectTrigger>
+              <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
+                <SelectTrigger className={autoFilledFields.has('industry') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                   <SelectValue placeholder="Select industry" />
                 </SelectTrigger>
                 <SelectContent>
@@ -240,7 +371,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               <div className="space-y-2">
                 <Label htmlFor="seniority">Seniority <span className="text-destructive">• Required</span></Label>
                 <Select onValueChange={(value) => setValue('seniority', value as any)} defaultValue="mid">
-                  <SelectTrigger>
+                  <SelectTrigger className={autoFilledFields.has('seniority') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -257,7 +388,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               <div className="space-y-2">
                 <Label htmlFor="employment_type">Employment Type <span className="text-destructive">• Required</span></Label>
                 <Select onValueChange={(value) => setValue('employment_type', value as any)} defaultValue="full_time">
-                  <SelectTrigger>
+                  <SelectTrigger className={autoFilledFields.has('employment_type') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -297,7 +428,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               <div className="space-y-2">
                 <Label htmlFor="location">Location <span className="text-destructive">• Required</span></Label>
                 <Select onValueChange={(value) => setValue('location', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className={autoFilledFields.has('location') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
@@ -318,7 +449,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="space-y-2">
               <Label htmlFor="budget_currency">Currency</Label>
               <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                <SelectTrigger>
+                <SelectTrigger className={autoFilledFields.has('budget_currency') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -332,11 +463,23 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="budget_min">Salary Min</Label>
-                <Input {...register('budget_min')} type="number" min="0" placeholder="0" />
+                <Input 
+                  {...register('budget_min')} 
+                  type="number" 
+                  min="0" 
+                  placeholder="0"
+                  className={autoFilledFields.has('budget_min') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="budget_max">Salary Max</Label>
-                <Input {...register('budget_max')} type="number" min="0" placeholder="0" />
+                <Input 
+                  {...register('budget_max')} 
+                  type="number" 
+                  min="0" 
+                  placeholder="0"
+                  className={autoFilledFields.has('budget_max') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
+                />
                 {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
               </div>
             </div>
@@ -348,7 +491,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             
             <div className="space-y-2">
               <Label htmlFor="description">Role Description <span className="text-destructive">• Required</span></Label>
-              <Textarea {...register('description')} rows={5} placeholder="Describe the role, responsibilities, and requirements..." />
+              <Textarea 
+                {...register('description')} 
+                rows={5} 
+                placeholder="Describe the role, responsibilities, and requirements..."
+                className={autoFilledFields.has('description') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
+              />
               {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
 
@@ -363,7 +511,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 />
                 <Button type="button" onClick={addSkillMust} variant="secondary">Add</Button>
               </div>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className={`flex flex-wrap gap-2 mt-2 p-2 rounded ${autoFilledFields.has('skills_must') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}`}>
                 {skillsMust.map(skill => (
                   <Badge key={skill} variant="secondary" className="gap-1">
                     {skill}
@@ -387,7 +535,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 />
                 <Button type="button" onClick={addSkillNice} variant="secondary">Add</Button>
               </div>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className={`flex flex-wrap gap-2 mt-2 p-2 rounded ${autoFilledFields.has('skills_nice') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}`}>
                 {skillsNice.map(skill => (
                   <Badge key={skill} variant="outline" className="gap-1">
                     {skill}
