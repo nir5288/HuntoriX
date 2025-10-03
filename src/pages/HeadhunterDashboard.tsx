@@ -111,7 +111,7 @@ const HeadhunterDashboard = () => {
           <Button 
             size="lg" 
             onClick={() => navigate('/opportunities')}
-            className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+            className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 opacity-95"
           >
             <Search className="mr-2 h-5 w-5" />
             Browse All Jobs
@@ -122,8 +122,8 @@ const HeadhunterDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Applications</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium opacity-90">Active Applications</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground opacity-80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -134,8 +134,8 @@ const HeadhunterDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Successful Placements</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium opacity-90">Successful Placements</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground opacity-80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -146,8 +146,8 @@ const HeadhunterDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium opacity-90">Response Rate</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -162,7 +162,7 @@ const HeadhunterDashboard = () => {
         {/* My Applications */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>My Applications</CardTitle>
+            <CardTitle className="opacity-90">My Applications</CardTitle>
             <CardDescription>Track your application status</CardDescription>
           </CardHeader>
           <CardContent>
@@ -177,13 +177,13 @@ const HeadhunterDashboard = () => {
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1" onClick={() => navigate(`/jobs/${app.job_id}`)} style={{ cursor: 'pointer' }}>
-                          <CardTitle className="text-lg">{app.job?.title}</CardTitle>
+                          <CardTitle className="text-lg opacity-90">{app.job?.title}</CardTitle>
                           <CardDescription className="mt-1">
                             Applied {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge className={getStatusColor(app.status)}>
+                          <Badge className={`${getStatusColor(app.status)} opacity-95`}>
                             {app.status}
                           </Badge>
                         </div>
@@ -195,6 +195,7 @@ const HeadhunterDashboard = () => {
                           size="sm" 
                           variant="outline"
                           onClick={() => handleChat(app.job_id)}
+                          className="opacity-95"
                         >
                           <MessageCircle className="mr-2 h-4 w-4" />
                           Chat with Employer
@@ -211,7 +212,7 @@ const HeadhunterDashboard = () => {
         {/* Recommended Jobs */}
         <Card>
           <CardHeader>
-            <CardTitle>Recommended Jobs</CardTitle>
+            <CardTitle className="opacity-90">Recommended Jobs</CardTitle>
             <CardDescription>Jobs matching your expertise</CardDescription>
           </CardHeader>
           <CardContent>
@@ -226,19 +227,19 @@ const HeadhunterDashboard = () => {
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-xl">{job.title}</CardTitle>
+                          <CardTitle className="text-xl opacity-90">{job.title}</CardTitle>
                           <CardDescription className="mt-2">
                             {job.employer?.company_name || job.employer?.name} • {job.location}
                           </CardDescription>
                           {job.skills_must && job.skills_must.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-3">
                               {job.skills_must.slice(0, 5).map((skill: string, idx: number) => (
-                                <Badge key={idx} variant="secondary">{skill}</Badge>
+                                <Badge key={idx} variant="secondary" className="opacity-90">{skill}</Badge>
                               ))}
                             </div>
                           )}
                         </div>
-                        <Badge className="bg-[hsl(var(--accent-mint))]">
+                        <Badge className="bg-[hsl(var(--accent-mint))] opacity-95">
                           {job.fee_model === 'percent_fee' ? `${job.fee_value}%` : `${job.fee_value} ${job.budget_currency}`}
                         </Badge>
                       </div>
