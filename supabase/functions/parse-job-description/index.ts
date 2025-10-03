@@ -39,7 +39,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at mapping job descriptions into structured fields. Rules: 1) Job Title: extract EXACT title text from the first heading or an explicit "Job Title" field; do not reword. 2) Industry: infer domain such as Software/Tech, Biotech/Healthcare, Finance/Fintech, Energy/Cleantech, Public/Non-profit. 3) Seniority: detect Junior/Mid/Senior/Lead/Exec using title keywords and experience thresholds (0-2y=juni, 2-5y=mid, 5-7y=senior, 8-9y=lead, 10+y=exec). 4) Employment Type: map Full-time/Part-time/Contract/Temporary to full_time/contract/temp. 5) Location Type: map On-site/Hybrid/Remote to on_site/hybrid/remote. 6) Compensation: extract currency and numeric min/max if any. 7) Role Description: include mission, summary, and responsibilities sections like "Your Mission", "What You’ll Do". Do NOT include benefits, perks, or legal/EEO text here. 8) Must-Have Skills: take from sections named "Requirements", "What You’ll Bring", strictly core qualifications; exclude benefits/perks. 9) Nice-to-Have Skills: take from "Bonus Points"/"Nice to Have". 10) Ignore EEO/legal compliance statements entirely for description and skills. Keep arrays concise, deduplicated, and trimmed.'
+            content: `You are an expert at mapping job descriptions into structured fields. Apply STRICT mapping and concise output.\n\nSection mapping:\n- Job Title: extract EXACT title from the first heading or explicit 'Job Title:' line; do not reword.\n- Industry: infer concise domain (Software/Tech, Biotech/Healthcare, Finance/Fintech, Energy/Cleantech, Public/Non-profit).\n- Seniority: choose highest single level mentioned (junior/mid/senior/lead/exec); use thresholds (0–2y=junior, 3–5y=mid, 5–7y=senior, 8–9y=lead, 10+y=exec).\n- Employment Type: map Full-time/Part-time/Contract/Temporary to full_time/contract/temp.\n- Location Type: map On-site/Hybrid/Remote to on_site/hybrid/remote. If 'Hybrid' and a city appears, set location_type=hybrid and location=<City>.\n- Compensation: extract currency and numeric min/max when present.\n\nRole Description:\n- 1–3 sentences summarizing mission and responsibilities (sections like 'Your Mission', 'What You’ll Do').\n- Keep concise, no filler.\n- Include benefits only as part of narrative if they appear; DO NOT move benefits into skills.\n- REMOVE legal/EEO/compliance text.\n\nSkills:\n- Must-Have Skills: from 'Requirements'/'What You’ll Bring'. Prefer hard skills (stack, cloud, CI/CD, security). Max 6 items.\n- Nice-to-Have Skills: from 'Bonus'/'Preferred'/'Plus'/'Nice to have'. Max 4 items.\n- Trim phrasing by removing fillers ('Experience with', 'Strong', 'Proficiency in', etc.).\n- Normalize tech names (e.g., 'JavaScript/TypeScript', 'React', 'Node.js', 'GCP/AWS', 'CI/CD', 'GraphQL').\n- Each bullet ≤ 10 words.\n- Deduplicate and trim; exclude benefits/perks/legal.\n\nGeneral:\n- Ignore EEO/legal statements entirely for description and skills.\n- Keep arrays concise and clean.`
           },
           {
             role: 'user',
@@ -135,8 +135,83 @@ serve(async (req) => {
       throw new Error('No tool call in AI response');
     }
 
-    const jobInfo = JSON.parse(toolCall.function.arguments);
-    console.log('Extracted job info:', jobInfo);
+    const raw = JSON.parse(toolCall.function.arguments) as any;
+    const originalText: string = String(jobDescription || '');
+
+    function stripFiller(s: string) {
+      return s.replace(/^(strong|proven|solid|hands?-on|experience with|proficiency in|expertise in|knowledge of|ability to)\s+/i, '').trim();
+    }
+
+    function normalizeTech(s: string) {
+      let out = s;
+      const rules = [
+        { re: /\bjavascript\s*\/?\s*typescript\b/i, to: 'JavaScript/TypeScript' },
+        { re: /\bnode(?:\.js)?\b/i, to: 'Node.js' },
+        { re: /\breact(?:\.js)?\b/i, to: 'React' },
+        { re: /\b(graphql)\b/i, to: 'GraphQL' },
+        { re: /\b(ci\/?cd|continuous integration(?: and)? continuous delivery)\b/i, to: 'CI/CD' },
+        { re: /\bgoogle cloud|gcp\b/i, to: 'GCP' },
+        { re: /\baws|amazon web services\b/i, to: 'AWS' },
+      ];
+      for (const r of rules) out = out.replace(r.re, r.to);
+      return out.trim();
+    }
+
+    function limitWords(s: string, max = 10) {
+      const words = s.split(/\s+/);
+      return words.length > max ? words.slice(0, max).join(' ') : s;
+    }
+
+    function cleanList(arr?: string[], cap = 6) {
+      const seen = new Set<string>();
+      const cleaned: string[] = [];
+      for (const item of arr ?? []) {
+        const x = limitWords(normalizeTech(stripFiller(String(item))), 10);
+        const key = x.toLowerCase();
+        if (x && !seen.has(key)) {
+          seen.add(key);
+          cleaned.push(x);
+        }
+        if (cleaned.length === cap) break;
+      }
+      return cleaned;
+    }
+
+    // Description: remove EEO/legal common lines, compress to 3 sentences
+    function cleanDescription(desc?: string) {
+      if (!desc) return '';
+      let d = desc
+        .replace(/equal opportunity.*?(\.|\n)/gi, '')
+        .replace(/accommodations.*?(\.|\n)/gi, '')
+        .replace(/(disability|veteran)s?.*?(\.|\n)/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const parts = d.split(/(?<=\.)\s+/).slice(0, 3);
+      return parts.join(' ');
+    }
+
+    const jobInfo: any = {
+      ...raw,
+      description: cleanDescription(raw.description),
+      skills_must: cleanList(raw.skills_must, 6),
+      skills_nice: cleanList(raw.skills_nice, 4),
+    };
+
+    // Fallback: if hybrid and location missing but city in text
+    if (jobInfo.location_type === 'hybrid' && !jobInfo.location) {
+      const m = originalText.match(/\b([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)\b/g);
+      if (m && m.length) {
+        const city = m.find(tok => tok.split(' ').length <= 3);
+        if (city) jobInfo.location = city;
+      }
+    }
+
+    // Ensure employment_type mapping remains in enum
+    if (jobInfo.employment_type === 'part_time') {
+      jobInfo.employment_type = 'contract';
+    }
+
+    console.log('Extracted job info (post-processed):', jobInfo);
 
     return new Response(
       JSON.stringify({ success: true, jobInfo }),
