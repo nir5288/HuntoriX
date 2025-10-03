@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { decompress } from "https://deno.land/x/zip@v1.2.5/mod.ts";
+import { BlobReader, ZipReader, TextWriter } from "https://deno.land/x/zipjs/index.js";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,36 +12,33 @@ async function parseDocx(base64Data: string): Promise<string> {
     // Convert base64 to Uint8Array
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    // Write to temp file
-    const tempPath = await Deno.makeTempFile({ suffix: '.docx' });
-    await Deno.writeFile(tempPath, binaryData);
-    
-    // Create temp directory for extraction
-    const extractPath = await Deno.makeTempDir();
-    
-    // Decompress the docx file
-    await decompress(tempPath, extractPath);
-    
-    // Read document.xml from word directory
-    const documentPath = `${extractPath}/word/document.xml`;
-    const xmlContent = await Deno.readTextFile(documentPath);
-    
-    // Extract text from XML (simple regex approach)
-    // This extracts content between <w:t> tags which contain the actual text
+    // Create a Blob from the data and read DOCX (ZIP) entries
+    const blob = new Blob([binaryData], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+    const zipReader = new ZipReader(new BlobReader(blob));
+    const entries = await zipReader.getEntries();
+
+    // Find the main document XML
+    const docEntry = entries.find((e: any) => e.filename === 'word/document.xml' || e.filename?.endsWith('/word/document.xml'));
+    if (!docEntry) {
+      await zipReader.close();
+      throw new Error('word/document.xml not found in DOCX');
+    }
+
+    const xmlContent = await (docEntry as any).getData(new TextWriter());
+    await zipReader.close();
+
+    // Extract text from XML (content inside <w:t> tags)
     const textMatches = xmlContent.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
     const extractedText = textMatches
-      .map(match => {
+      .map((match: string) => {
         const textMatch = match.match(/<w:t[^>]*>([^<]*)<\/w:t>/);
         return textMatch ? textMatch[1] : '';
       })
       .join(' ')
       .replace(/\s+/g, ' ')
       .trim();
-    
-    // Clean up temp files
-    await Deno.remove(tempPath);
-    await Deno.remove(extractPath, { recursive: true });
-    
+
     return extractedText;
   } catch (error) {
     console.error('Error parsing DOCX:', error);

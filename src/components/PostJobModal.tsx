@@ -183,6 +183,17 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         jobDescriptionText = parseData.text;
       }
 
+      const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-document', {
+        body: { 
+          fileData: base64,
+          fileName: file.name,
+          mimeType: file.type
+        }
+      });
+
+      if (parseError) throw parseError;
+      const jobDescriptionText = parseData.text as string;
+
       const { data, error } = await supabase.functions.invoke('parse-job-description', {
         body: { jobDescription: jobDescriptionText }
       });
@@ -191,11 +202,31 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       if (!data.success) throw new Error(data.error);
 
       const jobInfo = data.jobInfo;
+      const combinedText = `${jobInfo.title ?? ''} ${jobInfo.description ?? ''} ${jobDescriptionText}`;
+
+      // Helper: infer seniority from text
+      const detectSeniority = (text: string): 'junior' | 'mid' | 'senior' | 'lead' | 'exec' | undefined => {
+        const t = text.toLowerCase();
+        if (/(lead|tech lead|team lead)/.test(t)) return 'lead';
+        if (/(executive director|vp|cto|chief|executive)/.test(t)) return 'exec';
+        if (/(senior|sr\.?|5\+\s*years|6\+\s*years|7\+\s*years|8\+\s*years|9\+\s*years|10\+\s*years)/.test(t)) return 'senior';
+        if (/(junior|jr\.?|0-2\s*years|1-2\s*years)/.test(t)) return 'junior';
+        if (/(mid|3-5\s*years)/.test(t)) return 'mid';
+        return undefined;
+      };
       
       // Auto-fill fields
       if (jobInfo.title) {
-        setValue('title', jobInfo.title);
-        filledFields.add('title');
+        const normalized = jobInfo.title.trim();
+        if (jobTitles.includes(normalized)) {
+          setValue('title', normalized);
+          filledFields.add('title');
+        } else {
+          setValue('title', 'Other');
+          setValue('custom_title', normalized);
+          filledFields.add('title');
+          filledFields.add('custom_title');
+        }
       }
       if (jobInfo.industry) {
         setValue('industry', jobInfo.industry);
@@ -203,6 +234,17 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       }
       if (jobInfo.seniority) {
         setValue('seniority', jobInfo.seniority);
+        filledFields.add('seniority');
+      } else {
+        const inferred = detectSeniority(combinedText);
+        if (inferred) {
+          setValue('seniority', inferred);
+          filledFields.add('seniority');
+        }
+      }
+      // If title says Senior but seniority was mid/junior, override to senior
+      if ((jobInfo.title?.toLowerCase().includes('senior') || /5\+\s*years/i.test(combinedText)) && (watch('seniority') === 'mid' || watch('seniority') === 'junior')) {
+        setValue('seniority', 'senior');
         filledFields.add('seniority');
       }
       if (jobInfo.employment_type) {
