@@ -72,10 +72,11 @@ const Opportunities = () => {
   const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
   const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');
   
-  // Sort and applied filters
-  const [sortBy, setSortBy] = useState<'recent' | 'relevance'>(searchParams.get('sort') as any || 'recent');
-  const [showAppliedJobs, setShowAppliedJobs] = useState(searchParams.get('showApplied') === 'true');
+  // Sort and applied filters - initialize from user preferences
+  const [sortBy, setSortBy] = useState<'recent' | 'relevance'>('recent');
+  const [showAppliedJobs, setShowAppliedJobs] = useState(false);
   const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(new Set());
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
 
   // Debounced mirrors (to avoid re-fetching on every keystroke)
   const [debouncedLocation, setDebouncedLocation] = useState('');
@@ -105,10 +106,48 @@ const Opportunities = () => {
     return () => clearTimeout(t);
   }, [filterSalaryMax]);
 
+  // Load user preferences
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (!user) {
+        setPreferencesLoaded(true);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('sort_preference, show_applied_jobs')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading preferences:', error);
+        setPreferencesLoaded(true);
+        return;
+      }
+
+      if (data) {
+        // Use URL params if present, otherwise use saved preferences
+        const urlSort = searchParams.get('sort');
+        const urlShowApplied = searchParams.get('showApplied');
+        
+        setSortBy((urlSort as any) || data.sort_preference || 'recent');
+        setShowAppliedJobs(urlShowApplied ? urlShowApplied === 'true' : data.show_applied_jobs || false);
+      }
+      
+      setPreferencesLoaded(true);
+    };
+
+    loadPreferences();
+  }, [user]);
+
   // Fetch applied jobs for current user
   useEffect(() => {
     const fetchAppliedJobs = async () => {
-      if (!user || profile?.role !== 'headhunter') return;
+      if (!user || profile?.role !== 'headhunter') {
+        setAppliedJobIds(new Set());
+        return;
+      }
       
       const { data, error } = await supabase
         .from('applications')
@@ -133,6 +172,11 @@ const Opportunities = () => {
       .select('*', { count: 'exact' })
       .in('status', ['open', 'shortlisted', 'awarded'])
       .eq('visibility', 'public');
+    
+    // Filter out applied jobs at database level if needed
+    if (!showAppliedJobs && user && profile?.role === 'headhunter' && appliedJobIds.size > 0) {
+      q = q.not('id', 'in', `(${Array.from(appliedJobIds).join(',')})`);
+    }
     
     // Sort order
     if (sortBy === 'recent') {
@@ -200,7 +244,11 @@ const Opportunities = () => {
     debouncedSalaryMin,
     debouncedSalaryMax,
     debouncedQuery,
-    sortBy
+    sortBy,
+    showAppliedJobs,
+    appliedJobIds,
+    user,
+    profile
   ]);
 
   // Fetch page with count
@@ -247,14 +295,16 @@ const Opportunities = () => {
     }
   }, [buildBaseQuery, searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, setSearchParams]);
 
-  // Initial load - use page from URL
+  // Initial load - use page from URL (wait for preferences to load)
   useEffect(() => {
-    fetchPage(currentPage, true);
-  }, []);
+    if (preferencesLoaded && appliedJobIds !== undefined) {
+      fetchPage(currentPage, true);
+    }
+  }, [preferencesLoaded, appliedJobIds]);
 
   // On filter/search change (deps use *debounced* values) - reset to page 1
   useEffect(() => {
-    if (!loading) {
+    if (!loading && preferencesLoaded) {
       fetchPage(1, false);
     }
   }, [
@@ -267,7 +317,8 @@ const Opportunities = () => {
     debouncedSalaryMin,
     debouncedSalaryMax,
     debouncedQuery,
-    sortBy
+    sortBy,
+    showAppliedJobs
   ]);
 
   // Realtime: throttle bursts
@@ -291,13 +342,8 @@ const Opportunities = () => {
     };
   }, [fetchPage, currentPage]);
 
-  // Filter out applied jobs if toggle is off
-  const filteredJobs = useMemo(() => {
-    if (showAppliedJobs || !user || profile?.role !== 'headhunter') {
-      return jobs;
-    }
-    return jobs.filter(job => !appliedJobIds.has(job.id));
-  }, [jobs, showAppliedJobs, appliedJobIds, user, profile]);
+  // No need to filter client-side anymore since we filter at DB level
+  const filteredJobs = useMemo(() => jobs, [jobs]);
   
   // Calculate total pages
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -337,6 +383,30 @@ const Opportunities = () => {
 
   const handleSkillClick = (skill: string) => {
     setSearchQuery(skill);
+  };
+
+  // Save sort preference
+  const handleSortChange = async (value: 'recent' | 'relevance') => {
+    setSortBy(value);
+    
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({ sort_preference: value })
+        .eq('id', user.id);
+    }
+  };
+
+  // Save show applied preference
+  const handleShowAppliedChange = async (checked: boolean) => {
+    setShowAppliedJobs(checked);
+    
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({ show_applied_jobs: checked })
+        .eq('id', user.id);
+    }
   };
 
   // Filters extracted into <OpportunitiesFilters /> component to prevent remounting and focus loss.
@@ -408,7 +478,7 @@ const Opportunities = () => {
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Label className="text-sm font-medium">Sort by:</Label>
-              <Select value={sortBy} onValueChange={(value: 'recent' | 'relevance') => setSortBy(value)}>
+              <Select value={sortBy} onValueChange={handleSortChange}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -424,7 +494,7 @@ const Opportunities = () => {
                 <Switch
                   id="show-applied"
                   checked={showAppliedJobs}
-                  onCheckedChange={setShowAppliedJobs}
+                  onCheckedChange={handleShowAppliedChange}
                 />
                 <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">
                   Show applied jobs
