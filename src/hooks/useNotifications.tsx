@@ -78,6 +78,27 @@ export const useNotifications = () => {
     }
   };
 
+  const markAsUnread = async (notificationId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: false })
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setNotifications(prev =>
+        prev.map(n => (n.id === notificationId ? { ...n, is_read: false } : n))
+      );
+      setUnreadCount(prev => prev + 1);
+    } catch (error) {
+      console.error('Error marking notification as unread:', error);
+    }
+  };
+
   useEffect(() => {
     fetchNotifications();
 
@@ -115,6 +136,7 @@ export const useNotifications = () => {
     loading,
     markAsRead,
     markAllAsRead,
+    markAsUnread,
     refetch: fetchNotifications,
   };
 };

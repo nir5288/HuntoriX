@@ -11,13 +11,12 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 
 export const NotificationDropdown = () => {
   const navigate = useNavigate();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, markAsUnread } = useNotifications();
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
@@ -72,6 +71,11 @@ export const NotificationDropdown = () => {
     await markAsRead(notificationId);
   };
 
+  const handleMarkAsUnread = async (e: React.MouseEvent, notificationId: string) => {
+    e.stopPropagation();
+    await markAsUnread(notificationId);
+  };
+
   return (
     <DropdownMenu>
       <Tooltip>
@@ -92,7 +96,7 @@ export const NotificationDropdown = () => {
         </TooltipTrigger>
         <TooltipContent>Notifications</TooltipContent>
       </Tooltip>
-      <DropdownMenuContent align="end" className="w-80 bg-background">
+      <DropdownMenuContent align="end" className="w-80 bg-background z-[60]">
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>Notifications</span>
           {unreadCount > 0 && (
@@ -114,7 +118,7 @@ export const NotificationDropdown = () => {
             No notifications yet
           </div>
         ) : (
-          <ScrollArea className="max-h-[400px]">
+          <div className="max-h-[420px] overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
             <div className="py-1">
               {notifications.map((notification) => (
                 <DropdownMenuItem
@@ -138,20 +142,31 @@ export const NotificationDropdown = () => {
                       {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                     </p>
                   </div>
-                  {!notification.is_read && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleMarkAsRead(e, notification.id)}
-                      className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity h-auto p-1 text-xs"
-                    >
-                      Mark as Read
-                    </Button>
-                  )}
+                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {!notification.is_read ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleMarkAsRead(e, notification.id)}
+                        className="h-auto p-1 text-xs"
+                      >
+                        Mark as Read
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleMarkAsUnread(e, notification.id)}
+                        className="h-auto p-1 text-xs"
+                      >
+                        Mark as Unread
+                      </Button>
+                    )}
+                  </div>
                 </DropdownMenuItem>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
