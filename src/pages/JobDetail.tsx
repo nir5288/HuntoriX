@@ -28,6 +28,9 @@ const JobDetail = () => {
     if (from === 'dashboard') {
       return 'Back to Dashboard';
     }
+    if (from === 'saved') {
+      return 'Back to My Saved Jobs';
+    }
     return 'Back to Opportunities';
   };
 
