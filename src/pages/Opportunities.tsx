@@ -271,8 +271,7 @@ const Opportunities = () => {
 
   const handleApplyClose = () => {
     setApplyModalOpen(false);
-    // Refresh to reflect any application-side effects
-    fetchFirstPage();
+    // Real-time updates will handle state changes automatically
   };
 
   // Filters extracted into <OpportunitiesFilters /> component to prevent remounting and focus loss.
