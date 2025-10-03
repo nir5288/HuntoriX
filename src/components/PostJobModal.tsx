@@ -157,14 +157,30 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       if (file.type === 'text/plain') {
         jobDescriptionText = await file.text();
       } else {
-        // For PDF and DOCX, we'll need to read as text (simplified for now)
-        // In production, you'd use a proper PDF/DOCX parser
+        // For PDF and DOCX files, convert to base64 and send to backend
         const reader = new FileReader();
-        jobDescriptionText = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
+        const base64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            // Extract base64 part after the comma
+            const base64Data = result.split(',')[1];
+            resolve(base64Data);
+          };
           reader.onerror = reject;
-          reader.readAsText(file);
+          reader.readAsDataURL(file);
         });
+
+        // Send base64 file to backend for parsing
+        const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-document', {
+          body: { 
+            fileData: base64,
+            fileName: file.name,
+            mimeType: file.type
+          }
+        });
+
+        if (parseError) throw parseError;
+        jobDescriptionText = parseData.text;
       }
 
       const { data, error } = await supabase.functions.invoke('parse-job-description', {

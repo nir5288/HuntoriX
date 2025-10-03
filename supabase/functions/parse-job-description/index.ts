@@ -39,11 +39,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert at parsing job descriptions and extracting structured information. Extract as much information as possible from the job description provided.'
+            content: 'You are an expert at parsing job descriptions and extracting structured information. Be very precise with job titles - extract exactly what is written. For seniority, look for keywords like "Senior", "Junior", "Mid", "Lead", "Executive" in the job title or requirements. If experience is mentioned (e.g., "5+ years"), map it appropriately: 0-2 years = junior, 2-5 years = mid, 5+ years = senior, 8+ years = lead, 10+ years = exec.'
           },
           {
             role: 'user',
-            content: `Parse this job description and extract the following information:\n\n${jobDescription}`
+            content: `Parse this job description and extract the following information. Be precise with job titles and match seniority based on experience requirements:\n\n${jobDescription}`
           }
         ],
         tools: [
@@ -57,7 +57,7 @@ serve(async (req) => {
                 properties: {
                   title: {
                     type: 'string',
-                    description: 'The job title (e.g., Software Engineer, Frontend Developer)'
+                    description: 'The exact job title from the description (e.g., Senior Fullstack Engineer, Frontend Developer). Extract it precisely as written.'
                   },
                   industry: {
                     type: 'string',
