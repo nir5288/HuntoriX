@@ -158,10 +158,22 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-1">
                         {message.attachments.map((file: any, idx: number) => (
-                          <div key={idx} className="flex items-center gap-2 text-xs">
+                          <a
+                            key={idx}
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              "flex items-center gap-2 text-xs hover:underline",
+                              isFromMe ? "text-primary-foreground" : "text-foreground"
+                            )}
+                          >
                             <Paperclip className="h-3 w-3" />
                             <span>{file.name}</span>
-                          </div>
+                            <span className="text-[10px] opacity-70">
+                              ({(file.size / 1024).toFixed(1)}KB)
+                            </span>
+                          </a>
                         ))}
                       </div>
                     )}
