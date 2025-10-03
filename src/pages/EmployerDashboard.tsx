@@ -9,42 +9,43 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PostJobModal } from '@/components/PostJobModal';
-
 const EmployerDashboard = () => {
-  const { user, profile, loading } = useRequireAuth('employer');
+  const {
+    user,
+    profile,
+    loading
+  } = useRequireAuth('employer');
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [postJobModalOpen, setPostJobModalOpen] = useState(false);
-
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
     }
   }, [user, loading]);
-
   const fetchDashboardData = async () => {
     try {
       // Fetch jobs
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('created_by', user?.id)
-        .order('created_at', { ascending: false });
-
+      const {
+        data: jobsData,
+        error: jobsError
+      } = await supabase.from('jobs').select('*').eq('created_by', user?.id).order('created_at', {
+        ascending: false
+      });
       if (jobsError) throw jobsError;
       setJobs(jobsData || []);
 
       // Fetch applications for those jobs
       if (jobsData && jobsData.length > 0) {
         const jobIds = jobsData.map(job => job.id);
-        const { data: appsData, error: appsError } = await supabase
-          .from('applications')
-          .select('*, headhunter:profiles!applications_headhunter_id_fkey(*)')
-          .in('job_id', jobIds)
-          .order('created_at', { ascending: false });
-
+        const {
+          data: appsData,
+          error: appsError
+        } = await supabase.from('applications').select('*, headhunter:profiles!applications_headhunter_id_fkey(*)').in('job_id', jobIds).order('created_at', {
+          ascending: false
+        });
         if (appsError) throw appsError;
         setApplications(appsData || []);
       }
@@ -55,51 +56,50 @@ const EmployerDashboard = () => {
       setLoadingData(false);
     }
   };
-
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       open: 'bg-[hsl(var(--accent-mint))]',
       shortlisted: 'bg-[hsl(var(--accent-lilac))]',
       awarded: 'bg-[hsl(var(--success))]',
       closed: 'bg-gray-400',
-      on_hold: 'bg-[hsl(var(--warning))]',
+      on_hold: 'bg-[hsl(var(--warning))]'
     };
     return colors[status] || 'bg-gray-400';
   };
-
   const getApplicationStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       submitted: 'bg-[hsl(var(--warning))]',
       shortlisted: 'bg-[hsl(var(--accent-lilac))]',
       rejected: 'bg-destructive',
-      withdrawn: 'bg-muted',
+      withdrawn: 'bg-muted'
     };
     return colors[status] || 'bg-gray-400';
   };
-
   const handleAccept = async (applicationId: string, headhunterId: string, jobId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from('applications')
-        .update({ status: 'shortlisted' })
-        .eq('id', applicationId);
-
+      const {
+        error: updateError
+      } = await supabase.from('applications').update({
+        status: 'shortlisted'
+      }).eq('id', applicationId);
       if (updateError) throw updateError;
 
       // Create notification for headhunter
-      const { error: notifError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: headhunterId,
-          type: 'status_change',
-          payload: { job_id: jobId, application_id: applicationId, status: 'shortlisted' },
-          is_read: false,
-          title: 'Application Shortlisted',
-          message: 'Your application has been shortlisted',
-        } as any);
-
+      const {
+        error: notifError
+      } = await supabase.from('notifications').insert({
+        user_id: headhunterId,
+        type: 'status_change',
+        payload: {
+          job_id: jobId,
+          application_id: applicationId,
+          status: 'shortlisted'
+        },
+        is_read: false,
+        title: 'Application Shortlisted',
+        message: 'Your application has been shortlisted'
+      } as any);
       if (notifError) console.error('Notification error:', notifError);
-
       toast.success('Application accepted and headhunter notified');
       fetchDashboardData();
     } catch (error) {
@@ -107,30 +107,31 @@ const EmployerDashboard = () => {
       toast.error('Failed to accept application');
     }
   };
-
   const handleDecline = async (applicationId: string, headhunterId: string, jobId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from('applications')
-        .update({ status: 'rejected' })
-        .eq('id', applicationId);
-
+      const {
+        error: updateError
+      } = await supabase.from('applications').update({
+        status: 'rejected'
+      }).eq('id', applicationId);
       if (updateError) throw updateError;
 
       // Create notification for headhunter
-      const { error: notifError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: headhunterId,
-          type: 'status_change',
-          payload: { job_id: jobId, application_id: applicationId, status: 'rejected' },
-          is_read: false,
-          title: 'Application Rejected',
-          message: 'Your application has been rejected',
-        } as any);
-
+      const {
+        error: notifError
+      } = await supabase.from('notifications').insert({
+        user_id: headhunterId,
+        type: 'status_change',
+        payload: {
+          job_id: jobId,
+          application_id: applicationId,
+          status: 'rejected'
+        },
+        is_read: false,
+        title: 'Application Rejected',
+        message: 'Your application has been rejected'
+      } as any);
       if (notifError) console.error('Notification error:', notifError);
-
       toast.success('Application declined');
       fetchDashboardData();
     } catch (error) {
@@ -138,14 +139,11 @@ const EmployerDashboard = () => {
       toast.error('Failed to decline application');
     }
   };
-
   const handleChat = (jobId: string, headhunterId: string) => {
     navigate(`/messages?job=${jobId}&with=${headhunterId}`);
   };
-
   if (loading || loadingData) {
-    return (
-      <div className="min-h-screen bg-background">
+    return <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
@@ -153,12 +151,9 @@ const EmployerDashboard = () => {
             <div className="h-32 bg-muted rounded"></div>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
@@ -169,11 +164,7 @@ const EmployerDashboard = () => {
             </h1>
             <p className="text-muted-foreground">Manage your job postings and applications</p>
           </div>
-          <Button 
-            size="lg" 
-            onClick={() => setPostJobModalOpen(true)}
-            className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
-          >
+          <Button size="lg" onClick={() => setPostJobModalOpen(true)} className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
             <Plus className="mr-2 h-5 w-5" />
             Post a Job
           </Button>
@@ -221,8 +212,7 @@ const EmployerDashboard = () => {
             <CardDescription>View and manage your job postings</CardDescription>
           </CardHeader>
           <CardContent>
-            {jobs.length === 0 ? (
-              <div className="text-center py-12">
+            {jobs.length === 0 ? <div className="text-center py-12">
                 <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No jobs yet</h3>
                 <p className="text-muted-foreground mb-4">Post your first job to get started</p>
@@ -230,29 +220,19 @@ const EmployerDashboard = () => {
                   <Plus className="mr-2 h-4 w-4" />
                   Post a Job
                 </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {jobs.map((job) => {
-                  const jobApplications = applications.filter(a => a.job_id === job.id);
-                  const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
-                  
-                  return (
-                    <Card 
-                      key={job.id} 
-                      className="hover:shadow-md transition-shadow cursor-pointer" 
-                      onClick={() => navigate(`/jobs/${job.id}`)}
-                    >
+              </div> : <div className="space-y-4">
+                {jobs.map(job => {
+              const jobApplications = applications.filter(a => a.job_id === job.id);
+              const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
+              return <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`)}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <CardTitle className="text-xl">{job.title}</CardTitle>
-                              {pendingCount > 0 && (
-                                <Badge className="bg-[hsl(var(--warning))] text-white">
+                              {pendingCount > 0 && <Badge className="bg-[hsl(var(--warning))] text-white">
                                   {pendingCount} Pending Review
-                                </Badge>
-                              )}
+                                </Badge>}
                             </div>
                             <CardDescription>
                               {job.location} • {job.employment_type?.replace('_', ' ')}
@@ -270,22 +250,14 @@ const EmployerDashboard = () => {
                           <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
                         </div>
                       </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
+                    </Card>;
+            })}
+              </div>}
           </CardContent>
         </Card>
       </div>
 
-      <PostJobModal 
-        open={postJobModalOpen} 
-        onOpenChange={setPostJobModalOpen}
-        userId={user?.id || ''}
-      />
-    </div>
-  );
+      <PostJobModal open={postJobModalOpen} onOpenChange={setPostJobModalOpen} userId={user?.id || ''} />
+    </div>;
 };
-
 export default EmployerDashboard;
