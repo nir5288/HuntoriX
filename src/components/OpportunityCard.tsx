@@ -118,7 +118,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
+  const getPreviewDescription = (text: string) => {
+    // Truncate to 150 characters for consistent preview length
+    return truncateText(text, 150);
   };
 
   const handleCTA = () => {
@@ -274,19 +279,24 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           )}
         </div>
 
-        {/* Description teaser - fixed 2 lines */}
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {job.description}
+        {/* Description teaser - fixed preview length */}
+        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+          {getPreviewDescription(job.description)}
         </p>
 
-        {/* Skills */}
+        {/* Skills - always show max 4 for consistency */}
         {job.skills_must && job.skills_must.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {job.skills_must.slice(0, 5).map((skill, idx) => (
+          <div className="flex flex-wrap gap-2 min-h-[2rem]">
+            {job.skills_must.slice(0, 4).map((skill, idx) => (
               <Badge key={idx} variant="secondary" className="text-xs">
                 {skill}
               </Badge>
             ))}
+            {job.skills_must.length > 4 && (
+              <Badge variant="secondary" className="text-xs">
+                +{job.skills_must.length - 4} more
+              </Badge>
+            )}
           </div>
         )}
       </CardContent>
