@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
 import { Briefcase, LogOut, LayoutDashboard, Settings, MessageSquare, User } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -110,16 +111,21 @@ export function Header() {
 
         <div className="flex items-center gap-4">
           {user && profile ? (
-            <>
+            <TooltipProvider>
               <NotificationDropdown />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('/messages')}
-                className="relative"
-              >
-                <MessageSquare className="h-5 w-5" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => navigate('/messages')}
+                    className="relative"
+                  >
+                    <MessageSquare className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Messages</TooltipContent>
+              </Tooltip>
               <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 hover:opacity-80 transition">
@@ -159,7 +165,7 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            </>
+            </TooltipProvider>
           ) : (
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={() => navigate('/auth?mode=signin')}>

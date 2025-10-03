@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Pencil, Check, X, Paperclip, Reply } from "lucide-react";
@@ -136,7 +137,8 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
 
   return (
     <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-      <div className="space-y-4">
+      <TooltipProvider>
+        <div className="space-y-4">
         {messages.map((message) => {
           const isFromMe = message.from_user === currentUserId;
           const isEditing = editingMessageId === message.id;
@@ -229,26 +231,36 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                       )}
                       
                       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-6 w-6"
-                          onClick={() => onReply(message)}
-                        >
-                          <Reply className="h-3 w-3" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-6 w-6"
+                              onClick={() => onReply(message)}
+                            >
+                              <Reply className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Reply to message</TooltipContent>
+                        </Tooltip>
                         {canEditMessage(message) && !isEditing && (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6"
-                            onClick={() => {
-                              setEditingMessageId(message.id);
-                              setEditText(message.body);
-                            }}
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-6 w-6"
+                                onClick={() => {
+                                  setEditingMessageId(message.id);
+                                  setEditText(message.body);
+                                }}
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit message (within 5 minutes)</TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     </>
@@ -258,7 +270,8 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
             </div>
           );
         })}
-      </div>
+        </div>
+      </TooltipProvider>
     </ScrollArea>
   );
 };

@@ -1,6 +1,7 @@
 import { useState, KeyboardEvent, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Send, Paperclip, X, Smile } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import EmojiPicker from "emoji-picker-react";
@@ -63,6 +64,7 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
 
   return (
     <div className="p-4 border-t bg-background">
+      <TooltipProvider>
       {replyingTo && (
         <div className="mb-2 p-2 bg-muted rounded-lg flex items-start justify-between">
           <div className="flex-1 min-w-0">
@@ -113,16 +115,21 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
         />
         
         <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={disabled || sending}
-              className="h-[60px] w-[60px]"
-            >
-              <Smile className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={disabled || sending}
+                  className="h-[60px] w-[60px]"
+                >
+                  <Smile className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Add emoji</TooltipContent>
+          </Tooltip>
           <PopoverContent className="w-full p-0 border-0" align="start">
             <EmojiPicker
               onEmojiClick={(emojiData) => {
@@ -133,15 +140,20 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
           </PopoverContent>
         </Popover>
         
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || sending}
-          className="h-[60px] w-[60px]"
-        >
-          <Paperclip className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={disabled || sending}
+              className="h-[60px] w-[60px]"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Attach files (max 5)</TooltipContent>
+        </Tooltip>
         
         <Textarea
           value={message}
@@ -152,20 +164,26 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
           disabled={disabled || sending}
         />
         
-        <Button
-          onClick={handleSend}
-          disabled={(!message.trim() && attachedFiles.length === 0) || sending || disabled}
-          size="icon"
-          className="h-[60px] w-[60px]"
-        >
-          <Send className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleSend}
+              disabled={(!message.trim() && attachedFiles.length === 0) || sending || disabled}
+              size="icon"
+              className="h-[60px] w-[60px]"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Send message (Enter)</TooltipContent>
+        </Tooltip>
       </div>
       
       <p className="text-xs text-muted-foreground mt-1">
         {message.length} characters
         {attachedFiles.length > 0 && ` • ${attachedFiles.length} file${attachedFiles.length > 1 ? 's' : ''} attached`}
       </p>
+      </TooltipProvider>
     </div>
   );
 };
