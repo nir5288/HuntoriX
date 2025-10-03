@@ -213,10 +213,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   return (
-    <Card 
-      className="rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full cursor-pointer"
-      onClick={() => navigate(`/job/${job.id}`)}
-    >
+    <Card className="rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
@@ -294,13 +291,15 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         )}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between pt-4 border-t">
-        <div className="text-sm text-muted-foreground">
-          {new Date(job.created_at).toLocaleDateString()}
-        </div>
-        <div onClick={(e) => e.stopPropagation()}>
-          {renderButton()}
-        </div>
+      <CardFooter className="flex items-center justify-between gap-2 pt-4 border-t">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => navigate(`/job/${job.id}`)}
+        >
+          View Details
+        </Button>
+        {renderButton()}
       </CardFooter>
     </Card>
   );
