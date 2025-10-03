@@ -49,6 +49,29 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
     return isFromMe && (now - messageTime < fiveMinutes);
   };
 
+  const handleDownloadAttachment = async (url: string, filename: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download file",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleEditMessage = async (messageId: string) => {
     if (!editText.trim()) return;
 
@@ -158,13 +181,11 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-1">
                         {message.attachments.map((file: any, idx: number) => (
-                          <a
+                          <button
                             key={idx}
-                            href={file.url}
-                            download={file.name}
-                            rel="noopener noreferrer"
+                            onClick={() => handleDownloadAttachment(file.url, file.name)}
                             className={cn(
-                              "flex items-center gap-2 text-xs hover:underline",
+                              "flex items-center gap-2 text-xs hover:underline cursor-pointer",
                               isFromMe ? "text-primary-foreground" : "text-foreground"
                             )}
                           >
@@ -173,7 +194,7 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
                             <span className="text-[10px] opacity-70">
                               ({(file.size / 1024).toFixed(1)}KB)
                             </span>
-                          </a>
+                          </button>
                         ))}
                       </div>
                     )}
