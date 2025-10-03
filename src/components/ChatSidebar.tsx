@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, ChevronDown, Trash2 } from "lucide-react";
+import { X, MessageSquare, ChevronDown, Trash2, Circle, CircleDot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -118,6 +118,14 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
             unreadCount: 0,
           });
         }
+        
+        // Count unread messages where user is the recipient
+        if (!isFromMe && !msg.is_read) {
+          const conv = conversationMap.get(key);
+          if (conv) {
+            conv.unreadCount++;
+          }
+        }
       });
 
       setConversations(Array.from(conversationMap.values()));
@@ -168,6 +176,44 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
     }
   };
 
+  const handleMarkAsUnread = async (jobId: string, otherUserId: string) => {
+    if (!currentUserId) return;
+
+    try {
+      // Mark all messages from the other user as unread
+      const { error } = await supabase
+        .from("messages")
+        .update({ is_read: false })
+        .eq("job_id", jobId)
+        .eq("from_user", otherUserId)
+        .eq("to_user", currentUserId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Marked as unread",
+      });
+
+      loadConversations();
+    } catch (error) {
+      console.error("Error marking as unread:", error);
+      toast({
+        title: "Error",
+        description: "Failed to mark as unread",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredConversations = conversations.filter(conv => {
+    if (filter === "unread") {
+      return conv.unreadCount > 0;
+    }
+    // For now, we don't have archived conversations, so show all for "all" and "archived"
+    return true;
+  });
+
   return (
     <div
       className={cn(
@@ -211,9 +257,13 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
           <div className="p-4 text-center text-muted-foreground">
             No conversations yet
           </div>
+        ) : filteredConversations.length === 0 ? (
+          <div className="p-4 text-center text-muted-foreground">
+            No {filter !== "all" && filter} conversations
+          </div>
         ) : (
           <div className="divide-y">
-            {conversations.map((conv) => (
+            {filteredConversations.map((conv) => (
               <div
                 key={`${conv.jobId}-${conv.otherUserId}`}
                 className={cn(
@@ -226,44 +276,65 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
                   className="w-full p-3 text-left hover:bg-accent transition-colors"
                 >
                   <div className="flex items-start gap-2">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={conv.otherUserAvatar || undefined} />
-                      <AvatarFallback>
-                        {conv.otherUserName.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={conv.otherUserAvatar || undefined} />
+                        <AvatarFallback>
+                          {conv.otherUserName.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      {conv.unreadCount > 0 && (
+                        <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
-                        <p className="font-medium text-sm truncate">
+                        <p className={cn(
+                          "text-sm truncate",
+                          conv.unreadCount > 0 ? "font-semibold" : "font-medium"
+                        )}>
                           {conv.otherUserName}
                         </p>
-                        {conv.unreadCount > 0 && (
-                          <Badge variant="default" className="ml-2 text-xs px-1.5 py-0">
-                            {conv.unreadCount}
-                          </Badge>
-                        )}
                       </div>
                       <p className="text-xs text-muted-foreground mb-0.5 truncate">
                         {conv.jobTitle}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className={cn(
+                        "text-xs truncate",
+                        conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                      )}>
                         {conv.lastMessage}
                       </p>
                     </div>
                   </div>
                 </button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
-                    setDeleteDialogOpen(true);
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMarkAsUnread(conv.jobId, conv.otherUserId);
+                    }}
+                    title="Mark as unread"
+                  >
+                    <CircleDot className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
+                      setDeleteDialogOpen(true);
+                    }}
+                    title="Delete conversation"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

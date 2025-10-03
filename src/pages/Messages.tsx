@@ -52,6 +52,7 @@ const Messages = () => {
     if (jobId && otherUserId) {
       loadMessages();
       loadConversationDetails();
+      markMessagesAsRead();
 
       const channel = supabase
         .channel(`messages-${jobId}-${otherUserId}`)
@@ -70,6 +71,10 @@ const Messages = () => {
               (newMessage.from_user === otherUserId && newMessage.to_user === user.id)
             ) {
               loadMessages();
+              // Mark as read if I'm the recipient
+              if (newMessage.to_user === user.id) {
+                markMessagesAsRead();
+              }
             }
           }
         )
@@ -107,6 +112,22 @@ const Messages = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const markMessagesAsRead = async () => {
+    if (!jobId || !otherUserId || !user) return;
+
+    try {
+      await supabase
+        .from("messages")
+        .update({ is_read: true })
+        .eq("job_id", jobId)
+        .eq("from_user", otherUserId)
+        .eq("to_user", user.id)
+        .eq("is_read", false);
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
     }
   };
 
