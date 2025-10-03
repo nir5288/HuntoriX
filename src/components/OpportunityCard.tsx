@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselApi } from '@/components/ui/carousel';
 import { MapPin, DollarSign, Calendar, Briefcase, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
@@ -42,6 +42,24 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const { toast } = useToast();
   const [hasApplied, setHasApplied] = useState(false);
   const [checkingApplication, setCheckingApplication] = useState(true);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+
+  // Auto-scroll carousel
+  useEffect(() => {
+    if (!carouselApi || !job.skills_must || job.skills_must.length <= 3) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      if (carouselApi.canScrollNext()) {
+        carouselApi.scrollNext();
+      } else {
+        carouselApi.scrollTo(0);
+      }
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, [carouselApi, job.skills_must]);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -306,30 +324,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         {job.skills_must && job.skills_must.length > 0 && (
           <div className="relative overflow-hidden">
             <Carousel
+              setApi={setCarouselApi}
               opts={{
                 align: "start",
                 loop: true,
-                skipSnaps: false,
                 dragFree: true,
               }}
-              plugins={[
-                {
-                  name: 'autoScroll',
-                  init: (embla) => {
-                    let timer: NodeJS.Timeout;
-                    const scroll = () => {
-                      if (embla.canScrollNext()) {
-                        embla.scrollNext();
-                      } else {
-                        embla.scrollTo(0);
-                      }
-                      timer = setTimeout(scroll, 2000);
-                    };
-                    timer = setTimeout(scroll, 2000);
-                    embla.on('destroy', () => clearTimeout(timer));
-                  }
-                } as any
-              ]}
               className="w-full"
             >
               <CarouselContent className="-ml-2">
