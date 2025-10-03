@@ -43,6 +43,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     const verificationLink = tokenData.properties?.action_link;
 
+    if (!verificationLink) {
+      console.error("No verification link generated");
+      return new Response(
+        JSON.stringify({ error: "Failed to generate verification link" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     // Send verification email
     const emailResponse = await resend.emails.send({
       from: "Headhunter Network <onboarding@resend.dev>",
@@ -98,6 +109,17 @@ const handler = async (req: Request): Promise<Response> => {
         </html>
       `,
     });
+
+    if (emailResponse?.error) {
+      console.error("Resend error:", emailResponse.error);
+      return new Response(
+        JSON.stringify({ success: false, error: "Email provider error", details: emailResponse.error }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     console.log("Verification email sent successfully:", emailResponse);
 

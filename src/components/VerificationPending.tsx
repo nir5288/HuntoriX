@@ -23,17 +23,22 @@ export function VerificationPending({ email, userName }: VerificationPendingProp
         return;
       }
 
-      const { error } = await supabase.functions.invoke('send-verification-email', {
+      const { data, error } = await supabase.functions.invoke('send-verification-email', {
         body: {
           userId: user.id,
-          email: email,
+          email,
           name: userName,
         },
       });
 
       if (error) throw error;
 
-      toast.success('Verification email sent! Please check your inbox.');
+      if (data?.error || data?.emailResponse?.error) {
+        console.error('Send verification email failed:', data?.error || data?.emailResponse?.error);
+        toast.error('Failed to send email. Please update email settings and try again.');
+      } else {
+        toast.success('Verification email sent! Please check your inbox.');
+      }
     } catch (error: any) {
       console.error('Error resending verification email:', error);
       toast.error('Failed to resend verification email. Please try again.');
