@@ -283,22 +283,19 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
           {getPreviewDescription(job.description)}
         </p>
-
-        {/* Skills - always show max 4 for consistency */}
-        {job.skills_must && job.skills_must.length > 0 && (
-          <div className="flex flex-wrap gap-2 min-h-[2rem]">
-            {job.skills_must.slice(0, 4).map((skill, idx) => (
-              <Badge key={idx} variant="secondary" className="text-xs">
-                {skill}
-              </Badge>
-            ))}
-            {job.skills_must.length > 4 && (
-              <Badge variant="secondary" className="text-xs">
-                +{job.skills_must.length - 4} more
-              </Badge>
-            )}
-          </div>
-        )}
+        {/* Skills - single-row, fixed height */}
+        <div className="flex gap-2 overflow-hidden flex-nowrap h-8 items-center">
+          {(job.skills_must || []).slice(0, 4).map((skill, idx) => (
+            <Badge key={idx} variant="secondary" className="text-xs whitespace-nowrap">
+              {skill}
+            </Badge>
+          ))}
+          {job.skills_must && job.skills_must.length > 4 && (
+            <Badge variant="secondary" className="text-xs whitespace-nowrap">
+              +{job.skills_must.length - 4} more
+            </Badge>
+          )}
+        </div>
       </CardContent>
 
       <CardFooter className="flex items-center justify-between gap-2 pt-4 border-t">
