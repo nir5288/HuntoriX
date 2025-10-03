@@ -343,14 +343,16 @@ const EmployerProfile = () => {
 
                 <p className="text-muted-foreground mb-4">{profile.bio || "No company description provided"}</p>
 
-                <Button
-                  variant="default"
-                  onClick={() => navigate(`/messages?with=${profile.id}`)}
-                  className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Send Message
-                </Button>
+                {!isOwnProfile && (
+                  <Button
+                    variant="default"
+                    onClick={() => navigate(`/messages?with=${profile.id}`)}
+                    className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Send Message
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
