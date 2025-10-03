@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -12,11 +12,21 @@ import { toast } from 'sonner';
 const JobDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, profile } = useAuth();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [hasApplied, setHasApplied] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
+  
+  // Determine back button text based on referrer
+  const getBackButtonText = () => {
+    const referrer = document.referrer;
+    if (referrer.includes('/dashboard') || referrer.includes('/employer-dashboard') || referrer.includes('/headhunter-dashboard')) {
+      return 'Back to Dashboard';
+    }
+    return 'Back to Opportunities';
+  };
 
   useEffect(() => {
     fetchJob();
@@ -228,7 +238,7 @@ const JobDetail = () => {
       <div className="container mx-auto px-4 py-8">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Opportunities
+          {getBackButtonText()}
         </Button>
 
         <div className="grid lg:grid-cols-3 gap-8">
