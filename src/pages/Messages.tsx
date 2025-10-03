@@ -28,7 +28,7 @@ interface Message {
 const Messages = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -351,6 +351,7 @@ const Messages = () => {
               <MessageThread
                 messages={messages}
                 currentUserId={user?.id || ""}
+                currentUserProfile={profile}
                 loading={loading}
               />
 

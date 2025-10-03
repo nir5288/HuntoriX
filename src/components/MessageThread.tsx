@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { Pencil, Check, X, Paperclip } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -26,10 +26,20 @@ interface Message {
 interface MessageThreadProps {
   messages: Message[];
   currentUserId: string;
+  currentUserProfile: any;
   loading: boolean;
 }
 
-export const MessageThread = ({ messages, currentUserId, loading }: MessageThreadProps) => {
+const formatName = (fullName: string | undefined) => {
+  if (!fullName) return "User";
+  const parts = fullName.trim().split(" ");
+  if (parts.length === 1) return parts[0];
+  const firstName = parts[0];
+  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+  return `${firstName} ${lastInitial}`;
+};
+
+export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading }: MessageThreadProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
@@ -122,99 +132,89 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
           const isEditing = editingMessageId === message.id;
           
           return (
-            <div
-              key={message.id}
-              className={cn(
-                "flex gap-3 group",
-                isFromMe ? "flex-row-reverse" : "flex-row"
-              )}
-            >
-              {!isFromMe && (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={message.from_profile?.avatar_url || undefined} />
-                  <AvatarFallback>
-                    {message.from_profile?.name?.substring(0, 2).toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-              )}
+            <div key={message.id} className="flex gap-3 items-start group">
+              <Avatar className="h-8 w-8 shrink-0">
+                <AvatarImage 
+                  src={isFromMe ? currentUserProfile?.avatar_url : message.from_profile?.avatar_url || undefined} 
+                />
+                <AvatarFallback>
+                  {isFromMe 
+                    ? currentUserProfile?.name?.substring(0, 2).toUpperCase() || "ME"
+                    : message.from_profile?.name?.substring(0, 2).toUpperCase() || "U"
+                  }
+                </AvatarFallback>
+              </Avatar>
               
-              <div
-                className={cn(
-                  "max-w-[70%] rounded-lg px-4 py-2 relative",
-                  isFromMe
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
-                )}
-              >
-                {isEditing ? (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      className="h-8 text-sm"
-                      autoFocus
-                    />
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6"
-                      onClick={() => handleEditMessage(message.id)}
-                    >
-                      <Check className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6"
-                      onClick={() => {
-                        setEditingMessageId(null);
-                        setEditText("");
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-sm break-words">{message.body}</p>
-                    
-                    {message.attachments && message.attachments.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {message.attachments.map((file: any, idx: number) => (
-                          <button
-                            key={idx}
-                            onClick={() => handleDownloadAttachment(file.url, file.name)}
-                            className={cn(
-                              "flex items-center gap-2 text-xs hover:underline cursor-pointer",
-                              isFromMe ? "text-primary-foreground" : "text-foreground"
-                            )}
-                          >
-                            <Paperclip className="h-3 w-3" />
-                            <span>{file.name}</span>
-                            <span className="text-[10px] opacity-70">
-                              ({(file.size / 1024).toFixed(1)}KB)
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2 mt-1">
-                      <p
-                        className={cn(
-                          "text-xs",
-                          isFromMe ? "text-primary-foreground/70" : "text-muted-foreground"
-                        )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline justify-between gap-4 mb-1">
+                  <span className="font-semibold text-sm">
+                    {isFromMe ? "Me" : formatName(message.from_profile?.name)}
+                  </span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {format(new Date(message.created_at), "d MMM yyyy, HH:mm")}
+                  </span>
+                </div>
+                
+                <div className="bg-muted rounded-lg px-4 py-2">
+                  {isEditing ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        className="h-8 text-sm"
+                        autoFocus
+                      />
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6"
+                        onClick={() => handleEditMessage(message.id)}
                       >
-                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                        {message.edited_at && " (edited)"}
-                      </p>
+                        <Check className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6"
+                        onClick={() => {
+                          setEditingMessageId(null);
+                          setEditText("");
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm break-words">{message.body}</p>
+                      
+                      {message.attachments && message.attachments.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {message.attachments.map((file: any, idx: number) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleDownloadAttachment(file.url, file.name)}
+                              className="flex items-center gap-2 text-xs hover:underline cursor-pointer"
+                            >
+                              <Paperclip className="h-3 w-3" />
+                              <span>{file.name}</span>
+                              <span className="text-[10px] opacity-70">
+                                ({(file.size / 1024).toFixed(1)}KB)
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {message.edited_at && (
+                        <p className="text-xs text-muted-foreground mt-1">(edited)</p>
+                      )}
                       
                       {canEditMessage(message) && !isEditing && (
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2"
                           onClick={() => {
                             setEditingMessageId(message.id);
                             setEditText(message.body);
@@ -223,9 +223,9 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
                           <Pencil className="h-3 w-3" />
                         </Button>
                       )}
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           );
