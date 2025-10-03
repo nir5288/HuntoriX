@@ -175,14 +175,49 @@ const Messages = () => {
     }
   };
 
-  const handleSendMessage = async (messageText: string) => {
+  const handleSendMessage = async (messageText: string, files: File[]) => {
     if (!user || !jobId || !otherUserId) return;
+
+    // Upload files to storage if any
+    const attachments: Array<{ name: string; url: string; type: string; size: number }> = [];
+    
+    if (files.length > 0) {
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('profile-images')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          toast({
+            title: "Error",
+            description: `Failed to upload ${file.name}`,
+            variant: "destructive",
+          });
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('profile-images')
+          .getPublicUrl(fileName);
+
+        attachments.push({
+          name: file.name,
+          url: publicUrl,
+          type: file.type,
+          size: file.size,
+        });
+      }
+    }
 
     const { error } = await supabase.from("messages").insert({
       job_id: jobId,
       from_user: user.id,
       to_user: otherUserId,
       body: messageText,
+      attachments: attachments.length > 0 ? attachments : null,
     } as any);
 
     if (error) {

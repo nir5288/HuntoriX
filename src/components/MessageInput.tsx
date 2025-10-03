@@ -5,7 +5,7 @@ import { Send, Paperclip, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MessageInputProps {
-  onSend: (message: string) => Promise<void>;
+  onSend: (message: string, files: File[]) => Promise<void>;
   disabled?: boolean;
 }
 
@@ -17,12 +17,13 @@ export const MessageInput = ({ onSend, disabled }: MessageInputProps) => {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
   const handleSend = async () => {
-    if (!message.trim() || sending || disabled) return;
+    if ((!message.trim() && attachedFiles.length === 0) || sending || disabled) return;
 
     setSending(true);
     try {
-      await onSend(message.trim());
+      await onSend(message.trim(), attachedFiles);
       setMessage("");
+      setAttachedFiles([]);
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
@@ -107,7 +108,7 @@ export const MessageInput = ({ onSend, disabled }: MessageInputProps) => {
         
         <Button
           onClick={handleSend}
-          disabled={!message.trim() || sending || disabled}
+          disabled={(!message.trim() && attachedFiles.length === 0) || sending || disabled}
           size="icon"
           className="h-[60px] w-[60px]"
         >
