@@ -161,7 +161,7 @@ export const MessageThread = ({ messages, currentUserId, loading }: MessageThrea
                           <a
                             key={idx}
                             href={file.url}
-                            target="_blank"
+                            download={file.name}
                             rel="noopener noreferrer"
                             className={cn(
                               "flex items-center gap-2 text-xs hover:underline",
