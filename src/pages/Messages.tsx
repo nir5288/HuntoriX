@@ -125,7 +125,29 @@ const Messages = () => {
       setOtherUserName(profile?.name || "Unknown User");
       setOtherUserRole(profile?.role || null);
       setOtherUserAvatar(profile?.avatar_url || null);
-      setLastSeen("Online"); // You can enhance this with real presence tracking
+      
+      // Format last seen
+      if (profile?.last_seen) {
+        const lastSeenDate = new Date(profile.last_seen);
+        const now = new Date();
+        const diffMs = now.getTime() - lastSeenDate.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 5) {
+          setLastSeen("Online");
+        } else if (diffMins < 60) {
+          setLastSeen(`Last seen ${diffMins}m ago`);
+        } else if (diffMins < 1440) {
+          const hours = Math.floor(diffMins / 60);
+          setLastSeen(`Last seen ${hours}h ago`);
+        } else {
+          const days = Math.floor(diffMins / 1440);
+          setLastSeen(`Last seen ${days}d ago`);
+        }
+      } else {
+        setLastSeen("Offline");
+      }
+      
       setJobTitle(job?.title || "Unknown Job");
     } catch (error) {
       console.error("Error loading conversation details:", error);

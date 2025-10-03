@@ -205,8 +205,10 @@ export type Database = {
       }
       messages: {
         Row: {
+          attachments: Json | null
           body: string
           created_at: string
+          edited_at: string | null
           from_user: string
           id: string
           is_read: boolean
@@ -214,8 +216,10 @@ export type Database = {
           to_user: string
         }
         Insert: {
+          attachments?: Json | null
           body: string
           created_at?: string
+          edited_at?: string | null
           from_user: string
           id?: string
           is_read?: boolean
@@ -223,8 +227,10 @@ export type Database = {
           to_user: string
         }
         Update: {
+          attachments?: Json | null
           body?: string
           created_at?: string
+          edited_at?: string | null
           from_user?: string
           id?: string
           is_read?: boolean
@@ -327,6 +333,7 @@ export type Database = {
           id: string
           industries: string[] | null
           languages: string[] | null
+          last_seen: string | null
           linkedin: string | null
           location: string | null
           name: string | null
@@ -378,6 +385,7 @@ export type Database = {
           id: string
           industries?: string[] | null
           languages?: string[] | null
+          last_seen?: string | null
           linkedin?: string | null
           location?: string | null
           name?: string | null
@@ -429,6 +437,7 @@ export type Database = {
           id?: string
           industries?: string[] | null
           languages?: string[] | null
+          last_seen?: string | null
           linkedin?: string | null
           location?: string | null
           name?: string | null
@@ -460,6 +469,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_conversation: {
+        Args: { p_job_id: string; p_user1_id: string; p_user2_id: string }
+        Returns: undefined
+      }
       get_public_profile: {
         Args: { profile_id: string }
         Returns: {
@@ -483,6 +496,7 @@ export type Database = {
           id: string
           industries: string[]
           languages: string[]
+          last_seen: string
           linkedin: string
           location: string
           name: string
@@ -524,6 +538,7 @@ export type Database = {
           id: string
           industries: string[]
           languages: string[]
+          last_seen: string
           linkedin: string
           location: string
           name: string

@@ -5,14 +5,25 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, ChevronDown } from "lucide-react";
+import { X, MessageSquare, ChevronDown, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Conversation {
   otherUserId: string;
@@ -33,10 +44,13 @@ interface ChatSidebarProps {
 export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "archived">("all");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [conversationToDelete, setConversationToDelete] = useState<{ jobId: string; userId: string } | null>(null);
 
   const activeJobId = searchParams.get("job");
   const activeUserId = searchParams.get("with");
@@ -118,6 +132,42 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
     navigate(`/messages?job=${jobId}&with=${userId}`);
   };
 
+  const handleDeleteConversation = async () => {
+    if (!conversationToDelete || !currentUserId) return;
+
+    try {
+      const { error } = await supabase.rpc('delete_conversation', {
+        p_job_id: conversationToDelete.jobId,
+        p_user1_id: currentUserId,
+        p_user2_id: conversationToDelete.userId,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Conversation deleted",
+      });
+
+      loadConversations();
+      
+      // If we're viewing the deleted conversation, navigate away
+      if (activeJobId === conversationToDelete.jobId && activeUserId === conversationToDelete.userId) {
+        navigate('/messages');
+      }
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete conversation",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setConversationToDelete(null);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -125,18 +175,19 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
+      <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 hover:opacity-80 transition">
-              <MessageSquare className="h-5 w-5" />
-              <h2 className="font-semibold capitalize">{filter === "all" ? "All Messages" : filter}</h2>
-              <ChevronDown className="h-4 w-4" />
+            <button className="flex items-center gap-1.5 hover:opacity-80 transition text-sm">
+              <span className="text-xs font-medium text-muted-foreground capitalize">
+                {filter === "all" ? "All messages" : filter}
+              </span>
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem onClick={() => setFilter("all")}>
-              All Messages
+              All messages
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setFilter("unread")}>
               Unread
@@ -151,7 +202,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
         </Button>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-73px)]">
+      <ScrollArea className="h-[calc(100vh-65px)]">
         {loading ? (
           <div className="p-4 text-center text-muted-foreground">
             Loading conversations...
@@ -163,45 +214,76 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
         ) : (
           <div className="divide-y">
             {conversations.map((conv) => (
-              <button
+              <div
                 key={`${conv.jobId}-${conv.otherUserId}`}
-                onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
                 className={cn(
-                  "w-full p-4 text-left hover:bg-accent transition-colors",
+                  "relative group",
                   activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={conv.otherUserAvatar || undefined} />
-                    <AvatarFallback>
-                      {conv.otherUserName.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="font-medium text-sm truncate">
-                        {conv.otherUserName}
+                <button
+                  onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
+                  className="w-full p-3 text-left hover:bg-accent transition-colors"
+                >
+                  <div className="flex items-start gap-2">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={conv.otherUserAvatar || undefined} />
+                      <AvatarFallback>
+                        {conv.otherUserName.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <p className="font-medium text-sm truncate">
+                          {conv.otherUserName}
+                        </p>
+                        {conv.unreadCount > 0 && (
+                          <Badge variant="default" className="ml-2 text-xs px-1.5 py-0">
+                            {conv.unreadCount}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-0.5 truncate">
+                        {conv.jobTitle}
                       </p>
-                      {conv.unreadCount > 0 && (
-                        <Badge variant="default" className="ml-2">
-                          {conv.unreadCount}
-                        </Badge>
-                      )}
+                      <p className="text-xs text-muted-foreground truncate">
+                        {conv.lastMessage}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1 truncate">
-                      {conv.jobTitle}
-                    </p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {conv.lastMessage}
-                    </p>
                   </div>
-                </div>
-              </button>
+                </button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
+                    setDeleteDialogOpen(true);
+                  }}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             ))}
           </div>
         )}
       </ScrollArea>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this conversation? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConversation}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
