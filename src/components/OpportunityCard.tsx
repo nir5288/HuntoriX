@@ -231,7 +231,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
           {isNewJob() && (
-            <Badge className="bg-[hsl(var(--accent-pink))] text-white border-0 flex items-center gap-1 shrink-0">
+            <Badge className="bg-[hsl(var(--warning))] text-white border-0 flex items-center gap-1 shrink-0">
               <Sparkles className="h-3 w-3" />
               NEW
             </Badge>
@@ -302,14 +302,34 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           {getPreviewDescription(job.description)}
         </p>
         
-        {/* Skills carousel */}
+        {/* Skills carousel - auto-scroll */}
         {job.skills_must && job.skills_must.length > 0 && (
-          <div className="relative">
+          <div className="relative overflow-hidden">
             <Carousel
               opts={{
                 align: "start",
-                loop: false,
+                loop: true,
+                skipSnaps: false,
+                dragFree: true,
               }}
+              plugins={[
+                {
+                  name: 'autoScroll',
+                  init: (embla) => {
+                    let timer: NodeJS.Timeout;
+                    const scroll = () => {
+                      if (embla.canScrollNext()) {
+                        embla.scrollNext();
+                      } else {
+                        embla.scrollTo(0);
+                      }
+                      timer = setTimeout(scroll, 2000);
+                    };
+                    timer = setTimeout(scroll, 2000);
+                    embla.on('destroy', () => clearTimeout(timer));
+                  }
+                } as any
+              ]}
               className="w-full"
             >
               <CarouselContent className="-ml-2">
@@ -328,12 +348,6 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              {job.skills_must.length > 3 && (
-                <>
-                  <CarouselPrevious className="h-6 w-6 -left-2" />
-                  <CarouselNext className="h-6 w-6 -right-2" />
-                </>
-              )}
             </Carousel>
           </div>
         )}
