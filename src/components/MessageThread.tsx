@@ -230,7 +230,7 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                       )}
                       
                       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Tooltip delayDuration={0}>
+                        <Tooltip delayDuration={0} disableHoverableContent>
                           <TooltipTrigger asChild>
                             <Button
                               size="icon"
@@ -244,7 +244,7 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                           <TooltipContent>Reply to message</TooltipContent>
                         </Tooltip>
                         {canEditMessage(message) && !isEditing && (
-                          <Tooltip delayDuration={0}>
+                          <Tooltip delayDuration={0} disableHoverableContent>
                             <TooltipTrigger asChild>
                               <Button
                                 size="icon"
