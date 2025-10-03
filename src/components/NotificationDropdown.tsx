@@ -34,8 +34,10 @@ export const NotificationDropdown = () => {
     }
   };
 
-  const handleNotificationClick = async (notification: Notification) => {
-    await markAsRead(notification.id);
+  const handleNotificationClick = async (notification: Notification, markRead: boolean = true) => {
+    if (markRead && !notification.is_read) {
+      await markAsRead(notification.id);
+    }
     
     const payload = notification.payload as any;
     
@@ -63,6 +65,11 @@ export const NotificationDropdown = () => {
         }
         break;
     }
+  };
+
+  const handleMarkAsRead = async (e: React.MouseEvent, notificationId: string) => {
+    e.stopPropagation();
+    await markAsRead(notificationId);
   };
 
   return (
@@ -107,31 +114,43 @@ export const NotificationDropdown = () => {
             No notifications yet
           </div>
         ) : (
-          <ScrollArea className="max-h-96">
-            {notifications.map((notification) => (
-              <DropdownMenuItem
-                key={notification.id}
-                className={`flex items-start gap-3 p-3 cursor-pointer ${
-                  !notification.is_read ? 'bg-accent/50' : ''
-                }`}
-                onClick={() => handleNotificationClick(notification)}
-              >
-                <div className="mt-0.5">
-                  {getNotificationIcon(notification.type)}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className={`text-sm ${!notification.is_read ? 'font-semibold' : ''}`}>
-                    {notification.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {notification.message}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                  </p>
-                </div>
-              </DropdownMenuItem>
-            ))}
+          <ScrollArea className="max-h-[400px]">
+            <div className="py-1">
+              {notifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className={`flex items-start gap-3 p-3 cursor-pointer group relative ${
+                    !notification.is_read ? 'bg-accent/50' : ''
+                  }`}
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <div className="mt-0.5">
+                    {getNotificationIcon(notification.type)}
+                  </div>
+                  <div className="flex-1 space-y-1 pr-8">
+                    <p className={`text-sm ${!notification.is_read ? 'font-semibold' : ''}`}>
+                      {notification.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                  {!notification.is_read && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleMarkAsRead(e, notification.id)}
+                      className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity h-auto p-1 text-xs"
+                    >
+                      Mark as Read
+                    </Button>
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </div>
           </ScrollArea>
         )}
       </DropdownMenuContent>
