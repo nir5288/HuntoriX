@@ -15,6 +15,7 @@ import EmployerProfile from "./pages/EmployerProfile";
 import HeadhunterDirectory from "./pages/HeadhunterDirectory";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Engagement from "./pages/Engagement";
 
 import { VerificationWrapper } from './components/VerificationWrapper';
 
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/profile/employer/:id" element={<EmployerProfile />} />
             <Route path="/headhunters" element={<HeadhunterDirectory />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/engagement/:id" element={<Engagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
