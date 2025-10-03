@@ -51,14 +51,13 @@ const formatName = (fullName: string | undefined) => {
 
 export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading, onReply, onEdited }: MessageThreadProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const canEditMessage = (message: Message) => {
@@ -270,6 +269,7 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
         </div>
       </TooltipProvider>
     </ScrollArea>
