@@ -25,10 +25,31 @@ interface JobEditHistoryProps {
 
 export function JobEditHistory({ open, onOpenChange, history, jobTitle }: JobEditHistoryProps) {
   const formatFieldName = (field: string) => {
-    return field
+    const fieldNameMap: Record<string, string> = {
+      'skills_nice': 'Nice to Have Skills',
+      'skills_must': 'Required Skills',
+      'required_skills': 'Required Skills',
+      'employment_type': 'Employment Type',
+      'salary_range': 'Salary Range',
+      'remote_policy': 'Remote Policy',
+      'company_name': 'Company Name',
+      'budget_min': 'Budget Minimum',
+      'budget_max': 'Budget Maximum',
+      'budget_currency': 'Budget Currency',
+    };
+    
+    return fieldNameMap[field] || field
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  };
+
+  const getChangeType = (oldValue: any, newValue: any) => {
+    const isEmpty = (val: any) => val === null || val === undefined || val === '' || (Array.isArray(val) && val.length === 0);
+    
+    if (isEmpty(oldValue) && !isEmpty(newValue)) return 'added';
+    if (!isEmpty(oldValue) && isEmpty(newValue)) return 'removed';
+    return 'changed';
   };
 
   const formatValue = (value: any) => {
@@ -85,20 +106,48 @@ export function JobEditHistory({ open, onOpenChange, history, jobTitle }: JobEdi
                         <div className="font-medium text-sm">
                           {formatFieldName(change.field)}
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <div className="text-xs text-muted-foreground mb-1">Before:</div>
-                            <div className="text-destructive line-through">
-                              {formatValue(change.old_value)}
+                        {(() => {
+                          const changeType = getChangeType(change.old_value, change.new_value);
+                          
+                          if (changeType === 'added') {
+                            return (
+                              <div className="text-sm">
+                                <div className="text-xs text-muted-foreground mb-1">Added:</div>
+                                <div className="text-[hsl(var(--success))]">
+                                  {formatValue(change.new_value)}
+                                </div>
+                              </div>
+                            );
+                          }
+                          
+                          if (changeType === 'removed') {
+                            return (
+                              <div className="text-sm">
+                                <div className="text-xs text-muted-foreground mb-1">Removed:</div>
+                                <div className="text-destructive line-through">
+                                  {formatValue(change.old_value)}
+                                </div>
+                              </div>
+                            );
+                          }
+                          
+                          return (
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <div className="text-xs text-muted-foreground mb-1">From:</div>
+                                <div className="text-muted-foreground">
+                                  {formatValue(change.old_value)}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs text-muted-foreground mb-1">To:</div>
+                                <div className="text-[hsl(var(--success))]">
+                                  {formatValue(change.new_value)}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-muted-foreground mb-1">After:</div>
-                            <div className="text-[hsl(var(--success))]">
-                              {formatValue(change.new_value)}
-                            </div>
-                          </div>
-                        </div>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
