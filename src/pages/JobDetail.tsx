@@ -109,6 +109,46 @@ const JobDetail = () => {
 
   const handleAccept = async (applicationId: string, headhunterId: string) => {
     try {
+      // Get the application details
+      const { data: application, error: appError } = await supabase
+        .from('applications')
+        .select('*')
+        .eq('id', applicationId)
+        .single();
+
+      if (appError) throw appError;
+
+      // Create engagement
+      const { data: engagement, error: engagementError } = await supabase
+        .from('engagements')
+        .insert({
+          job_id: id,
+          application_id: applicationId,
+          employer_id: user?.id,
+          headhunter_id: headhunterId,
+          status: 'Proposed',
+          fee_model: application.proposed_fee_model || 'Percent',
+          fee_amount: application.proposed_fee_value || 15,
+          deposit_required: false,
+          candidate_cap: 5,
+          sla_days: application.eta_days || 3,
+        })
+        .select()
+        .single();
+
+      if (engagementError) throw engagementError;
+
+      // Create initial kickoff milestone
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + (application.eta_days || 3));
+      
+      await supabase.from('milestones').insert({
+        engagement_id: engagement.id,
+        type: 'Kickoff',
+        due_at: dueDate.toISOString(),
+      });
+
+      // Update application status
       const { error: updateError } = await supabase
         .from('applications')
         .update({ status: 'shortlisted' })
@@ -121,17 +161,18 @@ const JobDetail = () => {
         .from('notifications')
         .insert({
           user_id: headhunterId,
-          type: 'status_change',
-          payload: { job_id: id, application_id: applicationId, status: 'shortlisted' },
+          type: 'engagement_created',
+          related_id: engagement.id,
+          payload: { job_id: id, engagement_id: engagement.id },
           is_read: false,
-          title: 'Application Shortlisted',
-          message: 'Your application has been shortlisted',
+          title: 'Engagement Started',
+          message: 'An employer has accepted your application and started an engagement'
         } as any);
 
       if (notifError) console.error('Notification error:', notifError);
 
-      toast.success('Application accepted');
-      fetchJob();
+      toast.success('Engagement created! Redirecting...');
+      setTimeout(() => navigate(`/engagement/${engagement.id}`), 1500);
     } catch (error) {
       console.error('Error accepting application:', error);
       toast.error('Failed to accept application');
