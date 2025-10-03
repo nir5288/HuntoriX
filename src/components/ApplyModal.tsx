@@ -121,6 +121,15 @@ export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }
         .single();
 
       if (job) {
+        // Fetch headhunter profile to get their name
+        const { data: headhunterProfile } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('id', headhunterId)
+          .single();
+
+        const headhunterName = headhunterProfile?.name || 'A headhunter';
+
         // Create notification for employer
         try {
           const { error: notifError } = await supabase
@@ -128,8 +137,8 @@ export function ApplyModal({ open, onOpenChange, jobId, jobTitle, headhunterId }
             .insert({
               user_id: job.created_by,
               type: 'application_received',
-              title: 'New Application Received',
-              message: `You received a new application for ${job.title}`,
+              title: `${headhunterName} applied to ${job.title}`,
+              message: `${headhunterName} applied with an ETA of ${parseInt(etaDays)} days`,
               payload: { 
                 job_id: jobId, 
                 application_id: newApp.id,

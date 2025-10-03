@@ -21,32 +21,15 @@ export const NotificationDropdown = () => {
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'new_message':
-        return <Mail className="h-4 w-4 text-blue-500" />;
-      case 'new_application':
-        return <UserPlus className="h-4 w-4 text-green-500" />;
+        return <Mail className="h-4 w-4 text-[hsl(var(--accent-mint))]" />;
+      case 'application_received':
+        return <UserPlus className="h-4 w-4 text-[hsl(var(--accent-lilac))]" />;
       case 'job_invitation':
-        return <Briefcase className="h-4 w-4 text-purple-500" />;
+        return <Briefcase className="h-4 w-4 text-[hsl(var(--accent-pink))]" />;
       case 'status_change':
-        return <AlertCircle className="h-4 w-4 text-orange-500" />;
+        return <AlertCircle className="h-4 w-4 text-[hsl(var(--warning))]" />;
       default:
         return <Bell className="h-4 w-4" />;
-    }
-  };
-
-  const getNotificationText = (notification: Notification) => {
-    const payload = notification.payload as any;
-    
-    switch (notification.type) {
-      case 'new_message':
-        return `New message from ${payload.sender_name || 'someone'}`;
-      case 'new_application':
-        return `${payload.headhunter_name || 'A headhunter'} applied to "${payload.job_title}"`;
-      case 'job_invitation':
-        return `${payload.employer_name || 'An employer'} invited you to "${payload.job_title}"`;
-      case 'status_change':
-        return payload.message || 'Application status changed';
-      default:
-        return 'New notification';
     }
   };
 
@@ -57,25 +40,25 @@ export const NotificationDropdown = () => {
     
     switch (notification.type) {
       case 'new_message':
-        if (payload.job_id && payload.sender_id) {
-          navigate(`/messages?job=${payload.job_id}&with=${payload.sender_id}`);
+        if (payload.job_id && payload.from_user) {
+          navigate(`/messages?job=${payload.job_id}&with=${payload.from_user}`);
         } else {
           navigate('/messages');
         }
         break;
-      case 'new_application':
+      case 'application_received':
         if (payload.job_id) {
-          navigate(`/job/${payload.job_id}`);
+          navigate(`/jobs/${payload.job_id}`);
         }
         break;
       case 'job_invitation':
         if (payload.job_id) {
-          navigate(`/job/${payload.job_id}`);
+          navigate(`/jobs/${payload.job_id}`);
         }
         break;
       case 'status_change':
         if (payload.job_id) {
-          navigate(`/job/${payload.job_id}`);
+          navigate(`/jobs/${payload.job_id}`);
         }
         break;
     }
@@ -132,7 +115,10 @@ export const NotificationDropdown = () => {
                 </div>
                 <div className="flex-1 space-y-1">
                   <p className={`text-sm ${!notification.is_read ? 'font-semibold' : ''}`}>
-                    {getNotificationText(notification)}
+                    {notification.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {notification.message}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}

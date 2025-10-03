@@ -153,13 +153,22 @@ const Messages = () => {
 
     // Create notification for receiver
     try {
+      // Fetch sender's profile to get their name
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', user.id)
+        .single();
+
+      const senderName = senderProfile?.name || 'Someone';
+
       await supabase
         .from('notifications')
         .insert({
           user_id: otherUserId,
           type: 'new_message',
-          title: 'New Message',
-          message: `You have a new message from ${user?.user_metadata?.name || 'a user'}`,
+          title: `New message from ${senderName}`,
+          message: messageText.length > 100 ? messageText.substring(0, 100) + '...' : messageText,
           payload: { 
             job_id: jobId,
             from_user: user.id,
