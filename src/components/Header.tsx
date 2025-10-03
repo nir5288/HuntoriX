@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessageSquare, User } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import {
   DropdownMenu,
@@ -121,7 +121,7 @@ export function Header() {
                     onClick={() => navigate('/messages')}
                     className="relative"
                   >
-                    <MessageSquare className="h-5 w-5" />
+                    <MessagesSquare className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Messages</TooltipContent>
