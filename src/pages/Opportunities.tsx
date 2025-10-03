@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { supabase } from '@/integrations/supabase/client';
 import { Filter, Search } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
@@ -30,7 +31,7 @@ type Job = {
   created_at: string;
 };
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 12;
 
 const industries = ['Software/Tech', 'Biotech/Healthcare', 'Finance/Fintech', 'Energy/Cleantech', 'Public/Non-profit'];
 const seniorities = ['junior', 'mid', 'senior', 'lead', 'exec'];
@@ -42,8 +43,8 @@ const Opportunities = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pageLoading, setPageLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Search (debounced)
   const [searchQuery, setSearchQuery] = useState('');
@@ -161,8 +162,8 @@ const Opportunities = () => {
     debouncedQuery
   ]);
 
-  // Fetch first page (or refreshed) set
-  const fetchFirstPage = useCallback(async (isInitial = false) => {
+  // Fetch page with count
+  const fetchPage = useCallback(async (page: number, isInitial = false) => {
     if (isInitial) {
       setLoading(true);
     } else {
@@ -170,50 +171,35 @@ const Opportunities = () => {
     }
     
     try {
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      
       const q = buildBaseQuery();
-      const { data, error } = await q.range(0, PAGE_SIZE - 1);
+      const { data, error, count } = await q.range(from, to);
       if (error) throw error;
+      
       setJobs(data || []);
-      setHasMore((data?.length || 0) === PAGE_SIZE);
+      setTotalCount(count || 0);
+      setCurrentPage(page);
     } catch (err) {
       console.error('Error fetching jobs:', err);
       setJobs([]);
-      setHasMore(false);
+      setTotalCount(0);
     } finally {
       setLoading(false);
       setIsRefreshing(false);
     }
   }, [buildBaseQuery]);
 
-  // Load another page (append)
-  const fetchNextPage = useCallback(async () => {
-    if (!hasMore || pageLoading) return;
-    setPageLoading(true);
-    try {
-      const from = jobs.length;
-      const to = from + PAGE_SIZE - 1;
-      const q = buildBaseQuery();
-      const { data, error } = await q.range(from, to);
-      if (error) throw error;
-      const newItems = data || [];
-      setJobs(prev => [...prev, ...newItems]);
-      if (newItems.length < PAGE_SIZE) setHasMore(false);
-    } catch (err) {
-      console.error('Error fetching next page:', err);
-    } finally {
-      setPageLoading(false);
-    }
-  }, [jobs.length, hasMore, pageLoading, buildBaseQuery]);
-
   // Initial load
   useEffect(() => {
-    fetchFirstPage(true);
+    fetchPage(1, true);
   }, []);
 
-  // On filter/search change (deps use *debounced* values)
+  // On filter/search change (deps use *debounced* values) - reset to page 1
   useEffect(() => {
     if (!loading) {
-      fetchFirstPage(false);
+      fetchPage(1, false);
     }
   }, [
     filterIndustry,
@@ -236,7 +222,7 @@ const Opportunities = () => {
         if (!pending) {
           pending = true;
           setTimeout(() => {
-            fetchFirstPage(); // re-fetch with current debounced filters
+            fetchPage(currentPage); // re-fetch current page
             pending = false;
           }, 300);
         }
@@ -246,10 +232,13 @@ const Opportunities = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchFirstPage]);
+  }, [fetchPage, currentPage]);
 
   // Optional client-side fuzzy skill filter as a secondary pass
   const filteredJobs = useMemo(() => jobs, [jobs]);
+  
+  // Calculate total pages
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const resetFilters = () => {
     setFilterIndustry([]);
@@ -414,13 +403,31 @@ const Opportunities = () => {
                   ))}
                 </div>
 
-                {/* Pagination - reserved space to prevent layout shift */}
-                <div className="flex justify-center mt-8 h-12">
-                  {hasMore && debouncedQuery === '' ? (
-                    <Button onClick={fetchNextPage} disabled={pageLoading || isRefreshing}>
-                      {pageLoading ? 'Loading...' : 'Load more'}
-                    </Button>
-                  ) : null}
+                {/* Pagination */}
+                <div className="flex justify-center items-center mt-8 gap-4">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => currentPage > 1 && fetchPage(currentPage - 1)}
+                          className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                      
+                      <PaginationItem>
+                        <span className="text-sm font-medium px-4">
+                          {currentPage}/{totalPages}
+                        </span>
+                      </PaginationItem>
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => currentPage < totalPages && fetchPage(currentPage + 1)}
+                          className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
                 </div>
               </>
             )}
