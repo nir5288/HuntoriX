@@ -78,7 +78,7 @@ const SavedJobs = () => {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate(profile?.role === 'employer' ? '/employer/dashboard' : '/headhunter/dashboard')}
+          onClick={() => navigate(profile?.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter')}
           className="mb-4 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />

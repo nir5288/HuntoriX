@@ -79,7 +79,7 @@ const SavedHeadhunters = () => {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate('/employer/dashboard')}
+          onClick={() => navigate('/dashboard/employer')}
           className="mb-4 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
