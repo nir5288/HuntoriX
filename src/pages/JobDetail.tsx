@@ -17,6 +17,7 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true);
   const [hasApplied, setHasApplied] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
+  const [accepting, setAccepting] = useState(false);
 
   useEffect(() => {
     fetchJob();
@@ -108,7 +109,22 @@ const JobDetail = () => {
   };
 
   const handleAccept = async (applicationId: string, headhunterId: string) => {
+    setAccepting(true);
     try {
+      // If an engagement already exists for this job + headhunter, go to it
+      const { data: existing } = await supabase
+        .from('engagements')
+        .select('id')
+        .eq('job_id', id)
+        .eq('headhunter_id', headhunterId)
+        .maybeSingle();
+
+      if (existing?.id) {
+        toast.success('Engagement already exists. Redirecting...');
+        navigate(`/engagement/${existing.id}`);
+        return;
+      }
+
       // Get the application details
       const { data: application, error: appError } = await supabase
         .from('applications')
@@ -172,10 +188,26 @@ const JobDetail = () => {
       if (notifError) console.error('Notification error:', notifError);
 
       toast.success('Engagement created! Redirecting...');
-      setTimeout(() => navigate(`/engagement/${engagement.id}`), 1500);
-    } catch (error) {
+      navigate(`/engagement/${engagement.id}`);
+    } catch (error: any) {
+      // If duplicate, fetch and redirect to existing engagement
+      if (error?.code === '23505') {
+        const { data: existing } = await supabase
+          .from('engagements')
+          .select('id')
+          .eq('job_id', id)
+          .eq('headhunter_id', headhunterId)
+          .maybeSingle();
+        if (existing?.id) {
+          toast.success('Engagement already exists. Redirecting...');
+          navigate(`/engagement/${existing.id}`);
+          return;
+        }
+      }
       console.error('Error accepting application:', error);
       toast.error('Failed to accept application');
+    } finally {
+      setAccepting(false);
     }
   };
 
@@ -424,10 +456,11 @@ const JobDetail = () => {
                             <Button 
                               size="sm" 
                               variant="default"
+                              disabled={accepting}
                               onClick={() => handleAccept(app.id, app.headhunter_id)}
                             >
                               <Check className="mr-2 h-4 w-4" />
-                              Accept
+                              {accepting ? 'Accepting…' : 'Accept'}
                             </Button>
                             <Button 
                               size="sm" 
