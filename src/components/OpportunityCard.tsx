@@ -43,10 +43,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const [hasApplied, setHasApplied] = useState(false);
   const [checkingApplication, setCheckingApplication] = useState(true);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [isHoveringSkills, setIsHoveringSkills] = useState(false);
 
-  // Auto-scroll carousel with bidirectional movement
+  // Auto-scroll carousel with bidirectional movement - pause on hover
   useEffect(() => {
-    if (!carouselApi || !job.skills_must || job.skills_must.length <= 3) {
+    if (!carouselApi || !job.skills_must || job.skills_must.length <= 3 || isHoveringSkills) {
       return;
     }
 
@@ -79,7 +80,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     const timer = setInterval(scroll, scrollInterval);
 
     return () => clearInterval(timer);
-  }, [carouselApi, job.skills_must]);
+  }, [carouselApi, job.skills_must, isHoveringSkills]);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -298,7 +299,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 space-y-4">
+      <CardContent className="flex-1 flex flex-col space-y-4">
         {/* Meta row with icons */}
         <div className="space-y-2 text-sm text-muted-foreground">
           {job.location && (
@@ -336,14 +337,21 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
 
         {/* Description teaser - fixed preview length */}
-        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem] mb-4">
+        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
           {getPreviewDescription(job.description)}
         </p>
         
-        {/* Skills carousel - auto-scroll with consistent height */}
+        {/* Spacer to push skills to bottom */}
+        <div className="flex-1" />
+        
+        {/* Skills carousel - auto-scroll with consistent height - always at bottom */}
         <div className="h-10 flex items-center">
           {job.skills_must && job.skills_must.length > 0 && (
-            <div className="relative overflow-hidden w-full">
+            <div 
+              className="relative overflow-hidden w-full"
+              onMouseEnter={() => setIsHoveringSkills(true)}
+              onMouseLeave={() => setIsHoveringSkills(false)}
+            >
               <Carousel
                 setApi={setCarouselApi}
                 opts={{
