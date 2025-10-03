@@ -198,59 +198,106 @@ const JobDetail = () => {
     );
   }
 
+  const getIndustryColor = (industry: string | null) => {
+    if (!industry) return 'hsl(var(--surface))';
+    const colorMap: { [key: string]: string } = {
+      'Software/Tech': 'hsl(var(--accent-lilac))',
+      'Biotech/Healthcare': 'hsl(var(--accent-mint))',
+      'Finance/Fintech': 'hsl(var(--accent-pink))',
+      'Energy/Cleantech': 'hsl(var(--warning))',
+      'Public/Non-profit': 'hsl(var(--surface))'
+    };
+    return colorMap[industry] || 'hsl(var(--surface))';
+  };
+
+  const getStatusColor = (status: string | null) => {
+    if (!status) return 'bg-muted';
+    const colorMap: { [key: string]: string } = {
+      'open': 'bg-[hsl(var(--success))]',
+      'shortlisted': 'bg-[hsl(var(--accent-lilac))]',
+      'awarded': 'bg-[hsl(var(--accent-pink))]',
+      'closed': 'bg-muted'
+    };
+    return colorMap[status] || 'bg-muted';
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+        <Button variant="ghost" onClick={() => navigate('/opportunities')} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Back to Opportunities
         </Button>
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card>
+            <Card className="rounded-2xl">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-3xl mb-2">{job.title}</CardTitle>
-                    <CardDescription className="text-lg">
-                      {job.employer?.company_name || job.employer?.name}
-                    </CardDescription>
-                  </div>
-                  <Badge className="bg-[hsl(var(--accent-mint))]">
-                    {job.status}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{job.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-muted-foreground" />
-                    <span className="capitalize">{job.employment_type?.replace('_', ' ')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-3xl mb-3">{job.title}</CardTitle>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {job.industry && (
+                        <Badge 
+                          style={{ backgroundColor: getIndustryColor(job.industry) }}
+                          className="text-foreground border-0"
+                        >
+                          {job.industry}
+                        </Badge>
+                      )}
+                      {job.status && (
+                        <Badge className={`${getStatusColor(job.status)} text-white border-0`}>
+                          {job.status}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
 
+                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                  {job.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      <span>{job.location}</span>
+                    </div>
+                  )}
+                  {job.employment_type && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      <span className="capitalize">{job.employment_type === 'full_time' ? 'Full-time' : job.employment_type}</span>
+                      {job.seniority && <span> • {job.seniority.charAt(0).toUpperCase() + job.seniority.slice(1)}</span>}
+                    </div>
+                  )}
+                  {(job.budget_min || job.budget_max) && (
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      <span>
+                        {job.budget_currency} {job.budget_min?.toLocaleString()}
+                        {job.budget_max && ` - ${job.budget_max.toLocaleString()}`}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-3">Job Description</h3>
-                  <p className="text-muted-foreground whitespace-pre-wrap">{job.description}</p>
+                  <h3 className="text-xl font-semibold mb-3">Role Description</h3>
+                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.description}</p>
                 </div>
 
                 {job.skills_must && job.skills_must.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-semibold mb-3">Required Skills</h3>
+                    <h3 className="text-xl font-semibold mb-3">Must-Have Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {job.skills_must.map((skill: string, idx: number) => (
-                        <Badge key={idx} variant="secondary">{skill}</Badge>
+                        <Badge key={idx} variant="secondary" className="text-sm">{skill}</Badge>
                       ))}
                     </div>
                   </div>
@@ -258,10 +305,10 @@ const JobDetail = () => {
 
                 {job.skills_nice && job.skills_nice.length > 0 && (
                   <div>
-                    <h3 className="text-xl font-semibold mb-3">Nice to Have</h3>
+                    <h3 className="text-xl font-semibold mb-3">Nice-to-Have Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {job.skills_nice.map((skill: string, idx: number) => (
-                        <Badge key={idx} variant="outline">{skill}</Badge>
+                        <Badge key={idx} variant="outline" className="text-sm">{skill}</Badge>
                       ))}
                     </div>
                   </div>
@@ -271,57 +318,56 @@ const JobDetail = () => {
           </div>
 
           <div className="space-y-6">
-            <Card>
+            {/* Company Profile Card */}
+            <Card className="rounded-2xl">
               <CardHeader>
-                <CardTitle>Job Details</CardTitle>
+                <CardTitle>About the Company</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Seniority Level</p>
-                  <p className="font-medium capitalize">{job.seniority}</p>
+                  <p className="font-semibold text-lg">{job.employer?.company_name || job.employer?.name || 'Company'}</p>
+                  {job.employer?.company_sector && (
+                    <p className="text-sm text-muted-foreground">{job.employer.company_sector}</p>
+                  )}
                 </div>
                 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Industry</p>
-                  <p className="font-medium">{job.industry || 'Not specified'}</p>
-                </div>
+                {job.employer?.bio && (
+                  <p className="text-sm text-muted-foreground">{job.employer.bio}</p>
+                )}
 
-                {job.budget_min && job.budget_max && (
+                {job.employer?.company_size && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Salary Range</p>
-                    <p className="font-medium">
-                      {job.budget_currency} {job.budget_min?.toLocaleString()} - {job.budget_max?.toLocaleString()}
-                    </p>
+                    <p className="text-xs text-muted-foreground">Company Size</p>
+                    <p className="text-sm font-medium">{job.employer.company_size}</p>
                   </div>
                 )}
 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Placement Fee</p>
-                  <p className="font-medium">
-                    {job.fee_model === 'percent_fee' 
-                      ? `${job.fee_value}% of annual salary` 
-                      : `${job.fee_value} ${job.budget_currency}`}
-                  </p>
-                </div>
+                {job.employer?.company_hq && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Headquarters</p>
+                    <p className="text-sm font-medium">{job.employer.company_hq}</p>
+                  </div>
+                )}
 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Candidate Quota</p>
-                  <p className="font-medium">{job.candidate_quota} CVs per headhunter</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">SLA</p>
-                  <p className="font-medium">{job.sla_days} days</p>
-                </div>
+                {job.employer?.website && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => window.open(job.employer.website, '_blank')}
+                  >
+                    Visit Website
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
             {profile?.role === 'headhunter' && (
-              <Card>
+              <Card className="rounded-2xl">
                 <CardContent className="pt-6">
                   {hasApplied ? (
                     <div className="text-center space-y-2">
-                      <Badge className="bg-[hsl(var(--success))]">Applied</Badge>
+                      <Badge className="bg-[hsl(var(--success))] text-white">Applied</Badge>
                       <p className="text-sm text-muted-foreground">You have already applied to this job</p>
                     </div>
                   ) : (
