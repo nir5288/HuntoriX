@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart } from 'lucide-react';
+import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ const EmployerDashboard = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [postJobModalOpen, setPostJobModalOpen] = useState(false);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
+  const [savedHeadhuntersCount, setSavedHeadhuntersCount] = useState(0);
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -59,6 +60,15 @@ const EmployerDashboard = () => {
       
       if (savedError) throw savedError;
       setSavedJobsCount(count || 0);
+
+      // Fetch saved headhunters count
+      const { count: headhuntersCount, error: savedHeadhuntersError } = await supabase
+        .from('saved_headhunters')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user?.id);
+      
+      if (savedHeadhuntersError) throw savedHeadhuntersError;
+      setSavedHeadhuntersCount(headhuntersCount || 0);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data');
@@ -243,19 +253,34 @@ const EmployerDashboard = () => {
                 <CardTitle>My Jobs</CardTitle>
                 <CardDescription>View and manage your job postings</CardDescription>
               </div>
-              <Button
-                variant="outline"
-                onClick={() => navigate('/saved-jobs')}
-                className="gap-2"
-              >
-                <Heart className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
-                My Saved Jobs
-                {savedJobsCount > 0 && (
-                  <Badge className="bg-[hsl(var(--accent-pink))] text-white">
-                    {savedJobsCount}
-                  </Badge>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/saved-headhunters')}
+                  className="gap-2"
+                >
+                  <Star className="h-4 w-4 text-[hsl(var(--accent-lilac))]" />
+                  My Saved Headhunters
+                  {savedHeadhuntersCount > 0 && (
+                    <Badge className="bg-[hsl(var(--accent-lilac))] text-white">
+                      {savedHeadhuntersCount}
+                    </Badge>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/saved-jobs')}
+                  className="gap-2"
+                >
+                  <Heart className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
+                  My Saved Jobs
+                  {savedJobsCount > 0 && (
+                    <Badge className="bg-[hsl(var(--accent-pink))] text-white">
+                      {savedJobsCount}
+                    </Badge>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

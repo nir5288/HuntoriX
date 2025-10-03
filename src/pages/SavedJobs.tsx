@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, MapPin, Briefcase, TrendingUp, DollarSign, Calendar } from 'lucide-react';
+import { Heart, MapPin, Briefcase, TrendingUp, DollarSign, Calendar, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -75,6 +75,16 @@ const SavedJobs = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+
         {/* Header Section with Stats */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">

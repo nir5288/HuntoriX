@@ -667,6 +667,42 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_headhunters: {
+        Row: {
+          created_at: string
+          headhunter_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          headhunter_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          headhunter_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_headhunters_headhunter_id_fkey"
+            columns: ["headhunter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_headhunters_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_jobs: {
         Row: {
           created_at: string

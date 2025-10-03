@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InviteToJobModal } from "@/components/InviteToJobModal";
-import { Search, Star, MapPin, Briefcase, TrendingUp, Filter, UserPlus } from "lucide-react";
+import { Search, Star, MapPin, Briefcase, TrendingUp, Filter, UserPlus, Heart } from "lucide-react";
+import { toast } from "sonner";
 interface Headhunter {
   id: string;
   name: string;
@@ -43,9 +44,13 @@ const HeadhunterDirectory = () => {
   const [filterAvailability, setFilterAvailability] = useState<string>("all");
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [selectedHeadhunter, setSelectedHeadhunter] = useState<Headhunter | null>(null);
+  const [savedHeadhunters, setSavedHeadhunters] = useState<Set<string>>(new Set());
   useEffect(() => {
     loadHeadhunters();
-  }, []);
+    if (user) {
+      loadSavedHeadhunters();
+    }
+  }, [user]);
   useEffect(() => {
     applyFilters();
   }, [headhunters, searchTerm, sortBy, filterIndustry, filterAvailability]);
@@ -64,6 +69,72 @@ const HeadhunterDirectory = () => {
       console.error("Error loading headhunters:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadSavedHeadhunters = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('saved_headhunters')
+        .select('headhunter_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      const savedIds = new Set(data?.map(item => item.headhunter_id) || []);
+      setSavedHeadhunters(savedIds);
+    } catch (error) {
+      console.error('Error loading saved headhunters:', error);
+    }
+  };
+
+  const handleToggleSave = async (headhunterId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!user) {
+      toast.error('Please log in to save headhunters');
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      const isSaved = savedHeadhunters.has(headhunterId);
+
+      if (isSaved) {
+        // Unsave
+        const { error } = await supabase
+          .from('saved_headhunters')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('headhunter_id', headhunterId);
+
+        if (error) throw error;
+
+        setSavedHeadhunters(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(headhunterId);
+          return newSet;
+        });
+        toast.success('Headhunter removed from saved list');
+      } else {
+        // Save
+        const { error } = await supabase
+          .from('saved_headhunters')
+          .insert({
+            user_id: user.id,
+            headhunter_id: headhunterId,
+          });
+
+        if (error) throw error;
+
+        setSavedHeadhunters(prev => new Set(prev).add(headhunterId));
+        toast.success('Headhunter added to your saved list');
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      toast.error('Failed to update saved status');
     }
   };
   const applyFilters = () => {
@@ -254,6 +325,16 @@ const HeadhunterDirectory = () => {
                   <Button variant="outline" className="flex-1" onClick={() => navigate(`/profile/headhunter/${headhunter.id}`)}>
                     View Profile
                   </Button>
+                  {user && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => handleToggleSave(headhunter.id, e)}
+                      className={savedHeadhunters.has(headhunter.id) ? "text-[hsl(var(--accent-pink))]" : ""}
+                    >
+                      <Heart className={`h-4 w-4 ${savedHeadhunters.has(headhunter.id) ? 'fill-current' : ''}`} />
+                    </Button>
+                  )}
                   {profile?.role === "employer" && <Button onClick={() => handleInviteClick(headhunter)} className="flex-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-slate-950">
                       <UserPlus className="h-4 w-4 mr-2" />
                       Invite

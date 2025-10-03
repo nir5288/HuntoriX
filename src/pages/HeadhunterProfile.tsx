@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { toast as sonnerToast } from "sonner";
 import { 
   User, 
   MapPin, 
@@ -18,7 +19,8 @@ import {
   MessageSquare,
   ArrowLeft,
   Camera,
-  Upload
+  Upload,
+  Heart
 } from "lucide-react";
 
 interface HeadhunterProfile {
@@ -54,6 +56,8 @@ const HeadhunterProfile = () => {
   const [profile, setProfile] = useState<HeadhunterProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,7 +65,10 @@ const HeadhunterProfile = () => {
 
   useEffect(() => {
     loadProfile();
-  }, [id]);
+    if (user && id && user.id !== id) {
+      checkIfSaved();
+    }
+  }, [id, user]);
 
   const loadProfile = async () => {
     if (!id) return;
@@ -89,6 +96,70 @@ const HeadhunterProfile = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkIfSaved = async () => {
+    if (!user || !id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('saved_headhunters')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('headhunter_id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        setIsSaved(true);
+        setSavedId(data.id);
+      }
+    } catch (error) {
+      console.error('Error checking saved status:', error);
+    }
+  };
+
+  const handleToggleSave = async () => {
+    if (!user || !id) {
+      sonnerToast.error('Please log in to save headhunters');
+      return;
+    }
+
+    try {
+      if (isSaved && savedId) {
+        // Unsave
+        const { error } = await supabase
+          .from('saved_headhunters')
+          .delete()
+          .eq('id', savedId);
+
+        if (error) throw error;
+
+        setIsSaved(false);
+        setSavedId(null);
+        sonnerToast.success('Headhunter removed from saved list');
+      } else {
+        // Save
+        const { data, error } = await supabase
+          .from('saved_headhunters')
+          .insert({
+            user_id: user.id,
+            headhunter_id: id,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setIsSaved(true);
+        setSavedId(data.id);
+        sonnerToast.success('Headhunter added to your saved list');
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      sonnerToast.error('Failed to update saved status');
     }
   };
 
@@ -299,14 +370,24 @@ const HeadhunterProfile = () => {
                 <p className="text-muted-foreground mb-4">{profile.bio || "No bio provided"}</p>
 
                 {!isOwnProfile && (
-                  <Button
-                    variant="default"
-                    onClick={() => navigate(`/messages?with=${profile.id}`)}
-                    className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
-                  >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Send Message
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="default"
+                      onClick={() => navigate(`/messages?with=${profile.id}`)}
+                      className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Send Message
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleToggleSave}
+                      className={isSaved ? "text-[hsl(var(--accent-pink))]" : ""}
+                    >
+                      <Heart className={`h-4 w-4 mr-2 ${isSaved ? 'fill-current' : ''}`} />
+                      {isSaved ? 'Saved' : 'Save'}
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
