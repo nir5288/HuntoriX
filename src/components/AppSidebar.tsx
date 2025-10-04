@@ -29,7 +29,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
     },
     {
       title: role === 'employer' ? 'My Jobs' : 'My Applications',
-      url: role === 'employer' ? '/dashboard/employer' : '/applications',
+      url: role === 'employer' ? '/my-jobs' : '/applications',
       icon: Briefcase,
     },
     {

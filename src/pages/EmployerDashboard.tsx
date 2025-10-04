@@ -536,10 +536,10 @@ const EmployerDashboard = () => {
                         <div className="flex justify-center mt-6">
                           <Button
                             variant="outline"
-                            onClick={() => setVisibleJobCount(prev => prev + 3)}
+                            onClick={() => navigate('/my-jobs')}
                             className="w-full max-w-xs"
                           >
-                            Load More
+                            See All Jobs
                           </Button>
                         </div>
                       )}

@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import EmployerDashboard from "./pages/EmployerDashboard";
+import MyJobs from "./pages/MyJobs";
 import HeadhunterDashboard from "./pages/HeadhunterDashboard";
 import JobDetail from "./pages/JobDetail";
 import JobReview from "./pages/JobReview";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard/employer" element={<EmployerDashboard />} />
+            <Route path="/my-jobs" element={<MyJobs />} />
             <Route path="/dashboard/headhunter" element={<HeadhunterDashboard />} />
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="/applications" element={<Applications />} />
