@@ -10,8 +10,10 @@ import { MessageThread } from "@/components/MessageThread";
 import { MessageInput } from "@/components/MessageInput";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { Menu, ArrowLeft, User } from "lucide-react";
+import { Menu, ArrowLeft, User, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useUserPreferences } from "@/contexts/UserPreferencesContext";
+import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
 
 interface Message {
   id: string;
@@ -37,6 +39,8 @@ const Messages = () => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const { status: myStatus } = useUserPreferences();
+  useUpdateLastSeen(); // Update last_seen timestamp
   
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -44,7 +48,10 @@ const Messages = () => {
   const [otherUserName, setOtherUserName] = useState("");
   const [otherUserRole, setOtherUserRole] = useState<string | null>(null);
   const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
+  const [otherUserStatus, setOtherUserStatus] = useState<string>("");
+  const [otherUserShowStatus, setOtherUserShowStatus] = useState<boolean>(true);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const [statusIndicator, setStatusIndicator] = useState<{ color: string; text: string } | null>(null);
   const [jobTitle, setJobTitle] = useState("");
   const [replyingTo, setReplyingTo] = useState<{ id: string; body: string; senderName: string } | null>(null);
 
@@ -177,18 +184,20 @@ const Messages = () => {
     if (!otherUserId) return;
 
     try {
-      const profilePromise = supabase.rpc('get_public_profile', { profile_id: otherUserId });
+      // Fetch profile data including status
+      const { data: profileData } = await supabase.rpc('get_public_profile', { profile_id: otherUserId });
+      const { data: prefsData } = await supabase
+        .from("profiles")
+        .select("show_status, status")
+        .eq("id", otherUserId)
+        .single();
       
       let jobPromise = null;
       if (validJobId) {
         jobPromise = supabase.from("jobs").select("title").eq("id", validJobId).single();
       }
       
-      const [{ data: profileData }, jobResult] = await Promise.all([
-        profilePromise,
-        jobPromise || Promise.resolve({ data: null }),
-      ]);
-      
+      const jobResult = await (jobPromise || Promise.resolve({ data: null }));
       const job = jobResult?.data;
       
       // get_public_profile returns an array, get first item
@@ -197,27 +206,49 @@ const Messages = () => {
       setOtherUserName(profile?.name || "Unknown User");
       setOtherUserRole(profile?.role || null);
       setOtherUserAvatar(profile?.avatar_url || null);
+      setOtherUserShowStatus(prefsData?.show_status ?? true);
       
-      // Format last seen
-      if (profile?.last_seen) {
+      const userStatus = prefsData?.status || 'online';
+      setOtherUserStatus(userStatus);
+      
+      // Format status and last seen
+      if (!prefsData?.show_status) {
+        setStatusIndicator(null);
+        setLastSeen("Active recently");
+      } else if (profile?.last_seen) {
         const lastSeenDate = new Date(profile.last_seen);
         const now = new Date();
         const diffMs = now.getTime() - lastSeenDate.getTime();
         const diffMins = Math.floor(diffMs / 60000);
         
-        if (diffMins < 5) {
-          setLastSeen("Online");
+        // Check if they're currently active (within 2 minutes)
+        if (diffMins < 2) {
+          // Check their status preference from database
+          if (userStatus === 'away') {
+            setStatusIndicator({ color: "text-yellow-500", text: "Away" });
+            setLastSeen(null);
+          } else {
+            setStatusIndicator({ color: "text-green-500", text: "Online" });
+            setLastSeen(null);
+          }
         } else if (diffMins < 60) {
-          setLastSeen(`Last seen ${diffMins}m ago`);
+          setStatusIndicator(null);
+          setLastSeen(`Last seen ${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`);
         } else if (diffMins < 1440) {
           const hours = Math.floor(diffMins / 60);
-          setLastSeen(`Last seen ${hours}h ago`);
+          setStatusIndicator(null);
+          setLastSeen(`Last seen ${hours} hour${hours !== 1 ? 's' : ''} ago`);
+        } else if (diffMins < 2880) {
+          setStatusIndicator(null);
+          setLastSeen("Last seen yesterday");
         } else {
-          const days = Math.floor(diffMins / 1440);
-          setLastSeen(`Last seen ${days}d ago`);
+          setStatusIndicator(null);
+          const dateStr = lastSeenDate.toLocaleDateString();
+          setLastSeen(`Last seen on ${dateStr}`);
         }
       } else {
-        setLastSeen("Offline");
+        setStatusIndicator(null);
+        setLastSeen("Active recently");
       }
       
       setJobTitle(job?.title || "Unknown Job");
@@ -354,7 +385,9 @@ const Messages = () => {
                         <User className="h-5 w-5" />
                       </div>
                     )}
-                    <div className="absolute bottom-0 right-0 h-3 w-3 bg-[hsl(var(--accent-mint))] border-2 border-background rounded-full" />
+                    {statusIndicator && (
+                      <Circle className={`absolute bottom-0 right-0 h-3 w-3 fill-current ${statusIndicator.color} border-2 border-background rounded-full`} />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -366,9 +399,14 @@ const Messages = () => {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground truncate">{jobTitle}</p>
-                    {lastSeen && (
-                      <p className="text-xs text-[hsl(var(--accent-mint))]">{lastSeen}</p>
-                    )}
+                    {statusIndicator ? (
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <span className={statusIndicator.color}>●</span>
+                        <span className={statusIndicator.color}>{statusIndicator.text}</span>
+                      </div>
+                    ) : lastSeen ? (
+                      <p className="text-xs text-muted-foreground">{lastSeen}</p>
+                    ) : null}
                   </div>
                 </Link>
               </div>

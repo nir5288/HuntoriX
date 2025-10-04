@@ -591,9 +591,11 @@ export type Database = {
           role: string
           second_reminder_sent_at: string | null
           show_applied_jobs: boolean | null
+          show_status: boolean | null
           skills: string[] | null
           sort_preference: string | null
           specializations: string[] | null
+          status: string | null
           success_rate: number | null
           team_size: number | null
           updated_at: string
@@ -645,9 +647,11 @@ export type Database = {
           role: string
           second_reminder_sent_at?: string | null
           show_applied_jobs?: boolean | null
+          show_status?: boolean | null
           skills?: string[] | null
           sort_preference?: string | null
           specializations?: string[] | null
+          status?: string | null
           success_rate?: number | null
           team_size?: number | null
           updated_at?: string
@@ -699,9 +703,11 @@ export type Database = {
           role?: string
           second_reminder_sent_at?: string | null
           show_applied_jobs?: boolean | null
+          show_status?: boolean | null
           skills?: string[] | null
           sort_preference?: string | null
           specializations?: string[] | null
+          status?: string | null
           success_rate?: number | null
           team_size?: number | null
           updated_at?: string

@@ -6,8 +6,10 @@ type Language = 'en' | 'he';
 interface UserPreferences {
   status: UserStatus;
   language: Language;
+  showStatus: boolean;
   setStatus: (status: UserStatus) => void;
   setLanguage: (language: Language) => void;
+  setShowStatus: (show: boolean) => void;
 }
 
 const UserPreferencesContext = createContext<UserPreferences | undefined>(undefined);
@@ -23,6 +25,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     return (saved as Language) || 'en';
   });
 
+  const [showStatus, setShowStatusState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('userShowStatus');
+    return saved === null ? true : saved === 'true';
+  });
+
   useEffect(() => {
     localStorage.setItem('userStatus', status);
   }, [status]);
@@ -33,6 +40,10 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     document.documentElement.lang = language;
   }, [language]);
 
+  useEffect(() => {
+    localStorage.setItem('userShowStatus', showStatus.toString());
+  }, [showStatus]);
+
   const setStatus = (newStatus: UserStatus) => {
     setStatusState(newStatus);
   };
@@ -41,8 +52,12 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     setLanguageState(newLanguage);
   };
 
+  const setShowStatus = (show: boolean) => {
+    setShowStatusState(show);
+  };
+
   return (
-    <UserPreferencesContext.Provider value={{ status, language, setStatus, setLanguage }}>
+    <UserPreferencesContext.Provider value={{ status, language, showStatus, setStatus, setLanguage, setShowStatus }}>
       {children}
     </UserPreferencesContext.Provider>
   );

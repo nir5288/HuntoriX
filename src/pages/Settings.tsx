@@ -7,10 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 
 interface TeamMember {
   name: string;
@@ -23,8 +25,10 @@ const Settings = () => {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { showStatus, setShowStatus } = useUserPreferences();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [localShowStatus, setLocalShowStatus] = useState(showStatus);
 
   // Employer fields
   const [companyName, setCompanyName] = useState("");
@@ -65,6 +69,10 @@ const Settings = () => {
     }
   }, [user, profile]);
 
+  useEffect(() => {
+    setLocalShowStatus(showStatus);
+  }, [showStatus]);
+
   const loadProfileData = () => {
     if (!profile) return;
 
@@ -102,6 +110,7 @@ const Settings = () => {
     try {
       const updates: any = {
         id: user.id,
+        show_status: localShowStatus,
       };
 
       if (profile?.role === "employer") {
@@ -136,6 +145,9 @@ const Settings = () => {
         .eq("id", user.id);
 
       if (error) throw error;
+
+      // Update context
+      setShowStatus(localShowStatus);
 
       await refreshProfile();
 
@@ -630,6 +642,28 @@ const Settings = () => {
             </Card>
           </div>
         )}
+
+        <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Privacy Settings</CardTitle>
+            <CardDescription>Control your visibility and privacy</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="show-status">Show Online Status</Label>
+                <p className="text-sm text-muted-foreground">
+                  Let others see when you're online or away in messages
+                </p>
+              </div>
+              <Switch
+                id="show-status"
+                checked={localShowStatus}
+                onCheckedChange={setLocalShowStatus}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="flex justify-end gap-4 mt-6">
           <Button variant="outline" onClick={() => navigate(-1)}>
