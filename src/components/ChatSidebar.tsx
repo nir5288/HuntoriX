@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useSidebar } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -45,6 +46,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { open: sidebarOpen } = useSidebar();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -225,9 +227,12 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed top-16 bottom-0 left-0 z-40 w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
+        "fixed top-16 bottom-0 z-40 w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
+      style={{
+        left: sidebarOpen ? 'var(--sidebar-width, 16rem)' : 'var(--sidebar-width-icon, 3.5rem)'
+      }}
     >
       <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
         <DropdownMenu>
