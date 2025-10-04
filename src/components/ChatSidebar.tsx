@@ -236,7 +236,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed top-16 bottom-0 w-64 bg-background border-r transition-transform duration-300 ease-in-out",
+        "fixed top-16 bottom-0 w-56 bg-background border-r transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0 z-30" : "-translate-x-full -z-10 pointer-events-none"
       )}
       style={{
