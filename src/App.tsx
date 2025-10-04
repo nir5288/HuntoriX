@@ -25,6 +25,12 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 import { VerificationWrapper } from './components/VerificationWrapper';
+import { SidebarProvider } from "@/components/ui/sidebar";
+
+function getSidebarDefaultOpen() {
+  const match = document.cookie.match(/(?:^|; )sidebar:state=(true|false)/);
+  return match ? match[1] === "true" : false;
+}
 
 const AppContent = () => {
   const location = useLocation();
@@ -70,7 +76,9 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <AppContent />
+            <SidebarProvider defaultOpen={getSidebarDefaultOpen()}>
+              <AppContent />
+            </SidebarProvider>
           </AuthProvider>
         </BrowserRouter>
       </UserPreferencesProvider>
