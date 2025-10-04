@@ -57,6 +57,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        vibrant: {
+          pink: "hsl(var(--vibrant-pink))",
+          mint: "hsl(var(--vibrant-mint))",
+          lilac: "hsl(var(--vibrant-lilac))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

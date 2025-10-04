@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { Briefcase, Users, TrendingUp, Shield, Clock, Award, Bot, Sparkles, Target, BarChart3, Search, FileText, DollarSign, MessageSquare } from 'lucide-react';
 import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
 import { HotOpportunities } from '@/components/HotOpportunities';
+import dashboardPreview from '@/assets/dashboard-preview.jpg';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -65,6 +66,72 @@ const Index = () => {
               <Users className="mr-2 h-5 w-5" />
               I'm a Headhunter
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Dashboard Showcase */}
+      <section className="relative py-20 bg-gradient-to-b from-[#0a0a0f] via-[#12121a] to-background overflow-hidden">
+        {/* Ambient glow effects */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-vibrant-pink/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-vibrant-lilac/20 rounded-full blur-[120px] pointer-events-none" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto text-center space-y-8">
+            <div className="inline-block">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-vibrant-pink to-vibrant-lilac text-white text-sm font-semibold mb-6">
+                <Bot className="h-4 w-4" />
+                Best AI Recruiting Platform
+              </span>
+            </div>
+            
+            <h2 className="text-5xl md:text-6xl font-bold text-white">
+              A 10X Faster Way To
+              <span className="block bg-gradient-to-r from-vibrant-pink via-vibrant-mint to-vibrant-lilac bg-clip-text text-transparent">
+                Manage Your Hiring
+              </span>
+            </h2>
+            
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-vibrant-pink to-vibrant-lilac hover:opacity-90 text-white border-0"
+              onClick={handleEmployerCTA}
+            >
+              Start Hiring - It's Free
+            </Button>
+            
+            {/* Dashboard Preview with Glow */}
+            <div className="relative mt-12 group">
+              {/* Animated gradient border */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-vibrant-pink via-vibrant-mint to-vibrant-lilac rounded-3xl opacity-75 blur-lg group-hover:opacity-100 transition duration-500" />
+              
+              {/* Dashboard image container */}
+              <div className="relative rounded-2xl overflow-hidden border-2 border-transparent bg-gradient-to-r from-vibrant-pink via-vibrant-mint to-vibrant-lilac p-[2px]">
+                <div className="bg-[#0a0a0f] rounded-2xl overflow-hidden">
+                  <img 
+                    src={dashboardPreview} 
+                    alt="Huntorix Dashboard Preview" 
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Feature bullets */}
+            <div className="flex flex-wrap justify-center gap-8 pt-8 text-white/80">
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-vibrant-pink" />
+                <span className="text-sm">Post Jobs 10X Faster</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-vibrant-mint" />
+                <span className="text-sm">AI-Powered Candidate Matching</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-vibrant-lilac" />
+                <span className="text-sm">Smart Analytics & Insights</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
