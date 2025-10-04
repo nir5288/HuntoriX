@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth";
+import { ThemeProvider } from './components/ThemeProvider';
+import { UserPreferencesProvider } from './contexts/UserPreferencesContext';
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import EmployerDashboard from "./pages/EmployerDashboard";
@@ -27,11 +29,13 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <Toaster />
-    <Sonner />
-    <BrowserRouter>
-      <AuthProvider>
-        <VerificationWrapper>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <UserPreferencesProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <VerificationWrapper>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -54,9 +58,11 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </VerificationWrapper>
-      </AuthProvider>
-    </BrowserRouter>
+          </VerificationWrapper>
+        </AuthProvider>
+      </BrowserRouter>
+      </UserPreferencesProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
