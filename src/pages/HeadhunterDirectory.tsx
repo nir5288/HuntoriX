@@ -283,13 +283,19 @@ const HeadhunterDirectory = () => {
               <CardContent className="p-6 flex flex-col h-full">
                 {/* Save button - top right */}
                 <div className="absolute top-4 right-4 z-10 flex items-center gap-1">
-                  {headhunter.saves_count > 0 && (
-                    <span className="text-xs text-muted-foreground">{headhunter.saves_count}</span>
-                  )}
+                  <span className="text-xs text-muted-foreground">{headhunter.saves_count || 0}</span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => user ? handleToggleSave(headhunter.id, e) : navigate('/auth')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!user) {
+                        toast.error('Please log in to save headhunters');
+                        navigate('/auth');
+                        return;
+                      }
+                      handleToggleSave(headhunter.id, e);
+                    }}
                     className={`${
                       savedHeadhunters.has(headhunter.id) ? 'text-[hsl(var(--accent-pink))]' : ''
                     }`}

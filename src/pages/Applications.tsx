@@ -84,21 +84,30 @@ const Applications = () => {
   const getFilteredAndSortedApplications = () => {
     let filtered = applications;
 
-    // Apply pending review filter
+    // Apply pending review filter - explicitly exclude rejected/declined
     if (showPendingOnly) {
-      filtered = filtered.filter(app => 
-        (app.type === 'invitation' && app.status === 'pending') ||
-        (app.type === 'application' && app.status === 'submitted')
-      );
+      filtered = filtered.filter(app => {
+        // Exclude rejected and declined statuses
+        if (app.status === 'rejected' || app.status === 'declined') {
+          return false;
+        }
+        // Include pending invitations and submitted applications
+        return (app.type === 'invitation' && app.status === 'pending') ||
+               (app.type === 'application' && app.status === 'submitted');
+      });
     }
 
     // Apply status filter
     if (statusFilter !== 'all') {
       if (statusFilter === 'pending') {
-        filtered = filtered.filter(app => 
-          (app.type === 'invitation' && app.status === 'pending') ||
-          (app.type === 'application' && app.status === 'submitted')
-        );
+        filtered = filtered.filter(app => {
+          // Exclude rejected and declined statuses
+          if (app.status === 'rejected' || app.status === 'declined') {
+            return false;
+          }
+          return (app.type === 'invitation' && app.status === 'pending') ||
+                 (app.type === 'application' && app.status === 'submitted');
+        });
       } else {
         filtered = filtered.filter(app => app.status === statusFilter);
       }
