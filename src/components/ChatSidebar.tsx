@@ -102,6 +102,15 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
 
       const conversationMap = new Map<string, Conversation>();
 
+      // Helper function to format name
+      const formatName = (fullName: string) => {
+        const parts = fullName.trim().split(' ');
+        if (parts.length === 1) return fullName;
+        const firstName = parts[0];
+        const lastNameInitial = parts[parts.length - 1][0];
+        return `${firstName} ${lastNameInitial}.`;
+      };
+
       messages.forEach((msg: any) => {
         const isFromMe = msg.from_user === user.id;
         const otherUserId = isFromMe ? msg.to_user : msg.from_user;
@@ -111,7 +120,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
         if (!conversationMap.has(key)) {
           conversationMap.set(key, {
             otherUserId,
-            otherUserName: otherProfile?.name || "Unknown User",
+            otherUserName: otherProfile?.name ? formatName(otherProfile.name) : "Unknown User",
             otherUserAvatar: otherProfile?.avatar_url || null,
             jobId: msg.job_id,
             jobTitle: msg.job?.title || "Unknown Job",
@@ -227,8 +236,8 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed top-16 bottom-0 z-40 w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed top-16 bottom-0 w-64 bg-background border-r transition-all duration-300 ease-in-out",
+        isOpen ? "z-40 opacity-100" : "z-0 opacity-0 pointer-events-none"
       )}
       style={{
         left: sidebarOpen ? 'var(--sidebar-width, 16rem)' : 'var(--sidebar-width-icon, 3.5rem)'

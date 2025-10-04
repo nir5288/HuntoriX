@@ -350,7 +350,7 @@ const Messages = () => {
           <div className="h-[calc(100vh-64px)] flex flex-col">
             <div
               className={`flex-1 transition-all duration-300 ${
-                sidebarOpen ? "ml-80" : "ml-0"
+                sidebarOpen ? "ml-64" : "ml-0"
               }`}
             >
               {otherUserId ? (
