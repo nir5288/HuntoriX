@@ -13,15 +13,20 @@ export function useUpdateLastSeen() {
     // Update last_seen and status on mount
     const updateLastSeen = async () => {
       try {
-        await supabase
+        const { error } = await supabase
           .from('profiles')
           .update({ 
             last_seen: new Date().toISOString(),
             status: status 
           })
           .eq('id', user.id);
+        
+        // Silently ignore errors to prevent console spam
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error updating last_seen:', error);
+        }
       } catch (error) {
-        console.error('Error updating last_seen:', error);
+        // Silently catch errors to prevent breaking the app
       }
     };
 
