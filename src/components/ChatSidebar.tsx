@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, ChevronDown, Trash2, Circle, CircleDot } from "lucide-react";
+import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Circle, CircleDot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -266,7 +266,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
         <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
       </div>
 
