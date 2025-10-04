@@ -348,8 +348,8 @@ const Messages = () => {
       <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div
-        className={`transition-all duration-300 ${
-          sidebarOpen ? "ml-80" : "ml-0"
+        className={`transition-all duration-300 pt-16 ${
+          sidebarOpen ? "lg:ml-80" : "ml-0"
         }`}
       >
         <div className="h-[calc(100vh-64px)] flex flex-col">

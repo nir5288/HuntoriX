@@ -29,7 +29,7 @@ interface Conversation {
   otherUserId: string;
   otherUserName: string;
   otherUserAvatar: string | null;
-  jobId: string;
+  jobId: string | null;
   jobTitle: string;
   lastMessage: string;
   lastMessageTime: string;
@@ -136,8 +136,8 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
     }
   };
 
-  const handleConversationClick = (jobId: string, userId: string) => {
-    navigate(`/messages?job=${jobId}&with=${userId}`);
+  const handleConversationClick = (jobId: string | null, userId: string) => {
+    navigate(`/messages?job=${jobId || 'null'}&with=${userId}`);
   };
 
   const handleDeleteConversation = async () => {
@@ -176,15 +176,23 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
     }
   };
 
-  const handleMarkAsUnread = async (jobId: string, otherUserId: string) => {
+  const handleMarkAsUnread = async (jobId: string | null, otherUserId: string) => {
     if (!currentUserId) return;
 
     try {
       // Mark all messages from the other user as unread
-      const { error } = await supabase
+      let query = supabase
         .from("messages")
-        .update({ is_read: false })
-        .eq("job_id", jobId)
+        .update({ is_read: false });
+      
+      // Handle null jobId properly
+      if (jobId && jobId !== "null") {
+        query = query.eq("job_id", jobId);
+      } else {
+        query = query.is("job_id", null);
+      }
+      
+      const { error } = await query
         .eq("from_user", otherUserId)
         .eq("to_user", currentUserId);
 
@@ -217,7 +225,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed inset-y-0 left-0 z-50 w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
+        "fixed top-16 bottom-0 left-0 z-40 w-80 bg-background border-r transform transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
     >
