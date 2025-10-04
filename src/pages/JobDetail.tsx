@@ -319,7 +319,14 @@ const JobDetail = () => {
               <CardHeader>
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
-                    <CardTitle className="text-3xl mb-3">{job.title}</CardTitle>
+                    <div className="flex items-center gap-3 mb-3">
+                      <CardTitle className="text-3xl">{job.title}</CardTitle>
+                      {job.job_id_number && (
+                        <Badge variant="outline" className="text-sm">
+                          #{job.job_id_number}
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {job.industry && (
                         <Badge 

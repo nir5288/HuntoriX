@@ -22,6 +22,7 @@ const HeadhunterDashboard = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [showPendingOnly, setShowPendingOnly] = useState(false);
 
   useEffect(() => {
     if (user && !loading) {
@@ -39,7 +40,23 @@ const HeadhunterDashboard = () => {
         .order('created_at', { ascending: false });
 
       if (appsError) throw appsError;
-      setApplications(appsData || []);
+
+      // Fetch job invitations
+      const { data: invitesData, error: invitesError } = await supabase
+        .from('job_invitations')
+        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .eq('headhunter_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (invitesError) throw invitesError;
+
+      // Combine applications and invitations
+      const combinedData = [
+        ...(appsData || []).map(app => ({ ...app, type: 'application' })),
+        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' }))
+      ];
+
+      setApplications(combinedData || []);
 
       // Get job IDs that user has already applied to
       const appliedJobIds = new Set(appsData?.map(app => app.job_id) || []);
@@ -77,11 +94,14 @@ const HeadhunterDashboard = () => {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
+      pending: 'bg-[hsl(var(--warning))]',
       submitted: 'bg-[hsl(var(--accent-pink))]',
       shortlisted: 'bg-[hsl(var(--success))]',
       selected: 'bg-[hsl(var(--success))]',
       rejected: 'bg-[hsl(var(--destructive))]',
       withdrawn: 'bg-gray-400',
+      accepted: 'bg-[hsl(var(--success))]',
+      declined: 'bg-gray-400',
     };
     return colors[status] || 'bg-gray-400';
   };
@@ -123,9 +143,24 @@ const HeadhunterDashboard = () => {
   const getFilteredAndSortedApplications = () => {
     let filtered = applications;
 
+    // Apply pending review filter
+    if (showPendingOnly) {
+      filtered = filtered.filter(app => 
+        (app.type === 'invitation' && app.status === 'pending') ||
+        (app.type === 'application' && app.status === 'submitted')
+      );
+    }
+
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(app => app.status === statusFilter);
+      if (statusFilter === 'pending') {
+        filtered = filtered.filter(app => 
+          (app.type === 'invitation' && app.status === 'pending') ||
+          (app.type === 'application' && app.status === 'submitted')
+        );
+      } else {
+        filtered = filtered.filter(app => app.status === statusFilter);
+      }
     }
 
     // Apply sorting
@@ -221,6 +256,57 @@ const HeadhunterDashboard = () => {
         {/* Stats */}
         <TooltipProvider>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <Card 
+              className={`cursor-pointer transition-all ${
+                applications.filter(a => 
+                  (a.type === 'invitation' && a.status === 'pending') ||
+                  (a.type === 'application' && a.status === 'submitted')
+                ).length > 0 
+                  ? 'bg-[hsl(var(--warning))]/10 hover:bg-[hsl(var(--warning))]/20 border-[hsl(var(--warning))]/30' 
+                  : ''
+              }`}
+              onClick={() => {
+                const pendingCount = applications.filter(a => 
+                  (a.type === 'invitation' && a.status === 'pending') ||
+                  (a.type === 'application' && a.status === 'submitted')
+                ).length;
+                if (pendingCount > 0) {
+                  setShowPendingOnly(!showPendingOnly);
+                }
+              }}
+            >
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-sm font-medium opacity-90 cursor-help flex items-center gap-1">
+                      Pending Review
+                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Job invitations and applications pending your action</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {applications.filter(a => 
+                    (a.type === 'invitation' && a.status === 'pending') ||
+                    (a.type === 'application' && a.status === 'submitted')
+                  ).length}
+                </div>
+                {applications.filter(a => 
+                  (a.type === 'invitation' && a.status === 'pending') ||
+                  (a.type === 'application' && a.status === 'submitted')
+                ).length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Click to {showPendingOnly ? 'show all' : 'filter'}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <Tooltip>
@@ -238,7 +324,7 @@ const HeadhunterDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {applications.filter(a => ['submitted', 'shortlisted'].includes(a.status)).length}
+                  {applications.filter(a => a.type === 'application' && ['submitted', 'shortlisted'].includes(a.status)).length}
                 </div>
               </CardContent>
             </Card>
@@ -260,7 +346,7 @@ const HeadhunterDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {applications.filter(a => a.status === 'selected').length}
+                  {applications.filter(a => a.type === 'application' && a.status === 'selected').length}
                 </div>
               </CardContent>
             </Card>
@@ -373,6 +459,7 @@ const HeadhunterDashboard = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending Review</SelectItem>
                     <SelectItem value="submitted">Submitted</SelectItem>
                     <SelectItem value="shortlisted">Shortlisted</SelectItem>
                     <SelectItem value="selected">Selected</SelectItem>
@@ -407,7 +494,7 @@ const HeadhunterDashboard = () => {
             ) : (
               <div className="space-y-4">
                 {filteredApplications.slice(0, 5).map((app) => (
-                  <Card key={app.id} className="hover:shadow-md transition-shadow">
+                  <Card key={`${app.type}-${app.id}`} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1" onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'dashboard' } })} style={{ cursor: 'pointer' }}>
@@ -416,9 +503,14 @@ const HeadhunterDashboard = () => {
                             <Badge variant="outline" className="text-xs">
                               #{app.job?.job_id_number}
                             </Badge>
+                            {app.type === 'invitation' && (
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs">
+                                Invitation
+                              </Badge>
+                            )}
                           </div>
                           <CardDescription className="mt-1">
-                            Applied {new Date(app.created_at).toLocaleDateString()}
+                            {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">

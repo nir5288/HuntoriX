@@ -448,9 +448,14 @@ const EmployerDashboard = () => {
               return <Card key={job.id} className="group hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
+                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <CardTitle className="text-xl">{job.title}</CardTitle>
+                              {job.job_id_number && (
+                                <Badge variant="outline" className="text-sm">
+                                  #{job.job_id_number}
+                                </Badge>
+                              )}
                               {pendingCount > 0 && <Badge className="bg-[hsl(var(--warning))] text-white">
                                   {pendingCount} Pending Review
                                 </Badge>}

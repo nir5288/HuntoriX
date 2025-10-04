@@ -28,6 +28,7 @@ interface Headhunter {
   availability: boolean;
   verified: boolean;
   response_time_hours: number | null;
+  saves_count?: number;
 }
 const HeadhunterDirectory = () => {
   const navigate = useNavigate();
@@ -64,7 +65,26 @@ const HeadhunterDirectory = () => {
 
       // Filter for headhunters and non-suspended users client-side
       const filteredData = (data || []).filter((profile: any) => profile.role === 'headhunter' && profile.status !== 'suspended');
-      setHeadhunters(filteredData as any);
+      
+      // Fetch save counts for all headhunters
+      const headhunterIds = filteredData.map((h: any) => h.id);
+      const { data: savesData } = await supabase
+        .from('saved_headhunters')
+        .select('headhunter_id');
+      
+      // Count saves per headhunter
+      const savesCounts: Record<string, number> = {};
+      savesData?.forEach((save: any) => {
+        savesCounts[save.headhunter_id] = (savesCounts[save.headhunter_id] || 0) + 1;
+      });
+      
+      // Add saves_count to each headhunter
+      const headhuntersWithSaves = filteredData.map((h: any) => ({
+        ...h,
+        saves_count: savesCounts[h.id] || 0,
+      }));
+      
+      setHeadhunters(headhuntersWithSaves as any);
     } catch (error) {
       console.error("Error loading headhunters:", error);
     } finally {
@@ -262,18 +282,21 @@ const HeadhunterDirectory = () => {
           {filteredHeadhunters.map(headhunter => <Card key={headhunter.id} className="hover:shadow-lg transition-all cursor-pointer flex flex-col relative">
               <CardContent className="p-6 flex flex-col h-full">
                 {/* Save button - top right */}
-                {user && (
+                <div className="absolute top-4 right-4 z-10 flex items-center gap-1">
+                  {headhunter.saves_count > 0 && (
+                    <span className="text-xs text-muted-foreground">{headhunter.saves_count}</span>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => handleToggleSave(headhunter.id, e)}
-                    className={`absolute top-4 right-4 z-10 ${
+                    onClick={(e) => user ? handleToggleSave(headhunter.id, e) : navigate('/auth')}
+                    className={`${
                       savedHeadhunters.has(headhunter.id) ? 'text-[hsl(var(--accent-pink))]' : ''
                     }`}
                   >
                     <Heart className={`h-5 w-5 ${savedHeadhunters.has(headhunter.id) ? 'fill-current' : ''}`} />
                   </Button>
-                )}
+                </div>
                 
                 <div className="mb-4 flex-grow" onClick={() => navigate(`/profile/headhunter/${headhunter.id}`)}>
                   <div className="flex items-start gap-3 mb-3">
