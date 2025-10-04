@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, Check, X, MessageCircle, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ApplyModal } from '@/components/ApplyModal';
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -21,6 +22,8 @@ const JobDetail = () => {
   const [applications, setApplications] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [savingJob, setSavingJob] = useState(false);
+  const [applyModalOpen, setApplyModalOpen] = useState(false);
+  const [hasInvitation, setHasInvitation] = useState(false);
   
   // Determine back button text based on navigation state
   const getBackButtonText = () => {
@@ -82,6 +85,17 @@ const JobDetail = () => {
         if (appData) {
           setJob((prev: any) => ({ ...prev, userApplicationStatus: appData.status }));
         }
+
+        // Check if user has a pending invitation
+        const { data: inviteData } = await supabase
+          .from('job_invitations')
+          .select('id, status')
+          .eq('job_id', id)
+          .eq('headhunter_id', user.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        setHasInvitation(!!inviteData);
       }
 
       // If user is the employer who created this job, fetch applications
@@ -103,7 +117,7 @@ const JobDetail = () => {
     }
   };
 
-  const handleApply = async () => {
+  const handleApply = () => {
     if (!user) {
       navigate('/auth?role=headhunter');
       return;
@@ -114,26 +128,13 @@ const JobDetail = () => {
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .insert({
-          job_id: id,
-          headhunter_id: user.id,
-          status: 'submitted',
-          eta_days: 30,
-          proposed_fee_model: 'percentage',
-          proposed_fee_value: 15,
-        } as any);
+    setApplyModalOpen(true);
+  };
 
-      if (error) throw error;
-
-      toast.success('Application submitted successfully!');
-      setHasApplied(true);
-    } catch (error) {
-      console.error('Error applying:', error);
-      toast.error('Failed to submit application');
-    }
+  const handleApplicationSuccess = () => {
+    setHasApplied(true);
+    setApplyModalOpen(false);
+    fetchJob();
   };
 
   const getApplicationStatusColor = (status: string) => {
@@ -501,6 +502,15 @@ const JobDetail = () => {
                           : 'You have already applied to this job'}
                       </p>
                     </div>
+                  ) : hasInvitation ? (
+                    <Button 
+                      variant="hero" 
+                      size="lg" 
+                      className="w-full" 
+                      onClick={() => navigate(`/job-review/${id}`)}
+                    >
+                      Review Invitation
+                    </Button>
                   ) : (
                     <Button variant="hero" size="lg" className="w-full" onClick={handleApply}>
                       Apply Now
@@ -603,6 +613,18 @@ const JobDetail = () => {
           </Card>
         )}
       </div>
+
+      {/* Apply Modal */}
+      {user && job && (
+        <ApplyModal
+          open={applyModalOpen}
+          onOpenChange={setApplyModalOpen}
+          jobId={job.id}
+          jobTitle={job.title}
+          headhunterId={user.id}
+          onSuccess={handleApplicationSuccess}
+        />
+      )}
     </div>
   );
 };

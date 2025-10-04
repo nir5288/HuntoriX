@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Filter, ArrowUpDown, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Filter, ArrowUpDown, ArrowLeft, CheckSquare, Square } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -17,6 +17,7 @@ const Applications = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('newest');
+  const [showPendingOnly, setShowPendingOnly] = useState(false);
 
   useEffect(() => {
     if (user && !loading) {
@@ -33,7 +34,23 @@ const Applications = () => {
         .order('created_at', { ascending: false });
 
       if (appsError) throw appsError;
-      setApplications(appsData || []);
+
+      // Fetch job invitations
+      const { data: invitesData, error: invitesError } = await supabase
+        .from('job_invitations')
+        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .eq('headhunter_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (invitesError) throw invitesError;
+
+      // Combine applications and invitations
+      const combinedData = [
+        ...(appsData || []).map(app => ({ ...app, type: 'application' })),
+        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' }))
+      ];
+
+      setApplications(combinedData || []);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast.error('Failed to load applications');
@@ -44,11 +61,14 @@ const Applications = () => {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
+      pending: 'bg-[hsl(var(--warning))]',
       submitted: 'bg-[hsl(var(--accent-pink))]',
       shortlisted: 'bg-[hsl(var(--success))]',
       selected: 'bg-[hsl(var(--success))]',
       rejected: 'bg-[hsl(var(--destructive))]',
       withdrawn: 'bg-gray-400',
+      accepted: 'bg-[hsl(var(--success))]',
+      declined: 'bg-gray-400',
     };
     return colors[status] || 'bg-gray-400';
   };
@@ -64,9 +84,24 @@ const Applications = () => {
   const getFilteredAndSortedApplications = () => {
     let filtered = applications;
 
+    // Apply pending review filter
+    if (showPendingOnly) {
+      filtered = filtered.filter(app => 
+        (app.type === 'invitation' && app.status === 'pending') ||
+        (app.type === 'application' && app.status === 'submitted')
+      );
+    }
+
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(app => app.status === statusFilter);
+      if (statusFilter === 'pending') {
+        filtered = filtered.filter(app => 
+          (app.type === 'invitation' && app.status === 'pending') ||
+          (app.type === 'application' && app.status === 'submitted')
+        );
+      } else {
+        filtered = filtered.filter(app => app.status === statusFilter);
+      }
     }
 
     // Apply sorting
@@ -131,6 +166,15 @@ const Applications = () => {
             
             {/* Filters */}
             <div className="flex gap-3 mt-4">
+              <Button
+                variant={showPendingOnly ? "default" : "outline"}
+                onClick={() => setShowPendingOnly(!showPendingOnly)}
+                className="flex items-center gap-2"
+              >
+                {showPendingOnly ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                Pending Review Only
+              </Button>
+
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px]">
                   <Filter className="mr-2 h-4 w-4" />
@@ -138,6 +182,7 @@ const Applications = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending">Pending Review</SelectItem>
                   <SelectItem value="submitted">Submitted</SelectItem>
                   <SelectItem value="shortlisted">Shortlisted</SelectItem>
                   <SelectItem value="selected">Selected</SelectItem>
@@ -177,7 +222,7 @@ const Applications = () => {
             ) : (
               <div className="space-y-4">
                 {filteredApplications.map((app) => (
-                  <Card key={app.id} className="hover:shadow-md transition-shadow">
+                  <Card key={`${app.type}-${app.id}`} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div 
@@ -189,10 +234,15 @@ const Applications = () => {
                             <Badge variant="outline" className="text-xs">
                               #{app.job?.job_id_number}
                             </Badge>
+                            {app.type === 'invitation' && (
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs">
+                                Invitation
+                              </Badge>
+                            )}
                           </div>
                           <CardDescription className="mt-1">
                             {app.job?.employer?.company_name || app.job?.employer?.name} • 
-                            Applied {new Date(app.created_at).toLocaleDateString()}
+                            {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">

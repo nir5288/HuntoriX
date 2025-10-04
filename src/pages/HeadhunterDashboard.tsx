@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Briefcase, Clock, CheckCircle, MessageCircle, Heart, AlertCircle, Filter, ArrowUpDown, Mail } from 'lucide-react';
+import { Search, Briefcase, Clock, CheckCircle, MessageCircle, Heart, AlertCircle, Filter, ArrowUpDown, Mail, CheckSquare, Square } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -452,6 +452,15 @@ const HeadhunterDashboard = () => {
             {/* Filters */}
             {applications.length > 0 && (
               <div className="flex gap-3 mt-4">
+                <Button
+                  variant={showPendingOnly ? "default" : "outline"}
+                  onClick={() => setShowPendingOnly(!showPendingOnly)}
+                  className="flex items-center gap-2"
+                >
+                  {showPendingOnly ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                  Pending Review Only
+                </Button>
+
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[180px]">
                     <Filter className="mr-2 h-4 w-4" />

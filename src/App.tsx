@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import HeadhunterDashboard from "./pages/HeadhunterDashboard";
 import JobDetail from "./pages/JobDetail";
+import JobReview from "./pages/JobReview";
 import Opportunities from "./pages/Opportunities";
 import Applications from "./pages/Applications";
 import SavedJobs from "./pages/SavedJobs";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/jobs" element={<Opportunities />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/job/:id" element={<JobDetail />} />
+            <Route path="/job-review/:id" element={<JobReview />} />
             <Route path="/saved-jobs" element={<SavedJobs />} />
             <Route path="/saved-headhunters" element={<SavedHeadhunters />} />
             <Route path="/messages" element={<Messages />} />
