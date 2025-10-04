@@ -25,18 +25,30 @@ const JobDetail = () => {
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [hasInvitation, setHasInvitation] = useState(false);
   
-  // Determine back button text based on navigation state
+  // Determine back destination based on navigation state
+  const fromSource = location.state?.from as 'dashboard' | 'applications' | 'saved' | undefined;
   const getBackButtonText = () => {
-    const from = location.state?.from;
-    if (from === 'dashboard') {
-      return 'Back to Dashboard';
-    }
-    if (from === 'saved') {
-      return 'Back to My Saved Jobs';
-    }
+    if (fromSource === 'dashboard') return 'Back to Dashboard';
+    if (fromSource === 'applications') return 'Back to My Applications';
+    if (fromSource === 'saved') return 'Back to My Saved Jobs';
     return 'Back to Opportunities';
   };
 
+  const handleBack = () => {
+    switch (fromSource) {
+      case 'dashboard':
+        navigate('/dashboard/headhunter');
+        break;
+      case 'applications':
+        navigate('/applications');
+        break;
+      case 'saved':
+        navigate('/saved-jobs');
+        break;
+      default:
+        navigate('/opportunities');
+    }
+  };
   useEffect(() => {
     fetchJob();
     checkSaved();
@@ -309,7 +321,7 @@ const JobDetail = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
+        <Button variant="ghost" onClick={handleBack} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           {getBackButtonText()}
         </Button>
@@ -507,7 +519,7 @@ const JobDetail = () => {
                       variant="hero" 
                       size="lg" 
                       className="w-full" 
-                      onClick={() => navigate(`/job-review/${id}`)}
+                      onClick={() => navigate(`/job-review/${id}`, { state: { from: fromSource || 'dashboard' } })}
                     >
                       Review Invitation
                     </Button>

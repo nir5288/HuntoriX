@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 const JobReview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, profile } = useAuth();
   const [job, setJob] = useState<any>(null);
   const [invitation, setInvitation] = useState<any>(null);
@@ -30,6 +31,22 @@ const JobReview = () => {
   const [feeModel, setFeeModel] = useState('percent_fee');
   const [feeValue, setFeeValue] = useState('');
   const [etaDays, setEtaDays] = useState('');
+
+  // Back navigation handling
+  const fromSource = (location.state as any)?.from as 'dashboard' | 'applications' | 'saved' | undefined;
+  const backText = fromSource === 'dashboard' ? 'Back to Dashboard' : fromSource === 'applications' ? 'Back to My Applications' : 'Back to Job';
+  const handleBack = () => {
+    switch (fromSource) {
+      case 'dashboard':
+        navigate('/dashboard/headhunter');
+        break;
+      case 'applications':
+        navigate('/applications');
+        break;
+      default:
+        navigate(`/jobs/${id}`, { state: { from: fromSource } });
+    }
+  };
 
   useEffect(() => {
     if (user && profile?.role === 'headhunter') {
@@ -228,9 +245,9 @@ const JobReview = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={() => navigate(`/jobs/${id}`)} className="mb-6">
+        <Button variant="ghost" onClick={handleBack} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Job
+          {backText}
         </Button>
 
         <div className="mb-6">

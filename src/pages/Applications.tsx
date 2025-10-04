@@ -44,14 +44,26 @@ const Applications = () => {
 
       if (invitesError) throw invitesError;
 
-      // Combine applications and invitations with preference to applications over invitations
+      // Combine applications and invitations then prefer applications and most recent
       const combinedData = [
-        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' })),
         ...(appsData || []).map(app => ({ ...app, type: 'application' })),
+        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' }))
       ];
 
-      // Deduplicate by job_id so application overrides invitation if both exist
-      const dedupedByJob = Array.from(new Map(combinedData.map(item => [item.job_id, item])).values());
+      // Sort by priority (application first) then by date desc
+      const sorted = [...combinedData].sort((a: any, b: any) => {
+        const prioA = a.type === 'application' ? 0 : 1;
+        const prioB = b.type === 'application' ? 0 : 1;
+        if (prioA !== prioB) return prioA - prioB;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+
+      // Deduplicate by job_id so first occurrence (preferred) wins
+      const map = new Map();
+      for (const item of sorted) {
+        if (!map.has(item.job_id)) map.set(item.job_id, item);
+      }
+      const dedupedByJob = Array.from(map.values());
 
       setApplications(dedupedByJob || []);
     } catch (error) {
