@@ -329,10 +329,9 @@ const Messages = () => {
       <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           <div className="h-[calc(100vh-64px)] flex flex-col">
-            <div className={`h-full flex flex-col transition-all duration-300 ${sidebarOpen ? "ml-56" : "ml-0"}`}>
+            <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
               {otherUserId ? <>
-                  {/* Fixed Header */}
-                  <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
+                  <div className="p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
                 {!sidebarOpen && <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
                     <Menu className="h-5 w-5" />
                   </Button>}
@@ -361,8 +360,7 @@ const Messages = () => {
                 </Link>
               </div>
 
-              {/* Scrollable Message Area */}
-              <div className="flex-1 min-h-0 overflow-hidden">
+              <div className="flex-1 flex flex-col overflow-hidden">
                 <MessageThread messages={messages} currentUserId={user?.id || ""} currentUserProfile={profile} loading={loading} onEdited={loadMessages} onReply={message => {
               const isFromMe = message.from_user === user.id;
               setReplyingTo({
@@ -371,10 +369,7 @@ const Messages = () => {
                 senderName: isFromMe ? "yourself" : message.from_profile?.name || "User"
               });
             }} />
-              </div>
 
-              {/* Fixed Input */}
-              <div className="flex-shrink-0">
                 <MessageInput onSend={handleSendMessage} disabled={!user || !otherUserId} replyingTo={replyingTo} onCancelReply={() => setReplyingTo(null)} />
               </div>
             </> : <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
@@ -382,7 +377,7 @@ const Messages = () => {
                   <Menu className="h-4 w-4 mr-2" />
                   Open Conversations
                 </Button>}
-              <p className="my-[35px]">Select a conversation to start messaging</p>
+              <p className="my-0 mx-0">Select a conversation to start messaging</p>
             </div>}
         </div>
       </div>
