@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { Briefcase, Users, TrendingUp, Shield, Clock, Award, Bot, Sparkles, Target, BarChart3, Search, FileText, DollarSign, MessageSquare } from 'lucide-react';
 import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
 import { HotOpportunities } from '@/components/HotOpportunities';
+import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
 
 const Index = () => {
@@ -270,6 +271,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <TestimonialsSection />
 
       {/* Value Props */}
       <section className="container mx-auto px-4 py-20">
