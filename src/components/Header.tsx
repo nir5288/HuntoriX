@@ -257,7 +257,11 @@ export function Header() {
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut}>
+                <DropdownMenuItem onClick={() => {
+                  // Clear persisted sidebar state on logout
+                  document.cookie = "sidebar:state=; path=/; max-age=0";
+                  signOut();
+                }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
