@@ -72,61 +72,64 @@ const Index = () => {
       </section>
 
       {/* Dashboard Showcase */}
-      <section className="relative py-20 bg-[#1a1a24] overflow-hidden">
-        {/* Subtle ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[hsl(var(--accent-pink))]/10 rounded-full blur-[150px] pointer-events-none" />
-        
+      <section className="relative py-20 bg-[#0a0a12] overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto text-center space-y-8">
-            <div className="inline-block">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--accent-mint))]/20 text-[hsl(var(--accent-mint))] text-xs font-medium border border-[hsl(var(--accent-mint))]/30">
-                <Bot className="h-3.5 w-3.5" />
+          <div className="max-w-6xl mx-auto text-center space-y-10">
+            {/* Badge */}
+            <div className="inline-block animate-fade-in">
+              <span className="px-4 py-1.5 rounded-md bg-[hsl(var(--accent-mint))]/10 text-[hsl(var(--accent-mint))] text-sm font-medium border border-[hsl(var(--accent-mint))]/20">
                 Best AI Recruiting Platform
               </span>
             </div>
             
-            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+            {/* Heading */}
+            <h2 className="text-5xl md:text-6xl font-bold text-white leading-tight animate-fade-in">
               A 10X Faster Way To
-              <span className="block text-[hsl(var(--accent-mint))] mt-2">
+              <span className="block bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent mt-2">
                 Manage Your Hiring
               </span>
             </h2>
             
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-white border-0 shadow-lg"
-              onClick={handleEmployerCTA}
-            >
-              Start Hiring - It's Free
-            </Button>
+            {/* CTA Button */}
+            <div className="animate-fade-in">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:shadow-xl hover:scale-105 text-white border-0 shadow-lg transition-all duration-300 px-8 py-6 text-base"
+                onClick={handleEmployerCTA}
+              >
+                Start Hiring - It's Free
+              </Button>
+            </div>
             
-            {/* Dashboard Preview with subtle gradient border */}
-            <div className="relative mt-16 group">
-              {/* Subtle gradient border effect */}
-              <div className="absolute -inset-[2px] bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-500 blur-sm" />
+            {/* Dashboard Preview with animated gradient border */}
+            <div className="relative mt-12 animate-scale-in">
+              {/* Animated gradient border */}
+              <div className="absolute -inset-[3px] bg-gradient-to-r from-[hsl(var(--accent-mint))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] rounded-3xl opacity-75 blur-md animate-pulse" />
               
-              {/* Dashboard image container */}
-              <div className="relative rounded-2xl overflow-hidden bg-[#0f0f16] shadow-2xl">
-                <img 
-                  src={dashboardPreview} 
-                  alt="Huntorix Dashboard Preview - Manage hiring efficiently" 
-                  className="w-full h-auto"
-                />
+              {/* Dashboard image container - tighter frame */}
+              <div className="relative rounded-3xl overflow-hidden bg-[#000000] p-1">
+                <div className="rounded-2xl overflow-hidden">
+                  <img 
+                    src={dashboardPreview} 
+                    alt="Huntorix Dashboard Preview - Manage hiring efficiently" 
+                    className="w-full h-auto"
+                  />
+                </div>
               </div>
             </div>
             
-            {/* Feature bullets - cleaner design */}
-            <div className="flex flex-wrap justify-center gap-6 pt-12 text-white/70 text-sm">
+            {/* Feature bullets */}
+            <div className="flex flex-wrap justify-center gap-8 pt-8 text-white/80 text-base animate-fade-in">
               <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-white/50" />
+                <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent-mint))]" />
                 <span>Post Jobs 10X Faster</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-white/50" />
+                <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent-pink))]" />
                 <span>AI-Powered Candidate Matching</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-white/50" />
+                <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent-lilac))]" />
                 <span>Smart Analytics & Insights</span>
               </div>
             </div>
