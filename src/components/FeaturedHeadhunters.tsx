@@ -20,6 +20,7 @@ type HeadhunterProfile = {
   rating_avg: number | null;
   success_rate: number | null;
   verified: boolean | null;
+  response_time_hours?: number | null;
 };
 
 export function FeaturedHeadhunters() {
@@ -194,7 +195,19 @@ export function FeaturedHeadhunters() {
                       </div>
 
                       <div className="space-y-1">
-                        <h3 className="font-bold text-lg">{headhunter.name || 'Headhunter'}</h3>
+                        <div className="flex items-center justify-center gap-2 flex-wrap">
+                          <h3 className="font-bold text-lg">{headhunter.name || 'Headhunter'}</h3>
+                          {headhunter.response_time_hours && headhunter.response_time_hours < 2 && (
+                            <Badge className="bg-[hsl(var(--success))] text-white text-xs">
+                              Responds Under 2H
+                            </Badge>
+                          )}
+                          {headhunter.success_rate >= 85 && (
+                            <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs">
+                              {headhunter.success_rate}% Success
+                            </Badge>
+                          )}
+                        </div>
                         {headhunter.bio && (
                           <p className="text-sm text-muted-foreground line-clamp-2">{headhunter.bio}</p>
                         )}

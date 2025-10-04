@@ -259,8 +259,22 @@ const HeadhunterDirectory = () => {
 
         {/* Headhunters Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredHeadhunters.map(headhunter => <Card key={headhunter.id} className="hover:shadow-lg transition-all cursor-pointer flex flex-col">
+          {filteredHeadhunters.map(headhunter => <Card key={headhunter.id} className="hover:shadow-lg transition-all cursor-pointer flex flex-col relative">
               <CardContent className="p-6 flex flex-col h-full">
+                {/* Save button - top right */}
+                {user && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => handleToggleSave(headhunter.id, e)}
+                    className={`absolute top-4 right-4 z-10 ${
+                      savedHeadhunters.has(headhunter.id) ? 'text-[hsl(var(--accent-pink))]' : ''
+                    }`}
+                  >
+                    <Heart className={`h-5 w-5 ${savedHeadhunters.has(headhunter.id) ? 'fill-current' : ''}`} />
+                  </Button>
+                )}
+                
                 <div className="mb-4 flex-grow" onClick={() => navigate(`/profile/headhunter/${headhunter.id}`)}>
                   <div className="flex items-start gap-3 mb-3">
                     <Avatar className="h-16 w-16">
@@ -269,12 +283,22 @@ const HeadhunterDirectory = () => {
                         {headhunter.name?.[0]?.toUpperCase() || "H"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
+                    <div className="flex-1 pr-8">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-lg">{headhunter.name}</h3>
                         {headhunter.verified && <Badge className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))]">
                             Verified
                           </Badge>}
+                        {headhunter.response_time_hours && headhunter.response_time_hours < 2 && (
+                          <Badge className="bg-[hsl(var(--success))] text-white">
+                            Responds Under 2H
+                          </Badge>
+                        )}
+                        {headhunter.success_rate >= 85 && (
+                          <Badge className="bg-[hsl(var(--accent-lilac))] text-white">
+                            {headhunter.success_rate}% Success
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-1 mt-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
@@ -325,16 +349,6 @@ const HeadhunterDirectory = () => {
                   <Button variant="outline" className="flex-1" onClick={() => navigate(`/profile/headhunter/${headhunter.id}`)}>
                     View Profile
                   </Button>
-                  {user && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => handleToggleSave(headhunter.id, e)}
-                      className={savedHeadhunters.has(headhunter.id) ? "text-[hsl(var(--accent-pink))]" : ""}
-                    >
-                      <Heart className={`h-4 w-4 ${savedHeadhunters.has(headhunter.id) ? 'fill-current' : ''}`} />
-                    </Button>
-                  )}
                   {profile?.role === "employer" && <Button onClick={() => handleInviteClick(headhunter)} className="flex-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-slate-950">
                       <UserPlus className="h-4 w-4 mr-2" />
                       Invite

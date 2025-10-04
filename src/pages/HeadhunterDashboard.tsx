@@ -220,7 +220,7 @@ const HeadhunterDashboard = () => {
 
         {/* Stats */}
         <TooltipProvider>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <Tooltip>
@@ -281,11 +281,10 @@ const HeadhunterDashboard = () => {
                 <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {applications.length > 0 
-                    ? `${Math.round((applications.filter(a => a.status !== 'submitted').length / applications.length) * 100)}%`
-                    : '0%'}
-                </div>
+                <div className="text-2xl font-bold">N/A</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Coming soon
+                </p>
               </CardContent>
             </Card>
 
@@ -299,25 +298,46 @@ const HeadhunterDashboard = () => {
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Your response time performance for employer communications</p>
+                    <p>Average response time for employer communications</p>
                   </TooltipContent>
                 </Tooltip>
                 <Clock className="h-4 w-4 text-muted-foreground opacity-80" />
               </CardHeader>
               <CardContent>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Under 2h:</span>
-                    <span className="font-semibold text-[hsl(var(--success))]">0</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Under 24h:</span>
-                    <span className="font-semibold text-[hsl(var(--accent-mint))]">0</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Over 24h:</span>
-                    <span className="font-semibold text-[hsl(var(--warning))]">0</span>
-                  </div>
+                <div className="text-2xl font-bold">
+                  {profile?.response_time_hours ? (
+                    profile.response_time_hours < 2 ? (
+                      <span className="text-[hsl(var(--success))]">Under 2h</span>
+                    ) : profile.response_time_hours < 24 ? (
+                      <span className="text-[hsl(var(--accent-mint))]">Under 24h</span>
+                    ) : (
+                      <span className="text-[hsl(var(--warning))]">Over 24h</span>
+                    )
+                  ) : (
+                    <span className="text-muted-foreground text-lg">N/A</span>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CardTitle className="text-sm font-medium opacity-90 cursor-help flex items-center gap-1">
+                      Success Rate
+                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                    </CardTitle>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>% of submitted candidates marked as relevant by employers</p>
+                  </TooltipContent>
+                </Tooltip>
+                <CheckCircle className="h-4 w-4 text-muted-foreground opacity-80" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {profile?.success_rate ? `${profile.success_rate}%` : '0%'}
                 </div>
               </CardContent>
             </Card>

@@ -138,9 +138,16 @@ const SavedJobs = () => {
                       className="flex-1 cursor-pointer group" 
                       onClick={() => navigate(`/jobs/${savedJob.job.id}`, { state: { from: 'saved' } })}
                     >
-                      <CardTitle className="text-2xl opacity-90 mb-3 group-hover:text-[hsl(var(--accent-mint))] transition-colors">
-                        {savedJob.job?.title}
-                      </CardTitle>
+                      <div className="flex items-center gap-2 mb-3">
+                        <CardTitle className="text-2xl opacity-90 group-hover:text-[hsl(var(--accent-mint))] transition-colors">
+                          {savedJob.job?.title}
+                        </CardTitle>
+                        {savedJob.job?.job_id_number && (
+                          <Badge variant="outline" className="text-sm">
+                            #{savedJob.job?.job_id_number}
+                          </Badge>
+                        )}
+                      </div>
                       <CardDescription className="flex flex-wrap gap-4 text-base">
                         <span className="flex items-center gap-1.5 bg-background/50 px-3 py-1 rounded-full">
                           <Briefcase className="h-4 w-4 text-[hsl(var(--accent-mint))]" />

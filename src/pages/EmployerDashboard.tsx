@@ -314,7 +314,18 @@ const EmployerDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card 
+            className={`cursor-pointer transition-all ${
+              applications.filter(a => a.status === 'submitted').length > 0 
+                ? 'bg-[hsl(var(--warning))]/10 hover:bg-[hsl(var(--warning))]/20 border-[hsl(var(--warning))]/30' 
+                : ''
+            }`}
+            onClick={() => {
+              if (applications.filter(a => a.status === 'submitted').length > 0) {
+                setShowPendingOnly(!showPendingOnly);
+              }
+            }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
@@ -323,6 +334,11 @@ const EmployerDashboard = () => {
               <div className="text-2xl font-bold">
                 {applications.filter(a => a.status === 'submitted').length}
               </div>
+              {applications.filter(a => a.status === 'submitted').length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Click to {showPendingOnly ? 'show all' : 'filter'}
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>

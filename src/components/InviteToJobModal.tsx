@@ -12,6 +12,7 @@ interface Job {
   id: string;
   title: string;
   status: string;
+  job_id_number: number;
 }
 
 interface InviteToJobModalProps {
@@ -45,7 +46,7 @@ export const InviteToJobModal = ({
     try {
       const { data, error } = await supabase
         .from("jobs")
-        .select("id, title, status")
+        .select("id, title, status, job_id_number")
         .eq("created_by", employerId)
         .eq("status", "open")
         .order("created_at", { ascending: false });
@@ -160,7 +161,7 @@ export const InviteToJobModal = ({
                 ) : (
                   jobs.map((job) => (
                     <SelectItem key={job.id} value={job.id}>
-                      {job.title}
+                      {job.title} #{job.job_id_number}
                     </SelectItem>
                   ))
                 )}

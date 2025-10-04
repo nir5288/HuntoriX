@@ -342,12 +342,22 @@ const HeadhunterProfile = () => {
               </div>
 
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <h1 className="text-3xl font-bold">{profile.name}</h1>
                   {profile.verified && (
                     <Badge className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
                       <Award className="h-3 w-3 mr-1" />
                       Verified
+                    </Badge>
+                  )}
+                  {profile.response_time_hours && profile.response_time_hours < 2 && (
+                    <Badge className="bg-[hsl(var(--success))] text-white">
+                      Responds Under 2H
+                    </Badge>
+                  )}
+                  {profile.success_rate >= 85 && (
+                    <Badge className="bg-[hsl(var(--accent-lilac))] text-white">
+                      {profile.success_rate}% Success
                     </Badge>
                   )}
                 </div>

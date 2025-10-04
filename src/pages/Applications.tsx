@@ -119,23 +119,15 @@ const Applications = () => {
           </Button>
           
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-            All Applications
+            {filteredApplications.length} {filteredApplications.length === 1 ? 'Application' : 'Applications'}
           </h1>
-          <p className="text-muted-foreground">
-            View and manage all your job applications
+          <p className="text-muted-foreground mb-4">
+            Track your application status
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="opacity-90">
-                  {filteredApplications.length} {filteredApplications.length === 1 ? 'Application' : 'Applications'}
-                </CardTitle>
-                <CardDescription>Track your application status</CardDescription>
-              </div>
-            </div>
             
             {/* Filters */}
             <div className="flex gap-3 mt-4">
