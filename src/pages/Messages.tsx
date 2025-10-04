@@ -328,8 +328,8 @@ const Messages = () => {
   return <DashboardLayout>
       <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-          <div className="h-[calc(100vh-64px)] flex flex-col">
-            <div className={`h-full flex flex-col transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
+          <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+            <div className={`h-full flex flex-col overflow-hidden transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
               {otherUserId ? <>
                   {/* Fixed Header */}
                   <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
