@@ -2,7 +2,9 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import {
   DropdownMenu,
@@ -15,12 +17,17 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { SwitchRoleModal } from './SwitchRoleModal';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
+  const { status, language, setStatus, setLanguage } = useUserPreferences();
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -142,12 +149,17 @@ export function Header() {
               <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 hover:opacity-80 transition">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile.avatar_url} />
-                    <AvatarFallback>
-                      {profile.name?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={profile.avatar_url} />
+                      <AvatarFallback>
+                        {profile.name?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background ${
+                      status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
+                    }`} />
+                  </div>
                   <div className="hidden md:flex flex-col items-start">
                     <span className="text-sm font-medium">{profile.name || profile.email}</span>
                     <Badge variant="outline" className="text-xs capitalize">
@@ -156,9 +168,82 @@ export function Header() {
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                
+                {/* Dark Mode Toggle */}
+                <div className="px-2 py-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="dark-mode" className="flex items-center gap-2 cursor-pointer">
+                      {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                      <span className="text-sm">Dark Mode</span>
+                    </Label>
+                    <Switch
+                      id="dark-mode"
+                      checked={theme === 'dark'}
+                      onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                    />
+                  </div>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* Status Selector */}
+                <div className="px-2 py-2">
+                  <Label className="text-sm font-medium mb-2 block">Status</Label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setStatus('online')}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
+                        status === 'online' ? 'bg-muted' : 'hover:bg-muted/50'
+                      }`}
+                    >
+                      <Circle className="h-3 w-3 fill-green-500 text-green-500" />
+                      <span>Online</span>
+                    </button>
+                    <button
+                      onClick={() => setStatus('away')}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
+                        status === 'away' ? 'bg-muted' : 'hover:bg-muted/50'
+                      }`}
+                    >
+                      <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                      <span>Away</span>
+                    </button>
+                  </div>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* Language Selector */}
+                <div className="px-2 py-2">
+                  <Label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Globe className="h-4 w-4" />
+                    Language
+                  </Label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setLanguage('en')}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
+                        language === 'en' ? 'bg-muted' : 'hover:bg-muted/50'
+                      }`}
+                    >
+                      <span>English</span>
+                    </button>
+                    <button
+                      onClick={() => setLanguage('he')}
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
+                        language === 'he' ? 'bg-muted' : 'hover:bg-muted/50'
+                      }`}
+                    >
+                      <span>עברית</span>
+                    </button>
+                  </div>
+                </div>
+
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem onClick={() => navigate(getDashboardPath())}>
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
