@@ -14,6 +14,8 @@ import { Menu, ArrowLeft, User, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 
 interface Message {
   id: string;
@@ -343,15 +345,19 @@ const Messages = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-      <Header />
-      <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+        <AppSidebar role={profile?.role === 'employer' ? 'employer' : 'headhunter'} />
+        
+        <div className="flex-1 flex flex-col">
+          <Header />
+          <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div
-        className={`transition-all duration-300 pt-16 ${
-          sidebarOpen ? "lg:ml-80" : "ml-0"
-        }`}
-      >
+          <div
+            className={`transition-all duration-300 ${
+              sidebarOpen ? "lg:ml-80" : "ml-0"
+            }`}
+          >
         <div className="h-[calc(100vh-64px)] flex flex-col">
           {otherUserId ? (
             <>
@@ -448,9 +454,11 @@ const Messages = () => {
               <p>Select a conversation to start messaging</p>
             </div>
           )}
+          </div>
+        </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
