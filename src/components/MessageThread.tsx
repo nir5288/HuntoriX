@@ -135,7 +135,7 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
   }
 
   return (
-    <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+    <ScrollArea className="h-full p-4" ref={scrollRef}>
       <TooltipProvider>
         <div className="space-y-4">
         {messages.map((message) => {
