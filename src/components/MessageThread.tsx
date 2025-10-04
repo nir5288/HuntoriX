@@ -136,7 +136,7 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
 
   return (
     <ScrollArea className="h-full p-4" ref={scrollRef}>
-      <TooltipProvider>
+      <TooltipProvider delayDuration={0}>
         <div className="space-y-4">
         {messages.map((message) => {
           const isFromMe = message.from_user === currentUserId;

@@ -64,7 +64,7 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
 
   return (
     <div className="p-4 border-t bg-background">
-      <TooltipProvider>
+      <TooltipProvider delayDuration={0}>
       {replyingTo && (
         <div className="mb-2 p-2 bg-muted rounded-lg flex items-start justify-between">
           <div className="flex-1 min-w-0">

@@ -361,7 +361,7 @@ const JobDetail = () => {
                       )}
                     </div>
                   </div>
-                  <TooltipProvider>
+                  <TooltipProvider delayDuration={0}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button

@@ -274,26 +274,10 @@ const EmployerDashboard = () => {
             </h1>
             <p className="text-sm text-muted-foreground">Manage your job postings and applications</p>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/saved-headhunters')}
-              className="gap-2"
-            >
-              <Star className="h-3.5 w-3.5 text-[hsl(var(--accent-lilac))]" />
-              Saved Headhunters
-              {savedHeadhuntersCount > 0 && (
-                <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5">
-                  {savedHeadhuntersCount}
-                </Badge>
-              )}
-            </Button>
-            <Button size="sm" onClick={() => setPostJobModalOpen(true)} className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
-              <Plus className="mr-1.5 h-4 w-4" />
-              Post Job
-            </Button>
-          </div>
+          <Button size="sm" onClick={() => setPostJobModalOpen(true)} className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
+            <Plus className="mr-1.5 h-4 w-4" />
+            Post Job
+          </Button>
         </div>
 
         {/* Stats */}

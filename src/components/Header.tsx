@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -118,7 +118,7 @@ export function Header() {
 
         <div className="flex items-center gap-4">
           {user && profile ? (
-            <TooltipProvider>
+            <TooltipProvider delayDuration={0}>
               <NotificationDropdown />
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -133,6 +133,21 @@ export function Header() {
                 </TooltipTrigger>
                 <TooltipContent>My Saved Jobs</TooltipContent>
               </Tooltip>
+              {profile.role === 'employer' && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate('/saved-headhunters')}
+                      className="relative"
+                    >
+                      <Star className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>My Saved Headhunters</TooltipContent>
+                </Tooltip>
+              )}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button

@@ -273,7 +273,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     // Show tooltip for closed jobs
     if (job.status === 'closed') {
       return (
-        <TooltipProvider>
+        <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
               {button}
@@ -354,7 +354,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
           <div className="flex items-center gap-2 shrink-0">
-            <TooltipProvider>
+            <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
