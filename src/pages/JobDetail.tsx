@@ -37,7 +37,12 @@ const JobDetail = () => {
   const handleBack = () => {
     switch (fromSource) {
       case 'dashboard':
-        navigate('/dashboard/headhunter');
+        // Navigate to the correct dashboard based on user role
+        if (profile?.role === 'employer') {
+          navigate('/dashboard/employer');
+        } else {
+          navigate('/dashboard/headhunter');
+        }
         break;
       case 'applications':
         navigate('/applications');

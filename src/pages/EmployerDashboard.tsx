@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
 const EmployerDashboard = () => {
   const {
     user,
@@ -36,6 +38,8 @@ const EmployerDashboard = () => {
   const [showPendingOnly, setShowPendingOnly] = useState(false);
   const [showPrivateOnly, setShowPrivateOnly] = useState(false);
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
+  const [visibleJobCount, setVisibleJobCount] = useState(3);
+  
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -260,10 +264,18 @@ const EmployerDashboard = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-      <Header />
-      
-      <div className="container mx-auto px-4 py-8">
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+        <AppSidebar role="employer" />
+        
+        <div className="flex-1 flex flex-col">
+          <Header />
+          
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-6">
+              <SidebarTrigger />
+            </div>
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
@@ -442,7 +454,13 @@ const EmployerDashboard = () => {
                     );
                   }
                   
-                  return filteredJobs.map(job => {
+                  // Show only visible jobs based on pagination
+                  const visibleJobs = filteredJobs.slice(0, visibleJobCount);
+                  const hasMore = filteredJobs.length > visibleJobCount;
+                  
+                  return (
+                    <>
+                      {visibleJobs.map(job => {
               const jobApplications = applications.filter(a => a.job_id === job.id);
               const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
               return <Card key={job.id} className="group hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
@@ -511,8 +529,22 @@ const EmployerDashboard = () => {
                           )}
                         </div>
                       </CardContent>
-                    </Card>;
-                  });
+                    </Card>
+                      })}
+                      
+                      {hasMore && (
+                        <div className="flex justify-center mt-6">
+                          <Button
+                            variant="outline"
+                            onClick={() => setVisibleJobCount(prev => prev + 3)}
+                            className="w-full max-w-xs"
+                          >
+                            Load More
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  );
                 })()}
               </div>}
           </CardContent>
@@ -536,6 +568,9 @@ const EmployerDashboard = () => {
           />
         </>
       )}
-    </div>;
+        </div>
+      </div>
+    </SidebarProvider>
+  );
 };
 export default EmployerDashboard;
