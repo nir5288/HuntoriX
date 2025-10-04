@@ -15,7 +15,6 @@ import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
 import { DashboardLayout } from "@/components/DashboardLayout";
-
 interface Message {
   id: string;
   from_user: string;
@@ -34,15 +33,21 @@ interface Message {
     avatar_url: string | null;
   };
 }
-
 const Messages = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
-  const { toast } = useToast();
-  const { status: myStatus } = useUserPreferences();
+  const {
+    user,
+    profile
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
+  const {
+    status: myStatus
+  } = useUserPreferences();
   useUpdateLastSeen(); // Update last_seen timestamp
-  
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,166 +57,144 @@ const Messages = () => {
   const [otherUserStatus, setOtherUserStatus] = useState<string>("");
   const [otherUserShowStatus, setOtherUserShowStatus] = useState<boolean>(true);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
-  const [statusIndicator, setStatusIndicator] = useState<{ color: string; text: string } | null>(null);
+  const [statusIndicator, setStatusIndicator] = useState<{
+    color: string;
+    text: string;
+  } | null>(null);
   const [jobTitle, setJobTitle] = useState("");
-  const [replyingTo, setReplyingTo] = useState<{ id: string; body: string; senderName: string } | null>(null);
-
+  const [replyingTo, setReplyingTo] = useState<{
+    id: string;
+    body: string;
+    senderName: string;
+  } | null>(null);
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
-  
+
   // Handle "null" string from URL
   const validJobId = jobId && jobId !== "null" ? jobId : null;
-
   useEffect(() => {
     if (!user) {
       navigate("/auth");
       return;
     }
-
     if (otherUserId) {
       loadMessages();
       loadConversationDetails();
       markMessagesAsRead();
-
-      const channel = supabase
-        .channel(`messages-${validJobId || 'direct'}-${otherUserId}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "messages",
-            filter: validJobId ? `job_id=eq.${validJobId}` : `job_id=is.null`,
-          },
-          (payload) => {
-            const newMessage = payload.new as Message;
-            if (
-              (newMessage.from_user === user.id && newMessage.to_user === otherUserId) ||
-              (newMessage.from_user === otherUserId && newMessage.to_user === user.id)
-            ) {
-              loadMessages(true);
-              // Mark as read if I'm the recipient
-              if (newMessage.to_user === user.id) {
-                markMessagesAsRead();
-              }
-            }
+      const channel = supabase.channel(`messages-${validJobId || 'direct'}-${otherUserId}`).on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "messages",
+        filter: validJobId ? `job_id=eq.${validJobId}` : `job_id=is.null`
+      }, payload => {
+        const newMessage = payload.new as Message;
+        if (newMessage.from_user === user.id && newMessage.to_user === otherUserId || newMessage.from_user === otherUserId && newMessage.to_user === user.id) {
+          loadMessages(true);
+          // Mark as read if I'm the recipient
+          if (newMessage.to_user === user.id) {
+            markMessagesAsRead();
           }
-        )
-        .subscribe();
-
+        }
+      }).subscribe();
       return () => {
         supabase.removeChannel(channel);
       };
     }
   }, [validJobId, otherUserId, user]);
-
   const loadMessages = async (silent: boolean = false) => {
     if (!otherUserId || !user) return;
-
     if (!silent && messages.length === 0) setLoading(true);
     try {
-      let query = supabase
-        .from("messages")
-        .select(`
+      let query = supabase.from("messages").select(`
           *,
           from_profile:profiles!messages_from_user_fkey(name, avatar_url)
         `);
-      
+
       // Filter by job_id if present
       if (validJobId) {
         query = query.eq("job_id", validJobId);
       } else {
         query = query.is("job_id", null);
       }
-      
-      const { data, error } = await query
-        .or(`and(from_user.eq.${user.id},to_user.eq.${otherUserId}),and(from_user.eq.${otherUserId},to_user.eq.${user.id})`)
-        .order("created_at", { ascending: true });
-
+      const {
+        data,
+        error
+      } = await query.or(`and(from_user.eq.${user.id},to_user.eq.${otherUserId}),and(from_user.eq.${otherUserId},to_user.eq.${user.id})`).order("created_at", {
+        ascending: true
+      });
       if (error) throw error;
-      
+
       // Fetch replied messages separately
-      const messagesWithReplies = await Promise.all(
-        (data || []).map(async (msg: any) => {
-          if (msg.reply_to) {
-            const { data: repliedMsg } = await supabase
-              .from("messages")
-              .select("body, from_profile:profiles!messages_from_user_fkey(name)")
-              .eq("id", msg.reply_to)
-              .single();
-            return { ...msg, replied_message: repliedMsg };
-          }
-          return msg;
-        })
-      );
-      
+      const messagesWithReplies = await Promise.all((data || []).map(async (msg: any) => {
+        if (msg.reply_to) {
+          const {
+            data: repliedMsg
+          } = await supabase.from("messages").select("body, from_profile:profiles!messages_from_user_fkey(name)").eq("id", msg.reply_to).single();
+          return {
+            ...msg,
+            replied_message: repliedMsg
+          };
+        }
+        return msg;
+      }));
       setMessages(messagesWithReplies);
     } catch (error) {
       console.error("Error loading messages:", error);
       toast({
         title: "Error",
         description: "Failed to load messages",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       if (!silent && messages.length === 0) setLoading(false);
     }
   };
-
   const markMessagesAsRead = async () => {
     if (!otherUserId || !user) return;
-
     try {
-      let query = supabase
-        .from("messages")
-        .update({ is_read: true });
-      
+      let query = supabase.from("messages").update({
+        is_read: true
+      });
       if (validJobId) {
         query = query.eq("job_id", validJobId);
       } else {
         query = query.is("job_id", null);
       }
-      
-      await query
-        .eq("from_user", otherUserId)
-        .eq("to_user", user.id)
-        .eq("is_read", false);
+      await query.eq("from_user", otherUserId).eq("to_user", user.id).eq("is_read", false);
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
   };
-
   const loadConversationDetails = async () => {
     if (!otherUserId) return;
-
     try {
       // Fetch profile data including status
-      const { data: profileData } = await supabase.rpc('get_public_profile', { profile_id: otherUserId });
-      const { data: prefsData } = await supabase
-        .from("profiles")
-        .select("show_status, status")
-        .eq("id", otherUserId)
-        .single();
-      
+      const {
+        data: profileData
+      } = await supabase.rpc('get_public_profile', {
+        profile_id: otherUserId
+      });
+      const {
+        data: prefsData
+      } = await supabase.from("profiles").select("show_status, status").eq("id", otherUserId).single();
       let jobPromise = null;
       if (validJobId) {
         jobPromise = supabase.from("jobs").select("title").eq("id", validJobId).single();
       }
-      
-      const jobResult = await (jobPromise || Promise.resolve({ data: null }));
+      const jobResult = await (jobPromise || Promise.resolve({
+        data: null
+      }));
       const job = jobResult?.data;
-      
+
       // get_public_profile returns an array, get first item
       const profile = profileData && profileData.length > 0 ? profileData[0] : null;
-
       setOtherUserName(profile?.name || "Unknown User");
       setOtherUserRole(profile?.role || null);
       setOtherUserAvatar(profile?.avatar_url || null);
       setOtherUserShowStatus(prefsData?.show_status ?? true);
-      
       const userStatus = prefsData?.status || 'online';
       setOtherUserStatus(userStatus);
-      
+
       // Format status and last seen
       if (!prefsData?.show_status) {
         setStatusIndicator(null);
@@ -221,15 +204,21 @@ const Messages = () => {
         const now = new Date();
         const diffMs = now.getTime() - lastSeenDate.getTime();
         const diffMins = Math.floor(diffMs / 60000);
-        
+
         // Check if they're currently active (within 2 minutes)
         if (diffMins < 2) {
           // Check their status preference from database
           if (userStatus === 'away') {
-            setStatusIndicator({ color: "text-yellow-500", text: "Away" });
+            setStatusIndicator({
+              color: "text-yellow-500",
+              text: "Away"
+            });
             setLastSeen(null);
           } else {
-            setStatusIndicator({ color: "text-green-500", text: "Online" });
+            setStatusIndicator({
+              color: "text-green-500",
+              text: "Online"
+            });
             setLastSeen(null);
           }
         } else if (diffMins < 60) {
@@ -251,64 +240,65 @@ const Messages = () => {
         setStatusIndicator(null);
         setLastSeen("Active recently");
       }
-      
       setJobTitle(job?.title || "Unknown Job");
     } catch (error) {
       console.error("Error loading conversation details:", error);
     }
   };
-
   const handleSendMessage = async (messageText: string, files: File[], replyToId?: string) => {
     if (!user || !otherUserId) return;
 
     // Upload files to storage if any
-    const attachments: Array<{ name: string; url: string; type: string; size: number }> = [];
-    
+    const attachments: Array<{
+      name: string;
+      url: string;
+      type: string;
+      size: number;
+    }> = [];
     if (files.length > 0) {
       for (const file of files) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { error: uploadError, data } = await supabase.storage
-          .from('profile-images')
-          .upload(fileName, file);
-
+        const {
+          error: uploadError,
+          data
+        } = await supabase.storage.from('profile-images').upload(fileName, file);
         if (uploadError) {
           toast({
             title: "Error",
             description: `Failed to upload ${file.name}`,
-            variant: "destructive",
+            variant: "destructive"
           });
           throw uploadError;
         }
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('profile-images')
-          .getPublicUrl(fileName);
-
+        const {
+          data: {
+            publicUrl
+          }
+        } = supabase.storage.from('profile-images').getPublicUrl(fileName);
         attachments.push({
           name: file.name,
           url: publicUrl,
           type: file.type,
-          size: file.size,
+          size: file.size
         });
       }
     }
-
-    const { error } = await supabase.from("messages").insert({
+    const {
+      error
+    } = await supabase.from("messages").insert({
       job_id: validJobId,
       from_user: user.id,
       to_user: otherUserId,
       body: messageText,
       attachments: attachments.length > 0 ? attachments : null,
-      reply_to: replyToId || null,
+      reply_to: replyToId || null
     } as any);
-
     if (error) {
       toast({
         title: "Error",
         description: "Failed to send message",
-        variant: "destructive",
+        variant: "destructive"
       });
       throw error;
     }
@@ -316,144 +306,81 @@ const Messages = () => {
     // Create notification for receiver
     try {
       // Fetch sender's profile to get their name
-      const { data: senderProfile } = await supabase
-        .from('profiles')
-        .select('name')
-        .eq('id', user.id)
-        .single();
-
+      const {
+        data: senderProfile
+      } = await supabase.from('profiles').select('name').eq('id', user.id).single();
       const senderName = senderProfile?.name || 'Someone';
-
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: otherUserId,
-          type: 'new_message',
-          title: `New message from ${senderName}`,
-          message: messageText.length > 100 ? messageText.substring(0, 100) + '...' : messageText,
-          payload: { 
-            job_id: validJobId,
-            from_user: user.id,
-          },
-        } as any);
+      await supabase.from('notifications').insert({
+        user_id: otherUserId,
+        type: 'new_message',
+        title: `New message from ${senderName}`,
+        message: messageText.length > 100 ? messageText.substring(0, 100) + '...' : messageText,
+        payload: {
+          job_id: validJobId,
+          from_user: user.id
+        }
+      } as any);
     } catch (notifErr) {
       console.error('Error creating notification:', notifErr);
     }
-
     loadMessages(true);
   };
-
-  return (
-    <DashboardLayout>
+  return <DashboardLayout>
       <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           <div className="h-[calc(100vh-64px)] flex flex-col">
-            <div
-              className={`flex-1 transition-all duration-300 ${
-                sidebarOpen ? "ml-64" : "ml-0"
-              }`}
-            >
-              {otherUserId ? (
-                <>
+            <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
+              {otherUserId ? <>
                   <div className="p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
-                {!sidebarOpen && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSidebarOpen(true)}
-                  >
+                {!sidebarOpen && <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
                     <Menu className="h-5 w-5" />
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate(-1)}
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
+                  </Button>}
                 
-                <Link 
-                  to={otherUserRole === "headhunter" ? `/profile/headhunter/${otherUserId}` : `/profile/employer/${otherUserId}`}
-                  className="flex items-center gap-3 flex-1 hover:opacity-80 transition"
-                >
+                
+                <Link to={otherUserRole === "headhunter" ? `/profile/headhunter/${otherUserId}` : `/profile/employer/${otherUserId}`} className="flex items-center gap-3 flex-1 hover:opacity-80 transition">
                   <div className="relative">
-                    {otherUserAvatar ? (
-                      <img src={otherUserAvatar} alt={otherUserName} className="h-10 w-10 rounded-full object-cover" />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center">
+                    {otherUserAvatar ? <img src={otherUserAvatar} alt={otherUserName} className="h-10 w-10 rounded-full object-cover" /> : <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center">
                         <User className="h-5 w-5" />
-                      </div>
-                    )}
-                    {statusIndicator && (
-                      <Circle className={`absolute bottom-0 right-0 h-3 w-3 fill-current ${statusIndicator.color} border-2 border-background rounded-full`} />
-                    )}
+                      </div>}
+                    {statusIndicator && <Circle className={`absolute bottom-0 right-0 h-3 w-3 fill-current ${statusIndicator.color} border-2 border-background rounded-full`} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h2 className="font-semibold text-base">{otherUserName}</h2>
-                      {otherUserRole && (
-                        <Badge variant="outline" className="text-xs capitalize">
+                      {otherUserRole && <Badge variant="outline" className="text-xs capitalize">
                           {otherUserRole}
-                        </Badge>
-                      )}
+                        </Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground truncate">{jobTitle}</p>
-                    {statusIndicator ? (
-                      <div className="flex items-center gap-1.5 text-xs">
+                    {statusIndicator ? <div className="flex items-center gap-1.5 text-xs">
                         <span className={statusIndicator.color}>●</span>
                         <span className={statusIndicator.color}>{statusIndicator.text}</span>
-                      </div>
-                    ) : lastSeen ? (
-                      <p className="text-xs text-muted-foreground">{lastSeen}</p>
-                    ) : null}
+                      </div> : lastSeen ? <p className="text-xs text-muted-foreground">{lastSeen}</p> : null}
                   </div>
                 </Link>
               </div>
 
               <div className="flex-1 flex flex-col overflow-hidden">
-                <MessageThread
-                  messages={messages}
-                  currentUserId={user?.id || ""}
-                  currentUserProfile={profile}
-                  loading={loading}
-                  onEdited={loadMessages}
-                  onReply={(message) => {
-                    const isFromMe = message.from_user === user.id;
-                    setReplyingTo({
-                      id: message.id,
-                      body: message.body,
-                      senderName: isFromMe ? "yourself" : (message.from_profile?.name || "User"),
-                    });
-                  }}
-                />
+                <MessageThread messages={messages} currentUserId={user?.id || ""} currentUserProfile={profile} loading={loading} onEdited={loadMessages} onReply={message => {
+              const isFromMe = message.from_user === user.id;
+              setReplyingTo({
+                id: message.id,
+                body: message.body,
+                senderName: isFromMe ? "yourself" : message.from_profile?.name || "User"
+              });
+            }} />
 
-                <MessageInput
-                  onSend={handleSendMessage}
-                  disabled={!user || !otherUserId}
-                  replyingTo={replyingTo}
-                  onCancelReply={() => setReplyingTo(null)}
-                />
+                <MessageInput onSend={handleSendMessage} disabled={!user || !otherUserId} replyingTo={replyingTo} onCancelReply={() => setReplyingTo(null)} />
               </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
-              {!sidebarOpen && (
-                <Button
-                  variant="outline"
-                  onClick={() => setSidebarOpen(true)}
-                >
+            </> : <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
+              {!sidebarOpen && <Button variant="outline" onClick={() => setSidebarOpen(true)}>
                   <Menu className="h-4 w-4 mr-2" />
                   Open Conversations
-                </Button>
-              )}
+                </Button>}
               <p>Select a conversation to start messaging</p>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
-    </DashboardLayout>
-  );
+    </DashboardLayout>;
 };
-
 export default Messages;
