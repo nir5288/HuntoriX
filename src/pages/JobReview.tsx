@@ -32,22 +32,6 @@ const JobReview = () => {
   const [feeValue, setFeeValue] = useState('');
   const [etaDays, setEtaDays] = useState('');
 
-  // Back navigation handling
-  const fromSource = (location.state as any)?.from as 'dashboard' | 'applications' | 'saved' | undefined;
-  const backText = fromSource === 'dashboard' ? 'Back to Dashboard' : fromSource === 'applications' ? 'Back to My Applications' : 'Back to Job';
-  const handleBack = () => {
-    switch (fromSource) {
-      case 'dashboard':
-        navigate('/dashboard/headhunter');
-        break;
-      case 'applications':
-        navigate('/applications');
-        break;
-      default:
-        navigate(`/jobs/${id}`, { state: { from: fromSource } });
-    }
-  };
-
   useEffect(() => {
     if (user && profile?.role === 'headhunter') {
       fetchJobAndInvitation();
@@ -245,9 +229,9 @@ const JobReview = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={handleBack} className="mb-6">
+        <Button variant="ghost" onClick={() => navigate(`/jobs/${id}`, { state: { from: (location.state as any)?.from } })} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {backText}
+          Back to Job
         </Button>
 
         <div className="mb-6">
