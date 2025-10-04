@@ -266,7 +266,7 @@ const EmployerDashboard = () => {
   }
   return (
     <DashboardLayout>
-      <div className="container mx-auto px-6 py-6 max-w-6xl">
+      <div className="container px-6 py-6 max-w-7xl">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
