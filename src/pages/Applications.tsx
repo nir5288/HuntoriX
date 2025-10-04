@@ -15,15 +15,34 @@ const Applications = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('newest');
-  const [showPendingOnly, setShowPendingOnly] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>(() => {
+    return localStorage.getItem('headhunter_status_filter') || 'all';
+  });
+  const [sortBy, setSortBy] = useState<string>(() => {
+    return localStorage.getItem('headhunter_sort_by') || 'newest';
+  });
+  const [showPendingOnly, setShowPendingOnly] = useState(() => {
+    return localStorage.getItem('headhunter_show_pending') === 'true';
+  });
 
   useEffect(() => {
     if (user && !loading) {
       fetchApplications();
     }
   }, [user, loading]);
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('headhunter_status_filter', statusFilter);
+  }, [statusFilter]);
+
+  useEffect(() => {
+    localStorage.setItem('headhunter_sort_by', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('headhunter_show_pending', showPendingOnly.toString());
+  }, [showPendingOnly]);
 
   const fetchApplications = async () => {
     try {
