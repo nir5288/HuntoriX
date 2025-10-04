@@ -24,12 +24,17 @@ import HeadhunterDirectory from "./pages/HeadhunterDirectory";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
+import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
 
 const AppContent = () => {
   const location = useLocation();
   const hideFooter = location.pathname === '/messages';
 
+  // Always scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   return (
     <>
       <VerificationWrapper>

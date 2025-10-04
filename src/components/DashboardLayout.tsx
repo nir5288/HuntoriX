@@ -10,7 +10,7 @@ interface DashboardLayoutProps {
 
 function getSidebarDefaultOpen() {
   const match = document.cookie.match(/(?:^|; )sidebar:state=(true|false)/);
-  return match ? match[1] === "true" : false;
+  return match ? match[1] === "true" : true;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
