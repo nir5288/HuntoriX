@@ -373,7 +373,7 @@ const Messages = () => {
                 <MessageInput onSend={handleSendMessage} disabled={!user || !otherUserId} replyingTo={replyingTo} onCancelReply={() => setReplyingTo(null)} />
               </div>
             </> : <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
-              {!sidebarOpen && <Button variant="outline" onClick={() => setSidebarOpen(true)}>
+              {!sidebarOpen && <Button variant="outline" onClick={() => setSidebarOpen(true)} className="mx-0 my-[20px]">
                   <Menu className="h-4 w-4 mr-2" />
                   Open Conversations
                 </Button>}
