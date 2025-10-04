@@ -89,6 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
+      // Clear sidebar state cookie on logout
+      document.cookie = 'sidebar:state=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
       navigate('/');
       toast.success('Signed out successfully');
     } catch (error) {

@@ -15,8 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
+import { DashboardLayout } from '@/components/DashboardLayout';
 
 const MyJobs = () => {
   const { user, profile, loading } = useRequireAuth('employer');
@@ -158,32 +157,20 @@ const MyJobs = () => {
 
   if (loading || loadingData) {
     return (
-      <SidebarProvider defaultOpen={true}>
-        <div className="min-h-screen flex w-full bg-background">
-          <AppSidebar role="employer" />
-          <div className="flex-1">
-            <Header />
-            <div className="container mx-auto px-4 py-8">
-              <div className="animate-pulse space-y-4">
-                <div className="h-8 bg-muted rounded w-1/4"></div>
-                <div className="h-32 bg-muted rounded"></div>
-              </div>
-            </div>
+      <DashboardLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="h-32 bg-muted rounded"></div>
           </div>
         </div>
-      </SidebarProvider>
+      </DashboardLayout>
     );
   }
 
-  return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <AppSidebar role="employer" />
-        
-        <div className="flex-1 flex flex-col">
-          <Header />
-          
-          <div className="container mx-auto px-4 py-8">
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
@@ -371,8 +358,6 @@ const MyJobs = () => {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </div>
 
       <PostJobModal open={postJobModalOpen} onOpenChange={setPostJobModalOpen} userId={user?.id || ''} />
       {selectedJob && (
@@ -391,7 +376,7 @@ const MyJobs = () => {
           />
         </>
       )}
-    </SidebarProvider>
+    </DashboardLayout>
   );
 };
 

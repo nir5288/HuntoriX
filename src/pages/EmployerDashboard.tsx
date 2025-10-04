@@ -15,8 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
+import { DashboardLayout } from '@/components/DashboardLayout';
 const EmployerDashboard = () => {
   const {
     user,
@@ -265,14 +264,8 @@ const EmployerDashboard = () => {
       </div>;
   }
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <AppSidebar role="employer" />
-        
-        <div className="flex-1 flex flex-col">
-          <Header />
-          
-          <div className="container mx-auto px-4 py-8">
+    <DashboardLayout>
+      <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
@@ -565,9 +558,7 @@ const EmployerDashboard = () => {
           />
         </>
       )}
-        </div>
-      </div>
-    </SidebarProvider>
+    </DashboardLayout>
   );
 };
 export default EmployerDashboard;

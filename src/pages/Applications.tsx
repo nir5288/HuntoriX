@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DashboardLayout } from '@/components/DashboardLayout';
 
 const Applications = () => {
   const { user, loading } = useRequireAuth('headhunter');
@@ -181,9 +182,7 @@ const Applications = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-      <Header />
-      
+    <DashboardLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Button 
@@ -324,7 +323,7 @@ const Applications = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

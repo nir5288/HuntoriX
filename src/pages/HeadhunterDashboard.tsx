@@ -11,8 +11,7 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
+import { DashboardLayout } from '@/components/DashboardLayout';
 
 const HeadhunterDashboard = () => {
   const { user, profile, loading } = useRequireAuth('headhunter');
@@ -242,14 +241,8 @@ const HeadhunterDashboard = () => {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <AppSidebar role="headhunter" />
-        
-        <div className="flex-1 flex flex-col">
-          <Header />
-          
-          <div className="container mx-auto px-4 py-8">
+    <DashboardLayout>
+      <div className="container mx-auto px-4 py-8">
         {/* Verification Banner */}
         {!profile?.email_verified && (
           <Alert className="mb-6 border-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10">
@@ -639,10 +632,8 @@ const HeadhunterDashboard = () => {
             )}
           </CardContent>
         </Card>
-          </div>
-        </div>
       </div>
-    </SidebarProvider>
+    </DashboardLayout>
   );
 };
 

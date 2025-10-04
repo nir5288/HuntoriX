@@ -8,6 +8,7 @@ import { Heart, MapPin, Briefcase, TrendingUp, DollarSign, Calendar, ArrowLeft }
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { DashboardLayout } from '@/components/DashboardLayout';
 
 const SavedJobs = () => {
   const { user, profile, loading } = useRequireAuth();
@@ -71,9 +72,7 @@ const SavedJobs = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-[hsl(var(--surface))] to-background">
-      <Header />
-      
+    <DashboardLayout>
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <Button
@@ -236,7 +235,7 @@ const SavedJobs = () => {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

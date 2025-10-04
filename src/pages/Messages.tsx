@@ -14,8 +14,7 @@ import { Menu, ArrowLeft, User, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 interface Message {
   id: string;
@@ -345,13 +344,8 @@ const Messages = () => {
   };
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <AppSidebar role={profile?.role === 'employer' ? 'employer' : 'headhunter'} />
-        
-        <div className="flex-1 flex flex-col">
-          <Header />
-          <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <DashboardLayout>
+      <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           <div className="h-[calc(100vh-64px)] flex flex-col">
             <div
@@ -456,11 +450,9 @@ const Messages = () => {
               <p>Select a conversation to start messaging</p>
             </div>
           )}
-            </div>
-          </div>
         </div>
       </div>
-    </SidebarProvider>
+    </DashboardLayout>
   );
 };
 
