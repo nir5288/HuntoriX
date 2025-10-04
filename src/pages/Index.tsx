@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, Users, TrendingUp, Shield, Clock, Award } from 'lucide-react';
+import { Briefcase, Users, TrendingUp, Shield, Clock, Award, Bot, Sparkles, Target, BarChart3, Search, FileText, DollarSign, MessageSquare } from 'lucide-react';
 import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
 import { HotOpportunities } from '@/components/HotOpportunities';
 
@@ -74,6 +74,135 @@ const Index = () => {
 
       {/* Hot Opportunities */}
       <HotOpportunities />
+
+      {/* AI-Powered Features */}
+      <section className="container mx-auto px-4 py-20 bg-gradient-to-br from-[hsl(var(--accent-pink)/0.1)] via-[hsl(var(--accent-mint)/0.1)] to-[hsl(var(--accent-lilac)/0.1)]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
+              <Bot className="h-4 w-4" />
+              AI-Powered Platform
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Intelligent Hiring,
+              <span className="block bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+                Powered by AI
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Our advanced AI technology streamlines every step of the hiring process
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* For Employers */}
+            <Card className="border-2 hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center mb-4">
+                  <Briefcase className="h-6 w-6 text-foreground" />
+                </div>
+                <CardTitle className="text-xl">For Employers</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">AI Job Description Optimizer</h4>
+                    <p className="text-xs text-muted-foreground">Auto-enhances wording and adds missing skills</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Target className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Smart Headhunter Matching</h4>
+                    <p className="text-xs text-muted-foreground">Suggests the best headhunters by field & success rate</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Award className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">AI Candidate Fit Score</h4>
+                    <p className="text-xs text-muted-foreground">Ranks submissions by quality & relevance</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <BarChart3 className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Hiring Insights Dashboard</h4>
+                    <p className="text-xs text-muted-foreground">Shows time-to-hire, market salary ranges, and trends</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* For Headhunters */}
+            <Card className="border-2 hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] flex items-center justify-center mb-4">
+                  <Users className="h-6 w-6 text-foreground" />
+                </div>
+                <CardTitle className="text-xl">For Headhunters</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Search className="h-5 w-5 text-[hsl(var(--accent-mint))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">AI Sourcing Assistant</h4>
+                    <p className="text-xs text-muted-foreground">Builds Boolean searches & suggests candidate pools</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-[hsl(var(--accent-mint))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Smart Proposal Generator</h4>
+                    <p className="text-xs text-muted-foreground">Drafts personalized pitches for job openings</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <FileText className="h-5 w-5 text-[hsl(var(--accent-mint))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">AI Candidate Summarizer</h4>
+                    <p className="text-xs text-muted-foreground">Auto-summarizes CVs into quick, clear profiles</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* For the Marketplace */}
+            <Card className="border-2 hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] flex items-center justify-center mb-4">
+                  <Bot className="h-6 w-6 text-foreground" />
+                </div>
+                <CardTitle className="text-xl">For the Marketplace</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <TrendingUp className="h-5 w-5 text-[hsl(var(--accent-lilac))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Performance Prediction</h4>
+                    <p className="text-xs text-muted-foreground">Forecasts success rates of jobs & headhunters</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <DollarSign className="h-5 w-5 text-[hsl(var(--accent-lilac))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Dynamic Fee Optimization</h4>
+                    <p className="text-xs text-muted-foreground">Adjusts suggested success fees by demand & role type</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="h-5 w-5 text-[hsl(var(--accent-lilac))] mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Chat Assistant</h4>
+                    <p className="text-xs text-muted-foreground">Writes follow-ups, summaries, and coordination messages</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* Value Props */}
       <section className="container mx-auto px-4 py-20">
