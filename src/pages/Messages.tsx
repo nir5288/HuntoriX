@@ -377,7 +377,7 @@ const Messages = () => {
                   <Menu className="h-4 w-4 mr-2" />
                   Open Conversations
                 </Button>}
-              <p>Select a conversation to start messaging</p>
+              <p className="my-[35px]">Select a conversation to start messaging</p>
             </div>}
         </div>
       </div>
