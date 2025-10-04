@@ -9,7 +9,8 @@ interface DashboardLayoutProps {
 }
 
 function getSidebarDefaultOpen() {
-  const match = document.cookie.match(/(?:^|; )sidebar:state=(true|false)/);
+  const cookie = document.cookie;
+  const match = cookie.match(/(?:^|;\s*)(?:sidebar_state|sidebar:state|sidebar%3Astate)=(true|false)/);
   return match ? match[1] === "true" : true;
 }
 
