@@ -930,6 +930,13 @@ export type Database = {
           years_experience: number
         }[]
       }
+      get_saved_counts_for_headhunters: {
+        Args: { headhunter_ids: string[] }
+        Returns: {
+          headhunter_id: string
+          saves_count: number
+        }[]
+      }
     }
     Enums: {
       engagement_status:

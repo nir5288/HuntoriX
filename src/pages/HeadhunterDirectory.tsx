@@ -66,17 +66,19 @@ const HeadhunterDirectory = () => {
       // Filter for headhunters and non-suspended users client-side
       const filteredData = (data || []).filter((profile: any) => profile.role === 'headhunter' && profile.status !== 'suspended');
       
-      // Fetch save counts for all headhunters
+      // Fetch save counts for all headhunters using RPC (publicly accessible counts)
       const headhunterIds = filteredData.map((h: any) => h.id);
-      const { data: savesData } = await supabase
-        .from('saved_headhunters')
-        .select('headhunter_id');
-      
-      // Count saves per headhunter
-      const savesCounts: Record<string, number> = {};
-      savesData?.forEach((save: any) => {
-        savesCounts[save.headhunter_id] = (savesCounts[save.headhunter_id] || 0) + 1;
-      });
+      let savesCounts: Record<string, number> = {};
+      if (headhunterIds.length > 0) {
+        const { data: countsData, error: countsError } = await supabase.rpc('get_saved_counts_for_headhunters', {
+          headhunter_ids: headhunterIds,
+        });
+        if (!countsError && countsData) {
+          countsData.forEach((row: any) => {
+            savesCounts[row.headhunter_id] = row.saves_count || 0;
+          });
+        }
+      }
       
       // Add saves_count to each headhunter
       const headhuntersWithSaves = filteredData.map((h: any) => ({

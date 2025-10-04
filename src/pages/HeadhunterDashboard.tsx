@@ -50,13 +50,16 @@ const HeadhunterDashboard = () => {
 
       if (invitesError) throw invitesError;
 
-      // Combine applications and invitations
+      // Combine applications and invitations with preference to applications over invitations
       const combinedData = [
+        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' })),
         ...(appsData || []).map(app => ({ ...app, type: 'application' })),
-        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' }))
       ];
 
-      setApplications(combinedData || []);
+      // Deduplicate by job_id so application overrides invitation if both exist
+      const dedupedByJob = Array.from(new Map(combinedData.map(item => [item.job_id, item])).values());
+
+      setApplications(dedupedByJob || []);
 
       // Get job IDs that user has already applied to
       const appliedJobIds = new Set(appsData?.map(app => app.job_id) || []);
