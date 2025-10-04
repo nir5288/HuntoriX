@@ -8,11 +8,12 @@ import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
 import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
-
 const Index = () => {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
-
+  const {
+    user,
+    profile
+  } = useAuth();
   const handleEmployerCTA = () => {
     if (!user) {
       navigate('/auth?role=employer');
@@ -22,7 +23,6 @@ const Index = () => {
       alert("You're signed in as a Headhunter. Please log out to switch roles.");
     }
   };
-
   const handleHeadhunterCTA = () => {
     if (!user) {
       navigate('/auth?role=headhunter');
@@ -32,9 +32,7 @@ const Index = () => {
       alert("You're signed in as an Employer. Please log out to switch roles.");
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
       
       {/* Hero Section */}
@@ -72,67 +70,7 @@ const Index = () => {
       </section>
 
       {/* Dashboard Showcase */}
-      <section className="relative py-20 bg-[#1a1a24] overflow-hidden">
-        {/* Subtle ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[hsl(var(--accent-pink))]/10 rounded-full blur-[150px] pointer-events-none" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto text-center space-y-8">
-            <div className="inline-block">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(var(--accent-mint))]/20 text-[hsl(var(--accent-mint))] text-xs font-medium border border-[hsl(var(--accent-mint))]/30">
-                <Bot className="h-3.5 w-3.5" />
-                Best AI Recruiting Platform
-              </span>
-            </div>
-            
-            <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-              A 10X Faster Way To
-              <span className="block text-[hsl(var(--accent-mint))] mt-2">
-                Manage Your Hiring
-              </span>
-            </h2>
-            
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-white border-0 shadow-lg"
-              onClick={handleEmployerCTA}
-            >
-              Start Hiring - It's Free
-            </Button>
-            
-            {/* Dashboard Preview with subtle gradient border */}
-            <div className="relative mt-16 group">
-              {/* Subtle gradient border effect */}
-              <div className="absolute -inset-[2px] bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-500 blur-sm" />
-              
-              {/* Dashboard image container */}
-              <div className="relative rounded-2xl overflow-hidden bg-[#0f0f16] shadow-2xl">
-                <img 
-                  src={dashboardPreview} 
-                  alt="Huntorix Dashboard Preview - Manage hiring efficiently" 
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
-            
-            {/* Feature bullets - cleaner design */}
-            <div className="flex flex-wrap justify-center gap-6 pt-12 text-white/70 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-white/50" />
-                <span>Post Jobs 10X Faster</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-white/50" />
-                <span>AI-Powered Candidate Matching</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-white/50" />
-                <span>Smart Analytics & Insights</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Featured Headhunters */}
       <FeaturedHeadhunters />
@@ -374,8 +312,6 @@ const Index = () => {
           </CardContent>
         </Card>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
