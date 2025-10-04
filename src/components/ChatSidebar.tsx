@@ -236,8 +236,8 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed top-16 bottom-0 w-64 bg-background border-r transition-all duration-300 ease-in-out",
-        isOpen ? "z-40 opacity-100" : "z-0 opacity-0 pointer-events-none"
+        "fixed top-16 bottom-0 w-64 bg-background border-r transition-transform duration-300 ease-in-out",
+        isOpen ? "translate-x-0 z-30" : "-translate-x-full -z-10 pointer-events-none"
       )}
       style={{
         left: sidebarOpen ? 'var(--sidebar-width, 16rem)' : 'var(--sidebar-width-icon, 3.5rem)'
