@@ -72,43 +72,44 @@ const Index = () => {
       </section>
 
       {/* Dashboard Showcase */}
-      <section className="relative py-20 bg-[#0a0a12] overflow-hidden">
+      <section className="relative py-24 bg-gradient-to-b from-[hsl(var(--surface))] to-background overflow-hidden">
+        {/* Subtle ambient effects */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--accent-mint))]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[hsl(var(--accent-pink))]/5 rounded-full blur-3xl pointer-events-none" />
+        
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto text-center space-y-10">
-            {/* Badge */}
-            <div className="inline-block animate-fade-in">
-              <span className="px-4 py-1.5 rounded-md bg-[hsl(var(--accent-mint))]/10 text-[hsl(var(--accent-mint))] text-sm font-medium border border-[hsl(var(--accent-mint))]/20">
+          <div className="max-w-5xl mx-auto text-center space-y-8 animate-fade-in">
+            <div className="inline-block animate-scale-in">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 text-foreground text-sm font-medium border border-[hsl(var(--accent-mint))]/20">
+                <Bot className="h-4 w-4 text-[hsl(var(--accent-mint))]" />
                 Best AI Recruiting Platform
               </span>
             </div>
             
-            {/* Heading */}
-            <h2 className="text-5xl md:text-6xl font-bold text-white leading-tight animate-fade-in">
+            <h2 className="text-4xl md:text-6xl font-bold leading-tight">
               A 10X Faster Way To
-              <span className="block bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent mt-2">
+              <span className="block bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent mt-2">
                 Manage Your Hiring
               </span>
             </h2>
             
-            {/* CTA Button */}
-            <div className="animate-fade-in">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:shadow-xl hover:scale-105 text-white border-0 shadow-lg transition-all duration-300 px-8 py-6 text-base"
-                onClick={handleEmployerCTA}
-              >
-                Start Hiring - It's Free
-              </Button>
-            </div>
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:shadow-lg hover:scale-105 transition-all duration-300 text-white border-0 shadow-md"
+              onClick={handleEmployerCTA}
+            >
+              <Sparkles className="mr-2 h-5 w-5" />
+              Start Hiring - It's Free
+            </Button>
             
-            {/* Dashboard Preview with animated gradient border */}
-            <div className="relative mt-12 animate-scale-in">
-              {/* Animated gradient border */}
-              <div className="absolute -inset-[3px] bg-gradient-to-r from-[hsl(var(--accent-mint))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] rounded-3xl opacity-75 blur-md animate-pulse" />
+            {/* Dashboard Preview with professional frame */}
+            <div className="relative mt-12 group">
+              {/* Gradient glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] rounded-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 blur-xl animate-pulse" />
               
-              {/* Dashboard image container - tighter frame */}
-              <div className="relative rounded-3xl overflow-hidden bg-[#000000] p-1">
-                <div className="rounded-2xl overflow-hidden">
+              {/* Tight dashboard frame */}
+              <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-card/50 backdrop-blur-sm p-2 group-hover:scale-[1.02] transition-transform duration-500">
+                <div className="rounded-lg overflow-hidden">
                   <img 
                     src={dashboardPreview} 
                     alt="Huntorix Dashboard Preview - Manage hiring efficiently" 
@@ -118,19 +119,19 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Feature bullets */}
-            <div className="flex flex-wrap justify-center gap-8 pt-8 text-white/80 text-base animate-fade-in">
-              <div className="flex items-center gap-2">
+            {/* Feature highlights */}
+            <div className="flex flex-wrap justify-center gap-8 pt-8 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent-mint))]" />
-                <span>Post Jobs 10X Faster</span>
+                <span className="font-medium">Post Jobs 10X Faster</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent-pink))]" />
-                <span>AI-Powered Candidate Matching</span>
+                <span className="font-medium">AI-Powered Matching</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent-lilac))]" />
-                <span>Smart Analytics & Insights</span>
+                <span className="font-medium">Smart Analytics</span>
               </div>
             </div>
           </div>
