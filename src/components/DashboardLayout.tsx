@@ -9,7 +9,9 @@ interface DashboardLayoutProps {
 }
 
 function getSidebarDefaultOpen() {
+  // Check for the cookie set by the SidebarProvider
   const match = document.cookie.match(/(?:^|; )sidebar:state=(true|false)/);
+  // Default to false (closed) if no cookie exists (first login)
   return match ? match[1] === "true" : false;
 }
 
