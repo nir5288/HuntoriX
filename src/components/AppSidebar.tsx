@@ -61,8 +61,8 @@ export function AppSidebar({ role }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r bg-sidebar">
-      <SidebarHeader className="border-b p-3 flex flex-row items-center justify-between">
+    <Sidebar collapsible="icon" className="border-r bg-sidebar transition-all duration-200">
+      <SidebarHeader className="border-b p-3 flex flex-row items-center justify-between transition-all duration-200">
         {open && (
           <div className="flex items-center gap-2 px-1">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center text-white font-bold text-sm">
@@ -89,7 +89,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
         </Button>
       </SidebarHeader>
       
-      <SidebarContent className="py-2">
+      <SidebarContent className="py-2 transition-all duration-200">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
