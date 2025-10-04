@@ -19,7 +19,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ role }: AppSidebarProps) {
-  const { open, toggleSidebar } = useSidebar();
+  const { open, setOpen, toggleSidebar } = useSidebar();
   const location = useLocation();
   
   const items = [
@@ -78,9 +78,10 @@ export function AppSidebar({ role }: AppSidebarProps) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={toggleSidebar}
+          onClick={() => setOpen(!open)}
           className="h-8 w-8 ml-auto"
           aria-label="Toggle sidebar"
+          title={open ? "Collapse sidebar" : "Expand sidebar"}
         >
           {open ? (
             <ChevronLeft className="h-4 w-4" />
