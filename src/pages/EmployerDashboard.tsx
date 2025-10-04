@@ -297,7 +297,7 @@ const EmployerDashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
               <CardTitle className="text-xs font-medium">Active Jobs</CardTitle>
@@ -308,17 +308,7 @@ const EmployerDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-              <CardTitle className="text-xs font-medium">Total Applications</CardTitle>
-              <Users className="h-3.5 w-3.5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="px-4 pb-3">
-              <div className="text-xl font-bold">{applications.length}</div>
-            </CardContent>
-          </Card>
-
-          <Card 
+          <Card
             className={`cursor-pointer transition-all ${
               applications.filter(a => a.status === 'submitted').length > 0 
                 ? 'bg-[hsl(var(--warning))]/10 hover:bg-[hsl(var(--warning))]/20 border-[hsl(var(--warning))]/30' 
@@ -478,6 +468,24 @@ const EmployerDashboard = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-1.5">
+                            <div className="relative">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate('/headhunters');
+                                }}
+                                className="h-7 text-xs px-2 gap-1.5"
+                                title="Invite headhunters to this job"
+                              >
+                                <Users className="h-3 w-3" />
+                                Invite
+                              </Button>
+                              <Badge className="absolute -top-1.5 -right-1.5 bg-[hsl(var(--accent-pink))] text-white text-[10px] h-4 px-1">
+                                New
+                              </Badge>
+                            </div>
                             <Button
                               variant="ghost"
                               size="icon"
