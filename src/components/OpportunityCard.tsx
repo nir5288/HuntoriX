@@ -429,7 +429,10 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            <span>Posted {formatDistanceToNow(new Date(job.created_at), { addSuffix: true })}</span>
+            <span>Posted {job.created_at && !isNaN(new Date(job.created_at).getTime()) 
+              ? formatDistanceToNow(new Date(job.created_at), { addSuffix: true })
+              : 'recently'
+            }</span>
           </div>
           
           {(job.employment_type || job.seniority) && (
