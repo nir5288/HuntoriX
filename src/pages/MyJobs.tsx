@@ -215,9 +215,7 @@ const MyJobs = () => {
                     onClick={() => setShowPendingOnly(!showPendingOnly)}
                     className="h-8 text-xs gap-2"
                   >
-                    <div className={`h-3.5 w-3.5 border rounded flex items-center justify-center ${showPendingOnly ? 'bg-primary border-primary' : 'border-input'}`}>
-                      {showPendingOnly && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
-                    </div>
+                    {showPendingOnly && <Check className="h-3.5 w-3.5" />}
                     Pending Review
                   </Button>
                   <Button
@@ -226,9 +224,7 @@ const MyJobs = () => {
                     onClick={() => setShowPrivateOnly(!showPrivateOnly)}
                     className="h-8 text-xs gap-2"
                   >
-                    <div className={`h-3.5 w-3.5 border rounded flex items-center justify-center ${showPrivateOnly ? 'bg-primary border-primary' : 'border-input'}`}>
-                      {showPrivateOnly && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
-                    </div>
+                    {showPrivateOnly && <Check className="h-3.5 w-3.5" />}
                     Private Only
                   </Button>
                 </div>

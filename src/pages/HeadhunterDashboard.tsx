@@ -477,9 +477,7 @@ const HeadhunterDashboard = () => {
                   onClick={() => setShowPendingOnly(!showPendingOnly)}
                   className="h-8 text-xs gap-2"
                 >
-                  <div className={`h-3.5 w-3.5 border rounded flex items-center justify-center ${showPendingOnly ? 'bg-primary border-primary' : 'border-input'}`}>
-                    {showPendingOnly && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
-                  </div>
+                  {showPendingOnly && <Check className="h-3.5 w-3.5" />}
                   Pending Review
                 </Button>
 
