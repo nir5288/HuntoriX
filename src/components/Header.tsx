@@ -107,6 +107,14 @@ export function Header() {
             <Link to="/headhunters" className={getNavLinkClass('/headhunters')}>
               Find a Headhunter
             </Link>
+            <Link to="/huntrank" className={`${getNavLinkClass('/huntrank')} flex items-center gap-1.5`}>
+              HuntRank
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+            </Link>
+            <Link to="/huntbase" className={`${getNavLinkClass('/huntbase')} flex items-center gap-1.5`}>
+              HuntBase
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+            </Link>
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
               className={getNavLinkClass('/dashboard')}

@@ -23,6 +23,8 @@ import EmployerProfile from "./pages/EmployerProfile";
 import HeadhunterDirectory from "./pages/HeadhunterDirectory";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import HuntRank from "./pages/HuntRank";
+import HuntBase from "./pages/HuntBase";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -64,6 +66,8 @@ const AppContent = () => {
           <Route path="/profile/headhunter/:id" element={<HeadhunterProfile />} />
           <Route path="/profile/employer/:id" element={<EmployerProfile />} />
           <Route path="/headhunters" element={<HeadhunterDirectory />} />
+          <Route path="/huntrank" element={<HuntRank />} />
+          <Route path="/huntbase" element={<HuntBase />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </VerificationWrapper>
