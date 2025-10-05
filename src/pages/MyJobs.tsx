@@ -13,6 +13,7 @@ import { EditJobModal } from '@/components/EditJobModal';
 import { JobEditHistory } from '@/components/JobEditHistory';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Users } from 'lucide-react';
@@ -209,24 +210,28 @@ const MyJobs = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button
-                    variant={showPendingOnly ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setShowPendingOnly(!showPendingOnly)}
-                    className="h-8 text-xs gap-2"
-                  >
-                    {showPendingOnly && <Check className="h-3.5 w-3.5" />}
-                    Pending Review
-                  </Button>
-                  <Button
-                    variant={showPrivateOnly ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setShowPrivateOnly(!showPrivateOnly)}
-                    className="h-8 text-xs gap-2"
-                  >
-                    {showPrivateOnly && <Check className="h-3.5 w-3.5" />}
-                    Private Only
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      id="pending-only" 
+                      checked={showPendingOnly} 
+                      onCheckedChange={(checked) => setShowPendingOnly(checked as boolean)}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="pending-only" className="text-xs font-medium cursor-pointer">
+                      Pending Review
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      id="private-only" 
+                      checked={showPrivateOnly} 
+                      onCheckedChange={(checked) => setShowPrivateOnly(checked as boolean)}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="private-only" className="text-xs font-medium cursor-pointer">
+                      Private Only
+                    </Label>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="px-4 pb-4">
