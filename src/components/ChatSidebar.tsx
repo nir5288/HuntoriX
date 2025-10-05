@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Circle, CircleDot } from "lucide-react";
+import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Mail, MailOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -150,7 +150,11 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
     }
   };
 
-  const handleConversationClick = (jobId: string | null, userId: string) => {
+  const handleConversationClick = async (jobId: string | null, userId: string, hasUnread: boolean) => {
+    // Mark as read when clicking if there are unread messages
+    if (hasUnread) {
+      await handleMarkAsRead(jobId, userId);
+    }
     navigate(`/messages?job=${jobId || 'null'}&with=${userId}`);
   };
 
@@ -190,16 +194,40 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
     }
   };
 
+  const handleMarkAsRead = async (jobId: string | null, otherUserId: string) => {
+    if (!currentUserId) return;
+
+    try {
+      let query = supabase
+        .from("messages")
+        .update({ is_read: true });
+      
+      if (jobId && jobId !== "null") {
+        query = query.eq("job_id", jobId);
+      } else {
+        query = query.is("job_id", null);
+      }
+      
+      const { error } = await query
+        .eq("from_user", otherUserId)
+        .eq("to_user", currentUserId);
+
+      if (error) throw error;
+
+      loadConversations();
+    } catch (error) {
+      console.error("Error marking as read:", error);
+    }
+  };
+
   const handleMarkAsUnread = async (jobId: string | null, otherUserId: string) => {
     if (!currentUserId) return;
 
     try {
-      // Mark all messages from the other user as unread
       let query = supabase
         .from("messages")
         .update({ is_read: false });
       
-      // Handle null jobId properly
       if (jobId && jobId !== "null") {
         query = query.eq("job_id", jobId);
       } else {
@@ -310,7 +338,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
-                          onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
+                          onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
                           className={cn(
                             "w-full p-2 rounded-lg hover:bg-accent transition-colors flex items-center justify-center",
                             activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
@@ -339,7 +367,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                   ) : (
                     <>
                       <button
-                        onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
+                        onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
                         className="w-full p-3 text-left hover:bg-accent transition-colors"
                       >
                         <div className="flex items-start gap-2">
@@ -382,11 +410,19 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                           className="h-7 w-7"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleMarkAsUnread(conv.jobId, conv.otherUserId);
+                            if (conv.unreadCount > 0) {
+                              handleMarkAsRead(conv.jobId, conv.otherUserId);
+                            } else {
+                              handleMarkAsUnread(conv.jobId, conv.otherUserId);
+                            }
                           }}
-                          title="Mark as unread"
+                          title={conv.unreadCount > 0 ? "Mark as read" : "Mark as unread"}
                         >
-                          <CircleDot className="h-3.5 w-3.5" />
+                          {conv.unreadCount > 0 ? (
+                            <MailOpen className="h-3.5 w-3.5" />
+                          ) : (
+                            <Mail className="h-3.5 w-3.5" />
+                          )}
                         </Button>
                         <Button
                           variant="ghost"
