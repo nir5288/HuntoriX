@@ -36,7 +36,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 md:py-32">
+      <section className="container mx-auto px-4 md:py-32 py-[65px]">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="inline-block">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
