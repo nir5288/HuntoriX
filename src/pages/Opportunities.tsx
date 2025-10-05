@@ -227,10 +227,9 @@ const Opportunities = () => {
       q = q.gte('created_at', cutoff.toISOString());
     }
 
-    // Lightweight OR on title/industry (DB)
+    // Search on title/industry (DB query only - array search done client-side)
     if (debouncedQuery) {
       q = q.or(`title.ilike.%${debouncedQuery}%,industry.ilike.%${debouncedQuery}%`);
-      // If you add pg_trgm/full-text in DB, swap for proper text search.
     }
 
     return q;
@@ -342,8 +341,25 @@ const Opportunities = () => {
     };
   }, [fetchPage, currentPage]);
 
-  // No need to filter client-side anymore since we filter at DB level
-  const filteredJobs = useMemo(() => jobs, [jobs]);
+  // Client-side filter for skills (case-insensitive partial match)
+  const filteredJobs = useMemo(() => {
+    if (!debouncedQuery) return jobs;
+    
+    const query = debouncedQuery.toLowerCase();
+    return jobs.filter(job => {
+      // Already matched by DB query (title/industry), so include those
+      const titleMatch = job.title?.toLowerCase().includes(query);
+      const industryMatch = job.industry?.toLowerCase().includes(query);
+      
+      // Check skills arrays for partial match
+      const skillsMatch = [
+        ...(job.skills_must || []),
+        ...(job.skills_nice || [])
+      ].some(skill => skill.toLowerCase().includes(query));
+      
+      return titleMatch || industryMatch || skillsMatch;
+    });
+  }, [jobs, debouncedQuery]);
   
   // Calculate total pages
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
