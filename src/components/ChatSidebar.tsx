@@ -6,10 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Mail, MailOpen, Star } from "lucide-react";
+import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Mail, MailOpen, Star, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { formatDistanceToNow } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -326,9 +325,25 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
 
   const formatRelativeTime = (timestamp: string) => {
     try {
-      return formatDistanceToNow(new Date(timestamp), { addSuffix: true })
-        .replace('about ', '')
-        .replace(' ago', '');
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 1) return 'just now';
+      if (diffMins < 60) return `${diffMins}m`;
+      
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h`;
+      
+      const diffDays = Math.floor(diffHours / 24);
+      if (diffDays < 7) return `${diffDays}d`;
+      
+      const diffWeeks = Math.floor(diffDays / 7);
+      if (diffWeeks < 4) return `${diffWeeks}w`;
+      
+      const diffMonths = Math.floor(diffDays / 30);
+      return `${diffMonths}mo`;
     } catch {
       return '';
     }
@@ -440,7 +455,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
                         className="w-full p-3 text-left hover:bg-accent transition-colors"
                       >
-                        <div className="flex items-start gap-2 pr-6">
+                        <div className="flex items-start gap-2">
                           <div className="relative">
                             <Avatar className="h-9 w-9">
                               <AvatarImage src={conv.otherUserAvatar || undefined} />
@@ -452,23 +467,20 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-0.5 gap-2">
+                          <div className="flex-1 min-w-0 pr-12">
+                            <div className="flex items-center gap-2 mb-0.5">
                               <p className={cn(
-                                "text-sm truncate",
+                                "text-sm truncate flex-1",
                                 conv.unreadCount > 0 ? "font-semibold" : "font-medium"
                               )}>
                                 {conv.otherUserName}
                               </p>
-                              <span className="text-[10px] text-muted-foreground whitespace-nowrap flex-shrink-0">
-                                {formatRelativeTime(conv.lastMessageTime)}
-                              </span>
                             </div>
                             <p className="text-xs text-muted-foreground mb-0.5 truncate">
                               {conv.jobTitle}
                             </p>
                             <p className={cn(
-                              "text-xs truncate pr-2",
+                              "text-xs truncate",
                               conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
                             )}>
                               {conv.lastMessage}
@@ -477,55 +489,74 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         </div>
                       </button>
                       
-                      {/* Star button - always visible at bottom right */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute bottom-2 right-2 h-6 w-6"
-                        onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
-                        title={conv.isStarred ? "Unstar" : "Star"}
-                      >
-                        <Star className={cn(
-                          "h-3.5 w-3.5",
-                          conv.isStarred && "fill-yellow-500 text-yellow-500"
-                        )} />
-                      </Button>
+                      {/* Timestamp and Star - always visible */}
+                      <div className="absolute top-2 right-2 flex items-center gap-1">
+                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                          {formatRelativeTime(conv.lastMessageTime)}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 flex-shrink-0"
+                          onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
+                          title={conv.isStarred ? "Unstar" : "Star"}
+                        >
+                          <Star className={cn(
+                            "h-3.5 w-3.5",
+                            conv.isStarred && "fill-yellow-500 text-yellow-500"
+                          )} />
+                        </Button>
+                      </div>
 
-                      {/* Hover actions at top right */}
-                      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 bg-background/80 backdrop-blur-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (conv.unreadCount > 0) {
-                              handleMarkAsRead(conv.jobId, conv.otherUserId);
-                            } else {
-                              handleMarkAsUnread(conv.jobId, conv.otherUserId);
-                            }
-                          }}
-                          title={conv.unreadCount > 0 ? "Mark as read" : "Mark as unread"}
-                        >
-                          {conv.unreadCount > 0 ? (
-                            <MailOpen className="h-3.5 w-3.5" />
-                          ) : (
-                            <Mail className="h-3.5 w-3.5" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 bg-background/80 backdrop-blur-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
-                            setDeleteDialogOpen(true);
-                          }}
-                          title="Delete conversation"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                      {/* 3-dot menu - visible on hover */}
+                      <div className="absolute top-2 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 bg-background/90 backdrop-blur-sm"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (conv.unreadCount > 0) {
+                                  handleMarkAsRead(conv.jobId, conv.otherUserId);
+                                } else {
+                                  handleMarkAsUnread(conv.jobId, conv.otherUserId);
+                                }
+                              }}
+                            >
+                              {conv.unreadCount > 0 ? (
+                                <>
+                                  <MailOpen className="h-4 w-4 mr-2" />
+                                  Mark as read
+                                </>
+                              ) : (
+                                <>
+                                  <Mail className="h-4 w-4 mr-2" />
+                                  Mark as unread
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
+                                setDeleteDialogOpen(true);
+                              }}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete conversation
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </>
                   )}

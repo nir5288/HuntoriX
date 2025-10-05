@@ -12,9 +12,10 @@ interface MessageInputProps {
   disabled?: boolean;
   replyingTo?: { id: string; body: string; senderName: string } | null;
   onCancelReply?: () => void;
+  onInputClick?: () => void;
 }
 
-export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: MessageInputProps) => {
+export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply, onInputClick }: MessageInputProps) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
@@ -159,6 +160,7 @@ export const MessageInput = ({ onSend, disabled, replyingTo, onCancelReply }: Me
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onClick={onInputClick}
           placeholder="Type a message..."
           className="min-h-[60px] max-h-[120px] resize-none"
           disabled={disabled || sending}

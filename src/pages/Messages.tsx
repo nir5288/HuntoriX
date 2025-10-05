@@ -413,7 +413,13 @@ const Messages = () => {
 
               {/* Fixed Input */}
               <div className="shrink-0">
-                <MessageInput onSend={handleSendMessage} disabled={!user || !otherUserId} replyingTo={replyingTo} onCancelReply={() => setReplyingTo(null)} />
+                <MessageInput 
+                  onSend={handleSendMessage} 
+                  disabled={!user || !otherUserId} 
+                  replyingTo={replyingTo} 
+                  onCancelReply={() => setReplyingTo(null)}
+                  onInputClick={markMessagesAsRead}
+                />
               </div>
             </> : <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
               {!sidebarOpen && <Button variant="outline" onClick={() => setSidebarOpen(true)} className="mx-0 my-[20px]">
