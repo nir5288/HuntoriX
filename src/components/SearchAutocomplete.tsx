@@ -204,12 +204,20 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       <PopoverTrigger asChild>
         <div
           className="relative"
+          role="combobox"
+          aria-expanded={open}
           onMouseDown={(e) => {
-            // Prevent Radix from toggling the popover on click
+            // Prevent Radix from toggling the popover on press
             e.preventDefault();
             if (!open) setOpen(true);
             // Ensure input gets focus after preventing default
             requestAnimationFrame(() => inputRef.current?.focus());
+          }}
+          onClick={(e) => {
+            // Prevent the click from toggling the trigger closed
+            e.preventDefault();
+            if (!open) setOpen(true);
+            inputRef.current?.focus();
           }}
         >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
