@@ -967,6 +967,43 @@ export type Database = {
           saves_count: number
         }[]
       }
+      search_jobs: {
+        Args: {
+          p_budget_currency?: string
+          p_budget_max?: number
+          p_budget_min?: number
+          p_employment_type?: string
+          p_exclude_job_ids?: string[]
+          p_industries?: string[]
+          p_limit?: number
+          p_location?: string
+          p_offset?: number
+          p_posted_cutoff?: string
+          p_query: string
+          p_seniority?: string
+          p_sort?: string
+          p_status?: string[]
+          p_visibility?: string
+        }
+        Returns: {
+          budget_currency: string
+          budget_max: number
+          budget_min: number
+          created_at: string
+          created_by: string
+          description: string
+          employment_type: string
+          id: string
+          industry: string
+          location: string
+          seniority: string
+          skills_must: string[]
+          skills_nice: string[]
+          status: string
+          title: string
+          total_count: number
+        }[]
+      }
     }
     Enums: {
       engagement_status:

@@ -262,12 +262,49 @@ const Opportunities = () => {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       
-      const q = buildBaseQuery();
-      const { data, error, count } = await q.range(from, to);
+      // Use backend function for robust search (title, industry, skills)
+      const now = new Date();
+      let postedCutoff: string | null = null;
+      if (filterPosted !== 'all') {
+        const cutoff = new Date(now);
+        if (filterPosted === '24h') cutoff.setDate(now.getDate() - 1);
+        if (filterPosted === '7d') cutoff.setDate(now.getDate() - 7);
+        if (filterPosted === '30d') cutoff.setDate(now.getDate() - 30);
+        postedCutoff = cutoff.toISOString();
+      }
+
+      const excludeIds = (!showAppliedJobs && user && profile?.role === 'headhunter' && appliedJobIds.size > 0)
+        ? Array.from(appliedJobIds)
+        : null;
+
+      const useCurrency = Boolean((debouncedSalaryMin || debouncedSalaryMax) && filterCurrency);
+
+      const { data, error } = await supabase.rpc('search_jobs', {
+        p_query: debouncedQuery || null,
+        p_status: ['open', 'shortlisted', 'awarded'],
+        p_visibility: 'public',
+        p_industries: filterIndustry.length > 0 ? filterIndustry : null,
+        p_seniority: filterSeniority !== 'all' ? filterSeniority : null,
+        p_employment_type: filterEmploymentType !== 'all' ? filterEmploymentType : null,
+        p_location: debouncedLocation || null,
+        p_budget_currency: useCurrency ? filterCurrency : null,
+        p_budget_min: debouncedSalaryMin ? Number(debouncedSalaryMin) : null,
+        p_budget_max: debouncedSalaryMax ? Number(debouncedSalaryMax) : null,
+        p_posted_cutoff: postedCutoff,
+        p_exclude_job_ids: excludeIds,
+        p_sort: sortBy,
+        p_limit: PAGE_SIZE,
+        p_offset: from,
+      });
+
       if (error) throw error;
-      
-      setJobs(data || []);
-      setTotalCount(count || 0);
+
+      const mapped = (data || []).map((row: any) => {
+        const { total_count, ...rest } = row;
+        return rest as Job;
+      });
+      setJobs(mapped);
+      setTotalCount((data && data[0] && (data[0] as any).total_count) ? Number((data[0] as any).total_count) : 0);
       
       // Update URL params
       const params = new URLSearchParams();
