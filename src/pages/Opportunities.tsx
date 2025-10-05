@@ -408,7 +408,7 @@ const Opportunities = () => {
   // Calculate total pages
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-  const resetFilters = () => {
+  const resetFilters = async () => {
     setFilterIndustry([]);
     setFilterLocation('');
     setFilterSalaryMin('');
@@ -421,6 +421,15 @@ const Opportunities = () => {
     setSortBy('recent');
     setShowAppliedJobs(true);
     localStorage.setItem('showAppliedJobs', 'true');
+    
+    // Save to database if user is logged in
+    if (user) {
+      await supabase
+        .from('profiles')
+        .update({ show_applied_jobs: true, sort_preference: 'recent' })
+        .eq('id', user.id);
+    }
+    
     setSearchParams({}, { replace: true });
   };
 
