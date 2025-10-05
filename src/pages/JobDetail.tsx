@@ -524,7 +524,7 @@ const JobDetail = () => {
                       variant="hero" 
                       size="lg" 
                       className="w-full" 
-                      onClick={() => navigate(`/job-review/${id}`, { state: { from: fromSource || 'dashboard' } })}
+                      onClick={() => navigate(`/job-review/${id}`, { state: { from: 'job', parentFrom: fromSource } })}
                     >
                       Review Invitation
                     </Button>
