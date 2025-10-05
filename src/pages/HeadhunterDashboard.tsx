@@ -472,36 +472,34 @@ const HeadhunterDashboard = () => {
             
             {/* Filters */}
             {applications.length > 0 && (
-              <div className="flex flex-wrap gap-3 pt-3 border-t items-center justify-between">
-                <div className="flex gap-3 items-center">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="h-8 w-[140px] text-xs">
-                      <Filter className="mr-1.5 h-3 w-3" />
-                      <SelectValue placeholder="Filter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="pending">Pending Review</SelectItem>
-                      <SelectItem value="submitted">Submitted</SelectItem>
-                      <SelectItem value="shortlisted">Shortlisted</SelectItem>
-                      <SelectItem value="selected">Selected</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                      <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="flex flex-wrap gap-3 pt-3 border-t items-center">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="h-8 w-[140px] text-xs">
+                    <Filter className="mr-1.5 h-3 w-3" />
+                    <SelectValue placeholder="Filter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending Review</SelectItem>
+                    <SelectItem value="submitted">Submitted</SelectItem>
+                    <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                    <SelectItem value="selected">Selected</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                  </SelectContent>
+                </Select>
 
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="h-8 w-[140px] text-xs">
-                      <ArrowUpDown className="mr-1.5 h-3 w-3" />
-                      <SelectValue placeholder="Sort" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Newest First</SelectItem>
-                      <SelectItem value="oldest">Oldest First</SelectItem>
-                      <SelectItem value="status">By Status</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-8 w-[140px] text-xs">
+                    <ArrowUpDown className="mr-1.5 h-3 w-3" />
+                    <SelectValue placeholder="Sort" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                    <SelectItem value="status">By Status</SelectItem>
+                  </SelectContent>
+                </Select>
                 
                 <div className="flex items-center gap-2">
                   <Checkbox 
