@@ -112,6 +112,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const locationType = watch('location_type');
   const description = watch('description');
   const industry = watch('industry');
+  const seniorityVal = watch('seniority');
+  const employmentTypeVal = watch('employment_type');
 
   // Check if all required fields are filled
   const isFormValid = isValid && skillsMust.length > 0;
@@ -518,7 +520,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="seniority">Seniority <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('seniority', value as any)}>
+                <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
                   <SelectTrigger className={autoFilledFields.has('seniority') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue />
                   </SelectTrigger>
@@ -535,7 +537,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
               <div className="space-y-2">
                 <Label htmlFor="employment_type">Employment Type <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('employment_type', value as any)}>
+                <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
                   <SelectTrigger className={autoFilledFields.has('employment_type') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue />
                   </SelectTrigger>
@@ -557,7 +559,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="space-y-2">
               <Label>Location Type</Label>
               <RadioGroup
-                defaultValue="remote"
+                value={locationType || 'remote'}
                 onValueChange={(value) => setValue('location_type', value)}
                 className={autoFilledFields.has('location_type') ? 'bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded' : ''}
               >
