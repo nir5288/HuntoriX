@@ -305,8 +305,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       setOpen(false);
                     }}
                     className={cn(
-                      "flex items-center justify-between group data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
-                      selectedIndex === idx && "bg-accent"
+                      "flex items-center justify-between group",
+                      selectedIndex === idx
+                        ? "bg-accent data-[selected=true]:bg-accent"
+                        : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                     )}
                   >
                     <span>{search}</span>
@@ -345,8 +347,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       }}
                       onMouseLeave={() => setHoveredItem(null)}
                       className={cn(
-                        "flex items-center justify-between data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
-                        selectedIndex === globalIdx && "bg-accent"
+                        "flex items-center justify-between",
+                        selectedIndex === globalIdx
+                          ? "bg-accent data-[selected=true]:bg-accent"
+                          : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                       )}
                     >
                       <span>{suggestion.value}</span>
@@ -384,8 +388,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
                        className={cn(
-                         "flex items-center gap-2 data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
-                         selectedIndex === globalIdx && "bg-accent"
+                         "flex items-center gap-2",
+                         selectedIndex === globalIdx
+                           ? "bg-accent data-[selected=true]:bg-accent"
+                           : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                        )}
                     >
                       <Badge variant="outline" className="text-xs">Skill</Badge>
@@ -407,8 +413,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
                        className={cn(
-                         "relative data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
-                         selectedIndex === globalIdx && "bg-accent"
+                         "relative",
+                         selectedIndex === globalIdx
+                           ? "bg-accent data-[selected=true]:bg-accent"
+                           : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                        )}
                     >
                       {suggestion.value}
@@ -429,8 +437,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
                        className={cn(
-                         "flex items-center gap-2 data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
-                         selectedIndex === globalIdx && "bg-accent"
+                         "flex items-center gap-2",
+                         selectedIndex === globalIdx
+                           ? "bg-accent data-[selected=true]:bg-accent"
+                           : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                        )}
                     >
                       <Badge variant="outline" className="text-xs">Location</Badge>
