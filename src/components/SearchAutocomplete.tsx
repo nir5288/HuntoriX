@@ -167,7 +167,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   const handleSelect = (suggestion: SearchSuggestion) => {
     if (suggestion.type === 'skill') {
       onFilterAdd?.('skill', suggestion.value);
-      onChange('');
+      // Do not clear the query here; parent uses it to filter
     } else if (suggestion.type === 'location') {
       onFilterAdd?.('location', suggestion.value);
       onChange('');
