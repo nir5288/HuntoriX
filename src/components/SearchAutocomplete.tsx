@@ -305,7 +305,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       setOpen(false);
                     }}
                     className={cn(
-                      "flex items-center justify-between group",
+                      "flex items-center justify-between group data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
                       selectedIndex === idx && "bg-accent"
                     )}
                   >
@@ -345,7 +345,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       }}
                       onMouseLeave={() => setHoveredItem(null)}
                       className={cn(
-                        "flex items-center justify-between",
+                        "flex items-center justify-between data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
                         selectedIndex === globalIdx && "bg-accent"
                       )}
                     >
@@ -383,10 +383,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
-                      className={cn(
-                        "flex items-center gap-2",
-                        selectedIndex === globalIdx && "bg-accent"
-                      )}
+                       className={cn(
+                         "flex items-center gap-2 data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
+                         selectedIndex === globalIdx && "bg-accent"
+                       )}
                     >
                       <Badge variant="outline" className="text-xs">Skill</Badge>
                       <span>{suggestion.value}</span>
@@ -406,10 +406,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
-                      className={cn(
-                        "relative",
-                        selectedIndex === globalIdx && "bg-accent"
-                      )}
+                       className={cn(
+                         "relative data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
+                         selectedIndex === globalIdx && "bg-accent"
+                       )}
                     >
                       {suggestion.value}
                     </CommandItem>
@@ -428,10 +428,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
-                      className={cn(
-                        "flex items-center gap-2",
-                        selectedIndex === globalIdx && "bg-accent"
-                      )}
+                       className={cn(
+                         "flex items-center gap-2 data-[selected=true]:bg-transparent data-[selected=true]:text-foreground",
+                         selectedIndex === globalIdx && "bg-accent"
+                       )}
                     >
                       <Badge variant="outline" className="text-xs">Location</Badge>
                       <span>{suggestion.value}</span>
