@@ -63,8 +63,6 @@ export function AppSidebar({ role }: AppSidebarProps) {
 
   const getTooltip = (title: string) => {
     if (open) return undefined;
-    // Disable tooltip for Applications in headhunter sidebar to prevent flicker on click
-    if (role === 'headhunter' && title === 'Applications') return undefined;
     return title;
   };
   return (
