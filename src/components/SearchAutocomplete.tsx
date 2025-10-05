@@ -222,49 +222,26 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       >
         <Command className="rounded-lg border-none shadow-lg">
           <CommandList className="max-h-[400px]">
-            {showTrending && (
-              <>
-                {recentSearches.length > 0 && (
-                  <CommandGroup heading={
-                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      Recent Searches
-                    </div>
-                  }>
-                    {recentSearches.map((search, idx) => (
-                      <CommandItem
-                        key={`recent-${idx}`}
-                        value={search}
-                        onSelect={() => {
-                          onChange(search);
-                          setOpen(false);
-                        }}
-                      >
-                        {search}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                )}
-                <CommandGroup heading={
-                  <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <TrendingUp className="h-3 w-3" />
-                    Trending Now
-                  </div>
-                }>
-                  {TRENDING_TITLES.slice(0, 3).map((title) => (
-                    <CommandItem
-                      key={`trending-${title}`}
-                      value={title}
-                      onSelect={() => {
-                        onChange(title);
-                        setOpen(false);
-                      }}
-                    >
-                      {title}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </>
+            {showTrending && recentSearches.length > 0 && (
+              <CommandGroup heading={
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  Recent Searches
+                </div>
+              }>
+                {recentSearches.map((search, idx) => (
+                  <CommandItem
+                    key={`recent-${idx}`}
+                    value={search}
+                    onSelect={() => {
+                      onChange(search);
+                      setOpen(false);
+                    }}
+                  >
+                    {search}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             )}
 
             {showEmpty && (
