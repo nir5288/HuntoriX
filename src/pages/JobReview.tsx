@@ -229,9 +229,20 @@ const JobReview = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={() => navigate(`/jobs/${id}`, { state: { from: (location.state as any)?.from } })} className="mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => {
+            const from = (location.state as any)?.from;
+            if (from === 'dashboard') {
+              navigate('/dashboard/headhunter');
+            } else {
+              navigate(`/jobs/${id}`, { state: { from } });
+            }
+          }} 
+          className="mb-6"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Job
+          {(location.state as any)?.from === 'dashboard' ? 'Back to Dashboard' : 'Back to Job'}
         </Button>
 
         <div className="mb-6">

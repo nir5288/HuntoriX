@@ -553,19 +553,48 @@ const HeadhunterDashboard = () => {
                         </div>
                       </div>
                     </CardHeader>
-                    {app.status === 'shortlisted' && (
-                      <CardContent className="px-4 pb-3">
+                    <CardContent className="px-4 pb-3">
+                      <div className="flex gap-2">
+                        {app.status === 'shortlisted' && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleChat(app.job_id);
+                            }}
+                            className="h-7 text-xs"
+                          >
+                            <MessageCircle className="mr-1.5 h-3 w-3" />
+                            Chat
+                          </Button>
+                        )}
                         <Button 
                           size="sm" 
                           variant="outline"
-                          onClick={() => handleChat(app.job_id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/jobs/${app.job_id}`, { state: { from: 'dashboard' } });
+                          }}
                           className="h-7 text-xs"
                         >
-                          <MessageCircle className="mr-1.5 h-3 w-3" />
-                          Chat
+                          View Details
                         </Button>
-                      </CardContent>
-                    )}
+                        {app.type === 'invitation' && app.status === 'pending' && (
+                          <Button 
+                            size="sm" 
+                            variant="hero"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/job-review/${app.job_id}`, { state: { from: 'dashboard' } });
+                            }}
+                            className="h-7 text-xs"
+                          >
+                            Review
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
                   </Card>
                 ))}
               </div>
