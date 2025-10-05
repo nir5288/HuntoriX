@@ -22,6 +22,11 @@
     --vibrant-pink: 337 85% 55%;
     --vibrant-mint: 150 65% 45%;
     --vibrant-lilac: 252 85% 65%;
+    
+    /* Luxury colors for premium features */
+    --luxury-gold: 45 100% 51%;
+    --luxury-purple: 270 60% 35%;
+    --luxury-rose-gold: 15 86% 65%;
 
     --card: 0 0% 100%;
     --card-foreground: 220 27% 11%;

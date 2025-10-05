@@ -13,7 +13,7 @@ const badgeVariants = cva(
         destructive: "border-transparent bg-destructive text-destructive-foreground",
         outline: "text-foreground",
         filter: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer",
-        locked: "border-transparent bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] text-white font-bold shadow-lg",
+        locked: "border-transparent bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] text-white font-bold shadow-lg",
       },
     },
     defaultVariants: {
