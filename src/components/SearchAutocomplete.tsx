@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { Search, TrendingUp, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, TrendingUp, Clock, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
@@ -53,6 +54,13 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
     if (!query.trim()) return;
     
     const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  }, [recentSearches]);
+
+  // Delete a recent search
+  const deleteRecentSearch = useCallback((searchToDelete: string) => {
+    const updated = recentSearches.filter(s => s !== searchToDelete);
     setRecentSearches(updated);
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   }, [recentSearches]);
@@ -192,7 +200,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   const showTrending = value.length === 0;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -203,12 +211,14 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
             value={value}
             onChange={(e) => {
               onChange(e.target.value);
-              setOpen(true);
+              if (!open) setOpen(true);
             }}
             onFocus={() => setOpen(true)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleSearch();
+              } else if (e.key === 'Escape') {
+                setOpen(false);
               }
             }}
             className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -237,8 +247,20 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       onChange(search);
                       setOpen(false);
                     }}
+                    className="flex items-center justify-between group"
                   >
-                    {search}
+                    <span>{search}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteRecentSearch(search);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </CommandItem>
                 ))}
               </CommandGroup>
