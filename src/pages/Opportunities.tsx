@@ -299,12 +299,9 @@ const Opportunities = () => {
 
       if (error) throw error;
 
-      const mapped = (data || []).map((row: any) => {
-        const { total_count, ...rest } = row;
-        return rest as Job;
-      });
+      const mapped = (data || []).map((row: any) => row.job_data as Job);
       setJobs(mapped);
-      setTotalCount((data && data[0] && (data[0] as any).total_count) ? Number((data[0] as any).total_count) : 0);
+      setTotalCount((data && data[0]) ? Number(data[0].total_count) : 0);
       
       // Update URL params
       const params = new URLSearchParams();
