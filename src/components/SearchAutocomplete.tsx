@@ -278,8 +278,9 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
           role="combobox"
           aria-expanded={open}
           onMouseDown={(e) => {
-            // Only prevent if popover is closed, otherwise allow normal text selection
-            if (!open) {
+            const target = e.target as HTMLElement;
+            const clickedInput = !!target.closest('input');
+            if (!open && !clickedInput) {
               e.preventDefault();
               setOpen(true);
               setSelectedIndex(-1);
@@ -288,12 +289,13 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
             }
           }}
           onClick={(e) => {
-            // Only handle if closed, otherwise allow normal cursor positioning
-            if (!open) {
+            const target = e.target as HTMLElement;
+            const clickedInput = !!target.closest('input');
+            if (!open && !clickedInput) {
               e.preventDefault();
               setOpen(true);
+              inputRef.current?.focus();
             }
-            inputRef.current?.focus();
           }}
         >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -308,6 +310,18 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
               setPreviewValue('');
               setOriginalQuery('');
               if (!open) setOpen(true);
+            }}
+            onMouseDown={(e) => {
+              if (open) {
+                // Keep popover open and allow native caret placement
+                e.stopPropagation();
+              }
+            }}
+            onClick={(e) => {
+              if (open) {
+                // Prevent trigger toggle when clicking inside input
+                e.stopPropagation();
+              }
             }}
             onFocus={() => {
               setOpen(true);
