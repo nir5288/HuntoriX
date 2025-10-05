@@ -36,10 +36,10 @@ const JobReview = () => {
     if (user && profile?.role === 'headhunter') {
       fetchJobAndInvitation();
       fetchMessages();
-    } else if (user && profile && profile.role !== 'headhunter') {
+    } else if (!loading) {
       navigate('/');
     }
-  }, [id, user, profile, navigate]);
+  }, [id, user, profile]);
 
   const fetchJobAndInvitation = async () => {
     try {
