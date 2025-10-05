@@ -14,7 +14,6 @@ import { Menu, ArrowLeft, User, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
-import { DashboardLayout } from "@/components/DashboardLayout";
 interface Message {
   id: string;
   from_user: string;
@@ -358,8 +357,8 @@ const Messages = () => {
     }
     loadMessages(true);
   };
-  return <DashboardLayout>
-      <ChatSidebar 
+  return <>
+      <ChatSidebar
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}
         isCollapsed={chatSidebarCollapsed}
@@ -430,6 +429,6 @@ const Messages = () => {
             </div>}
         </div>
       </div>
-    </DashboardLayout>;
+    </>;
 };
 export default Messages;

@@ -13,7 +13,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { DashboardLayout } from '@/components/DashboardLayout';
 
 const HeadhunterDashboard = () => {
   const { user, profile, loading } = useRequireAuth('headhunter');
@@ -230,19 +229,16 @@ const HeadhunterDashboard = () => {
 
   if (loading || loadingData) {
     return (
-      <DashboardLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-1/4"></div>
             <div className="h-32 bg-muted rounded"></div>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
       <div className="container px-6 py-6 max-w-7xl">
         {/* Verification Banner */}
         {!profile?.email_verified && (
@@ -644,7 +640,6 @@ const HeadhunterDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 };
 

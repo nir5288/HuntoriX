@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
+import { DashboardLayoutWrapper } from './components/DashboardLayoutWrapper';
 
 const AppContent = () => {
   const location = useLocation();
@@ -41,22 +42,28 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard/employer" element={<EmployerDashboard />} />
-          <Route path="/my-jobs" element={<MyJobs />} />
-          <Route path="/dashboard/headhunter" element={<HeadhunterDashboard />} />
+          
+          {/* Dashboard routes with persistent layout */}
+          <Route element={<DashboardLayoutWrapper />}>
+            <Route path="/dashboard/employer" element={<EmployerDashboard />} />
+            <Route path="/my-jobs" element={<MyJobs />} />
+            <Route path="/dashboard/headhunter" element={<HeadhunterDashboard />} />
+            <Route path="/applications" element={<Applications />} />
+            <Route path="/saved-jobs" element={<SavedJobs />} />
+            <Route path="/saved-headhunters" element={<SavedHeadhunters />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+
+          {/* Public routes without dashboard layout */}
           <Route path="/opportunities" element={<Opportunities />} />
-          <Route path="/applications" element={<Applications />} />
           <Route path="/jobs" element={<Opportunities />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/job-review/:id" element={<JobReview />} />
-          <Route path="/saved-jobs" element={<SavedJobs />} />
-          <Route path="/saved-headhunters" element={<SavedHeadhunters />} />
-          <Route path="/messages" element={<Messages />} />
           <Route path="/profile/headhunter/:id" element={<HeadhunterProfile />} />
           <Route path="/profile/employer/:id" element={<EmployerProfile />} />
           <Route path="/headhunters" element={<HeadhunterDirectory />} />
-          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </VerificationWrapper>

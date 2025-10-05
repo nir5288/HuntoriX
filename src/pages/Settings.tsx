@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -233,7 +232,6 @@ const Settings = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <p className="text-muted-foreground">Loading...</p>
         </div>
@@ -243,7 +241,6 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-      <Header />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button

@@ -15,7 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
-import { DashboardLayout } from '@/components/DashboardLayout';
 import { Users } from 'lucide-react';
 
 const MyJobs = () => {
@@ -158,19 +157,17 @@ const MyJobs = () => {
 
   if (loading || loadingData) {
     return (
-      <DashboardLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-1/4"></div>
             <div className="h-32 bg-muted rounded"></div>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
     return (
-      <DashboardLayout>
+      <>
         <div className="container px-6 py-6 max-w-7xl">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -397,7 +394,7 @@ const MyJobs = () => {
           />
         </>
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

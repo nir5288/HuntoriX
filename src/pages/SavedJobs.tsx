@@ -8,7 +8,6 @@ import { Heart, MapPin, Briefcase, TrendingUp, DollarSign, Calendar, ArrowLeft, 
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { DashboardLayout } from '@/components/DashboardLayout';
 
 const SavedJobs = () => {
   const { user, profile, loading } = useRequireAuth();
@@ -72,7 +71,6 @@ const SavedJobs = () => {
   }
 
   return (
-    <DashboardLayout>
       <div className="container px-6 py-6 max-w-7xl">
         {/* Header Section with Stats */}
         <div className="mb-6">
@@ -226,7 +224,6 @@ const SavedJobs = () => {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 };
 

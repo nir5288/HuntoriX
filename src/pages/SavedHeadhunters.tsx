@@ -9,7 +9,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DashboardLayout } from '@/components/DashboardLayout';
 
 const SavedHeadhunters = () => {
   const { user, loading } = useRequireAuth('employer');
@@ -73,7 +72,6 @@ const SavedHeadhunters = () => {
   }
 
   return (
-    <DashboardLayout>
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <Button
@@ -231,7 +229,6 @@ const SavedHeadhunters = () => {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 };
 

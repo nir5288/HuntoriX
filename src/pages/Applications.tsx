@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DashboardLayout } from '@/components/DashboardLayout';
 
 const Applications = () => {
   const { user, loading } = useRequireAuth('headhunter');
@@ -168,19 +167,16 @@ const Applications = () => {
 
   if (loading || loadingData) {
     return (
-      <DashboardLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-1/4"></div>
             <div className="h-32 bg-muted rounded"></div>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
       <div className="container px-6 py-6 max-w-7xl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
@@ -327,7 +323,6 @@ const Applications = () => {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 };
 
