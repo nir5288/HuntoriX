@@ -783,6 +783,30 @@ export type Database = {
           },
         ]
       }
+      starred_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string | null
+          other_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          other_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          other_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           candidate_email: string | null

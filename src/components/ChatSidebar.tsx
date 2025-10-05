@@ -6,9 +6,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Mail, MailOpen } from "lucide-react";
+import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Mail, MailOpen, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { formatDistanceToNow } from "date-fns";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -36,6 +37,7 @@ interface Conversation {
   lastMessage: string;
   lastMessageTime: string;
   unreadCount: number;
+  isStarred: boolean;
 }
 
 interface ChatSidebarProps {
@@ -53,7 +55,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "unread" | "archived">("all");
+  const [filter, setFilter] = useState<"all" | "unread" | "starred">("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState<{ jobId: string; userId: string } | null>(null);
 
@@ -103,6 +105,16 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
 
       if (!messages) return;
 
+      // Load starred conversations
+      const { data: starredData } = await supabase
+        .from("starred_conversations")
+        .select("*")
+        .eq("user_id", user.id);
+
+      const starredSet = new Set(
+        starredData?.map((s) => `${s.job_id || 'null'}-${s.other_user_id}`) || []
+      );
+
       const conversationMap = new Map<string, Conversation>();
 
       // Helper function to format name
@@ -130,6 +142,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
             lastMessage: msg.body,
             lastMessageTime: msg.created_at,
             unreadCount: 0,
+            isStarred: starredSet.has(`${msg.job_id || 'null'}-${otherUserId}`),
           });
         }
         
@@ -256,13 +269,63 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
     }
   };
 
+  const handleToggleStar = async (e: React.MouseEvent, jobId: string | null, otherUserId: string) => {
+    e.stopPropagation();
+    if (!currentUserId) return;
+
+    try {
+      const conv = conversations.find(c => c.jobId === jobId && c.otherUserId === otherUserId);
+      if (!conv) return;
+
+      if (conv.isStarred) {
+        // Unstar
+        await supabase
+          .from("starred_conversations")
+          .delete()
+          .eq("user_id", currentUserId)
+          .eq("other_user_id", otherUserId)
+          .eq("job_id", jobId || null);
+      } else {
+        // Star
+        await supabase
+          .from("starred_conversations")
+          .insert({
+            user_id: currentUserId,
+            job_id: jobId,
+            other_user_id: otherUserId,
+          });
+      }
+
+      loadConversations();
+    } catch (error) {
+      console.error("Error toggling star:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update star status",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredConversations = conversations.filter(conv => {
     if (filter === "unread") {
       return conv.unreadCount > 0;
     }
-    // For now, we don't have archived conversations, so show all for "all" and "archived"
+    if (filter === "starred") {
+      return conv.isStarred;
+    }
     return true;
   });
+
+  const formatRelativeTime = (timestamp: string) => {
+    try {
+      return formatDistanceToNow(new Date(timestamp), { addSuffix: true })
+        .replace('about ', '')
+        .replace(' ago', '');
+    } catch {
+      return '';
+    }
+  };
 
   return (
     <div
@@ -293,8 +356,8 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
               <DropdownMenuItem onClick={() => setFilter("unread")}>
                 Unread
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilter("archived")}>
-                Archived
+              <DropdownMenuItem onClick={() => setFilter("starred")}>
+                Starred
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -370,7 +433,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
                         className="w-full p-3 text-left hover:bg-accent transition-colors"
                       >
-                        <div className="flex items-start gap-2">
+                            <div className="flex items-start gap-2">
                           <div className="relative">
                             <Avatar className="h-9 w-9">
                               <AvatarImage src={conv.otherUserAvatar || undefined} />
@@ -390,6 +453,9 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               )}>
                                 {conv.otherUserName}
                               </p>
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-1">
+                                {formatRelativeTime(conv.lastMessageTime)}
+                              </span>
                             </div>
                             <p className="text-xs text-muted-foreground mb-0.5 truncate">
                               {conv.jobTitle}
@@ -404,6 +470,18 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         </div>
                       </button>
                       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
+                          title={conv.isStarred ? "Unstar" : "Star"}
+                        >
+                          <Star className={cn(
+                            "h-3.5 w-3.5",
+                            conv.isStarred && "fill-yellow-500 text-yellow-500"
+                          )} />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"

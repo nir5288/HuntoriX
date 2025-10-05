@@ -73,6 +73,38 @@ const Messages = () => {
 
   // Handle "null" string from URL
   const validJobId = jobId && jobId !== "null" ? jobId : null;
+
+  // Auto-open last conversation on initial load
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    // If no conversation selected, load the most recent one
+    if (!otherUserId) {
+      const loadLastConversation = async () => {
+        try {
+          const { data: messages } = await supabase
+            .from("messages")
+            .select("job_id, from_user, to_user")
+            .or(`from_user.eq.${user.id},to_user.eq.${user.id}`)
+            .order("created_at", { ascending: false })
+            .limit(1);
+
+          if (messages && messages.length > 0) {
+            const lastMsg = messages[0];
+            const lastOtherUserId = lastMsg.from_user === user.id ? lastMsg.to_user : lastMsg.from_user;
+            navigate(`/messages?job=${lastMsg.job_id || 'null'}&with=${lastOtherUserId}`, { replace: true });
+          }
+        } catch (error) {
+          console.error("Error loading last conversation:", error);
+        }
+      };
+      loadLastConversation();
+    }
+  }, [user, otherUserId, navigate]);
+
   useEffect(() => {
     if (!user) {
       navigate("/auth");
