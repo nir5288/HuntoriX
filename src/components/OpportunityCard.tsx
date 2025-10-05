@@ -388,8 +388,9 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <div className="flex flex-wrap gap-2">
           {job.industry && (
             <Badge 
+              variant="filter"
               style={{ backgroundColor: getIndustryColor(job.industry) }}
-              className="text-foreground border-0 cursor-pointer hover:opacity-80 transition-opacity"
+              className="text-foreground border-0"
               onClick={(e) => {
                 e.stopPropagation();
                 onIndustryClick?.(job.industry!);
@@ -473,8 +474,8 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
                   {job.skills_must.map((skill, idx) => (
                     <CarouselItem key={idx} className="pl-2 basis-auto">
                       <Badge 
-                        variant="secondary" 
-                        className="text-xs whitespace-nowrap cursor-pointer hover:bg-secondary/80 transition-colors"
+                        variant="filter" 
+                        className="text-xs whitespace-nowrap"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSkillClick?.(skill);
