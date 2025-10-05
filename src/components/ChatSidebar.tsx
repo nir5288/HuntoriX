@@ -490,10 +490,10 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         </div>
                       </button>
                       
-                      {/* Timestamp - always visible, moves left on hover */}
+                      {/* Timestamp - always visible, moves left on hover or when menu open */}
                       <span className={cn(
                         "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200",
-                        "group-hover:right-12 right-3"
+                        (openMenuKey === `${conv.jobId}-${conv.otherUserId}`) ? "right-12" : "group-hover:right-12 right-3"
                       )}>
                         {formatRelativeTime(conv.lastMessageTime)}
                       </span>
