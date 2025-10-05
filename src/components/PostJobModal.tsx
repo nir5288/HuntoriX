@@ -97,8 +97,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       title: '',
       custom_title: '',
       industry: '',
-      seniority: 'mid' as const,
-      employment_type: 'full_time' as const,
+      seniority: undefined as any,
+      employment_type: undefined as any,
       location_type: 'remote',
       location: '',
       budget_currency: 'ILS',
@@ -205,7 +205,51 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         if (/(mid|3-5\s*years)/.test(t)) return 'mid';
         return undefined;
       };
-      
+
+      // Helper: derive title from natural language
+      const deriveTitle = (text: string): string | undefined => {
+        const t = text.replace(/\s+/g, ' ');
+        const patterns = [
+          /looking for an?\s+([A-Z][A-Za-z0-9/ .+\-]+?)(?=\s+(?:to|for|in|at)|[.,\n])/i,
+          /we['’]re\s+(?:looking|seeking|hiring)\s+for\s+an?\s+([A-Z][A-Za-z0-9/ .+\-]+?)(?=\s+(?:to|for|in|at)|[.,\n])/i,
+          /we['’]re\s+(?:looking|seeking|hiring)\s+an?\s+([A-Z][A-Za-z0-9/ .+\-]+?)(?=\s+(?:to|for|in|at)|[.,\n])/i,
+          /join\s+our[^.\n]*\s+as\s+an?\s+([A-Z][A-Za-z0-9/ .+\-]+?)(?=\s+(?:to|for|in|at)|[.,\n])/i,
+        ];
+        for (const re of patterns) {
+          const m = t.match(re);
+          if (m?.[1]) {
+            let title = m[1].trim();
+            title = title.replace(/^(talented|experienced|passionate|skilled|seasoned)\s+/i, '').trim();
+            return title;
+          }
+        }
+        return undefined;
+      };
+
+      // Helper: detect employment type
+      const detectEmployment = (text: string): 'full_time' | 'contract' | 'temp' | undefined => {
+        const t = text.toLowerCase();
+        if (/(full[- ]?time)/.test(t)) return 'full_time';
+        if (/(part[- ]?time|temporary)/.test(t)) return 'temp';
+        if (/(contract|contractor)/.test(t)) return 'contract';
+        return undefined;
+      };
+
+      // Helper: derive location/type
+      const deriveLocation = (text: string): { type?: 'on_site' | 'hybrid' | 'remote'; city?: string } => {
+        const out: { type?: 'on_site' | 'hybrid' | 'remote'; city?: string } = {};
+        if (/hybrid/i.test(text)) out.type = 'hybrid';
+        else if (/on[- ]?site/i.test(text)) out.type = 'on_site';
+        else if (/remote/i.test(text)) out.type = 'remote';
+        const officeMatch = text.match(/from our ([A-Za-z][A-Za-z ]{1,40}) office/i);
+        if (officeMatch?.[1]) out.city = officeMatch[1].trim();
+        if (!out.city) {
+          for (const city of locations) {
+            if (new RegExp(`\\b${city}\\b`, 'i').test(text)) { out.city = city; break; }
+          }
+        }
+        return out;
+      };
       // Auto-fill fields
       if (jobInfo.title) {
         const normalized = jobInfo.title.trim();
@@ -278,8 +322,60 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         filledFields.add('skills_nice');
       }
 
+      // Fallbacks when AI misses fields
+      if (!watch('title')) {
+        const t = deriveTitle(jobDescriptionText);
+        if (t) {
+          if (jobTitles.includes(t)) {
+            setValue('title', t);
+          } else {
+            setValue('title', 'Other');
+            setValue('custom_title', t);
+          }
+          filledFields.add('title');
+          filledFields.add('custom_title');
+        }
+      }
+
+      if (!watch('seniority')) {
+        const inferred = detectSeniority(jobDescriptionText);
+        if (inferred) {
+          setValue('seniority', inferred as any);
+          filledFields.add('seniority');
+        }
+      }
+
+      if (!watch('employment_type')) {
+        const et = detectEmployment(jobDescriptionText);
+        if (et) {
+          setValue('employment_type', et as any);
+          filledFields.add('employment_type');
+        }
+      }
+
+      if (!watch('location_type')) {
+        const loc = deriveLocation(jobDescriptionText);
+        if (loc.type) { setValue('location_type', loc.type); filledFields.add('location_type'); }
+        if (loc.city) { setValue('location', loc.city); filledFields.add('location'); }
+      }
+
+      if (!watch('industry')) {
+        if (/(cybersecurity|software|cloud|saas)/i.test(jobDescriptionText)) {
+          setValue('industry', 'Software/Tech');
+          filledFields.add('industry');
+        }
+      }
+
+      if (!watch('description')) {
+        const sentences = jobDescriptionText.replace(/\s+/g, ' ').split(/(?<=\.)\s+/).slice(0, 2).join(' ');
+        if (sentences.length >= 10) {
+          setValue('description', sentences);
+          filledFields.add('description');
+        }
+      }
+
       setAutoFilledFields(filledFields);
-      toast.success('Job description parsed successfully! Review and edit the fields as needed.');
+      toast.success('Parsed and auto-filled key fields. Please review before posting.');
 
     } catch (error) {
       console.error('Error parsing job description:', error);
@@ -422,7 +518,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="seniority">Seniority <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('seniority', value as any)} defaultValue="mid">
+                <Select onValueChange={(value) => setValue('seniority', value as any)}>
                   <SelectTrigger className={autoFilledFields.has('seniority') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue />
                   </SelectTrigger>
@@ -434,12 +530,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     <SelectItem value="exec">Executive</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.seniority && <p className="text-sm text-destructive">{errors.seniority.message}</p>}
+                {errors.seniority?.message && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="employment_type">Employment Type <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('employment_type', value as any)} defaultValue="full_time">
+                <Select onValueChange={(value) => setValue('employment_type', value as any)}>
                   <SelectTrigger className={autoFilledFields.has('employment_type') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
                     <SelectValue />
                   </SelectTrigger>
@@ -449,7 +545,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     <SelectItem value="temp">Temporary</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.employment_type && <p className="text-sm text-destructive">{errors.employment_type.message}</p>}
+                {errors.employment_type?.message && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
               </div>
             </div>
           </div>
