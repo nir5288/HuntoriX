@@ -49,6 +49,7 @@ const Messages = () => {
   useUpdateLastSeen(); // Update last_seen timestamp
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [chatSidebarCollapsed, setChatSidebarCollapsed] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [otherUserName, setOtherUserName] = useState("");
@@ -326,10 +327,15 @@ const Messages = () => {
     loadMessages(true);
   };
   return <DashboardLayout>
-      <ChatSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <ChatSidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)}
+        isCollapsed={chatSidebarCollapsed}
+        onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
+      />
 
           <div className="h-[calc(100vh-64px)] flex flex-col">
-            <div className={`h-full flex flex-col transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-0"}`}>
+            <div className={`h-full flex flex-col transition-all duration-300 ${sidebarOpen ? (chatSidebarCollapsed ? "ml-16" : "ml-64") : "ml-0"}`}>
               {otherUserId ? <>
                   {/* Fixed Header */}
                   <div className="shrink-0 p-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, MessageSquare, ChevronDown, Trash2, Circle, CircleDot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,9 +41,11 @@ interface Conversation {
 interface ChatSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
+export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: ChatSidebarProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
@@ -236,131 +239,176 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
   return (
     <div
       className={cn(
-        "fixed top-16 bottom-0 w-56 bg-background border-r transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0 z-30" : "-translate-x-full -z-10 pointer-events-none"
+        "fixed top-16 bottom-0 bg-background border-r transition-all duration-300 ease-in-out",
+        isOpen ? "translate-x-0 z-30" : "-translate-x-full -z-10 pointer-events-none",
+        isCollapsed ? "w-16" : "w-56"
       )}
       style={{
         left: sidebarOpen ? 'var(--sidebar-width, 16rem)' : 'var(--sidebar-width-icon, 3.5rem)'
       }}
     >
       <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1.5 hover:opacity-80 transition text-sm">
-              <span className="text-xs font-medium text-muted-foreground capitalize">
-                {filter === "all" ? "All messages" : filter}
-              </span>
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => setFilter("all")}>
-              All messages
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter("unread")}>
-              Unread
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter("archived")}>
-              Archived
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <ChevronLeft className="h-4 w-4" />
+        {!isCollapsed && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 hover:opacity-80 transition text-sm">
+                <span className="text-xs font-medium text-muted-foreground capitalize">
+                  {filter === "all" ? "All messages" : filter}
+                </span>
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem onClick={() => setFilter("all")}>
+                All messages
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilter("unread")}>
+                Unread
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilter("archived")}>
+                Archived
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onToggleCollapse}
+          className="ml-auto"
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <ChevronLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
         </Button>
       </div>
 
       <ScrollArea className="h-[calc(100vh-65px)]">
-        {loading ? (
-          <div className="p-4 text-center text-muted-foreground">
-            Loading conversations...
-          </div>
-        ) : conversations.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground">
-            No conversations yet
-          </div>
-        ) : filteredConversations.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground">
-            No {filter !== "all" && filter} conversations
-          </div>
-        ) : (
-          <div className="divide-y">
-            {filteredConversations.map((conv) => (
-              <div
-                key={`${conv.jobId}-${conv.otherUserId}`}
-                className={cn(
-                  "relative group",
-                  activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
-                )}
-              >
-                <button
-                  onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
-                  className="w-full p-3 text-left hover:bg-accent transition-colors"
+        <TooltipProvider delayDuration={200}>
+          {loading ? (
+            <div className="p-4 text-center text-muted-foreground">
+              {!isCollapsed && "Loading conversations..."}
+            </div>
+          ) : conversations.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">
+              {!isCollapsed && "No conversations yet"}
+            </div>
+          ) : filteredConversations.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">
+              {!isCollapsed && `No ${filter !== "all" && filter} conversations`}
+            </div>
+          ) : (
+            <div className={cn(isCollapsed ? "space-y-2 p-2" : "divide-y")}>
+              {filteredConversations.map((conv) => (
+                <div
+                  key={`${conv.jobId}-${conv.otherUserId}`}
+                  className={cn(
+                    "relative group",
+                    !isCollapsed && activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
+                  )}
                 >
-                  <div className="flex items-start gap-2">
-                    <div className="relative">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={conv.otherUserAvatar || undefined} />
-                        <AvatarFallback>
-                          {conv.otherUserName.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      {conv.unreadCount > 0 && (
-                        <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className={cn(
-                          "text-sm truncate",
-                          conv.unreadCount > 0 ? "font-semibold" : "font-medium"
-                        )}>
-                          {conv.otherUserName}
-                        </p>
+                  {isCollapsed ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
+                          className={cn(
+                            "w-full p-2 rounded-lg hover:bg-accent transition-colors flex items-center justify-center",
+                            activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
+                          )}
+                        >
+                          <div className="relative">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={conv.otherUserAvatar || undefined} />
+                              <AvatarFallback>
+                                {conv.otherUserName.substring(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            {conv.unreadCount > 0 && (
+                              <div className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full border-2 border-background flex items-center justify-center">
+                                <span className="text-[10px] font-bold text-white">{conv.unreadCount > 9 ? '9+' : conv.unreadCount}</span>
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p className="font-semibold">{conv.otherUserName}</p>
+                        <p className="text-xs text-muted-foreground">{conv.jobTitle}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleConversationClick(conv.jobId, conv.otherUserId)}
+                        className="w-full p-3 text-left hover:bg-accent transition-colors"
+                      >
+                        <div className="flex items-start gap-2">
+                          <div className="relative">
+                            <Avatar className="h-9 w-9">
+                              <AvatarImage src={conv.otherUserAvatar || undefined} />
+                              <AvatarFallback>
+                                {conv.otherUserName.substring(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            {conv.unreadCount > 0 && (
+                              <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <p className={cn(
+                                "text-sm truncate",
+                                conv.unreadCount > 0 ? "font-semibold" : "font-medium"
+                              )}>
+                                {conv.otherUserName}
+                              </p>
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-0.5 truncate">
+                              {conv.jobTitle}
+                            </p>
+                            <p className={cn(
+                              "text-xs truncate",
+                              conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                            )}>
+                              {conv.lastMessage}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMarkAsUnread(conv.jobId, conv.otherUserId);
+                          }}
+                          title="Mark as unread"
+                        >
+                          <CircleDot className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
+                            setDeleteDialogOpen(true);
+                          }}
+                          title="Delete conversation"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-0.5 truncate">
-                        {conv.jobTitle}
-                      </p>
-                      <p className={cn(
-                        "text-xs truncate",
-                        conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
-                      )}>
-                        {conv.lastMessage}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMarkAsUnread(conv.jobId, conv.otherUserId);
-                    }}
-                    title="Mark as unread"
-                  >
-                    <CircleDot className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
-                      setDeleteDialogOpen(true);
-                    }}
-                    title="Delete conversation"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                    </>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </TooltipProvider>
       </ScrollArea>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
