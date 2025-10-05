@@ -221,7 +221,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       setSelectedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+      setSelectedIndex(prev => (prev > -1 ? prev - 1 : -1));
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < allItems.length) {
@@ -270,9 +270,13 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
             value={value}
             onChange={(e) => {
               onChange(e.target.value);
+              setSelectedIndex(-1);
               if (!open) setOpen(true);
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              setOpen(true);
+              setSelectedIndex(-1);
+            }}
             onKeyDown={handleKeyDown}
             className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
