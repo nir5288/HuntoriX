@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { DashboardLayout } from '@/components/DashboardLayout';
 
 const HeadhunterDashboard = () => {
@@ -470,44 +472,48 @@ const HeadhunterDashboard = () => {
             
             {/* Filters */}
             {applications.length > 0 && (
-              <div className="flex flex-wrap gap-3 pt-3 border-t">
-                <Button
-                  variant={showPendingOnly ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setShowPendingOnly(!showPendingOnly)}
-                  className="h-8 text-xs gap-2"
-                >
-                  {showPendingOnly && <Check className="h-3.5 w-3.5" />}
-                  Pending Review
-                </Button>
+              <div className="flex flex-wrap gap-3 pt-3 border-t items-center justify-between">
+                <div className="flex gap-3 items-center">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="h-8 w-[140px] text-xs">
+                      <Filter className="mr-1.5 h-3 w-3" />
+                      <SelectValue placeholder="Filter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="pending">Pending Review</SelectItem>
+                      <SelectItem value="submitted">Submitted</SelectItem>
+                      <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                      <SelectItem value="selected">Selected</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                      <SelectItem value="withdrawn">Withdrawn</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-8 w-[140px] text-xs">
-                    <Filter className="mr-1.5 h-3 w-3" />
-                    <SelectValue placeholder="Filter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="pending">Pending Review</SelectItem>
-                    <SelectItem value="submitted">Submitted</SelectItem>
-                    <SelectItem value="shortlisted">Shortlisted</SelectItem>
-                    <SelectItem value="selected">Selected</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                    <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="h-8 w-[140px] text-xs">
-                    <ArrowUpDown className="mr-1.5 h-3 w-3" />
-                    <SelectValue placeholder="Sort" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
-                    <SelectItem value="status">By Status</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="h-8 w-[140px] text-xs">
+                      <ArrowUpDown className="mr-1.5 h-3 w-3" />
+                      <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest First</SelectItem>
+                      <SelectItem value="oldest">Oldest First</SelectItem>
+                      <SelectItem value="status">By Status</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Checkbox 
+                    id="pending-only" 
+                    checked={showPendingOnly} 
+                    onCheckedChange={(checked) => setShowPendingOnly(checked as boolean)}
+                    className="h-4 w-4"
+                  />
+                  <Label htmlFor="pending-only" className="text-xs font-medium cursor-pointer">
+                    Pending Review
+                  </Label>
+                </div>
               </div>
             )}
           </CardHeader>
