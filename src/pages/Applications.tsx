@@ -96,16 +96,16 @@ const Applications = () => {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: 'bg-[hsl(var(--warning))]',
-      submitted: 'bg-[hsl(var(--accent-pink))]',
-      shortlisted: 'bg-[hsl(var(--success))]',
-      selected: 'bg-[hsl(var(--success))]',
-      rejected: 'bg-[hsl(var(--destructive))]',
-      withdrawn: 'bg-gray-400',
-      accepted: 'bg-[hsl(var(--success))]',
-      declined: 'bg-gray-400',
+      pending: 'bg-[hsl(var(--warning))] text-white',
+      submitted: 'bg-[hsl(var(--accent-pink))] text-white',
+      shortlisted: 'bg-[hsl(var(--success))] text-white',
+      selected: 'bg-[hsl(var(--success))] text-white',
+      rejected: 'bg-[hsl(var(--destructive))] text-white',
+      withdrawn: 'bg-muted-foreground text-white',
+      accepted: 'bg-[hsl(var(--success))] text-white',
+      declined: 'bg-muted-foreground text-white',
     };
-    return colors[status] || 'bg-gray-400';
+    return colors[status] || 'bg-muted-foreground text-white';
   };
 
   const handleChat = (jobId: string) => {
@@ -268,11 +268,11 @@ const Applications = () => {
                         >
                           <div className="flex items-center gap-2 mb-1">
                             <CardTitle className="text-base">{app.job?.title}</CardTitle>
-                            <Badge variant="outline" className="text-xs h-5">
+                            <Badge variant="outline" className="text-xs h-5 hover:bg-muted transition-colors">
                               #{app.job?.job_id_number}
                             </Badge>
                             {app.type === 'invitation' && (
-                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5">
+                              <Badge className="bg-[hsl(var(--accent-lilac))] hover:bg-[hsl(var(--accent-lilac))]/80 text-white text-xs h-5 transition-colors">
                                 Invitation
                               </Badge>
                             )}
@@ -283,7 +283,7 @@ const Applications = () => {
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)}`}>
+                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)} hover:opacity-80 transition-opacity`}>
                             {app.status}
                           </Badge>
                         </div>
