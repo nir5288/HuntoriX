@@ -284,10 +284,9 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
             // Ensure input gets focus after preventing default
             requestAnimationFrame(() => inputRef.current?.focus());
           }}
-          onClick={(e) => {
-            // Prevent the click from toggling the trigger closed
-            e.preventDefault();
+          onClick={() => {
             if (!open) setOpen(true);
+            // Let the browser handle caret placement; just ensure focus
             inputRef.current?.focus();
           }}
         >
