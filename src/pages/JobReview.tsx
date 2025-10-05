@@ -231,25 +231,11 @@ const JobReview = () => {
       <div className="container mx-auto px-4 py-8">
         <Button 
           variant="ghost" 
-          onClick={() => {
-            const from = (location.state as any)?.from;
-            const parentFrom = (location.state as any)?.parentFrom;
-            
-            if (from === 'job') {
-              // Came from job detail page, go back to it with proper parent context
-              navigate(`/jobs/${id}`, { state: { from: parentFrom || 'dashboard' } });
-            } else if (from === 'dashboard') {
-              // Came directly from dashboard
-              navigate('/dashboard/headhunter');
-            } else {
-              // Default fallback
-              navigate(`/jobs/${id}`);
-            }
-          }} 
+          onClick={() => navigate(-1)} 
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {(location.state as any)?.from === 'job' ? 'Back to Job' : 'Back to Dashboard'}
+          Back
         </Button>
 
         <div className="mb-6">
