@@ -312,7 +312,7 @@ const Applications = () => {
                           <Button 
                             size="sm" 
                             variant="hero"
-                            onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications', isInvitation: true } })}
+                            onClick={() => navigate(`/job-review/${app.job_id}`)}
                             className="h-7 text-xs"
                           >
                             Review
