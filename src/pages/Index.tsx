@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { Briefcase, Users, TrendingUp, Shield, Clock, Award, Bot, Sparkles, Target, BarChart3, Search, FileText, DollarSign, MessageSquare } from 'lucide-react';
-import { MarketplaceShowcase } from '@/components/MarketplaceShowcase';
+import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
+import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
 const Index = () => {
@@ -68,8 +69,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Marketplace Showcase */}
-      <MarketplaceShowcase />
+      {/* Dashboard Showcase */}
+      
+
+      {/* Featured Headhunters */}
+      <FeaturedHeadhunters />
+
+      {/* Hot Opportunities */}
+      <HotOpportunities />
 
       {/* AI-Powered Features */}
       <section className="container mx-auto px-4 py-20 bg-gradient-to-br from-[hsl(var(--accent-pink)/0.1)] via-[hsl(var(--accent-mint)/0.1)] to-[hsl(var(--accent-lilac)/0.1)]">
