@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { MessageThread } from "@/components/MessageThread";
 import { MessageInput } from "@/components/MessageInput";
-import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
 import { Menu, ArrowLeft, User, Circle } from "lucide-react";
 import { Link } from "react-router-dom";
