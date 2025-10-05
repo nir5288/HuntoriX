@@ -467,7 +467,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0 pr-12">
+                          <div className="flex-1 min-w-0 pr-16">
                             <div className="flex items-center gap-2 mb-0.5">
                               <p className={cn(
                                 "text-sm truncate flex-1",
@@ -489,27 +489,16 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         </div>
                       </button>
                       
-                      {/* Timestamp and Star - always visible */}
-                      <div className="absolute top-2 right-2 flex items-center gap-1">
-                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                          {formatRelativeTime(conv.lastMessageTime)}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 flex-shrink-0"
-                          onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
-                          title={conv.isStarred ? "Unstar" : "Star"}
-                        >
-                          <Star className={cn(
-                            "h-3.5 w-3.5",
-                            conv.isStarred && "fill-yellow-500 text-yellow-500"
-                          )} />
-                        </Button>
-                      </div>
+                      {/* Timestamp - always visible, moves left on hover */}
+                      <span className={cn(
+                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200",
+                        "group-hover:right-12 right-3"
+                      )}>
+                        {formatRelativeTime(conv.lastMessageTime)}
+                      </span>
 
-                      {/* 3-dot menu - visible on hover */}
-                      <div className="absolute top-2 right-12 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* 3-dot menu - appears on hover in top right */}
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -558,6 +547,20 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
+
+                      {/* Star button - always visible at bottom right */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute bottom-2 right-2 h-6 w-6"
+                        onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
+                        title={conv.isStarred ? "Unstar" : "Star"}
+                      >
+                        <Star className={cn(
+                          "h-3.5 w-3.5",
+                          conv.isStarred && "fill-yellow-500 text-yellow-500"
+                        )} />
+                      </Button>
                     </>
                   )}
                 </div>
