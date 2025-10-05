@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Eye, EyeOff, Pencil } from 'lucide-react';
+import { Plus, Briefcase, Eye, EyeOff, Pencil, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -213,16 +213,22 @@ const MyJobs = () => {
                     variant={showPendingOnly ? "default" : "outline"}
                     size="sm"
                     onClick={() => setShowPendingOnly(!showPendingOnly)}
-                    className="h-8 text-xs"
+                    className="h-8 text-xs gap-2"
                   >
+                    <div className={`h-3.5 w-3.5 border rounded flex items-center justify-center ${showPendingOnly ? 'bg-primary border-primary' : 'border-input'}`}>
+                      {showPendingOnly && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
+                    </div>
                     Pending Review
                   </Button>
                   <Button
                     variant={showPrivateOnly ? "default" : "outline"}
                     size="sm"
                     onClick={() => setShowPrivateOnly(!showPrivateOnly)}
-                    className="h-8 text-xs"
+                    className="h-8 text-xs gap-2"
                   >
+                    <div className={`h-3.5 w-3.5 border rounded flex items-center justify-center ${showPrivateOnly ? 'bg-primary border-primary' : 'border-input'}`}>
+                      {showPrivateOnly && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
+                    </div>
                     Private Only
                   </Button>
                 </div>

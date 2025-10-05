@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Filter, ArrowUpDown, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Filter, ArrowUpDown, ArrowLeft, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -205,8 +205,11 @@ const Applications = () => {
                 variant={showPendingOnly ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowPendingOnly(!showPendingOnly)}
-                className="h-8 text-xs"
+                className="h-8 text-xs gap-2"
               >
+                <div className={`h-3.5 w-3.5 border rounded flex items-center justify-center ${showPendingOnly ? 'bg-primary border-primary' : 'border-input'}`}>
+                  {showPendingOnly && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
+                </div>
                 Pending Review
               </Button>
 

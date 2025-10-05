@@ -365,7 +365,7 @@ const EmployerDashboard = () => {
                   className="h-4 w-4"
                 />
                 <Label htmlFor="pending-only" className="text-xs font-medium cursor-pointer">
-                  Pending Review Only
+                  Pending Review
                 </Label>
               </div>
               <div className="flex items-center gap-2">
