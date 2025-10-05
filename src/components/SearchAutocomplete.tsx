@@ -278,18 +278,21 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
           role="combobox"
           aria-expanded={open}
           onMouseDown={(e) => {
-            // Prevent Radix from toggling the popover on press
-            e.preventDefault();
-            if (!open) setOpen(true);
-            setSelectedIndex(-1);
-            setPreviewValue('');
-            // Ensure input gets focus after preventing default
-            requestAnimationFrame(() => inputRef.current?.focus());
+            // Only prevent if popover is closed, otherwise allow normal text selection
+            if (!open) {
+              e.preventDefault();
+              setOpen(true);
+              setSelectedIndex(-1);
+              setPreviewValue('');
+              requestAnimationFrame(() => inputRef.current?.focus());
+            }
           }}
           onClick={(e) => {
-            // Prevent the click from toggling the trigger closed
-            e.preventDefault();
-            if (!open) setOpen(true);
+            // Only handle if closed, otherwise allow normal cursor positioning
+            if (!open) {
+              e.preventDefault();
+              setOpen(true);
+            }
             inputRef.current?.focus();
           }}
         >
@@ -337,6 +340,8 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       onChange(search);
                       setOpen(false);
                     }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    onMouseLeave={() => setSelectedIndex(-1)}
                     className={cn(
                       "flex items-center justify-between group",
                       selectedIndex === idx
@@ -378,7 +383,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                         setHoveredItem(`title-${idx}`);
                         setSelectedIndex(globalIdx);
                       }}
-                      onMouseLeave={() => setHoveredItem(null)}
+                      onMouseLeave={() => {
+                        setHoveredItem(null);
+                        setSelectedIndex(-1);
+                      }}
                       className={cn(
                         "flex items-center justify-between",
                         selectedIndex === globalIdx
@@ -420,6 +428,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      onMouseLeave={() => setSelectedIndex(-1)}
                        className={cn(
                          "flex items-center gap-2",
                          selectedIndex === globalIdx
@@ -445,6 +454,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      onMouseLeave={() => setSelectedIndex(-1)}
                        className={cn(
                          "relative",
                          selectedIndex === globalIdx
@@ -469,6 +479,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
                       onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      onMouseLeave={() => setSelectedIndex(-1)}
                        className={cn(
                          "flex items-center gap-2",
                          selectedIndex === globalIdx
