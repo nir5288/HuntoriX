@@ -115,6 +115,10 @@ export function Header() {
               HuntBase
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
             </Link>
+            <Link to="/executives" className={`${getNavLinkClass('/executives')} flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent font-bold`}>
+              Executives
+              <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>
+            </Link>
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
               className={getNavLinkClass('/dashboard')}

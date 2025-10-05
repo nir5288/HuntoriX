@@ -25,6 +25,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import HuntRank from "./pages/HuntRank";
 import HuntBase from "./pages/HuntBase";
+import Executives from "./pages/Executives";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -68,6 +69,7 @@ const AppContent = () => {
           <Route path="/headhunters" element={<HeadhunterDirectory />} />
           <Route path="/huntrank" element={<HuntRank />} />
           <Route path="/huntbase" element={<HuntBase />} />
+          <Route path="/executives" element={<Executives />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </VerificationWrapper>
