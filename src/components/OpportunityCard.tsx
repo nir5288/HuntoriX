@@ -243,7 +243,6 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
 
   const getCTAVariant = () => {
     if (hasApplied || job.status === 'closed') return 'outline';
-    if (!currentUser || currentUserRole !== 'headhunter') return 'outline';
     return 'hero';
   };
 
