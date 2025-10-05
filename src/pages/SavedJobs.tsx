@@ -76,6 +76,15 @@ const SavedJobs = () => {
       <div className="container px-6 py-6 max-w-7xl">
         {/* Header Section with Stats */}
         <div className="mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(profile?.role === 'employer' ? '/employer-dashboard' : '/headhunter-dashboard')}
+            className="mb-3 -ml-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
