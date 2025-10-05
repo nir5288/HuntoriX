@@ -202,7 +202,16 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
-        <div className="relative">
+        <div
+          className="relative"
+          onMouseDown={(e) => {
+            // Prevent Radix from toggling the popover on click
+            e.preventDefault();
+            if (!open) setOpen(true);
+            // Ensure input gets focus after preventing default
+            requestAnimationFrame(() => inputRef.current?.focus());
+          }}
+        >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             ref={inputRef}
