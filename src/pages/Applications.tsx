@@ -3,18 +3,18 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Filter, ArrowUpDown, Check } from 'lucide-react';
+import { MessageCircle, Filter, ArrowUpDown, ArrowLeft, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { useApplicationsData } from '@/hooks/useApplicationsData';
 
 const Applications = () => {
-  const { user, loading: authLoading } = useRequireAuth('headhunter');
+  const { user, loading } = useRequireAuth('headhunter');
   const navigate = useNavigate();
-  const { applications, loading: dataLoading } = useApplicationsData(user?.id);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>(() => {
     return localStorage.getItem('headhunter_status_filter') || 'all';
   });
@@ -24,6 +24,12 @@ const Applications = () => {
   const [showPendingOnly, setShowPendingOnly] = useState(() => {
     return localStorage.getItem('headhunter_show_pending') === 'true';
   });
+
+  useEffect(() => {
+    if (user && !loading) {
+      fetchApplications();
+    }
+  }, [user, loading]);
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
@@ -37,6 +43,55 @@ const Applications = () => {
   useEffect(() => {
     localStorage.setItem('headhunter_show_pending', showPendingOnly.toString());
   }, [showPendingOnly]);
+
+  const fetchApplications = async () => {
+    try {
+      const { data: appsData, error: appsError } = await supabase
+        .from('applications')
+        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .eq('headhunter_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (appsError) throw appsError;
+
+      // Fetch job invitations
+      const { data: invitesData, error: invitesError } = await supabase
+        .from('job_invitations')
+        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .eq('headhunter_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (invitesError) throw invitesError;
+
+      // Combine applications and invitations then prefer applications and most recent
+      const combinedData = [
+        ...(appsData || []).map(app => ({ ...app, type: 'application' })),
+        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' }))
+      ];
+
+      // Sort by priority (application first) then by date desc
+      const sorted = [...combinedData].sort((a: any, b: any) => {
+        const prioA = a.type === 'application' ? 0 : 1;
+        const prioB = b.type === 'application' ? 0 : 1;
+        if (prioA !== prioB) return prioA - prioB;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+
+      // Deduplicate by job_id so first occurrence (preferred) wins
+      const map = new Map();
+      for (const item of sorted) {
+        if (!map.has(item.job_id)) map.set(item.job_id, item);
+      }
+      const dedupedByJob = Array.from(map.values());
+
+      setApplications(dedupedByJob || []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      toast.error('Failed to load applications');
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -111,9 +166,7 @@ const Applications = () => {
 
   const filteredApplications = getFilteredAndSortedApplications();
 
-  const loading = authLoading || dataLoading;
-
-  if (loading) {
+  if (loading || loadingData) {
     return (
       <DashboardLayout>
         <div className="container mx-auto px-4 py-8">

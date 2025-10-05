@@ -14,15 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { useApplicationsData } from '@/hooks/useApplicationsData';
 
 const HeadhunterDashboard = () => {
-  const { user, profile, loading: authLoading } = useRequireAuth('headhunter');
+  const { user, profile, loading } = useRequireAuth('headhunter');
   const navigate = useNavigate();
-  const { applications, loading: appsLoading } = useApplicationsData(user?.id);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
-  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [loadingData, setLoadingData] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>(() => {
     return localStorage.getItem('headhunter_status_filter') || 'all';
   });
@@ -35,10 +34,10 @@ const HeadhunterDashboard = () => {
   });
 
   useEffect(() => {
-    if (user && !authLoading) {
-      fetchJobsData();
+    if (user && !loading) {
+      fetchDashboardData();
     }
-  }, [user, authLoading]);
+  }, [user, loading]);
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
@@ -53,45 +52,80 @@ const HeadhunterDashboard = () => {
     localStorage.setItem('headhunter_show_pending', showPendingOnly.toString());
   }, [showPendingOnly]);
 
-  const fetchJobsData = async () => {
-    if (!user) return;
-    
+  const fetchDashboardData = async () => {
     try {
-      // Fetch applications to get applied job IDs
-      const { data: appsData } = await supabase
+      // Fetch user's applications with employer info
+      const { data: appsData, error: appsError } = await supabase
         .from('applications')
-        .select('job_id')
-        .eq('headhunter_id', user.id);
+        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .eq('headhunter_id', user?.id)
+        .order('created_at', { ascending: false });
 
+      if (appsError) throw appsError;
+
+      // Fetch job invitations
+      const { data: invitesData, error: invitesError } = await supabase
+        .from('job_invitations')
+        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .eq('headhunter_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (invitesError) throw invitesError;
+
+      // Combine applications and invitations then prefer applications and most recent
+      const combinedData = [
+        ...(appsData || []).map(app => ({ ...app, type: 'application' })),
+        ...(invitesData || []).map(invite => ({ ...invite, type: 'invitation' }))
+      ];
+
+      // Sort by priority (application first) then by date desc
+      const sorted = [...combinedData].sort((a: any, b: any) => {
+        const prioA = a.type === 'application' ? 0 : 1;
+        const prioB = b.type === 'application' ? 0 : 1;
+        if (prioA !== prioB) return prioA - prioB;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+
+      // Deduplicate by job_id so first occurrence (preferred) wins
+      const map = new Map();
+      for (const item of sorted) {
+        if (!map.has(item.job_id)) map.set(item.job_id, item);
+      }
+      const dedupedByJob = Array.from(map.values());
+
+      setApplications(dedupedByJob || []);
+
+      // Get job IDs that user has already applied to
       const appliedJobIds = new Set(appsData?.map(app => app.job_id) || []);
 
-      // Fetch jobs and saved count in parallel
-      const [jobsResult, savedCountResult] = await Promise.all([
-        supabase
-          .from('jobs')
-          .select('*, employer:profiles!jobs_created_by_fkey(*)')
-          .eq('visibility', 'public')
-          .in('status', ['open', 'shortlisted'])
-          .order('created_at', { ascending: false })
-          .limit(10),
-        supabase
-          .from('saved_jobs')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-      ]);
+      // Fetch public jobs excluding ones user has already applied to
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('jobs')
+        .select('*, employer:profiles!jobs_created_by_fkey(*)')
+        .eq('visibility', 'public')
+        .in('status', ['open', 'shortlisted'])
+        .order('created_at', { ascending: false })
+        .limit(10);
 
-      if (jobsResult.error) throw jobsResult.error;
-      if (savedCountResult.error) throw savedCountResult.error;
+      if (jobsError) throw jobsError;
       
-      // Filter out already applied jobs
-      const filteredJobs = (jobsResult.data || []).filter(job => !appliedJobIds.has(job.id));
+      // Filter out jobs user has already applied to
+      const filteredJobs = (jobsData || []).filter(job => !appliedJobIds.has(job.id));
       setJobs(filteredJobs);
-      setSavedJobsCount(savedCountResult.count || 0);
+
+      // Fetch saved jobs count
+      const { count, error: savedError } = await supabase
+        .from('saved_jobs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user?.id);
+
+      if (savedError) throw savedError;
+      setSavedJobsCount(count || 0);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
-      toast.error('Failed to load jobs');
+      console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
     } finally {
-      setLoadingJobs(false);
+      setLoadingData(false);
     }
   };
 
@@ -194,9 +228,7 @@ const HeadhunterDashboard = () => {
 
   const filteredApplications = getFilteredAndSortedApplications();
 
-  const loading = authLoading || appsLoading || loadingJobs;
-
-  if (loading) {
+  if (loading || loadingData) {
     return (
       <DashboardLayout>
         <div className="container mx-auto px-4 py-8">
