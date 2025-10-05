@@ -37,6 +37,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [originalQuery, setOriginalQuery] = useState('');
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -218,10 +219,30 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
+      // Store original query on first arrow down
+      if (selectedIndex === -1) {
+        setOriginalQuery(value);
+      }
+      setSelectedIndex(prev => {
+        const newIndex = prev < allItems.length - 1 ? prev + 1 : prev;
+        // Update input with selected item
+        if (newIndex >= 0 && newIndex < allItems.length) {
+          onChange(allItems[newIndex].value);
+        }
+        return newIndex;
+      });
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev > -1 ? prev - 1 : -1));
+      setSelectedIndex(prev => {
+        const newIndex = prev > -1 ? prev - 1 : -1;
+        // Restore original query when going back to -1
+        if (newIndex === -1) {
+          onChange(originalQuery);
+        } else if (newIndex >= 0 && newIndex < allItems.length) {
+          onChange(allItems[newIndex].value);
+        }
+        return newIndex;
+      });
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < allItems.length) {
