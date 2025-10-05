@@ -57,6 +57,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
   const [filter, setFilter] = useState<"all" | "unread" | "starred">("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState<{ jobId: string; userId: string } | null>(null);
+  const [openMenuKey, setOpenMenuKey] = useState<string | null>(null);
 
   const activeJobId = searchParams.get("job");
   const activeUserId = searchParams.get("with");
@@ -497,9 +498,17 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         {formatRelativeTime(conv.lastMessageTime)}
                       </span>
 
-                      {/* 3-dot menu - appears on hover in top right */}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <DropdownMenu>
+                      {/* 3-dot menu - appears on hover or when open in top right */}
+                      <div className={cn(
+                        "absolute top-2 right-2 transition-opacity",
+                        openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                      )}>
+                        <DropdownMenu
+                          open={openMenuKey === `${conv.jobId}-${conv.otherUserId}`}
+                          onOpenChange={(open) => {
+                            setOpenMenuKey(open ? `${conv.jobId}-${conv.otherUserId}` : null);
+                          }}
+                        >
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
@@ -510,7 +519,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="z-50">
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -519,6 +528,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                                 } else {
                                   handleMarkAsUnread(conv.jobId, conv.otherUserId);
                                 }
+                                setOpenMenuKey(null);
                               }}
                             >
                               {conv.unreadCount > 0 ? (
@@ -538,6 +548,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                                 e.stopPropagation();
                                 setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
                                 setDeleteDialogOpen(true);
+                                setOpenMenuKey(null);
                               }}
                               className="text-destructive"
                             >
