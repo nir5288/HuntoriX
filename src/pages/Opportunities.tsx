@@ -72,9 +72,12 @@ const Opportunities = () => {
   const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
   const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');
   
-  // Sort and applied filters - initialize from user preferences
+  // Sort and applied filters - initialize from localStorage first
   const [sortBy, setSortBy] = useState<'recent' | 'relevance'>('recent');
-  const [showAppliedJobs, setShowAppliedJobs] = useState(false);
+  const [showAppliedJobs, setShowAppliedJobs] = useState(() => {
+    const saved = localStorage.getItem('showAppliedJobs');
+    return saved === null ? true : saved === 'true';
+  });
   const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(new Set());
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
 
@@ -127,12 +130,19 @@ const Opportunities = () => {
       }
 
       if (data) {
-        // Use URL params if present, otherwise use saved preferences
+        // Use URL params if present, otherwise use saved preferences from DB, fallback to localStorage
         const urlSort = searchParams.get('sort');
         const urlShowApplied = searchParams.get('showApplied');
         
         setSortBy((urlSort as any) || data.sort_preference || 'recent');
-        setShowAppliedJobs(urlShowApplied ? urlShowApplied === 'true' : data.show_applied_jobs || false);
+        if (urlShowApplied) {
+          const showApplied = urlShowApplied === 'true';
+          setShowAppliedJobs(showApplied);
+          localStorage.setItem('showAppliedJobs', showApplied.toString());
+        } else if (data.show_applied_jobs !== null) {
+          setShowAppliedJobs(data.show_applied_jobs);
+          localStorage.setItem('showAppliedJobs', data.show_applied_jobs.toString());
+        }
       }
       
       setPreferencesLoaded(true);
@@ -409,7 +419,8 @@ const Opportunities = () => {
     setFilterPosted('all');
     setSearchQuery('');
     setSortBy('recent');
-    setShowAppliedJobs(false);
+    setShowAppliedJobs(true);
+    localStorage.setItem('showAppliedJobs', 'true');
     setSearchParams({}, { replace: true });
   };
 
@@ -453,6 +464,7 @@ const Opportunities = () => {
   // Save show applied preference
   const handleShowAppliedChange = async (checked: boolean) => {
     setShowAppliedJobs(checked);
+    localStorage.setItem('showAppliedJobs', checked.toString());
     
     if (user) {
       await supabase
