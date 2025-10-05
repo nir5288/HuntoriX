@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 function getSidebarDefaultOpen() {
   const cookie = document.cookie;
   const match = cookie.match(/(?:^|;\s*)(?:sidebar_state|sidebar:state|sidebar%3Astate)=(true|false)/);
-  return match ? match[1] === "true" : false;
+  return match ? match[1] === "true" : true;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
