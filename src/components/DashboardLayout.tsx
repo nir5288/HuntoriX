@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 function getSidebarStateFromCookie(): boolean {
   const cookie = document.cookie;
   const match = cookie.match(/(?:^|;\s*)sidebar_state=(true|false)/);
-  return match ? match[1] === "true" : true;
+  return match ? match[1] === "true" : false;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
