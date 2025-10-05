@@ -38,6 +38,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [originalQuery, setOriginalQuery] = useState('');
+  const [previewValue, setPreviewValue] = useState('');
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -225,9 +226,9 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       }
       setSelectedIndex(prev => {
         const newIndex = prev < allItems.length - 1 ? prev + 1 : prev;
-        // Update input with selected item
+        // Preview the selected item without triggering parent onChange
         if (newIndex >= 0 && newIndex < allItems.length) {
-          onChange(allItems[newIndex].value);
+          setPreviewValue(allItems[newIndex].value);
         }
         return newIndex;
       });
@@ -237,9 +238,9 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
         const newIndex = prev > -1 ? prev - 1 : -1;
         // Restore original query when going back to -1
         if (newIndex === -1) {
-          onChange(originalQuery);
+          setPreviewValue('');
         } else if (newIndex >= 0 && newIndex < allItems.length) {
-          onChange(allItems[newIndex].value);
+          setPreviewValue(allItems[newIndex].value);
         }
         return newIndex;
       });
@@ -256,9 +257,13 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       } else {
         handleSearch();
       }
+      setPreviewValue('');
+      setOriginalQuery('');
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);
+      setPreviewValue('');
+      setOriginalQuery('');
     }
   };
 
@@ -288,10 +293,12 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
             ref={inputRef}
             type="text"
             placeholder={placeholder || "Search jobs, skills, companies..."}
-            value={value}
+            value={previewValue || value}
             onChange={(e) => {
               onChange(e.target.value);
               setSelectedIndex(-1);
+              setPreviewValue('');
+              setOriginalQuery('');
               if (!open) setOpen(true);
             }}
             onFocus={() => {
