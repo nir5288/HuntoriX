@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Header } from '@/components/Header';
 import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -169,15 +168,14 @@ const Applications = () => {
 
   if (loading || loadingData) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
+      <DashboardLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-1/4"></div>
             <div className="h-32 bg-muted rounded"></div>
           </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
