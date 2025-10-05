@@ -335,7 +335,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                     className={cn(
                       "flex items-center justify-between group",
                       selectedIndex === idx
-                        ? "bg-accent data-[selected=true]:bg-accent"
+                        ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
                         : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                     )}
                   >
@@ -377,7 +377,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       className={cn(
                         "flex items-center justify-between",
                         selectedIndex === globalIdx
-                          ? "bg-accent data-[selected=true]:bg-accent"
+                          ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
                           : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                       )}
                     >
@@ -418,7 +418,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                        className={cn(
                          "flex items-center gap-2",
                          selectedIndex === globalIdx
-                           ? "bg-accent data-[selected=true]:bg-accent"
+                           ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
                            : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                        )}
                     >
@@ -443,7 +443,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                        className={cn(
                          "relative",
                          selectedIndex === globalIdx
-                           ? "bg-accent data-[selected=true]:bg-accent"
+                           ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
                            : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                        )}
                     >
@@ -467,7 +467,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                        className={cn(
                          "flex items-center gap-2",
                          selectedIndex === globalIdx
-                           ? "bg-accent data-[selected=true]:bg-accent"
+                           ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
                            : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
                        )}
                     >
