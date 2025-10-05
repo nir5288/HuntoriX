@@ -36,6 +36,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -70,6 +71,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
     const fetchSuggestions = async () => {
       if (value.length === 0) {
         setSuggestions([]);
+        setSelectedIndex(-1);
         return;
       }
 
@@ -145,6 +147,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
         }
 
         setSuggestions(newSuggestions);
+        setSelectedIndex(-1);
       } catch (error) {
         console.error('Error fetching suggestions:', error);
       }
@@ -155,6 +158,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       return () => clearTimeout(timeout);
     } else {
       setSuggestions([]);
+      setSelectedIndex(-1);
     }
   }, [value]);
 
@@ -199,6 +203,44 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
   const showEmpty = value.length > 0 && !hasAnySuggestions;
   const showTrending = value.length === 0;
 
+  // Flatten all items for keyboard navigation
+  const allItems = [
+    ...(showTrending ? recentSearches.map(s => ({ type: 'recent' as const, value: s })) : []),
+    ...groupedSuggestions.titles,
+    ...groupedSuggestions.skills,
+    ...groupedSuggestions.companies,
+    ...groupedSuggestions.locations,
+  ];
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < allItems.length) {
+        const selectedItem = allItems[selectedIndex];
+        if (selectedItem.type === 'recent') {
+          onChange(selectedItem.value);
+          setOpen(false);
+        } else {
+          handleSelect(selectedItem);
+        }
+      } else {
+        handleSearch();
+      }
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+      setSelectedIndex(-1);
+    }
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
@@ -231,13 +273,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
               if (!open) setOpen(true);
             }}
             onFocus={() => setOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSearch();
-              } else if (e.key === 'Escape') {
-                setOpen(false);
-              }
-            }}
+            onKeyDown={handleKeyDown}
             className="flex h-10 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
@@ -264,7 +300,10 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       onChange(search);
                       setOpen(false);
                     }}
-                    className="flex items-center justify-between group"
+                    className={cn(
+                      "flex items-center justify-between group",
+                      selectedIndex === idx && "bg-accent"
+                    )}
                   >
                     <span>{search}</span>
                     <Button
@@ -289,81 +328,112 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
 
             {groupedSuggestions.titles.length > 0 && (
               <CommandGroup heading="Job Titles">
-                {groupedSuggestions.titles.map((suggestion, idx) => (
-                  <CommandItem
-                    key={`title-${idx}`}
-                    value={suggestion.value}
-                    onSelect={() => handleSelect(suggestion)}
-                    onMouseEnter={() => setHoveredItem(`title-${idx}`)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                    className="flex items-center justify-between"
-                  >
-                    <span>{suggestion.value}</span>
-                    {hoveredItem === `title-${idx}` && (
-                      <div className="flex gap-1">
-                        {Object.keys(QUICK_CHIPS).map((chip) => (
-                          <Badge
-                            key={chip}
-                            variant="secondary"
-                            className="cursor-pointer text-xs hover:bg-accent"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleChipClick(chip);
-                            }}
-                          >
-                            {chip}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </CommandItem>
-                ))}
+                {groupedSuggestions.titles.map((suggestion, idx) => {
+                  const globalIdx = (showTrending ? recentSearches.length : 0) + idx;
+                  return (
+                    <CommandItem
+                      key={`title-${idx}`}
+                      value={suggestion.value}
+                      onSelect={() => handleSelect(suggestion)}
+                      onMouseEnter={() => {
+                        setHoveredItem(`title-${idx}`);
+                        setSelectedIndex(globalIdx);
+                      }}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      className={cn(
+                        "flex items-center justify-between",
+                        selectedIndex === globalIdx && "bg-accent"
+                      )}
+                    >
+                      <span>{suggestion.value}</span>
+                      {hoveredItem === `title-${idx}` && (
+                        <div className="flex gap-1">
+                          {Object.keys(QUICK_CHIPS).map((chip) => (
+                            <Badge
+                              key={chip}
+                              variant="secondary"
+                              className="cursor-pointer text-xs hover:bg-accent"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleChipClick(chip);
+                              }}
+                            >
+                              {chip}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
 
             {groupedSuggestions.skills.length > 0 && (
               <CommandGroup heading="Skills">
-                {groupedSuggestions.skills.map((suggestion, idx) => (
-                  <CommandItem
-                    key={`skill-${idx}`}
-                    value={suggestion.value}
-                    onSelect={() => handleSelect(suggestion)}
-                    className="flex items-center gap-2"
-                  >
-                    <Badge variant="outline" className="text-xs">Skill</Badge>
-                    <span>{suggestion.value}</span>
-                  </CommandItem>
-                ))}
+                {groupedSuggestions.skills.map((suggestion, idx) => {
+                  const globalIdx = (showTrending ? recentSearches.length : 0) + groupedSuggestions.titles.length + idx;
+                  return (
+                    <CommandItem
+                      key={`skill-${idx}`}
+                      value={suggestion.value}
+                      onSelect={() => handleSelect(suggestion)}
+                      onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      className={cn(
+                        "flex items-center gap-2",
+                        selectedIndex === globalIdx && "bg-accent"
+                      )}
+                    >
+                      <Badge variant="outline" className="text-xs">Skill</Badge>
+                      <span>{suggestion.value}</span>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
 
             {groupedSuggestions.companies.length > 0 && (
               <CommandGroup heading="Companies">
-                {groupedSuggestions.companies.map((suggestion, idx) => (
-                  <CommandItem
-                    key={`company-${idx}`}
-                    value={suggestion.value}
-                    onSelect={() => handleSelect(suggestion)}
-                  >
-                    {suggestion.value}
-                  </CommandItem>
-                ))}
+                {groupedSuggestions.companies.map((suggestion, idx) => {
+                  const globalIdx = (showTrending ? recentSearches.length : 0) + groupedSuggestions.titles.length + groupedSuggestions.skills.length + idx;
+                  return (
+                    <CommandItem
+                      key={`company-${idx}`}
+                      value={suggestion.value}
+                      onSelect={() => handleSelect(suggestion)}
+                      onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      className={cn(
+                        "relative",
+                        selectedIndex === globalIdx && "bg-accent"
+                      )}
+                    >
+                      {suggestion.value}
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
 
             {groupedSuggestions.locations.length > 0 && (
               <CommandGroup heading="Locations">
-                {groupedSuggestions.locations.map((suggestion, idx) => (
-                  <CommandItem
-                    key={`location-${idx}`}
-                    value={suggestion.value}
-                    onSelect={() => handleSelect(suggestion)}
-                    className="flex items-center gap-2"
-                  >
-                    <Badge variant="outline" className="text-xs">Location</Badge>
-                    <span>{suggestion.value}</span>
-                  </CommandItem>
-                ))}
+                {groupedSuggestions.locations.map((suggestion, idx) => {
+                  const globalIdx = (showTrending ? recentSearches.length : 0) + groupedSuggestions.titles.length + groupedSuggestions.skills.length + groupedSuggestions.companies.length + idx;
+                  return (
+                    <CommandItem
+                      key={`location-${idx}`}
+                      value={suggestion.value}
+                      onSelect={() => handleSelect(suggestion)}
+                      onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      className={cn(
+                        "flex items-center gap-2",
+                        selectedIndex === globalIdx && "bg-accent"
+                      )}
+                    >
+                      <Badge variant="outline" className="text-xs">Location</Badge>
+                      <span>{suggestion.value}</span>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
 
