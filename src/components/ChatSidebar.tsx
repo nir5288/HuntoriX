@@ -278,13 +278,20 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
       if (!conv) return;
 
       if (conv.isStarred) {
-        // Unstar
-        await supabase
+        // Unstar - handle null job_id properly
+        let query = supabase
           .from("starred_conversations")
           .delete()
           .eq("user_id", currentUserId)
-          .eq("other_user_id", otherUserId)
-          .eq("job_id", jobId || null);
+          .eq("other_user_id", otherUserId);
+        
+        if (jobId) {
+          query = query.eq("job_id", jobId);
+        } else {
+          query = query.is("job_id", null);
+        }
+        
+        await query;
       } else {
         // Star
         await supabase
@@ -433,7 +440,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
                         className="w-full p-3 text-left hover:bg-accent transition-colors"
                       >
-                            <div className="flex items-start gap-2">
+                        <div className="flex items-start gap-2 pr-6">
                           <div className="relative">
                             <Avatar className="h-9 w-9">
                               <AvatarImage src={conv.otherUserAvatar || undefined} />
@@ -446,14 +453,14 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-0.5">
+                            <div className="flex items-center justify-between mb-0.5 gap-2">
                               <p className={cn(
                                 "text-sm truncate",
                                 conv.unreadCount > 0 ? "font-semibold" : "font-medium"
                               )}>
                                 {conv.otherUserName}
                               </p>
-                              <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-1">
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap flex-shrink-0">
                                 {formatRelativeTime(conv.lastMessageTime)}
                               </span>
                             </div>
@@ -461,7 +468,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               {conv.jobTitle}
                             </p>
                             <p className={cn(
-                              "text-xs truncate",
+                              "text-xs truncate pr-2",
                               conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
                             )}>
                               {conv.lastMessage}
@@ -469,23 +476,27 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                           </div>
                         </div>
                       </button>
+                      
+                      {/* Star button - always visible at bottom right */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute bottom-2 right-2 h-6 w-6"
+                        onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
+                        title={conv.isStarred ? "Unstar" : "Star"}
+                      >
+                        <Star className={cn(
+                          "h-3.5 w-3.5",
+                          conv.isStarred && "fill-yellow-500 text-yellow-500"
+                        )} />
+                      </Button>
+
+                      {/* Hover actions at top right */}
                       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7"
-                          onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
-                          title={conv.isStarred ? "Unstar" : "Star"}
-                        >
-                          <Star className={cn(
-                            "h-3.5 w-3.5",
-                            conv.isStarred && "fill-yellow-500 text-yellow-500"
-                          )} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
+                          className="h-7 w-7 bg-background/80 backdrop-blur-sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (conv.unreadCount > 0) {
@@ -505,7 +516,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-7 w-7 bg-background/80 backdrop-blur-sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
