@@ -277,6 +277,13 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
       const conv = conversations.find(c => c.jobId === jobId && c.otherUserId === otherUserId);
       if (!conv) return;
 
+      // Optimistically update UI immediately
+      setConversations(conversations.map(c => 
+        c.jobId === jobId && c.otherUserId === otherUserId
+          ? { ...c, isStarred: !c.isStarred }
+          : c
+      ));
+
       if (conv.isStarred) {
         // Unstar - handle null job_id properly
         let query = supabase
@@ -291,21 +298,23 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
           query = query.is("job_id", null);
         }
         
-        await query;
+        const { error } = await query;
+        if (error) throw error;
       } else {
         // Star
-        await supabase
+        const { error } = await supabase
           .from("starred_conversations")
           .insert({
             user_id: currentUserId,
             job_id: jobId,
             other_user_id: otherUserId,
           });
+        if (error) throw error;
       }
-
-      loadConversations();
     } catch (error) {
       console.error("Error toggling star:", error);
+      // Revert optimistic update on error
+      loadConversations();
       toast({
         title: "Error",
         description: "Failed to update star status",
