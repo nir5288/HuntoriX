@@ -176,6 +176,9 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       addToRecentSearches(suggestion.value);
     }
     setOpen(false);
+    setPreviewValue('');
+    setOriginalQuery('');
+    setSelectedIndex(-1);
   };
 
   const handleSearch = () => {
