@@ -13,6 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface AppSidebarProps {
   role: 'employer' | 'headhunter';
@@ -94,30 +95,32 @@ export function AppSidebar({ role }: AppSidebarProps) {
       <SidebarContent className="py-2 transition-all duration-200">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild={item.url !== '#'}
-                    isActive={isActive(item.url)}
-                    tooltip={!open ? item.title : undefined}
-                    className="h-10 px-3"
-                  >
-                    {item.url === '#' ? (
-                      <div className="flex items-center gap-3 w-full cursor-not-allowed opacity-50">
-                        <item.icon className="h-5 w-5 shrink-0" />
-                        {open && <span className="text-sm font-medium">{item.title}</span>}
-                      </div>
-                    ) : (
-                      <NavLink to={item.url} className="flex items-center gap-3 w-full">
-                        <item.icon className="h-5 w-5 shrink-0" />
-                        {open && <span className="text-sm font-medium">{item.title}</span>}
-                      </NavLink>
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <TooltipProvider delayDuration={200} skipDelayDuration={0}>
+              <SidebarMenu className="gap-1">
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton 
+                      asChild={item.url !== '#'}
+                      isActive={isActive(item.url)}
+                      tooltip={!open ? item.title : undefined}
+                      className="h-10 px-3"
+                    >
+                      {item.url === '#' ? (
+                        <div className="flex items-center gap-3 w-full cursor-not-allowed opacity-50">
+                          <item.icon className="h-5 w-5 shrink-0" />
+                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                        </div>
+                      ) : (
+                        <NavLink to={item.url} className="flex items-center gap-3 w-full">
+                          <item.icon className="h-5 w-5 shrink-0" />
+                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                        </NavLink>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </TooltipProvider>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
