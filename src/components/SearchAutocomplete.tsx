@@ -281,12 +281,15 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
             // Prevent Radix from toggling the popover on press
             e.preventDefault();
             if (!open) setOpen(true);
+            setSelectedIndex(-1);
+            setPreviewValue('');
             // Ensure input gets focus after preventing default
             requestAnimationFrame(() => inputRef.current?.focus());
           }}
-          onClick={() => {
+          onClick={(e) => {
+            // Prevent the click from toggling the trigger closed
+            e.preventDefault();
             if (!open) setOpen(true);
-            // Let the browser handle caret placement; just ensure focus
             inputRef.current?.focus();
           }}
         >
