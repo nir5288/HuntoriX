@@ -300,16 +300,6 @@ const Applications = () => {
                             Chat
                           </Button>
                         )}
-                        {app.type === 'invitation' && app.status === 'pending' && (
-                          <Button 
-                            size="sm" 
-                            variant="default"
-                            onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications', isInvitation: true } })}
-                            className="h-7 text-xs"
-                          >
-                            Review
-                          </Button>
-                        )}
                         <Button 
                           size="sm" 
                           variant="outline"
@@ -318,6 +308,16 @@ const Applications = () => {
                         >
                           View Details
                         </Button>
+                        {app.type === 'invitation' && app.status === 'pending' && (
+                          <Button 
+                            size="sm" 
+                            variant="hero"
+                            onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications', isInvitation: true } })}
+                            className="h-7 text-xs"
+                          >
+                            Review
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
