@@ -262,9 +262,9 @@ const HeadhunterDashboard = () => {
 
         <div className="flex items-center justify-between mb-6">
           <div>
-<h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(155, 70%, 45%)] via-[hsl(200, 70%, 55%)] to-[hsl(265, 80%, 60%)] bg-clip-text text-transparent">
-  Headhunter Dashboard
-</h1>
+            <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+              Headhunter Dashboard
+            </h1>
             <p className="text-sm text-muted-foreground">Browse jobs and manage your applications</p>
           </div>
           <div className="flex gap-2">
