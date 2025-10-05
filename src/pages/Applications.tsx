@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Filter, ArrowUpDown, ArrowLeft, CheckSquare, Square } from 'lucide-react';
+import { MessageCircle, Filter, ArrowUpDown, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -183,44 +183,37 @@ const Applications = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/dashboard/headhunter')}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-          
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-            {filteredApplications.length} {filteredApplications.length === 1 ? 'Application' : 'Applications'}
+      <div className="container px-6 py-6 max-w-7xl">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+            My Applications
           </h1>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-sm text-muted-foreground">
             Track your application status
           </p>
         </div>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="px-4 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <CardTitle className="text-lg">{filteredApplications.length} {filteredApplications.length === 1 ? 'Application' : 'Applications'}</CardTitle>
+            </div>
             
             {/* Filters */}
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-wrap gap-3 pt-3 border-t">
               <Button
                 variant={showPendingOnly ? "default" : "outline"}
+                size="sm"
                 onClick={() => setShowPendingOnly(!showPendingOnly)}
-                className="flex items-center gap-2"
+                className="h-8 text-xs"
               >
-                {showPendingOnly ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
-                Pending Review Only
+                Pending Review
               </Button>
 
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Filter by status" />
+                <SelectTrigger className="h-8 w-[140px] text-xs">
+                  <Filter className="mr-1.5 h-3 w-3" />
+                  <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
@@ -234,9 +227,9 @@ const Applications = () => {
               </Select>
 
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[180px]">
-                  <ArrowUpDown className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Sort by" />
+                <SelectTrigger className="h-8 w-[140px] text-xs">
+                  <ArrowUpDown className="mr-1.5 h-3 w-3" />
+                  <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="newest">Newest First</SelectItem>
@@ -246,73 +239,75 @@ const Applications = () => {
               </Select>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             {applications.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">No applications yet</p>
+              <div className="text-center py-6">
+                <p className="text-sm text-muted-foreground">No applications yet</p>
                 <Button 
-                  className="mt-4"
+                  size="sm"
+                  className="mt-3"
                   onClick={() => navigate('/opportunities')}
                 >
                   Browse Jobs
                 </Button>
               </div>
             ) : filteredApplications.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">No applications match your filters</p>
+              <div className="text-center py-6">
+                <p className="text-sm text-muted-foreground">No applications match your filters</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filteredApplications.map((app) => (
                   <Card key={`${app.type}-${app.id}`} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
+                    <CardHeader className="px-4 py-3">
                       <div className="flex items-start justify-between">
                         <div 
                           className="flex-1 cursor-pointer"
                           onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-lg opacity-90">{app.job?.title}</CardTitle>
-                            <Badge variant="outline" className="text-xs">
+                            <CardTitle className="text-base">{app.job?.title}</CardTitle>
+                            <Badge variant="outline" className="text-xs h-5">
                               #{app.job?.job_id_number}
                             </Badge>
                             {app.type === 'invitation' && (
-                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs">
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5">
                                 Invitation
                               </Badge>
                             )}
                           </div>
-                          <CardDescription className="mt-1">
+                          <CardDescription className="text-xs">
                             {app.job?.employer?.company_name || app.job?.employer?.name} • 
                             {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={`${getStatusColor(app.status)} opacity-95`}>
+                        <div className="flex items-center gap-1.5">
+                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)}`}>
                             {app.status}
                           </Badge>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="px-4 pb-3">
                       <div className="flex gap-2">
                         {app.status === 'shortlisted' && (
                           <Button 
                             size="sm" 
                             variant="outline"
                             onClick={() => handleChat(app.job_id)}
-                            className="opacity-95"
+                            className="h-7 text-xs"
                           >
-                            <MessageCircle className="mr-2 h-4 w-4" />
-                            Chat with Employer
+                            <MessageCircle className="mr-1.5 h-3 w-3" />
+                            Chat
                           </Button>
                         )}
                         <Button 
                           size="sm" 
                           variant="outline"
                           onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
+                          className="h-7 text-xs"
                         >
-                          View Job Details
+                          View Details
                         </Button>
                       </div>
                     </CardContent>

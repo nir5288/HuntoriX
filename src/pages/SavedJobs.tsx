@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, MapPin, Briefcase, TrendingUp, DollarSign, Calendar, ArrowLeft } from 'lucide-react';
+import { Heart, MapPin, Briefcase, TrendingUp, DollarSign, Calendar, ArrowLeft, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -73,33 +73,23 @@ const SavedJobs = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate(profile?.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter')}
-          className="mb-4 gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Button>
-
+      <div className="container px-6 py-6 max-w-7xl">
         {/* Header Section with Stats */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent animate-fade-in">
+              <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
                 My Saved Jobs
               </h1>
-              <p className="text-muted-foreground">Jobs you've bookmarked for later</p>
+              <p className="text-sm text-muted-foreground">Jobs you've bookmarked for later</p>
             </div>
             <Card className="bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 to-[hsl(var(--accent-lilac))]/10 border-[hsl(var(--accent-pink))]/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <Heart className="h-8 w-8 text-[hsl(var(--accent-pink))] fill-current" />
+              <CardContent className="pt-4 pb-3 px-4">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-6 w-6 text-[hsl(var(--accent-pink))] fill-current" />
                   <div>
-                    <p className="text-3xl font-bold">{savedJobs.length}</p>
-                    <p className="text-sm text-muted-foreground">Saved Jobs</p>
+                    <p className="text-xl font-bold">{savedJobs.length}</p>
+                    <p className="text-xs text-muted-foreground">Saved</p>
                   </div>
                 </div>
               </CardContent>
@@ -109,13 +99,14 @@ const SavedJobs = () => {
 
         {savedJobs.length === 0 ? (
           <Card className="border-dashed border-2 hover:border-[hsl(var(--accent-mint))] transition-colors">
-            <CardContent className="text-center py-16">
-              <div className="inline-block p-4 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 to-[hsl(var(--accent-lilac))]/10 mb-4">
-                <Heart className="h-16 w-16 text-[hsl(var(--accent-pink))] opacity-50" />
+            <CardContent className="text-center py-12">
+              <div className="inline-block p-3 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 to-[hsl(var(--accent-lilac))]/10 mb-3">
+                <Heart className="h-12 w-12 text-[hsl(var(--accent-pink))] opacity-50" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">No saved jobs yet</h3>
-              <p className="text-muted-foreground mb-6">Start building your collection of dream opportunities</p>
+              <h3 className="text-base font-semibold mb-1.5">No saved jobs yet</h3>
+              <p className="text-sm text-muted-foreground mb-4">Start building your collection of dream opportunities</p>
               <Button 
+                size="sm"
                 onClick={() => navigate('/opportunities')}
                 className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
               >
@@ -124,114 +115,100 @@ const SavedJobs = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6">
-            {savedJobs.map((savedJob, index) => (
-              <Card 
-                key={savedJob.id} 
-                className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-l-4 border-l-transparent hover:border-l-[hsl(var(--accent-mint))] animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <CardHeader className="bg-gradient-to-r from-[hsl(var(--accent-mint))]/5 to-transparent">
-                  <div className="flex items-start justify-between gap-4">
-                    <div 
-                      className="flex-1 cursor-pointer group" 
-                      onClick={() => navigate(`/jobs/${savedJob.job.id}`, { state: { from: 'saved' } })}
-                    >
-                      <div className="flex items-center gap-2 mb-3">
-                        <CardTitle className="text-2xl opacity-90 group-hover:text-[hsl(var(--accent-mint))] transition-colors">
-                          {savedJob.job?.title}
-                        </CardTitle>
-                        {savedJob.job?.job_id_number && (
-                          <Badge variant="outline" className="text-sm">
-                            #{savedJob.job?.job_id_number}
-                          </Badge>
-                        )}
+          <div className="space-y-3">
+            {savedJobs.map((savedJob, index) => {
+              const isMyJob = savedJob.job.created_by === user?.id;
+              return (
+                <Card 
+                  key={savedJob.id} 
+                  className="hover:shadow-md transition-shadow"
+                >
+                  <CardHeader className="px-4 py-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div 
+                        className="flex-1 cursor-pointer group" 
+                        onClick={() => navigate(`/jobs/${savedJob.job.id}`, { state: { from: 'saved' } })}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <CardTitle className="text-base group-hover:text-[hsl(var(--accent-mint))] transition-colors">
+                            {savedJob.job?.title}
+                          </CardTitle>
+                          {savedJob.job?.job_id_number && (
+                            <Badge variant="outline" className="text-xs h-5">
+                              #{savedJob.job?.job_id_number}
+                            </Badge>
+                          )}
+                        </div>
+                        <CardDescription className="text-xs">
+                          {savedJob.job.employer?.company_name || savedJob.job.employer?.name} • {savedJob.job.location}
+                        </CardDescription>
                       </div>
-                      <CardDescription className="flex flex-wrap gap-4 text-base">
-                        <span className="flex items-center gap-1.5 bg-background/50 px-3 py-1 rounded-full">
-                          <Briefcase className="h-4 w-4 text-[hsl(var(--accent-mint))]" />
-                          {savedJob.job.employer?.company_name || savedJob.job.employer?.name}
-                        </span>
-                        {savedJob.job.location && (
-                          <span className="flex items-center gap-1.5 bg-background/50 px-3 py-1 rounded-full">
-                            <MapPin className="h-4 w-4 text-[hsl(var(--accent-lilac))]" />
-                            {savedJob.job.location}
-                          </span>
+                      <div className="flex items-center gap-1.5">
+                        {isMyJob && profile?.role === 'employer' && (
+                          <div className="relative">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/headhunters');
+                              }}
+                              className="h-7 text-xs px-2 gap-1.5"
+                              title="Invite headhunters to this job"
+                            >
+                              <Users className="h-3 w-3" />
+                              Invite
+                            </Button>
+                            <Badge className="absolute -top-1.5 -right-1.5 bg-[hsl(var(--accent-pink))] text-white text-[10px] h-4 px-1">
+                              New
+                            </Badge>
+                          </div>
                         )}
-                        {savedJob.job.employment_type && (
-                          <span className="flex items-center gap-1.5 bg-background/50 px-3 py-1 rounded-full">
-                            <TrendingUp className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
-                            {savedJob.job.employment_type}
-                          </span>
-                        )}
-                      </CardDescription>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleUnsave(savedJob.id, savedJob.job?.title)}
+                          className="h-7 w-7 text-[hsl(var(--accent-pink))] hover:bg-[hsl(var(--accent-pink))]/10"
+                        >
+                          <Heart className="h-4 w-4 fill-current" />
+                        </Button>
+                      </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleUnsave(savedJob.id, savedJob.job?.title)}
-                      className="text-[hsl(var(--accent-pink))] hover:bg-[hsl(var(--accent-pink))]/10 hover:scale-110 transition-transform"
-                    >
-                      <Heart className="h-5 w-5 fill-current" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    {savedJob.job.description && (
-                      <p className="text-muted-foreground line-clamp-2 leading-relaxed">
-                        {savedJob.job.description}
-                      </p>
-                    )}
+                  </CardHeader>
+                  <CardContent className="px-4 pb-3">
                     {savedJob.job.skills_must && savedJob.job.skills_must.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {savedJob.job.skills_must.slice(0, 6).map((skill: string, idx: number) => (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {savedJob.job.skills_must.slice(0, 4).map((skill: string, idx: number) => (
                           <Badge 
                             key={idx} 
                             variant="secondary" 
-                            className="opacity-90 hover:opacity-100 transition-opacity bg-gradient-to-r from-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10"
+                            className="text-xs bg-gradient-to-r from-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10"
                           >
                             {skill}
                           </Badge>
                         ))}
                       </div>
                     )}
-                    
-                    {/* Additional Info Bar */}
-                    <div className="flex flex-wrap gap-4 pt-2 border-t">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-[hsl(var(--accent-mint))]" />
-                        <span className="text-muted-foreground">
-                          Saved {new Date(savedJob.created_at).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
-                          })}
-                        </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        Saved {new Date(savedJob.created_at).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric'
+                        })}
                       </div>
-                      {savedJob.job.salary_range && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <DollarSign className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
-                          <span className="text-muted-foreground">{savedJob.job.salary_range}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2">
-                      <Badge className="bg-gradient-to-r from-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20 text-foreground border-0">
-                        {savedJob.job.status === 'open' ? '🟢 Open' : '📋 Active'}
-                      </Badge>
                       <Button 
+                        size="sm"
                         onClick={() => navigate(`/jobs/${savedJob.job.id}`, { state: { from: 'saved' } })}
-                        className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 opacity-95 hover:scale-105 transition-transform"
+                        className="h-7 text-xs bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
                       >
-                        View Details
+                        View
                       </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

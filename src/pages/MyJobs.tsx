@@ -12,10 +12,10 @@ import { PostJobModal } from '@/components/PostJobModal';
 import { EditJobModal } from '@/components/EditJobModal';
 import { JobEditHistory } from '@/components/JobEditHistory';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { DashboardLayout } from '@/components/DashboardLayout';
+import { Users } from 'lucide-react';
 
 const MyJobs = () => {
   const { user, profile, loading } = useRequireAuth('employer');
@@ -170,37 +170,37 @@ const MyJobs = () => {
 
     return (
       <DashboardLayout>
-        <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center justify-between mb-8">
+        <div className="container px-6 py-6 max-w-7xl">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
                   My Jobs
                 </h1>
-                <p className="text-muted-foreground">View and manage all your job postings</p>
+                <p className="text-sm text-muted-foreground">View and manage all your job postings</p>
               </div>
               <Button 
-                size="lg" 
+                size="sm" 
                 onClick={() => setPostJobModalOpen(true)} 
                 className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
               >
-                <Plus className="mr-2 h-5 w-5" />
-                Post a Job
+                <Plus className="mr-1.5 h-4 w-4" />
+                Post Job
               </Button>
             </div>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="px-4 py-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>All Jobs</CardTitle>
-                    <CardDescription>{jobs.length} total job postings</CardDescription>
+                    <CardTitle className="text-lg">All Jobs</CardTitle>
+                    <CardDescription className="text-xs">{jobs.length} total job postings</CardDescription>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-4 pt-4 border-t">
+                <div className="flex flex-wrap items-center gap-3 pt-3 border-t mt-3">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="sort-jobs" className="text-sm font-medium">Sort by:</Label>
+                    <Label htmlFor="sort-jobs" className="text-xs font-medium">Sort:</Label>
                     <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
-                      <SelectTrigger id="sort-jobs" className="w-[140px]">
+                      <SelectTrigger id="sort-jobs" className="h-8 w-[120px] text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -209,41 +209,37 @@ const MyJobs = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox 
-                      id="pending-only" 
-                      checked={showPendingOnly} 
-                      onCheckedChange={(checked) => setShowPendingOnly(checked as boolean)}
-                    />
-                    <Label htmlFor="pending-only" className="text-sm font-medium cursor-pointer">
-                      Pending Review Only
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox 
-                      id="private-only" 
-                      checked={showPrivateOnly} 
-                      onCheckedChange={(checked) => setShowPrivateOnly(checked as boolean)}
-                    />
-                    <Label htmlFor="private-only" className="text-sm font-medium cursor-pointer">
-                      Private Only
-                    </Label>
-                  </div>
+                  <Button
+                    variant={showPendingOnly ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowPendingOnly(!showPendingOnly)}
+                    className="h-8 text-xs"
+                  >
+                    Pending Review
+                  </Button>
+                  <Button
+                    variant={showPrivateOnly ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowPrivateOnly(!showPrivateOnly)}
+                    className="h-8 text-xs"
+                  >
+                    Private Only
+                  </Button>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 pb-4">
                 {jobs.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No jobs yet</h3>
-                    <p className="text-muted-foreground mb-4">Post your first job to get started</p>
-                    <Button variant="hero" onClick={() => setPostJobModalOpen(true)}>
-                      <Plus className="mr-2 h-4 w-4" />
+                  <div className="text-center py-8">
+                    <Briefcase className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                    <h3 className="text-base font-semibold mb-1.5">No jobs yet</h3>
+                    <p className="text-sm text-muted-foreground mb-3">Post your first job to get started</p>
+                    <Button size="sm" variant="hero" onClick={() => setPostJobModalOpen(true)}>
+                      <Plus className="mr-1.5 h-3.5 w-3.5" />
                       Post a Job
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {(() => {
                       let filteredJobs = [...jobs];
                       
@@ -266,7 +262,7 @@ const MyJobs = () => {
                       
                       if (filteredJobs.length === 0) {
                         return (
-                          <div className="text-center py-8 text-muted-foreground">
+                          <div className="text-center py-6 text-sm text-muted-foreground">
                             No jobs match your filters
                           </div>
                         );
@@ -282,57 +278,75 @@ const MyJobs = () => {
                             className="group hover:shadow-md transition-shadow cursor-pointer" 
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
-                            <CardHeader>
+                            <CardHeader className="px-4 py-3">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <CardTitle className="text-xl">{job.title}</CardTitle>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <CardTitle className="text-base">{job.title}</CardTitle>
                                     {job.job_id_number && (
-                                      <Badge variant="outline" className="text-sm">
+                                      <Badge variant="outline" className="text-xs h-5">
                                         #{job.job_id_number}
                                       </Badge>
                                     )}
                                     {pendingCount > 0 && (
-                                      <Badge className="bg-[hsl(var(--warning))] text-white">
-                                        {pendingCount} Pending Review
+                                      <Badge className="bg-[hsl(var(--warning))] text-white text-xs h-5">
+                                        {pendingCount} Pending
                                       </Badge>
                                     )}
                                   </div>
-                                  <CardDescription>
+                                  <CardDescription className="text-xs">
                                     {job.location} • {job.employment_type?.replace('_', ' ')}
                                   </CardDescription>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <div className="relative">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate('/headhunters');
+                                      }}
+                                      className="h-7 text-xs px-2 gap-1.5"
+                                      title="Invite headhunters to this job"
+                                    >
+                                      <Users className="h-3 w-3" />
+                                      Invite
+                                    </Button>
+                                    <Badge className="absolute -top-1.5 -right-1.5 bg-[hsl(var(--accent-pink))] text-white text-[10px] h-4 px-1">
+                                      New
+                                    </Badge>
+                                  </div>
                                   <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={(e) => handleEditJob(job, e)}
-                                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="h-7 w-7"
                                     title="Edit job"
                                   >
-                                    <Pencil className="h-4 w-4 text-[hsl(var(--accent-pink))]" />
+                                    <Pencil className="h-3.5 w-3.5 text-[hsl(var(--accent-pink))]" />
                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                    className="h-8 w-8"
+                                    className="h-7 w-7"
                                     title={job.visibility === 'public' ? 'Make private' : 'Make public'}
                                   >
                                     {job.visibility === 'public' ? (
-                                      <Eye className="h-4 w-4 text-[hsl(var(--accent-mint))]" />
+                                      <Eye className="h-3.5 w-3.5 text-[hsl(var(--accent-mint))]" />
                                     ) : (
-                                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                      <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
                                     )}
                                   </Button>
-                                  <Badge className={getStatusColor(job.status)}>
+                                  <Badge className={`text-xs h-5 ${getStatusColor(job.status)}`}>
                                     {job.status}
                                   </Badge>
                                 </div>
                               </div>
                             </CardHeader>
-                            <CardContent>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <CardContent className="px-4 pb-3">
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                 <span>{jobApplications.length} applications</span>
                                 <span>•</span>
                                 <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
