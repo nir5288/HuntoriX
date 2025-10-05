@@ -61,6 +61,12 @@ export function AppSidebar({ role }: AppSidebarProps) {
     return location.pathname === path;
   };
 
+  const getTooltip = (title: string) => {
+    if (open) return undefined;
+    // Disable tooltip for Applications in headhunter sidebar to prevent flicker on click
+    if (role === 'headhunter' && title === 'Applications') return undefined;
+    return title;
+  };
   return (
     <Sidebar collapsible="icon" className="border-r bg-sidebar transition-all duration-200">
       <SidebarHeader className="border-b p-3 flex flex-row items-center justify-between transition-all duration-200">
@@ -102,7 +108,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                     <SidebarMenuButton 
                       asChild={item.url !== '#'}
                       isActive={isActive(item.url)}
-                      tooltip={!open ? item.title : undefined}
+                      tooltip={getTooltip(item.title)}
                       className="h-10 px-3"
                     >
                       {item.url === '#' ? (
