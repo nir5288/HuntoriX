@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { supabase } from '@/integrations/supabase/client';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, X } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { ApplyModal } from '@/components/ApplyModal';
 import { OpportunitiesFilters } from '@/components/OpportunitiesFilters';
 import { Switch } from '@/components/ui/switch';
+import { SearchAutocomplete } from '@/components/SearchAutocomplete';
+import { Badge } from '@/components/ui/badge';
 
 type Job = {
   id: string;
@@ -85,6 +87,9 @@ const Opportunities = () => {
   const [debouncedLocation, setDebouncedLocation] = useState('');
   const [debouncedSalaryMin, setDebouncedSalaryMin] = useState('');
   const [debouncedSalaryMax, setDebouncedSalaryMax] = useState('');
+  
+  // Active filter chips from autocomplete
+  const [activeFilterChips, setActiveFilterChips] = useState<Array<{type: string, value: string, label: string}>>([]);
 
   // Debounce search input
   useEffect(() => {
@@ -420,6 +425,7 @@ const Opportunities = () => {
     setSearchQuery('');
     setSortBy('recent');
     setShowAppliedJobs(true);
+    setActiveFilterChips([]);
     localStorage.setItem('showAppliedJobs', 'true');
     
     // Save to database if user is logged in
@@ -483,6 +489,45 @@ const Opportunities = () => {
     }
   };
 
+  // Handle filter additions from autocomplete
+  const handleFilterAdd = (type: 'skill' | 'location' | 'seniority' | 'industry' | 'remote', value: string) => {
+    if (type === 'skill') {
+      // Add skill to search query
+      setSearchQuery(value);
+      setActiveFilterChips(prev => [...prev, { type: 'skill', value, label: value }]);
+    } else if (type === 'location') {
+      setFilterLocation(value);
+      setActiveFilterChips(prev => [...prev, { type: 'location', value, label: value }]);
+    } else if (type === 'seniority') {
+      setFilterSeniority(value);
+      setActiveFilterChips(prev => [...prev, { type: 'seniority', value, label: value }]);
+    } else if (type === 'industry') {
+      if (!filterIndustry.includes(value)) {
+        setFilterIndustry(prev => [...prev, value]);
+        setActiveFilterChips(prev => [...prev, { type: 'industry', value, label: value }]);
+      }
+    } else if (type === 'remote') {
+      setFilterLocation('remote');
+      setActiveFilterChips(prev => [...prev, { type: 'remote', value: 'remote', label: 'Remote' }]);
+    }
+  };
+
+  const removeFilterChip = (index: number) => {
+    const chip = activeFilterChips[index];
+    
+    if (chip.type === 'skill') {
+      setSearchQuery('');
+    } else if (chip.type === 'location' || chip.type === 'remote') {
+      setFilterLocation('');
+    } else if (chip.type === 'seniority') {
+      setFilterSeniority('all');
+    } else if (chip.type === 'industry') {
+      setFilterIndustry(prev => prev.filter(i => i !== chip.value));
+    }
+    
+    setActiveFilterChips(prev => prev.filter((_, i) => i !== index));
+  };
+
   // Filters extracted into <OpportunitiesFilters /> component to prevent remounting and focus loss.
 
 
@@ -499,14 +544,36 @@ const Opportunities = () => {
 
           {/* Search + Mobile Filters */}
           <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
+            <div className="flex-1">
+              <SearchAutocomplete
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by title, skills, or industry..."
-                className="pl-10"
+                onChange={setSearchQuery}
+                onFilterAdd={handleFilterAdd}
+                placeholder="Search jobs, skills, companies..."
               />
+              
+              {/* Active filter chips */}
+              {activeFilterChips.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {activeFilterChips.map((chip, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="secondary"
+                      className="pl-3 pr-1 py-1 flex items-center gap-1"
+                    >
+                      {chip.label}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                        onClick={() => removeFilterChip(idx)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Sheet>
