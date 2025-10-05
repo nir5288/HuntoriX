@@ -24,16 +24,10 @@ type SearchAutocompleteProps = {
 const TRENDING_TITLES = ['Data Scientist', 'Backend Engineer', 'Product Manager', 'Frontend Developer'];
 const TRENDING_SKILLS = ['Python', 'React', 'TypeScript', 'AWS', 'SQL'];
 const TRENDING_LOCATIONS = ['Tel Aviv', 'Remote', 'Herzliya', 'Jerusalem'];
-const QUICK_CHIPS = {
-  'Remote': { type: 'remote' as const, value: 'remote' },
-  'Senior': { type: 'seniority' as const, value: 'senior' },
-  'Fintech': { type: 'industry' as const, value: 'Finance/Fintech' },
-};
 
 export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }: SearchAutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -187,13 +181,6 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       // Trigger search (parent handles this via onChange)
     }
     setOpen(false);
-  };
-
-  const handleChipClick = (chipKey: string) => {
-    const chip = QUICK_CHIPS[chipKey as keyof typeof QUICK_CHIPS];
-    if (chip) {
-      onFilterAdd?.(chip.type, chip.value);
-    }
   };
 
   // Group suggestions by type
@@ -393,14 +380,8 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       key={`title-${idx}`}
                       value={suggestion.value}
                       onSelect={() => handleSelect(suggestion)}
-                      onMouseEnter={() => {
-                        setHoveredItem(`title-${idx}`);
-                        setSelectedIndex(globalIdx);
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredItem(null);
-                        setSelectedIndex(-1);
-                      }}
+                      onMouseEnter={() => setSelectedIndex(globalIdx)}
+                      onMouseLeave={() => setSelectedIndex(-1)}
                       className={cn(
                         "flex items-center justify-between",
                         selectedIndex === globalIdx
@@ -409,23 +390,6 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                       )}
                     >
                       <span>{suggestion.value}</span>
-                      {hoveredItem === `title-${idx}` && (
-                        <div className="flex gap-1">
-                          {Object.keys(QUICK_CHIPS).map((chip) => (
-                            <Badge
-                              key={chip}
-                              variant="secondary"
-                              className="cursor-pointer text-xs hover:bg-accent"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleChipClick(chip);
-                              }}
-                            >
-                              {chip}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
                     </CommandItem>
                   );
                 })}
