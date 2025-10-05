@@ -176,9 +176,14 @@ const SavedJobs = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="px-4 pb-3">
+                    {savedJob.job.description && (
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                        {savedJob.job.description}
+                      </p>
+                    )}
                     {savedJob.job.skills_must && savedJob.job.skills_must.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-3">
-                        {savedJob.job.skills_must.slice(0, 4).map((skill: string, idx: number) => (
+                        {savedJob.job.skills_must.slice(0, 2).map((skill: string, idx: number) => (
                           <Badge 
                             key={idx} 
                             variant="secondary" 
