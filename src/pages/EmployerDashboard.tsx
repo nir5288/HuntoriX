@@ -474,7 +474,7 @@ const EmployerDashboard = () => {
                               variant="ghost"
                               size="icon"
                               onClick={(e) => handleEditJob(job, e)}
-                              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="h-7 w-7"
                               title="Edit job"
                             >
                               <Pencil className="h-3.5 w-3.5 text-[hsl(var(--accent-pink))]" />
