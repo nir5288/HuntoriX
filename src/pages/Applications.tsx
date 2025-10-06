@@ -47,7 +47,7 @@ const Applications = () => {
     try {
       const { data: appsData, error: appsError } = await supabase
         .from('applications')
-        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .select('*, job:jobs(id, title, job_id_number, is_exclusive, created_by, employer:profiles!jobs_created_by_fkey(*))')
         .eq('headhunter_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -56,7 +56,7 @@ const Applications = () => {
       // Fetch job invitations
       const { data: invitesData, error: invitesError } = await supabase
         .from('job_invitations')
-        .select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))')
+        .select('*, job:jobs(id, title, job_id_number, is_exclusive, created_by, employer:profiles!jobs_created_by_fkey(*))')
         .eq('headhunter_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -253,7 +253,9 @@ const Applications = () => {
             ) : (
               <div className="space-y-3">
                 {filteredApplications.map((app) => (
-                  <Card key={`${app.type}-${app.id}`} className="hover:shadow-md transition-shadow">
+                  <Card key={`${app.type}-${app.id}`} className={`hover:shadow-md transition-shadow ${
+                    app.job?.is_exclusive ? 'exclusive-job-card' : ''
+                  }`}>
                     <CardHeader className="px-4 py-3">
                       <div className="flex items-start justify-between">
                         <div 
@@ -265,6 +267,11 @@ const Applications = () => {
                             <Badge variant="outline" className="text-xs h-5">
                               #{app.job?.job_id_number}
                             </Badge>
+                            {app.job?.is_exclusive && (
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                                Exclusive
+                              </Badge>
+                            )}
                             {app.type === 'invitation' && (
                               <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5">
                                 Invitation
