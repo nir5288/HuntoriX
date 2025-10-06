@@ -181,6 +181,7 @@ export function PromotionalBanner() {
               <Button 
                 onClick={handleApply}
                 size="sm"
+                variant="hero"
               >
                 Apply
               </Button>
