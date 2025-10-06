@@ -483,27 +483,37 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <button
               type="button"
               onClick={() => setIsExclusive(!isExclusive)}
-              className="relative flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 hover:scale-110 group"
+              className="relative flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 group active:scale-95"
             >
               {isExclusive ? (
                 <>
-                  {/* Outer glow layers */}
-                  <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-xl opacity-60 animate-[spin_3s_linear_infinite]" />
-                  <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-blue-400 via-purple-600 to-pink-400 blur-lg opacity-80 animate-[spin_3s_linear_infinite]" />
+                  {/* Rotating conic gradient ring */}
+                  <div 
+                    className="absolute inset-0 rounded-full opacity-100 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: `conic-gradient(from 0deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4)`,
+                      animation: 'spin 10s linear infinite'
+                    }}
+                  />
                   
-                  {/* Main neon ring */}
-                  <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-[spin_3s_linear_infinite]">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-400" style={{ transform: 'rotate(180deg)' }} />
+                  {/* Pulse effect on click */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 group-active:opacity-60 group-active:scale-150 transition-all duration-200" />
+                  
+                  {/* Dark center circle */}
+                  <div className="absolute inset-[2px] rounded-full bg-background flex items-center justify-center">
+                    <span className="text-[10px] font-bold bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                      X
+                    </span>
                   </div>
-                  
-                  {/* Inner white/cyan bright ring */}
-                  <div className="absolute inset-[3px] rounded-full bg-gradient-to-tr from-cyan-300 via-white to-purple-300 opacity-90 animate-[spin_2s_linear_infinite_reverse]" />
-                  
-                  {/* Dark center */}
-                  <div className="absolute inset-[4px] rounded-full bg-gradient-to-br from-blue-950 via-purple-950 to-blue-950" />
                 </>
               ) : (
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40 border-2 border-muted-foreground/30 hover:border-muted-foreground/50 transition-colors" />
+                <>
+                  {/* Default soft ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-muted-foreground/30 group-hover:border-muted-foreground/50 transition-colors opacity-100 group-disabled:opacity-40" />
+                  
+                  {/* Dark center */}
+                  <div className="absolute inset-[2px] rounded-full bg-background" />
+                </>
               )}
             </button>
             <div className="flex items-center gap-1">
