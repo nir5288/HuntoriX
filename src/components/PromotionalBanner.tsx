@@ -103,13 +103,10 @@ export function PromotionalBanner() {
     // If it's a job banner and we have job details, show the job card
     if (currentBanner.content_type === 'job' && jobDetails) {
       return <div className="flex justify-center items-center flex-1">
-          <div className={`relative flex flex-col gap-0.5 w-full md:w-full lg:w-[78%] xl:w-[47%] p-2.5 pb-2 border-2`} style={jobDetails.is_exclusive ? {
+          <div className={`relative flex flex-col gap-0.5 w-full md:w-full lg:w-[78%] xl:w-[47%] p-2.5 pb-2 border-2`} style={{
           background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
           borderRadius: '1rem',
           border: '2px solid transparent'
-        } : {
-          borderColor: 'hsl(var(--border))',
-          borderRadius: '1rem'
         }}>
             {/* Sponsored badge - absolute positioned at top right */}
             <Badge variant="secondary" className="absolute top-2 right-2 text-primary shrink-0 z-10 bg-[#ffe208] rounded-md text-[10px] h-4 px-1.5">
