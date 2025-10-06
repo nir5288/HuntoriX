@@ -33,8 +33,6 @@ export function PromotionalBanner() {
     staleTime: 60000,
   });
 
-  if (!banners.length) return null;
-
   const currentBanner = banners[currentIndex];
 
   // Fetch job details for the current banner if it's a job type
@@ -56,6 +54,8 @@ export function PromotionalBanner() {
     staleTime: 60000,
     gcTime: 300000,
   });
+
+  if (!banners.length) return null;
 
   const nextBanner = () => {
     setCurrentIndex((prev) => (prev + 1) % banners.length);
