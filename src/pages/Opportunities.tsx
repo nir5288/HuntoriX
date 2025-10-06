@@ -492,7 +492,7 @@ const Opportunities = () => {
 
   return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
-      <PromotionalBanner />
+      <PromotionalBanner location="opportunities_top" />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
