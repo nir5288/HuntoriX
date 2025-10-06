@@ -210,7 +210,7 @@ export function PromotionalBanner() {
   };
   return <>
       <div className="w-full relative z-10">
-        <div className="container mx-auto px-4 py-5">
+        <div className="container mx-auto px-4 pt-5">
           <div className="flex items-center gap-4">
             {banners.length > 1 && <Button variant="ghost" size="icon" onClick={prevBanner} className="flex-shrink-0 h-8 w-8">
                 <ChevronLeft className="h-4 w-4" />
