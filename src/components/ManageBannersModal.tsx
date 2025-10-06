@@ -27,8 +27,6 @@ export function ManageBannersModal({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
     content_type: 'job' as 'job' | 'image' | 'video',
     link_url: '',
     image_url: '',
@@ -74,8 +72,8 @@ export function ManageBannersModal({
         }
       }
       const insertData: any = {
-        title: data.title,
-        description: data.description,
+        title: '',
+        description: '',
         content_type: data.content_type,
         link_url: data.link_url,
         image_url: data.image_url,
@@ -174,8 +172,6 @@ export function ManageBannersModal({
   });
   const resetForm = () => {
     setFormData({
-      title: '',
-      description: '',
       content_type: 'job',
       link_url: '',
       image_url: '',
@@ -242,8 +238,6 @@ export function ManageBannersModal({
   };
   const handleEdit = (banner: any) => {
     setFormData({
-      title: banner.title,
-      description: banner.description || '',
       content_type: banner.content_type,
       link_url: banner.link_url || '',
       image_url: banner.image_url || '',
@@ -298,21 +292,6 @@ export function ManageBannersModal({
 
               {formData.content_type === 'image' && <>
                   <div>
-                    <Label htmlFor="title">Title *</Label>
-                    <Input id="title" value={formData.title} onChange={e => setFormData({
-                  ...formData,
-                  title: e.target.value
-                })} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" value={formData.description} onChange={e => setFormData({
-                  ...formData,
-                  description: e.target.value
-                })} rows={2} />
-                  </div>
-                  
-                  <div>
                     <Label htmlFor="link_url">Link URL (Optional)</Label>
                     <Input id="link_url" type="url" value={formData.link_url} onChange={e => setFormData({
                   ...formData,
@@ -322,20 +301,6 @@ export function ManageBannersModal({
                 </>}
 
               {formData.content_type === 'video' && <>
-                  <div>
-                    <Label htmlFor="title">Title *</Label>
-                    <Input id="title" value={formData.title} onChange={e => setFormData({
-                  ...formData,
-                  title: e.target.value
-                })} required />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" value={formData.description} onChange={e => setFormData({
-                  ...formData,
-                  description: e.target.value
-                })} rows={2} />
-                  </div>
                   <div>
                     <Label htmlFor="video_url">Video URL *</Label>
                     <Input id="video_url" type="url" value={formData.video_url} onChange={e => setFormData({
@@ -386,9 +351,7 @@ export function ManageBannersModal({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm truncate">{banner.title}</h4>
-                            {banner.description && <p className="text-xs text-muted-foreground truncate">{banner.description}</p>}
-                            <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center gap-2">
                               <span className="text-xs bg-secondary px-2 py-0.5 rounded">
                                 {banner.content_type}
                               </span>
