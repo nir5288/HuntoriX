@@ -11,7 +11,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/auth';
 import bannerImage from '@/assets/huntorix-banner.jpg';
-export function PromotionalBanner() {
+interface PromotionalBannerProps {
+  location?: string;
+}
+
+export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerProps = {}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showManageModal, setShowManageModal] = useState(false);
   const {
@@ -24,14 +28,19 @@ export function PromotionalBanner() {
   const {
     data: banners = []
   } = useQuery({
-    queryKey: ['promotional-banners'],
+    queryKey: ['promotional-banners', location],
     queryFn: async () => {
       const {
         data,
         error
-      } = await supabase.from('promotional_banners').select('*').eq('is_active', true).order('display_order', {
-        ascending: true
-      });
+      } = await supabase
+        .from('promotional_banners')
+        .select('*')
+        .eq('is_active', true)
+        .eq('location', location)
+        .order('display_order', {
+          ascending: true
+        });
       if (error) throw error;
       return data || [];
     },

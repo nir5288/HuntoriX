@@ -52,8 +52,10 @@ export function ManageBannersModal({
     video_url: '',
     job_id: '',
     is_active: true,
-    display_order: 0
+    display_order: 0,
+    location: 'home_top'
   });
+  const [locationFilter, setLocationFilter] = useState('home_top');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -85,12 +87,13 @@ export function ManageBannersModal({
 
   const reorderMutation = useMutation({
     mutationFn: async (reorderedBanners: any[]) => {
-      // Update display_order for all banners
+      // Update display_order for banners in the same location
       const updates = reorderedBanners.map((banner, index) => 
         supabase
           .from('promotional_banners')
           .update({ display_order: index })
           .eq('id', banner.id)
+          .eq('location', locationFilter)
       );
       
       await Promise.all(updates);
@@ -139,6 +142,7 @@ export function ManageBannersModal({
         job_id: resolvedJobId,
         is_active: data.is_active,
         display_order: data.display_order,
+        location: data.location || 'home_top',
         created_by: user!.id
       };
       const {
@@ -242,7 +246,8 @@ export function ManageBannersModal({
       video_url: '',
       job_id: '',
       is_active: true,
-      display_order: 0
+      display_order: 0,
+      location: locationFilter
     });
     setEditingId(null);
   };
@@ -351,7 +356,8 @@ export function ManageBannersModal({
       video_url: banner.video_url || '',
       job_id: banner.job_id || '',
       is_active: banner.is_active,
-      display_order: banner.display_order
+      display_order: banner.display_order,
+      location: banner.location || 'home_top'
     });
     setEditingId(banner.id);
   };
@@ -361,15 +367,25 @@ export function ManageBannersModal({
 
     if (over && active.id !== over.id) {
       setLocalBanners((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
+        // Filter to only items in current location
+        const locationItems = items.filter(item => item.location === locationFilter);
+        const otherItems = items.filter(item => item.location !== locationFilter);
         
-        const reordered = arrayMove(items, oldIndex, newIndex);
+        const oldIndex = locationItems.findIndex((item) => item.id === active.id);
+        const newIndex = locationItems.findIndex((item) => item.id === over.id);
         
-        // Update the database with new order
+        const reordered = arrayMove(locationItems, oldIndex, newIndex);
+        
+        // Update the database with new order for this location only
         reorderMutation.mutate(reordered);
         
-        return reordered;
+        // Combine reordered location items with other location items
+        return [...otherItems, ...reordered].sort((a, b) => {
+          if (a.location !== b.location) {
+            return a.location.localeCompare(b.location);
+          }
+          return a.display_order - b.display_order;
+        });
       });
     }
   };
@@ -411,6 +427,9 @@ export function ManageBannersModal({
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="secondary" className="text-xs">
                     {banner.content_type}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">
+                    {banner.location?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Home Top'}
                   </Badge>
                   {!banner.is_active && (
                     <Badge variant="outline" className="text-xs">
@@ -473,9 +492,30 @@ export function ManageBannersModal({
                         <SelectItem value="video">Video</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                   </div>
 
-                  {formData.content_type === 'job' && <>
+                   <div>
+                     <Label htmlFor="location" className="text-sm font-medium">Ad Location *</Label>
+                     <Select value={formData.location} onValueChange={(value: string) => setFormData({
+                     ...formData,
+                     location: value
+                   })}>
+                       <SelectTrigger className="mt-1.5">
+                         <SelectValue />
+                       </SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="home_top">Home - Top Banner</SelectItem>
+                         <SelectItem value="opportunities_top">Opportunities - Top Banner</SelectItem>
+                         <SelectItem value="sidebar">Sidebar</SelectItem>
+                         <SelectItem value="footer">Footer</SelectItem>
+                       </SelectContent>
+                     </Select>
+                     <p className="text-xs text-muted-foreground mt-1.5">
+                       Choose where this banner will be displayed
+                     </p>
+                   </div>
+
+                   {formData.content_type === 'job' && <>
                       <div>
                         <Label htmlFor="job_id" className="text-sm font-medium">Job ID *</Label>
                         <Input 
@@ -633,20 +673,44 @@ export function ManageBannersModal({
 
             <div className="space-y-4">
               <div className="bg-accent/30 p-4 rounded-lg border">
-                <h3 className="font-semibold mb-4 text-lg">Existing Banners ({localBanners.length})</h3>
-                <DndContext 
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-lg">Existing Banners</h3>
+                </div>
+                
+                <div className="mb-4">
+                  <Label className="text-sm font-medium mb-2 block">Filter by Location</Label>
+                  <Select value={locationFilter} onValueChange={setLocationFilter}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="home_top">Home - Top Banner</SelectItem>
+                      <SelectItem value="opportunities_top">Opportunities - Top Banner</SelectItem>
+                      <SelectItem value="sidebar">Sidebar</SelectItem>
+                      <SelectItem value="footer">Footer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="mb-2 text-sm text-muted-foreground">
+                  Showing {localBanners.filter(b => b.location === locationFilter).length} banner(s) in this location
+                </div>
+
+                <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext 
-                    items={localBanners.map(b => b.id)}
+                    items={localBanners.filter(b => b.location === locationFilter).map(b => b.id)}
                     strategy={verticalListSortingStrategy}
                   >
                     <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                      {localBanners.map(banner => (
-                        <SortableItem key={banner.id} banner={banner} />
-                      ))}
+                      {localBanners
+                        .filter(b => b.location === locationFilter)
+                        .map(banner => (
+                          <SortableItem key={banner.id} banner={banner} />
+                        ))}
                     </div>
                   </SortableContext>
                 </DndContext>
