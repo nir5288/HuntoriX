@@ -40,18 +40,18 @@ export function PromotionalBanner() {
 
   const renderBannerContent = () => {
     const content = (
-      <div className="flex items-center gap-4 flex-1 min-w-0">
+      <div className="flex items-center gap-6 flex-1 min-w-0">
         {currentBanner.image_url && (
           <img
             src={currentBanner.image_url}
             alt={currentBanner.title}
-            className="h-16 w-16 object-cover rounded-lg flex-shrink-0"
+            className="h-24 w-32 object-cover rounded-lg flex-shrink-0"
           />
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm truncate">{currentBanner.title}</h3>
+          <h3 className="font-semibold text-lg mb-1">{currentBanner.title}</h3>
           {currentBanner.description && (
-            <p className="text-xs text-muted-foreground truncate">{currentBanner.description}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">{currentBanner.description}</p>
           )}
         </div>
       </div>
@@ -64,7 +64,7 @@ export function PromotionalBanner() {
 
     if (linkTo) {
       return (
-        <Link to={linkTo} className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80 transition">
+        <Link to={linkTo} className="flex items-center gap-6 flex-1 min-w-0 hover:opacity-80 transition">
           {content}
         </Link>
       );
@@ -76,8 +76,8 @@ export function PromotionalBanner() {
   return (
     <>
       <div className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-3">
+        <div className="container mx-auto px-4 py-5">
+          <div className="flex items-center gap-4">
             {banners.length > 1 && (
               <Button
                 variant="ghost"

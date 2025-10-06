@@ -26,7 +26,7 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    content_type: 'custom' as 'job' | 'company' | 'service' | 'image' | 'video' | 'custom',
+    content_type: 'job' as 'job' | 'image' | 'video',
     link_url: '',
     image_url: '',
     video_url: '',
@@ -125,7 +125,7 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
     setFormData({
       title: '',
       description: '',
-      content_type: 'custom',
+      content_type: 'job',
       link_url: '',
       image_url: '',
       video_url: '',
@@ -215,27 +215,7 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
             <h3 className="font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Banner</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={2}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="content_type">Content Type</Label>
+                <Label htmlFor="content_type">Content Type *</Label>
                 <Select
                   value={formData.content_type}
                   onValueChange={(value: any) => setFormData({ ...formData, content_type: value })}
@@ -245,108 +225,179 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="job">Job</SelectItem>
-                    <SelectItem value="company">Company</SelectItem>
-                    <SelectItem value="service">Service</SelectItem>
                     <SelectItem value="image">Image</SelectItem>
                     <SelectItem value="video">Video</SelectItem>
-                    <SelectItem value="custom">Custom</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {formData.content_type === 'job' && (
-                <div>
-                  <Label htmlFor="job_id">Job ID</Label>
-                  <Input
-                    id="job_id"
-                    value={formData.job_id}
-                    onChange={(e) => setFormData({ ...formData, job_id: e.target.value })}
-                    placeholder="Enter job UUID or job number"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    This will create a link to /job-detail/{'{job_id}'}
-                  </p>
-                </div>
-              )}
-
-              {formData.content_type !== 'job' && (
-                <div>
-                  <Label htmlFor="link_url">Link URL</Label>
-                  <Input
-                    id="link_url"
-                    type="url"
-                    value={formData.link_url}
-                    onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="image_upload">Upload Image/GIF</Label>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
+                <>
+                  <div>
+                    <Label htmlFor="job_id">Job ID *</Label>
                     <Input
-                      id="image_upload"
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
-                      onChange={handleFileUpload}
-                      disabled={uploading}
-                      className="flex-1"
+                      id="job_id"
+                      value={formData.job_id}
+                      onChange={(e) => setFormData({ ...formData, job_id: e.target.value })}
+                      placeholder="Enter job UUID or job number"
+                      required
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      disabled={uploading}
-                    >
-                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This will link to /job-detail/{'{job_id}'}
+                    </p>
                   </div>
-                  {formData.image_url && (
-                    <div className="relative">
-                      <img 
-                        src={formData.image_url} 
-                        alt="Banner preview" 
-                        className="w-full h-32 object-cover rounded border"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2 h-6 w-6"
-                        onClick={() => setFormData({ ...formData, image_url: '' })}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Or paste URL below (max 5MB, PNG/JPG/GIF/WebP)
-                  </p>
-                  <Input
-                    id="image_url"
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
+                  <div>
+                    <Label htmlFor="title">Banner Title (Optional)</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Optional custom title"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Banner Description (Optional)</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={2}
+                      placeholder="Optional custom description"
+                    />
+                  </div>
+                </>
+              )}
 
-              <div>
-                <Label htmlFor="video_url">Video URL</Label>
-                <Input
-                  id="video_url"
-                  type="url"
-                  value={formData.video_url}
-                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  placeholder="https://youtube.com/... or https://vimeo.com/..."
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  YouTube, Vimeo, or direct video URLs supported
-                </p>
-              </div>
+              {formData.content_type === 'image' && (
+                <>
+                  <div>
+                    <Label htmlFor="title">Title *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="image_upload">Upload Image/GIF *</Label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          id="image_upload"
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                          onChange={handleFileUpload}
+                          disabled={uploading}
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          disabled={uploading}
+                        >
+                          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                      {formData.image_url && (
+                        <div className="relative">
+                          <img 
+                            src={formData.image_url} 
+                            alt="Banner preview" 
+                            className="w-full h-32 object-cover rounded border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 h-6 w-6"
+                            onClick={() => setFormData({ ...formData, image_url: '' })}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Or paste URL below (max 5MB, PNG/JPG/GIF/WebP)
+                      </p>
+                      <Input
+                        id="image_url"
+                        type="url"
+                        value={formData.image_url}
+                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="link_url">Link URL (Optional)</Label>
+                    <Input
+                      id="link_url"
+                      type="url"
+                      value={formData.link_url}
+                      onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.content_type === 'video' && (
+                <>
+                  <div>
+                    <Label htmlFor="title">Title *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="video_url">Video URL *</Label>
+                    <Input
+                      id="video_url"
+                      type="url"
+                      value={formData.video_url}
+                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                      placeholder="https://youtube.com/... or https://vimeo.com/..."
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      YouTube, Vimeo, or direct video URLs supported
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="link_url">Link URL (Optional)</Label>
+                    <Input
+                      id="link_url"
+                      type="url"
+                      value={formData.link_url}
+                      onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </>
+              )}
 
               <div>
                 <Label htmlFor="display_order">Display Order</Label>
