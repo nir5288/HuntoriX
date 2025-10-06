@@ -129,7 +129,7 @@ export function AIAssistant() {
       {/* Floating Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed left-6 bottom-6 h-14 w-14 rounded-full shadow-lg z-50 bg-gradient-to-r from-primary to-accent-purple hover:scale-110 transition-transform"
+        className="fixed left-6 bottom-6 h-14 w-14 rounded-full shadow-2xl z-[9999] bg-gradient-to-r from-primary to-primary-glow hover:scale-110 transition-transform"
         size="icon"
       >
         {isOpen ? (
@@ -141,7 +141,7 @@ export function AIAssistant() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed left-6 bottom-24 w-96 h-[500px] bg-background border border-border rounded-lg shadow-2xl z-50 flex flex-col">
+        <div className="fixed left-6 bottom-24 w-96 h-[500px] bg-background border border-border rounded-lg shadow-2xl z-[9999] flex flex-col">
           {/* Header */}
           <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-primary/10 to-accent-purple/10">
             <Avatar className="h-10 w-10 border-2 border-primary">
