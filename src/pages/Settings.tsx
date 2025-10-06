@@ -37,7 +37,7 @@ const colorPalettes: ColorPalette[] = [
     id: "default",
     name: "Original",
     colors: {
-      primary: "220 80% 11%",
+      primary: "220 100% 11%",
       accentPink: "337 90% 91%",
       accentMint: "150 90% 88%",
       accentLilac: "252 100% 95%",
