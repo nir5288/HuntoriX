@@ -279,16 +279,11 @@ const MyJobs = () => {
                         return (
                           <Card 
                             key={job.id} 
-                            className={`group hover:shadow-md transition-shadow cursor-pointer overflow-hidden ${
+                            className={`group hover:shadow-md transition-shadow cursor-pointer ${
                               job.is_exclusive ? 'exclusive-job-card' : ''
                             }`}
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
-                            {job.is_exclusive && (
-                              <div className="w-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-2 px-4 text-sm font-semibold">
-                                HuntoriX Exclusive
-                              </div>
-                            )}
                             <CardHeader className="px-4 py-3">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
@@ -297,6 +292,11 @@ const MyJobs = () => {
                                     {job.job_id_number && (
                                       <Badge variant="outline" className="text-xs h-5">
                                         #{job.job_id_number}
+                                      </Badge>
+                                    )}
+                                    {job.is_exclusive && (
+                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                                        HuntoriX Exclusive
                                       </Badge>
                                     )}
                                     {pendingCount > 0 && (

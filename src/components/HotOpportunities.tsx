@@ -189,19 +189,20 @@ export function HotOpportunities() {
             <CarouselContent className="-ml-2 md:-ml-4">
               {jobs.map((job) => (
                 <CarouselItem key={job.id} className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                  <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 h-full bg-gradient-to-br from-background via-[hsl(var(--surface)/0.3)] to-background overflow-hidden ${
+                  <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 h-full bg-gradient-to-br from-background via-[hsl(var(--surface)/0.3)] to-background ${
                     job.is_exclusive ? 'exclusive-job-card' : ''
                   }`}>
-                    {job.is_exclusive && (
-                      <div className="w-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-2 px-4 text-sm font-semibold">
-                        HuntoriX Exclusive
-                      </div>
-                    )}
                     <CardContent className="p-6 flex flex-col h-full">
                       <div className="space-y-4 flex-grow">
                       <div className="space-y-2">
                         <h3 className="font-bold text-lg line-clamp-1">{job.title}</h3>
                         <div className="flex flex-wrap gap-2">
+                          {job.is_exclusive && (
+                            <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold">
+                              HuntoriX Exclusive
+                            </Badge>
+                          )}
+                          
                           {job.industry && (
                             <Badge className={`${getIndustryColor(job.industry)} border-0`}>
                               {job.industry}
