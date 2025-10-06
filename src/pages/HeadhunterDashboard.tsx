@@ -518,23 +518,23 @@ const HeadhunterDashboard = () => {
             {jobs.length === 0 ? <div className="text-center py-6">
                 <p className="text-sm text-muted-foreground">No jobs available at the moment</p>
               </div> : <div className="space-y-3">
-                {jobs.map(job => <Card key={job.id} className={`hover:shadow-md transition-shadow cursor-pointer ${
+                {jobs.map(job => <Card key={job.id} className={`hover:shadow-md transition-shadow cursor-pointer overflow-hidden ${
                   job.is_exclusive ? 'exclusive-job-card' : ''
                 }`} onClick={() => navigate(`/jobs/${job.id}`, {
             state: {
               from: 'dashboard'
             }
           })}>
+                    {job.is_exclusive && (
+                      <div className="w-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-2 px-4 text-sm font-semibold">
+                        HuntoriX Exclusive
+                      </div>
+                    )}
                     <CardHeader className="px-4 py-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <CardTitle className="text-base">{job.title}</CardTitle>
-                            {job.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
-                                HuntoriX Exclusive
-                              </Badge>
-                            )}
                           </div>
                           <CardDescription className="text-xs">
                             {job.employer?.company_name || job.employer?.name} • {job.location}

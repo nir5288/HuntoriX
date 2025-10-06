@@ -313,7 +313,12 @@ const JobDetail = () => {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="rounded-2xl">
+            <Card className={`rounded-2xl overflow-hidden ${job.is_exclusive ? 'exclusive-job-card' : ''}`}>
+              {job.is_exclusive && (
+                <div className="w-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-2 px-4 text-sm font-semibold">
+                  HuntoriX Exclusive
+                </div>
+              )}
               <CardHeader>
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
@@ -326,12 +331,6 @@ const JobDetail = () => {
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {job.is_exclusive && (
-                        <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold">
-                          HuntoriX Exclusive
-                        </Badge>
-                      )}
-                      
                       {job.industry && (
                         <Badge 
                           style={{ backgroundColor: getIndustryColor(job.industry) }}

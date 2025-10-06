@@ -129,10 +129,15 @@ const SavedJobs = () => {
             return (
               <Card 
                 key={savedJob.id} 
-                className={`hover:shadow-md transition-shadow ${
+                className={`hover:shadow-md transition-shadow overflow-hidden ${
                   job.is_exclusive ? 'exclusive-job-card' : ''
                 }`}
               >
+                {job.is_exclusive && (
+                  <div className="w-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-2 px-4 text-sm font-semibold">
+                    HuntoriX Exclusive
+                  </div>
+                )}
                 <CardHeader className="px-4 py-3">
                     <div className="flex items-start justify-between gap-4">
                       <div 
@@ -146,11 +151,6 @@ const SavedJobs = () => {
                           {savedJob.job?.job_id_number && (
                             <Badge variant="outline" className="text-xs h-5">
                               #{savedJob.job?.job_id_number}
-                            </Badge>
-                          )}
-                          {job.is_exclusive && (
-                            <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
-                              HuntoriX Exclusive
                             </Badge>
                           )}
                         </div>

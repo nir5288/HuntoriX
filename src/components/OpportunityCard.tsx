@@ -349,9 +349,14 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   return (
-    <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
+    <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full overflow-hidden ${
       job.is_exclusive ? 'exclusive-job-card' : ''
     }`}>
+      {job.is_exclusive && (
+        <div className="w-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-2 px-4 text-sm font-semibold">
+          HuntoriX Exclusive
+        </div>
+      )}
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
@@ -388,12 +393,6 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
         
         <div className="flex flex-wrap gap-2">
-          {job.is_exclusive && (
-            <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold">
-              HuntoriX Exclusive
-            </Badge>
-          )}
-          
           {job.industry && (
             <Badge 
               variant="filter"
