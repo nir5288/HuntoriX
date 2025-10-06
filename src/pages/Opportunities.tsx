@@ -655,7 +655,7 @@ const Opportunities = () => {
         <div className="flex gap-8">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
-            <div className="sticky top-8 bg-card rounded-2xl border p-6">
+            <div className="bg-card rounded-2xl border p-6">
               <h3 className="font-semibold mb-4">Filters</h3>
               <OpportunitiesFilters
                 industries={industries}
