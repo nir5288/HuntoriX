@@ -12,7 +12,9 @@ import { useAuth } from "@/lib/auth";
 import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
-import { Palette } from "lucide-react";
+import { Palette, Settings as SettingsIcon } from "lucide-react";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { ManageBannersModal } from "@/components/ManageBannersModal";
 
 interface TeamMember {
   name: string;
@@ -150,9 +152,11 @@ const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { showStatus, setShowStatus } = useUserPreferences();
+  const { isAdmin } = useIsAdmin();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
+  const [showManageBanners, setShowManageBanners] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState<string>(() => {
     return localStorage.getItem("color-palette") || "default";
   });
@@ -774,6 +778,28 @@ const Settings = () => {
           </CardContent>
         </Card>
 
+        {isAdmin && (
+          <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
+            <CardHeader>
+              <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent flex items-center gap-2">
+                <SettingsIcon className="h-6 w-6" />
+                Admin Controls
+              </CardTitle>
+              <CardDescription>Manage promotional banners and site content</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => setShowManageBanners(true)}
+                variant="outline"
+                className="w-full"
+              >
+                <SettingsIcon className="h-4 w-4 mr-2" />
+                Manage Promotional Banners
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Privacy Settings</CardTitle>
@@ -819,6 +845,13 @@ const Settings = () => {
           </Button>
         </div>
       </div>
+
+      {isAdmin && (
+        <ManageBannersModal
+          open={showManageBanners}
+          onOpenChange={setShowManageBanners}
+        />
+      )}
     </div>
   );
 };
