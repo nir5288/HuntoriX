@@ -10,6 +10,7 @@ import { ManageBannersModal } from './ManageBannersModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/auth';
+import bannerImage from '@/assets/huntorix-banner.jpg';
 export function PromotionalBanner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showManageModal, setShowManageModal] = useState(false);
@@ -154,10 +155,14 @@ export function PromotionalBanner() {
     }
 
     // Default banner content (image/video/custom)
+    const imageUrl = currentBanner.image_url?.startsWith('/src/assets/') 
+      ? bannerImage 
+      : currentBanner.image_url;
+      
     const content = <div className="flex justify-center items-center flex-1">
-        {currentBanner.image_url && <div className="w-full h-[100px] overflow-hidden rounded-lg">
+        {imageUrl && <div className="w-full h-[100px] overflow-hidden rounded-lg">
             <img 
-              src={currentBanner.image_url} 
+              src={imageUrl} 
               alt="Banner" 
               className="w-full h-full object-cover"
             />
