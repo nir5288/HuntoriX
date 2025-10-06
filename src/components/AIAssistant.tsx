@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import aiAvatar from "@/assets/huntorix-ai-avatar.jpg";
 
 interface Message {
   role: "user" | "assistant";
@@ -16,7 +17,7 @@ export function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "👋 Hi! I'm Avatar AI, your guide to Huntorix. How can I help you navigate the platform today?"
+      content: "👋 Hi! I'm Huntorix AI, your guide to Huntorix. How can I help you navigate the platform today?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -153,12 +154,13 @@ export function AIAssistant() {
           {/* Header */}
           <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
             <Avatar className="h-9 w-9 border border-primary/20">
+              <AvatarImage src={aiAvatar} alt="Huntorix AI" />
               <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white font-semibold text-xs">
                 AI
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-sm text-foreground">HuntoriX AI</h3>
+              <h3 className="font-semibold text-sm text-foreground">Huntorix AI</h3>
               <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
             </div>
           </div>
@@ -175,7 +177,8 @@ export function AIAssistant() {
                 >
                   {message.role === "assistant" && (
                     <Avatar className="h-8 w-8 border border-primary/20">
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-accent-purple text-white text-xs">
+                      <AvatarImage src={aiAvatar} alt="Huntorix AI" />
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white text-xs">
                         AI
                       </AvatarFallback>
                     </Avatar>
@@ -194,7 +197,8 @@ export function AIAssistant() {
               {isLoading && (
                 <div className="flex gap-3">
                   <Avatar className="h-8 w-8 border border-primary/20">
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-accent-purple text-white text-xs">
+                    <AvatarImage src={aiAvatar} alt="Huntorix AI" />
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white text-xs">
                       AI
                     </AvatarFallback>
                   </Avatar>
