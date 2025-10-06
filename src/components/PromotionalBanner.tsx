@@ -109,120 +109,54 @@ export function PromotionalBanner() {
     // If it's a job banner and we have job details, show the job card
     if (currentBanner.content_type === 'job' && jobDetails) {
       return (
-        <div className="flex gap-6 items-start">
-          {/* Left side - Main content (70%) */}
-          <div className="flex-1 space-y-3">
-            {/* Title row with Promoted badge */}
-            <div className="flex items-start gap-3">
-              <Badge variant="secondary" className="bg-primary/10 text-primary shrink-0 mt-0.5">
-                Promoted
-              </Badge>
-              <h3 className="text-xl font-bold leading-tight flex-1">
+        <div className="flex gap-6 items-center justify-between w-full">
+          {/* Left side - Compact job info */}
+          <div className="flex-1 min-w-0">
+            {/* Title row with job ID and exclusive badge */}
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-lg font-semibold truncate">
                 {currentBanner.title || jobDetails.title}
               </h3>
+              <span className="text-sm text-muted-foreground shrink-0">
+                #{jobDetails.job_id_number}
+              </span>
+              {jobDetails.is_exclusive && (
+                <Badge variant="secondary" className="bg-primary text-primary-foreground shrink-0">
+                  HuntoriX Exclusive
+                </Badge>
+              )}
             </div>
             
-            {/* Badges row - Industry and Status */}
-            <div className="flex flex-wrap gap-2">
-              {jobDetails.industry && (
-                <Badge 
-                  variant="filter"
-                  style={{ backgroundColor: getIndustryColor(jobDetails.industry) }}
-                  className="text-foreground border-0"
-                >
-                  {jobDetails.industry}
-                </Badge>
+            {/* Compact meta info */}
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              {jobDetails.employment_type && (
+                <span>• {jobDetails.employment_type === 'full_time' ? 'contract' : jobDetails.employment_type}</span>
               )}
-              
-              {jobDetails.status && (
-                <Badge className={`${getStatusColor(jobDetails.status)} text-white border-0`}>
-                  {jobDetails.status}
-                </Badge>
-              )}
+              <span>0 applications</span>
+              <span>
+                • Posted {jobDetails.created_at && !isNaN(new Date(jobDetails.created_at).getTime()) 
+                  ? formatDistanceToNow(new Date(jobDetails.created_at), { addSuffix: true }).replace('about ', '')
+                  : 'recently'
+                }
+              </span>
             </div>
-
-            {/* Meta information with icons */}
-            <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-              {jobDetails.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{jobDetails.location}</span>
-                </div>
-              )}
-              
-              {(jobDetails.budget_min || jobDetails.budget_max) && (
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 shrink-0" />
-                  <span className="truncate">
-                    {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
-                    {jobDetails.budget_max && ` - ${jobDetails.budget_max.toLocaleString()}`}
-                  </span>
-                </div>
-              )}
-              
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 shrink-0" />
-                <span className="truncate">
-                  Posted {jobDetails.created_at && !isNaN(new Date(jobDetails.created_at).getTime()) 
-                    ? formatDistanceToNow(new Date(jobDetails.created_at), { addSuffix: true })
-                    : 'recently'
-                  }
-                </span>
-              </div>
-
-              {(jobDetails.employment_type || jobDetails.seniority) && (
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4 shrink-0" />
-                  <span className="truncate">
-                    {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type)}
-                    {jobDetails.employment_type && jobDetails.seniority && ' • '}
-                    {jobDetails.seniority && jobDetails.seniority.charAt(0).toUpperCase() + jobDetails.seniority.slice(1)}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Description preview */}
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {truncateText(jobDetails.description, 180)}
-            </p>
-
-            {/* Skills tags */}
-            {jobDetails.skills_must && jobDetails.skills_must.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {jobDetails.skills_must.slice(0, 6).map((skill, idx) => (
-                  <Badge 
-                    key={idx}
-                    variant="filter" 
-                    className="text-xs"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-                {jobDetails.skills_must.length > 6 && (
-                  <Badge variant="filter" className="text-xs">
-                    +{jobDetails.skills_must.length - 6} more
-                  </Badge>
-                )}
-              </div>
-            )}
           </div>
 
-          {/* Right side - Action buttons (30%) */}
-          <div className="flex flex-col gap-2 shrink-0 w-40">
+          {/* Right side - Action buttons */}
+          <div className="flex gap-2 shrink-0">
             <Button
               onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
               variant="outline"
-              className="w-full"
+              size="sm"
             >
-              View Details
+              Invite
             </Button>
             <Button
               onClick={handleApply}
-              variant="hero"
-              className="w-full"
+              variant="default"
+              size="sm"
             >
-              Apply
+              Open
             </Button>
           </div>
         </div>
