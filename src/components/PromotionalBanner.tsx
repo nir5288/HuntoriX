@@ -192,9 +192,9 @@ export function PromotionalBanner() {
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
                 size="sm"
-                className="text-xs px-8 py-1 h-8"
+                className="text-xs px-6 py-1 h-8"
               >
-                View
+                View Details
               </Button>
               <Button
                 onClick={handleApply}
