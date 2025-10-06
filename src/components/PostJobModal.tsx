@@ -474,27 +474,46 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   </div>
                 )}
               </div>
-              
-              {/* Exclusive Toggle */}
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsExclusive(!isExclusive)}
-                  className="relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-primary transition-all duration-300 hover:scale-110 group"
-                >
-                  <div className={`absolute inset-0.5 rounded-full transition-all duration-500 ${
-                    isExclusive 
-                      ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-[spin_3s_linear_infinite]' 
-                      : 'bg-transparent'
-                  }`} />
-                  {isExclusive && (
-                    <div className="absolute inset-1 rounded-full bg-background z-10" />
-                  )}
-                </button>
-                <span className="text-sm font-medium">Exclusive on HuntoriX</span>
-              </div>
             </div>
           </Card>
+
+          {/* Exclusive Toggle */}
+          <div className="flex items-center gap-3 -mt-3">
+            <button
+              type="button"
+              onClick={() => setIsExclusive(!isExclusive)}
+              className="relative flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 hover:scale-110 group"
+            >
+              {/* Outer glow ring */}
+              <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                isExclusive 
+                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] animate-[spin_2s_linear_infinite] blur-sm opacity-70' 
+                  : 'bg-border'
+              }`} />
+              
+              {/* Main dot border */}
+              <div className={`absolute inset-0.5 rounded-full transition-all duration-500 ${
+                isExclusive 
+                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-[spin_3s_linear_infinite]' 
+                  : 'bg-muted-foreground/30'
+              }`} />
+              
+              {/* Inner background */}
+              <div className="absolute inset-1 rounded-full bg-background z-10" />
+              
+              {/* Center active dot */}
+              {isExclusive && (
+                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] z-20 animate-pulse" />
+              )}
+            </button>
+            <span className={`text-sm font-medium transition-all duration-300 ${
+              isExclusive 
+                ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent' 
+                : 'text-muted-foreground'
+            }`}>
+              Exclusive on HuntoriX
+            </span>
+          </div>
 
           {/* A. Basics */}
           <div className="space-y-4">
