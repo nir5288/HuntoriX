@@ -128,19 +128,17 @@ export function PromotionalBanner() {
 
             {/* Left side - Content */}
             <div className="flex-1 space-y-2 -mt-6">
-              {/* Title at top left */}
-              <h3 className="text-lg font-bold leading-tight">
-                {currentBanner.title || jobDetails.title}
-              </h3>
-              
-              {/* Exclusive badge */}
-              {jobDetails.is_exclusive && (
-                <div>
+              {/* Title and exclusive badge on same line */}
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold leading-tight">
+                  {currentBanner.title || jobDetails.title}
+                </h3>
+                {jobDetails.is_exclusive && (
                   <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-xs">
                     HuntoriX Exclusive
                   </Badge>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Industry badge under title */}
               {jobDetails.industry && (
