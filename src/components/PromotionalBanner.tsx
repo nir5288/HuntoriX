@@ -187,7 +187,7 @@ export function PromotionalBanner() {
             </div>
 
             {/* Right side - Action buttons */}
-            <div className="flex flex-row md:flex-col gap-2 w-full md:w-32 lg:w-36 relative z-10">
+            <div className="flex flex-row gap-2 w-full md:w-auto relative z-10">
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
