@@ -16,6 +16,7 @@ import { OpportunitiesFilters } from '@/components/OpportunitiesFilters';
 import { Switch } from '@/components/ui/switch';
 import { SearchAutocomplete } from '@/components/SearchAutocomplete';
 import { Badge } from '@/components/ui/badge';
+import { PromotionalBanner } from '@/components/PromotionalBanner';
 type Job = {
   id: string;
   title: string;
@@ -491,6 +492,7 @@ const Opportunities = () => {
 
   return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
+      <PromotionalBanner />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
