@@ -111,7 +111,7 @@ export function PromotionalBanner() {
       return (
         <div className="flex justify-center items-center flex-1">
           <div 
-            className={`relative flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-[80%] lg:w-[60%] xl:w-[36%] p-3 pt-8 border-2`}
+            className={`relative flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-full lg:w-[78%] xl:w-[47%] p-3 pt-8 border-2`}
             style={jobDetails.is_exclusive ? {
               background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
               borderRadius: '1rem',
