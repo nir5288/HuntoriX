@@ -110,17 +110,13 @@ export function PromotionalBanner() {
     if (currentBanner.content_type === 'job' && jobDetails) {
       return (
         <div className="flex justify-center items-center flex-1">
-          <div className={`flex gap-4 items-center w-[60%] p-3 rounded-2xl border-2 ${
-            jobDetails.is_exclusive 
-              ? 'bg-gradient-to-r from-purple-500/5 via-blue-500/5 to-cyan-500/5' 
-              : 'bg-card'
-          }`} style={jobDetails.is_exclusive ? {
+          <div className={`flex gap-4 items-center w-[60%] p-3 rounded-2xl border-2`} style={jobDetails.is_exclusive ? {
             borderImage: 'linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) 1',
             borderRadius: '1rem'
           } : { borderColor: 'hsl(var(--border))' }}>
             {/* Left side - Content */}
             <div className="flex-1 space-y-2">
-              {/* Promoted badge and Title with exclusive badge */}
+              {/* Promoted badge and exclusive badge */}
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="bg-primary/10 text-primary shrink-0 text-xs">
                   Promoted
@@ -130,11 +126,20 @@ export function PromotionalBanner() {
                     HuntoriX Exclusive
                   </Badge>
                 )}
-                <h3 className="text-lg font-bold leading-tight">
-                  {currentBanner.title || jobDetails.title}
-                </h3>
               </div>
             
+            {/* Employment type and seniority */}
+            {(jobDetails.employment_type || jobDetails.seniority) && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Briefcase className="h-3 w-3 shrink-0" />
+                <span className="truncate">
+                  {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type === 'contract' ? 'Contract' : jobDetails.employment_type)}
+                  {jobDetails.employment_type && jobDetails.seniority && ' • '}
+                  {jobDetails.seniority && jobDetails.seniority.charAt(0).toUpperCase() + jobDetails.seniority.slice(1)}
+                </span>
+              </div>
+            )}
+
             {/* Badges row - Industry and Status */}
             <div className="flex flex-wrap gap-2">
               {jobDetails.industry && (
@@ -172,27 +177,6 @@ export function PromotionalBanner() {
                   </span>
                 </div>
               )}
-              
-              <div className="flex items-center gap-1.5">
-                <Calendar className="h-3 w-3 shrink-0" />
-                <span className="truncate">
-                  Posted {jobDetails.created_at && !isNaN(new Date(jobDetails.created_at).getTime()) 
-                    ? formatDistanceToNow(new Date(jobDetails.created_at), { addSuffix: true })
-                    : 'recently'
-                  }
-                </span>
-              </div>
-
-              {(jobDetails.employment_type || jobDetails.seniority) && (
-                <div className="flex items-center gap-1.5">
-                  <Briefcase className="h-3 w-3 shrink-0" />
-                  <span className="truncate">
-                    {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type)}
-                    {jobDetails.employment_type && jobDetails.seniority && ' • '}
-                    {jobDetails.seniority && jobDetails.seniority.charAt(0).toUpperCase() + jobDetails.seniority.slice(1)}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Description preview */}
@@ -221,8 +205,11 @@ export function PromotionalBanner() {
             )}
           </div>
 
-            {/* Right side - Action buttons */}
-            <div className="flex flex-col gap-2 shrink-0 w-32">
+            {/* Right side - Title and Action buttons */}
+            <div className="flex flex-col gap-2 shrink-0 w-48">
+              <h3 className="text-lg font-bold leading-tight">
+                {currentBanner.title || jobDetails.title}
+              </h3>
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
