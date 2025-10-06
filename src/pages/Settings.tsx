@@ -143,6 +143,106 @@ const colorPalettes: ColorPalette[] = [
       accentLilac: "235 65% 60%",
     },
   },
+  {
+    id: "champagne",
+    name: "Champagne Gold",
+    colors: {
+      primary: "45 65% 75%",
+      accentPink: "35 55% 85%",
+      accentMint: "50 60% 88%",
+      accentLilac: "40 50% 82%",
+    },
+  },
+  {
+    id: "silver",
+    name: "Silver Mist",
+    colors: {
+      primary: "200 15% 70%",
+      accentPink: "210 12% 82%",
+      accentMint: "190 14% 85%",
+      accentLilac: "205 13% 88%",
+    },
+  },
+  {
+    id: "rosegold",
+    name: "Rose Gold",
+    colors: {
+      primary: "15 55% 75%",
+      accentPink: "350 50% 85%",
+      accentMint: "25 45% 82%",
+      accentLilac: "10 48% 88%",
+    },
+  },
+  {
+    id: "pearl",
+    name: "Pearl White",
+    colors: {
+      primary: "30 18% 88%",
+      accentPink: "340 15% 92%",
+      accentMint: "160 12% 90%",
+      accentLilac: "260 14% 93%",
+    },
+  },
+  {
+    id: "platinum",
+    name: "Platinum",
+    colors: {
+      primary: "210 25% 78%",
+      accentPink: "195 22% 85%",
+      accentMint: "180 20% 87%",
+      accentLilac: "220 23% 89%",
+    },
+  },
+  {
+    id: "ivory",
+    name: "Ivory Silk",
+    colors: {
+      primary: "40 35% 85%",
+      accentPink: "30 28% 88%",
+      accentMint: "50 32% 90%",
+      accentLilac: "35 30% 92%",
+    },
+  },
+  {
+    id: "crystal",
+    name: "Crystal Blue",
+    colors: {
+      primary: "195 45% 80%",
+      accentPink: "185 38% 85%",
+      accentMint: "175 40% 87%",
+      accentLilac: "205 42% 89%",
+    },
+  },
+  {
+    id: "blush",
+    name: "Blush Elegance",
+    colors: {
+      primary: "350 40% 82%",
+      accentPink: "340 35% 88%",
+      accentMint: "20 30% 85%",
+      accentLilac: "330 33% 90%",
+    },
+  },
+  {
+    id: "sage",
+    name: "Sage Luxury",
+    colors: {
+      primary: "155 30% 75%",
+      accentPink: "145 25% 82%",
+      accentMint: "165 28% 85%",
+      accentLilac: "150 26% 88%",
+    },
+  },
+  {
+    id: "frost",
+    name: "Lavender Frost",
+    colors: {
+      primary: "270 35% 82%",
+      accentPink: "280 30% 87%",
+      accentMint: "260 28% 85%",
+      accentLilac: "275 32% 90%",
+    },
+  },
 ];
 
 const Settings = () => {
