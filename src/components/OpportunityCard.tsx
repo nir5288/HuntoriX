@@ -349,11 +349,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   return (
-    <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full overflow-hidden ${
+    <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
       job.is_exclusive ? 'exclusive-job-card' : ''
     }`}>
       {job.is_exclusive && (
-        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1.5">
+        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1.5 rounded-t-2xl -m-[1px] mx-0 mt-0">
           <span>HuntoriX Exclusive</span>
           <TooltipProvider delayDuration={0}>
             <Tooltip>
