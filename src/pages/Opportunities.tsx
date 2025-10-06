@@ -542,12 +542,12 @@ const Opportunities = () => {
         <div className="flex gap-8">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
-            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto bg-card rounded-2xl border p-6">
+            <div className="bg-card rounded-2xl border p-6">
               <h3 className="font-semibold mb-4">Filters</h3>
 
               {/* Sort by filter */}
-              <div className="flex items-center gap-2 mb-4">
-                <Label className="text-sm font-medium">Sort by:</Label>
+              <div className="flex items-center gap-2 mb-4 whitespace-nowrap">
+                <Label className="text-sm font-medium shrink-0">Sort by:</Label>
                 <Select value={sortBy} onValueChange={handleSortChange}>
                   <SelectTrigger className="w-[140px]">
                     <SelectValue />
