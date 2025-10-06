@@ -127,7 +127,7 @@ export function PromotionalBanner() {
             </Badge>
 
             {/* Left side - Content */}
-            <div className="flex-1 space-y-2 -mt-4">
+            <div className="flex-1 space-y-2 -mt-6">
               {/* Title at top left */}
               <h3 className="text-lg font-bold leading-tight">
                 {currentBanner.title || jobDetails.title}
