@@ -109,21 +109,28 @@ export function PromotionalBanner() {
     // If it's a job banner and we have job details, show the job card
     if (currentBanner.content_type === 'job' && jobDetails) {
       return (
-        <div className="flex gap-6 items-start">
-          {/* Left side - Main content (70%) */}
-          <div className="flex-1 space-y-3">
-            {/* Title row with Promoted badge */}
-            <div className="flex items-start gap-3">
-              <Badge variant="secondary" className="bg-primary/10 text-primary shrink-0 mt-0.5">
-                Promoted
-              </Badge>
-              <h3 className="text-xl font-bold leading-tight flex-1">
-                {currentBanner.title || jobDetails.title}
-              </h3>
-            </div>
+        <div className={`flex gap-6 items-center justify-center flex-1 p-4 rounded-xl ${
+          jobDetails.is_exclusive ? 'border-2 border-gradient-to-r from-purple-500 via-blue-500 to-cyan-500' : ''
+        }`} style={jobDetails.is_exclusive ? {
+          borderImage: 'linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) 1'
+        } : {}}>
+          <div className="flex-1 max-w-4xl mx-auto space-y-3">
+            {/* Exclusive badge centered at top */}
+            {jobDetails.is_exclusive && (
+              <div className="flex justify-center mb-2">
+                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 px-4 py-1">
+                  HuntoriX Exclusive
+                </Badge>
+              </div>
+            )}
+
+            {/* Title */}
+            <h3 className="text-xl font-bold leading-tight text-center">
+              {currentBanner.title || jobDetails.title}
+            </h3>
             
             {/* Badges row - Industry and Status */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 justify-center">
               {jobDetails.industry && (
                 <Badge 
                   variant="filter"
@@ -142,16 +149,16 @@ export function PromotionalBanner() {
             </div>
 
             {/* Meta information with icons */}
-            <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+            <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground max-w-2xl mx-auto">
               {jobDetails.location && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 justify-center">
                   <MapPin className="h-4 w-4 shrink-0" />
                   <span className="truncate">{jobDetails.location}</span>
                 </div>
               )}
               
               {(jobDetails.budget_min || jobDetails.budget_max) && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 justify-center">
                   <DollarSign className="h-4 w-4 shrink-0" />
                   <span className="truncate">
                     {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
@@ -160,7 +167,7 @@ export function PromotionalBanner() {
                 </div>
               )}
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-center">
                 <Calendar className="h-4 w-4 shrink-0" />
                 <span className="truncate">
                   Posted {jobDetails.created_at && !isNaN(new Date(jobDetails.created_at).getTime()) 
@@ -171,7 +178,7 @@ export function PromotionalBanner() {
               </div>
 
               {(jobDetails.employment_type || jobDetails.seniority) && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 justify-center">
                   <Briefcase className="h-4 w-4 shrink-0" />
                   <span className="truncate">
                     {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type)}
@@ -183,13 +190,13 @@ export function PromotionalBanner() {
             </div>
 
             {/* Description preview */}
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-sm text-muted-foreground line-clamp-2 text-center max-w-2xl mx-auto">
               {truncateText(jobDetails.description, 180)}
             </p>
 
             {/* Skills tags */}
             {jobDetails.skills_must && jobDetails.skills_must.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
                 {jobDetails.skills_must.slice(0, 6).map((skill, idx) => (
                   <Badge 
                     key={idx}
@@ -206,24 +213,24 @@ export function PromotionalBanner() {
                 )}
               </div>
             )}
-          </div>
 
-          {/* Right side - Action buttons (30%) */}
-          <div className="flex flex-col gap-2 shrink-0 w-40">
-            <Button
-              onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
-              variant="outline"
-              className="w-full"
-            >
-              View Details
-            </Button>
-            <Button
-              onClick={handleApply}
-              variant="hero"
-              className="w-full"
-            >
-              Apply
-            </Button>
+            {/* Action buttons centered */}
+            <div className="flex gap-3 justify-center pt-2">
+              <Button
+                onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
+                variant="outline"
+                className="min-w-[140px]"
+              >
+                View Details
+              </Button>
+              <Button
+                onClick={handleApply}
+                variant="hero"
+                className="min-w-[140px]"
+              >
+                Apply
+              </Button>
+            </div>
           </div>
         </div>
       );
