@@ -121,16 +121,21 @@ export function PromotionalBanner() {
               borderRadius: '1rem'
             }}
           >
-            {/* Promoted badge - absolute positioned at top left */}
-            <Badge variant="secondary" className="absolute top-2 left-2 bg-primary/10 text-primary shrink-0 text-xs z-10">
+            {/* Promoted badge - absolute positioned at top right */}
+            <Badge variant="secondary" className="absolute top-2 right-2 bg-primary/10 text-primary shrink-0 text-xs z-10">
               Promoted
             </Badge>
 
             {/* Left side - Content */}
             <div className="flex-1 space-y-2">
+              {/* Title at top left */}
+              <h3 className="text-lg font-bold leading-tight pt-4">
+                {currentBanner.title || jobDetails.title}
+              </h3>
+              
               {/* Exclusive badge */}
               {jobDetails.is_exclusive && (
-                <div className="pt-4">
+                <div>
                   <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-xs">
                     HuntoriX Exclusive
                   </Badge>
@@ -208,26 +213,21 @@ export function PromotionalBanner() {
             )}
           </div>
 
-            {/* Right side - Title and Action buttons */}
-            <div className="flex flex-col gap-2 shrink-0 w-48 relative z-10">
-              {/* Title at top */}
-              <h3 className="text-lg font-bold leading-tight text-right">
-                {currentBanner.title || jobDetails.title}
-              </h3>
-              
+            {/* Right side - Action buttons */}
+            <div className="flex flex-col gap-2 shrink-0 w-32 relative z-10">
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="w-full text-xs px-2 py-1 h-8"
               >
-                View Details
+                View
               </Button>
               <Button
                 onClick={handleApply}
                 variant="hero"
                 size="sm"
-                className="w-full"
+                className="w-full text-xs px-2 py-1 h-8"
               >
                 Apply
               </Button>
