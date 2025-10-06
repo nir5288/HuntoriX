@@ -111,7 +111,7 @@ export function PromotionalBanner() {
       return (
         <div className="flex justify-center items-center flex-1">
           <div 
-            className={`relative flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-full lg:w-[78%] xl:w-[47%] p-3 pt-8 border-2`}
+            className={`relative flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-full lg:w-[78%] xl:w-[47%] p-2 pt-6 border-2`}
             style={jobDetails.is_exclusive ? {
               background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
               borderRadius: '1rem',
@@ -127,7 +127,7 @@ export function PromotionalBanner() {
             </Badge>
 
             {/* Left side - Content */}
-            <div className="flex-1 space-y-2 -mt-6">
+            <div className="flex-1 space-y-1 -mt-4">
               {/* Title and exclusive badge on same line */}
               <div className="flex flex-wrap items-center gap-2 pr-20 md:pr-4">
                 <h3 className="text-base md:text-lg font-bold leading-tight">
@@ -165,51 +165,26 @@ export function PromotionalBanner() {
                 </div>
               )}
 
-            {/* Meta information - compact grid */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              {jobDetails.location && (
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{jobDetails.location}</span>
-                </div>
-              )}
-              
-              {(jobDetails.budget_min || jobDetails.budget_max) && (
-                <div className="flex items-center gap-1.5">
-                  <DollarSign className="h-3 w-3 shrink-0" />
-                  <span className="truncate">
-                    {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
-                    {jobDetails.budget_max && ` - ${jobDetails.budget_max.toLocaleString()}`}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Description preview */}
-            <p className="text-xs text-muted-foreground line-clamp-1">
-              {truncateText(jobDetails.description, 150)}
-            </p>
-
-            {/* Skills tags - compact */}
-            {jobDetails.skills_must && jobDetails.skills_must.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {jobDetails.skills_must.slice(0, 4).map((skill, idx) => (
-                  <Badge 
-                    key={idx}
-                    variant="filter" 
-                    className="text-xs"
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-                {jobDetails.skills_must.length > 4 && (
-                  <Badge variant="filter" className="text-xs">
-                    +{jobDetails.skills_must.length - 4}
-                  </Badge>
+              {/* Meta information - compact grid */}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                {jobDetails.location && (
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{jobDetails.location}</span>
+                  </div>
+                )}
+                
+                {(jobDetails.budget_min || jobDetails.budget_max) && (
+                  <div className="flex items-center gap-1.5">
+                    <DollarSign className="h-3 w-3 shrink-0" />
+                    <span className="truncate">
+                      {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
+                      {jobDetails.budget_max && ` - ${jobDetails.budget_max.toLocaleString()}`}
+                    </span>
+                  </div>
                 )}
               </div>
-            )}
-          </div>
+            </div>
 
             {/* Right side - Action buttons */}
             <div className="flex flex-row md:flex-col gap-2 w-full md:w-32 lg:w-36 relative z-10">
