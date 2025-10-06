@@ -525,8 +525,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Mark Job as Exclusive on Huntorix
+                Mark as Exclusive on Huntorix
               </button>
+              <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0">
+                Premium
+              </Badge>
               {showExclusiveInfo && (
                 <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg text-sm text-popover-foreground z-50 max-w-xs">
                   <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
