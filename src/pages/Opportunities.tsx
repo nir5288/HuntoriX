@@ -535,10 +535,12 @@ const Opportunities = () => {
         <div className="flex gap-8 items-start">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
-            {/* Spacer to align with job count */}
-            <div className="h-[2.5rem] mb-4"></div>
-            
-            <div className="mt-8 bg-card rounded-2xl border p-6">
+            <div className="bg-card rounded-2xl border p-6">
+              {/* Job count for alignment */}
+              <div className="h-0 opacity-0 pointer-events-none mb-4">
+                <p className="text-sm">Placeholder</p>
+              </div>
+
               <h3 className="font-semibold mb-4">Filters</h3>
 
               {/* Sort by filter */}
