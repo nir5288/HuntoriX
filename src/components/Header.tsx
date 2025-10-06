@@ -219,24 +219,19 @@ export function Header() {
 
                 {/* Status Selector */}
                 <div className="px-2 py-2">
-                  <div className="flex items-center gap-3">
-                    <Label className="text-sm font-medium">Status</Label>
-                    <RadioGroup value={status} onValueChange={(value: 'online' | 'away') => setStatus(value)} className="flex gap-3">
-                      <div className="flex items-center gap-1.5">
-                        <RadioGroupItem value="online" id="status-online" />
-                        <Label htmlFor="status-online" className="text-sm cursor-pointer flex items-center gap-1">
-                          <Circle className="h-2.5 w-2.5 fill-green-500 text-green-500" />
-                          Online
-                        </Label>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <RadioGroupItem value="away" id="status-away" />
-                        <Label htmlFor="status-away" className="text-sm cursor-pointer flex items-center gap-1">
-                          <Circle className="h-2.5 w-2.5 fill-yellow-500 text-yellow-500" />
-                          Away
-                        </Label>
-                      </div>
-                    </RadioGroup>
+                  <div className="flex items-center justify-between gap-3">
+                    <Label className="text-sm font-medium flex items-center gap-1.5">
+                      <Circle className={`h-2.5 w-2.5 ${status === 'online' ? 'fill-green-500 text-green-500' : 'fill-muted text-muted'}`} />
+                      Online
+                    </Label>
+                    <Switch
+                      checked={status === 'away'}
+                      onCheckedChange={(checked) => setStatus(checked ? 'away' : 'online')}
+                    />
+                    <Label className="text-sm font-medium flex items-center gap-1.5">
+                      <Circle className={`h-2.5 w-2.5 ${status === 'away' ? 'fill-yellow-500 text-yellow-500' : 'fill-muted text-muted'}`} />
+                      Away
+                    </Label>
                   </div>
                 </div>
 
