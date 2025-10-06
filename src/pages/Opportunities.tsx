@@ -513,13 +513,6 @@ const Opportunities = () => {
                 </div>}
             </div>
 
-            {/* Show applied toggle - desktop */}
-            {user && profile?.role === 'headhunter' && <div className="hidden md:flex items-center gap-2">
-                <Switch id="show-applied" checked={showAppliedJobs} onCheckedChange={handleShowAppliedChange} />
-                <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">
-                  Show applied jobs
-                </Label>
-              </div>}
 
             <Sheet>
               <SheetTrigger asChild>
@@ -549,9 +542,11 @@ const Opportunities = () => {
         <div className="flex gap-8">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
-            <div className="sticky top-8 bg-card rounded-2xl border p-6">
+            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto bg-card rounded-2xl border p-6">
+              <h3 className="font-semibold mb-4">Filters</h3>
+
               {/* Sort by filter */}
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-4">
                 <Label className="text-sm font-medium">Sort by:</Label>
                 <Select value={sortBy} onValueChange={handleSortChange}>
                   <SelectTrigger className="w-[140px]">
@@ -563,8 +558,16 @@ const Opportunities = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {user && profile?.role === 'headhunter' && (
+                <div className="flex items-center gap-2 mb-6">
+                  <Switch id="show-applied" checked={showAppliedJobs} onCheckedChange={handleShowAppliedChange} />
+                  <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">
+                    Show applied jobs
+                  </Label>
+                </div>
+              )}
               
-              <h3 className="font-semibold mb-4">Filters</h3>
               <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} resetFilters={resetFilters} />
             </div>
           </aside>
