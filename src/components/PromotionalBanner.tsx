@@ -103,7 +103,7 @@ export function PromotionalBanner() {
     // If it's a job banner and we have job details, show the job card
     if (currentBanner.content_type === 'job' && jobDetails) {
       return <div className="flex justify-center items-center flex-1">
-          <div className={`relative flex flex-col gap-0.5 w-full md:w-full lg:w-[78%] xl:w-[47%] p-2.5 pb-2 border-2`} style={jobDetails.is_exclusive ? {
+          <div className={`relative flex flex-col gap-1 w-full md:w-full lg:w-[78%] xl:w-[47%] p-3 pt-3.5 pb-14 md:pb-2.5 border-2`} style={jobDetails.is_exclusive ? {
           background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
           borderRadius: '1rem',
           border: '2px solid transparent'
@@ -112,18 +112,18 @@ export function PromotionalBanner() {
           borderRadius: '1rem'
         }}>
             {/* Sponsored badge - absolute positioned at top right */}
-            <Badge variant="secondary" className="absolute top-2 right-2 text-primary shrink-0 z-10 bg-[#ffe208] rounded-md text-[10px] h-4 px-1.5">
+            <Badge variant="secondary" className="absolute top-2.5 right-2.5 text-primary shrink-0 z-10 bg-[#ffe208] rounded-md">
               Sponsored
             </Badge>
 
-            {/* Main content with proper spacing to avoid button overlap */}
-            <div className="space-y-0.5 pb-10 md:pb-0 md:pr-40">
+            {/* Left side - Content */}
+            <div className="flex-1 space-y-1">
               {/* Title and exclusive badge on same line */}
-              <div className="flex flex-wrap items-center gap-1.5 pr-16 md:pr-0">
-                <h3 className="text-lg md:text-xl font-bold leading-tight">
+              <div className="flex flex-wrap items-center gap-2 pr-20 md:pr-4">
+                <h3 className="text-xl font-bold leading-tight">
                   {currentBanner.title || jobDetails.title}
                 </h3>
-                {jobDetails.is_exclusive && <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-[10px] h-4">
+                {jobDetails.is_exclusive && <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0">
                     HuntoriX Exclusive
                   </Badge>}
               </div>
@@ -132,59 +132,29 @@ export function PromotionalBanner() {
               {jobDetails.industry && <div>
                   <Badge variant="filter" style={{
                 backgroundColor: getIndustryColor(jobDetails.industry)
-              }} className="text-foreground border-0 text-xs h-5">
+              }} className="text-foreground border-0">
                     {jobDetails.industry}
                   </Badge>
                 </div>}
             
               {/* Employment type and seniority */}
-              {(jobDetails.employment_type || jobDetails.seniority) && <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Briefcase className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">
-                    {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type === 'contract' ? 'Contract' : jobDetails.employment_type)}
-                    {jobDetails.employment_type && jobDetails.seniority && ' • '}
-                    {jobDetails.seniority && jobDetails.seniority.charAt(0).toUpperCase() + jobDetails.seniority.slice(1)}
-                  </span>
-                </div>}
+              {jobDetails.employment_type || jobDetails.seniority}
 
               {/* Description */}
-              {jobDetails.description && <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 md:line-clamp-2">
+              {jobDetails.description && <p className="text-sm text-muted-foreground line-clamp-2">
                   {jobDetails.description}
                 </p>}
 
-              {/* Meta information - compact single row on mobile, grid on desktop */}
-              <div className="flex flex-wrap gap-x-3 gap-y-0 text-xs text-muted-foreground">
-                {jobDetails.location && <div className="flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{jobDetails.location}</span>
-                  </div>}
-                
-                {(jobDetails.budget_min || jobDetails.budget_max) && <div className="flex items-center gap-1">
-                    <DollarSign className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">
-                      {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
-                      {jobDetails.budget_max && ` - ${jobDetails.budget_max.toLocaleString()}`}
-                    </span>
-                  </div>}
-              </div>
+              {/* Meta information - compact grid */}
+              
             </div>
 
             {/* Action buttons - responsive positioning */}
-            <div className="absolute bottom-2 right-2 left-2 md:left-auto flex gap-1.5">
-              <Button 
-                onClick={handleApply}
-                size="sm"
-                variant="outline"
-                className="flex-1 md:flex-initial h-7 text-xs"
-              >
+            <div className="absolute bottom-2.5 right-2.5 left-2.5 md:left-auto flex gap-2 justify-end">
+              <Button onClick={handleApply} size="sm" variant="outline" className="flex-1 md:flex-initial">
                 View Details
               </Button>
-              <Button 
-                onClick={handleApply}
-                size="sm"
-                variant="hero"
-                className="flex-1 md:flex-initial h-7 text-xs"
-              >
+              <Button onClick={handleApply} size="sm" variant="hero" className="flex-1 md:flex-initial">
                 Apply
               </Button>
             </div>
