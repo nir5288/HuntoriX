@@ -499,20 +499,6 @@ const Opportunities = () => {
 
           {/* Search + Mobile Filters */}
           <div className="flex gap-4 items-center justify-center">
-            {/* Sort by filter */}
-            <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium">Sort by:</Label>
-              <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">Most Recent</SelectItem>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             <div className="w-full max-w-[50%]">
               <SearchAutocomplete value={searchQuery} onChange={setSearchQuery} onFilterAdd={handleFilterAdd} placeholder="Search jobs, skills, companies..." />
               
@@ -526,6 +512,14 @@ const Opportunities = () => {
                     </Badge>)}
                 </div>}
             </div>
+
+            {/* Show applied toggle - desktop */}
+            {user && profile?.role === 'headhunter' && <div className="hidden md:flex items-center gap-2">
+                <Switch id="show-applied" checked={showAppliedJobs} onCheckedChange={handleShowAppliedChange} />
+                <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">
+                  Show applied jobs
+                </Label>
+              </div>}
 
             <Sheet>
               <SheetTrigger asChild>
@@ -544,17 +538,11 @@ const Opportunities = () => {
             </Sheet>
           </div>
 
-          {/* Job count and Show applied jobs toggle */}
-          <div className="mt-3 flex justify-center items-center gap-4">
+          {/* Job count */}
+          <div className="mt-3 flex justify-center">
             <p className="text-sm text-muted-foreground">
               {totalCount} {totalCount === 1 ? 'job' : 'jobs'} found
             </p>
-            {user && profile?.role === 'headhunter' && <div className="flex items-center gap-2">
-                <Switch id="show-applied" checked={showAppliedJobs} onCheckedChange={handleShowAppliedChange} />
-                <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">
-                  Show applied jobs
-                </Label>
-              </div>}
           </div>
         </div>
 
@@ -562,6 +550,20 @@ const Opportunities = () => {
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
             <div className="sticky top-8 bg-card rounded-2xl border p-6">
+              {/* Sort by filter */}
+              <div className="flex items-center gap-2 mb-6">
+                <Label className="text-sm font-medium">Sort by:</Label>
+                <Select value={sortBy} onValueChange={handleSortChange}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Most Recent</SelectItem>
+                    <SelectItem value="relevance">Relevance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <h3 className="font-semibold mb-4">Filters</h3>
               <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} resetFilters={resetFilters} />
             </div>
