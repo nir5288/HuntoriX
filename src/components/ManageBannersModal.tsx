@@ -311,33 +311,7 @@ export function ManageBannersModal({
                   description: e.target.value
                 })} rows={2} />
                   </div>
-                  <div>
-                    <Label htmlFor="image_upload">Upload Image/GIF *</Label>
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <Input id="image_upload" type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" onChange={handleFileUpload} disabled={uploading} className="flex-1" />
-                        <Button type="button" variant="outline" size="icon" disabled={uploading}>
-                          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                      {formData.image_url && <div className="relative">
-                          <img src={formData.image_url} alt="Banner preview" className="w-full h-32 object-cover rounded border" />
-                          <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-6 w-6" onClick={() => setFormData({
-                      ...formData,
-                      image_url: ''
-                    })}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>}
-                      <p className="text-xs text-muted-foreground">
-                        Or paste URL below (max 5MB, PNG/JPG/GIF/WebP)
-                      </p>
-                      <Input id="image_url" type="url" value={formData.image_url} onChange={e => setFormData({
-                    ...formData,
-                    image_url: e.target.value
-                  })} placeholder="https://..." />
-                    </div>
-                  </div>
+                  
                   <div>
                     <Label htmlFor="link_url">Link URL (Optional)</Label>
                     <Input id="link_url" type="url" value={formData.link_url} onChange={e => setFormData({
