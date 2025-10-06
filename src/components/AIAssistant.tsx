@@ -129,13 +129,18 @@ export function AIAssistant() {
       {/* Floating Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed left-6 bottom-6 h-14 w-14 rounded-full shadow-2xl z-[9999] bg-gradient-to-r from-primary to-primary-glow hover:scale-110 transition-transform"
-        size="icon"
+        className="fixed left-6 bottom-6 h-16 px-6 rounded-full shadow-[0_0_30px_rgba(124,58,237,0.5)] z-[9999] bg-gradient-to-r from-primary via-accent-purple to-primary bg-[length:200%_100%] animate-gradient hover:scale-105 transition-all duration-300 flex items-center gap-3"
       >
         {isOpen ? (
-          <X className="h-6 w-6" />
+          <>
+            <X className="h-5 w-5 text-white" />
+            <span className="text-white font-semibold text-sm">Close</span>
+          </>
         ) : (
-          <MessageCircle className="h-6 w-6" />
+          <>
+            <MessageCircle className="h-5 w-5 text-white" />
+            <span className="text-white font-semibold text-sm">HuntoriX AI</span>
+          </>
         )}
       </Button>
 

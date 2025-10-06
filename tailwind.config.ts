@@ -62,6 +62,8 @@ export default {
           mint: "hsl(var(--vibrant-mint))",
           lilac: "hsl(var(--vibrant-lilac))",
         },
+        "accent-purple": "270 60% 55%",
+        "primary-glow": "220 27% 25%",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -101,12 +103,24 @@ export default {
             transform: "translateX(100%) skewX(-20deg)",
           },
         },
+        gradient: {
+          "0%": {
+            backgroundPosition: "0% 50%",
+          },
+          "50%": {
+            backgroundPosition: "100% 50%",
+          },
+          "100%": {
+            backgroundPosition: "0% 50%",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 3s ease-in-out infinite",
         wave: "wave 3s ease-in-out infinite",
+        gradient: "gradient 3s ease infinite",
       },
     },
   },
