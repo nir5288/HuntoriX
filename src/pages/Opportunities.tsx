@@ -498,8 +498,8 @@ const Opportunities = () => {
           
 
           {/* Search + Mobile Filters */}
-          <div className="flex gap-4">
-            <div className="flex-1">
+          <div className="flex gap-4 items-start justify-center">
+            <div className="w-full max-w-[50%]">
               <SearchAutocomplete value={searchQuery} onChange={setSearchQuery} onFilterAdd={handleFilterAdd} placeholder="Search jobs, skills, companies..." />
               
               {/* Active filter chips */}
