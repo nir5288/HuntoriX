@@ -51,6 +51,28 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      let resolvedJobId = data.job_id || null;
+
+      // If content_type is job and job_id is provided, resolve it
+      if (data.content_type === 'job' && data.job_id) {
+        // Check if it's a UUID or a job number
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.job_id);
+        
+        if (!isUUID) {
+          // It's a job number, look up the UUID
+          const { data: jobData, error: jobError } = await supabase
+            .from('jobs')
+            .select('id')
+            .eq('job_id_number', parseInt(data.job_id))
+            .single();
+
+          if (jobError || !jobData) {
+            throw new Error(`Job #${data.job_id} not found`);
+          }
+          resolvedJobId = jobData.id;
+        }
+      }
+
       const insertData: any = {
         title: data.title,
         description: data.description,
@@ -58,7 +80,7 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
         link_url: data.link_url,
         image_url: data.image_url,
         video_url: data.video_url,
-        job_id: data.job_id || null,
+        job_id: resolvedJobId,
         is_active: data.is_active,
         display_order: data.display_order,
         created_by: user!.id,
@@ -83,9 +105,31 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<typeof formData> }) => {
+      let updateData = { ...data };
+
+      // If content_type is job and job_id is provided, resolve it
+      if (data.content_type === 'job' && data.job_id) {
+        // Check if it's a UUID or a job number
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.job_id);
+        
+        if (!isUUID) {
+          // It's a job number, look up the UUID
+          const { data: jobData, error: jobError } = await supabase
+            .from('jobs')
+            .select('id')
+            .eq('job_id_number', parseInt(data.job_id))
+            .single();
+
+          if (jobError || !jobData) {
+            throw new Error(`Job #${data.job_id} not found`);
+          }
+          updateData.job_id = jobData.id;
+        }
+      }
+
       const { error } = await supabase
         .from('promotional_banners')
-        .update(data)
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
