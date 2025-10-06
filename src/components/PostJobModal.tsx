@@ -500,11 +500,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 group-active:opacity-60 group-active:scale-150 transition-all duration-200" />
                   
                   {/* Dark center circle */}
-                  <div className="absolute inset-[2px] rounded-full bg-background flex items-center justify-center">
-                    <span className="text-[10px] font-bold bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                      X
-                    </span>
-                  </div>
+                  <div className="absolute inset-[2px] rounded-full bg-background" />
                 </>
               ) : (
                 <>
@@ -529,7 +525,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Exclusive on HuntoriX
+                Mark Job as Exclusive on Huntorix
               </button>
               {showExclusiveInfo && (
                 <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg text-sm text-popover-foreground z-50 max-w-xs">
