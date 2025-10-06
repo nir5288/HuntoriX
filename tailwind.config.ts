@@ -93,11 +93,20 @@ export default {
             backgroundPosition: "200% 0",
           },
         },
+        wave: {
+          "0%, 100%": {
+            transform: "translateX(-100%) skewX(-20deg)",
+          },
+          "50%": {
+            transform: "translateX(100%) skewX(-20deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 3s ease-in-out infinite",
+        wave: "wave 3s ease-in-out infinite",
       },
     },
   },

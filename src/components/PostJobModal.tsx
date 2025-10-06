@@ -485,31 +485,29 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               onClick={() => setIsExclusive(!isExclusive)}
               className="relative flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 hover:scale-110 group"
             >
-              {/* Outer glow effect - only when active */}
-              {isExclusive && (
-                <>
-                  <div className="absolute -inset-1 rounded-full bg-purple-500/30 blur-lg animate-pulse" />
-                  <div className="absolute -inset-1 rounded-full bg-cyan-400/30 blur-lg animate-pulse" style={{ animationDelay: '1s' }} />
-                </>
-              )}
-              
               {/* Main dot */}
-              <div className={`relative w-full h-full rounded-full transition-all duration-500 ${
+              <div className={`relative w-full h-full rounded-full transition-all duration-500 overflow-hidden ${
                 isExclusive 
-                  ? 'bg-gradient-to-br from-purple-500 via-blue-400 to-cyan-400 shadow-lg shadow-purple-500/50' 
+                  ? 'bg-gradient-to-br from-purple-500 via-blue-400 to-cyan-400' 
                   : 'bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40 border-2 border-muted-foreground/30 hover:border-muted-foreground/50'
               }`}>
                 {isExclusive && (
                   <>
-                    {/* Moving gradient overlay */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" 
-                         style={{ 
-                           backgroundSize: '200% 100%',
-                           animation: 'shimmer 3s ease-in-out infinite'
-                         }} />
-                    {/* Rotating color layer */}
-                    <div className="absolute inset-0 rounded-full opacity-60">
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-400 via-purple-500 to-blue-500 animate-[spin_6s_linear_infinite]" />
+                    {/* First flowing layer */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-600/80 via-transparent to-cyan-500/80 animate-[spin_4s_ease-in-out_infinite]" />
+                    
+                    {/* Second flowing layer (opposite direction) */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-bl from-blue-500/60 via-purple-400/60 to-transparent animate-[spin_6s_ease-in-out_infinite_reverse]" />
+                    
+                    {/* Pulsing center glow */}
+                    <div className="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-300/40 via-purple-300/40 to-blue-300/40 animate-pulse" />
+                    
+                    {/* Organic wave effect */}
+                    <div className="absolute inset-0 rounded-full">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[wave_3s_ease-in-out_infinite]" 
+                           style={{ 
+                             transform: 'skewX(-20deg)',
+                           }} />
                     </div>
                   </>
                 )}
@@ -531,7 +529,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 Exclusive on HuntoriX
               </button>
               {showExclusiveInfo && (
-                <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-50 max-w-xs">
+                <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg text-sm text-popover-foreground z-50 max-w-xs">
                   <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
                   <button 
                     onClick={() => setShowExclusiveInfo(false)}
