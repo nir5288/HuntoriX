@@ -462,7 +462,7 @@ const HeadhunterDashboard = () => {
                             </Badge>
                             {app.job?.is_exclusive && (
                               <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
-                                Exclusive
+                                HuntoriX Exclusive
                               </Badge>
                             )}
                             {app.type === 'invitation' && <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5 bg-fuchsia-500">
