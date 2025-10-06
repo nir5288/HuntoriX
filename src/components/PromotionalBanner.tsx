@@ -118,24 +118,20 @@ export function PromotionalBanner() {
 
             {/* Main content with proper spacing to avoid button overlap */}
             <div className="space-y-0.5 pb-10 md:pb-0 md:pr-40">
-              {/* Title and exclusive badge on same line */}
+              {/* Title and badges on same line */}
               <div className="flex flex-wrap items-center gap-1.5 pr-16 md:pr-0">
                 <h3 className="text-lg md:text-xl font-bold leading-tight">
                   {currentBanner.title || jobDetails.title}
                 </h3>
+                {jobDetails.industry && <Badge variant="filter" style={{
+                    backgroundColor: getIndustryColor(jobDetails.industry)
+                  }} className="text-foreground border-0 text-xs h-5">
+                    {jobDetails.industry}
+                  </Badge>}
                 {jobDetails.is_exclusive && <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-[10px] h-4">
                     HuntoriX Exclusive
                   </Badge>}
               </div>
-
-              {/* Industry badge under title */}
-              {jobDetails.industry && <div>
-                  <Badge variant="filter" style={{
-                backgroundColor: getIndustryColor(jobDetails.industry)
-              }} className="text-foreground border-0 text-xs h-5">
-                    {jobDetails.industry}
-                  </Badge>
-                </div>}
             
 
               {/* Description */}
