@@ -153,7 +153,7 @@ export const InviteToJobModal = ({
               <SelectTrigger id="job">
                 <SelectValue placeholder="Choose a job posting..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 {jobs.length === 0 ? (
                   <SelectItem value="none" disabled>
                     No open jobs available
