@@ -187,12 +187,12 @@ export function PromotionalBanner() {
             </div>
 
             {/* Right side - Action buttons */}
-            <div className="flex flex-row gap-2 w-full md:w-auto relative z-10">
+            <div className="flex flex-row gap-2 shrink-0">
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
                 size="sm"
-                className="flex-1 md:flex-none md:w-full text-xs px-2 py-1 h-8"
+                className="text-xs px-3 py-1 h-8"
               >
                 View
               </Button>
@@ -200,7 +200,7 @@ export function PromotionalBanner() {
                 onClick={handleApply}
                 variant="hero"
                 size="sm"
-                className="flex-1 md:flex-none md:w-full text-xs px-2 py-1 h-8"
+                className="text-xs px-3 py-1 h-8"
               >
                 Apply
               </Button>
