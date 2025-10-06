@@ -9,10 +9,27 @@ import { Badge } from './ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Trash2, Plus, GripVertical, Settings, Upload, X, Loader2 } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 interface ManageBannersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -27,6 +44,7 @@ export function ManageBannersModal({
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [localBanners, setLocalBanners] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     content_type: 'job' as 'job' | 'image' | 'video',
     link_url: '',
@@ -36,6 +54,13 @@ export function ManageBannersModal({
     is_active: true,
     display_order: 0
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   const {
     data: banners = []
   } = useQuery({
@@ -51,6 +76,38 @@ export function ManageBannersModal({
       return data || [];
     },
     enabled: open
+  });
+
+  // Update local banners when data changes
+  useEffect(() => {
+    setLocalBanners(banners);
+  }, [banners]);
+
+  const reorderMutation = useMutation({
+    mutationFn: async (reorderedBanners: any[]) => {
+      // Update display_order for all banners
+      const updates = reorderedBanners.map((banner, index) => 
+        supabase
+          .from('promotional_banners')
+          .update({ display_order: index })
+          .eq('id', banner.id)
+      );
+      
+      await Promise.all(updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['promotional-banners']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['all-promotional-banners']
+      });
+      toast.success('Banner order updated');
+    },
+    onError: () => {
+      toast.error('Failed to update banner order');
+      setLocalBanners(banners); // Reset to original order on error
+    }
   });
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -298,6 +355,97 @@ export function ManageBannersModal({
     });
     setEditingId(banner.id);
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setLocalBanners((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        
+        const reordered = arrayMove(items, oldIndex, newIndex);
+        
+        // Update the database with new order
+        reorderMutation.mutate(reordered);
+        
+        return reordered;
+      });
+    }
+  };
+
+  // Sortable Item Component
+  const SortableItem = ({ banner }: { banner: any }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: banner.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div 
+        ref={setNodeRef}
+        style={style}
+        className="p-3 border rounded-lg hover:bg-accent/50 transition bg-background"
+      >
+        <div className="flex items-start gap-3">
+          <button
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing mt-1 flex-shrink-0"
+          >
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="secondary" className="text-xs">
+                    {banner.content_type}
+                  </Badge>
+                  {!banner.is_active && (
+                    <Badge variant="outline" className="text-xs">
+                      Inactive
+                    </Badge>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    Order: {banner.display_order}
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-1 flex-shrink-0">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={() => handleEdit(banner)}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-destructive hover:text-destructive" 
+                  onClick={() => deleteMutation.mutate(banner.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
   return <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden">
         <DialogHeader>
@@ -485,56 +633,23 @@ export function ManageBannersModal({
 
             <div className="space-y-4">
               <div className="bg-accent/30 p-4 rounded-lg border">
-                <h3 className="font-semibold mb-4 text-lg">Existing Banners ({banners.length})</h3>
-                <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                  {banners.map(banner => (
-                    <div 
-                      key={banner.id} 
-                      className="p-3 border rounded-lg hover:bg-accent/50 transition bg-background"
-                    >
-                      <div className="flex items-start gap-3">
-                        <GripVertical className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <Badge variant="secondary" className="text-xs">
-                                  {banner.content_type}
-                                </Badge>
-                                {!banner.is_active && (
-                                  <Badge variant="outline" className="text-xs">
-                                    Inactive
-                                  </Badge>
-                                )}
-                                <span className="text-xs text-muted-foreground">
-                                  Order: {banner.display_order}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex gap-1 flex-shrink-0">
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-8 w-8" 
-                                onClick={() => handleEdit(banner)}
-                              >
-                                <Settings className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-8 w-8 text-destructive hover:text-destructive" 
-                                onClick={() => deleteMutation.mutate(banner.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                <h3 className="font-semibold mb-4 text-lg">Existing Banners ({localBanners.length})</h3>
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext 
+                    items={localBanners.map(b => b.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
+                      {localBanners.map(banner => (
+                        <SortableItem key={banner.id} banner={banner} />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               </div>
             </div>
           </div>
