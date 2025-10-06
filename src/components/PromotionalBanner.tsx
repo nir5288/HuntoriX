@@ -111,7 +111,7 @@ export function PromotionalBanner() {
       return (
         <div className="flex justify-center items-center flex-1">
           <div 
-            className={`relative flex gap-4 items-center w-[36%] p-3 pt-8 border-2`} 
+            className={`relative flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-[80%] lg:w-[60%] xl:w-[36%] p-3 pt-8 border-2`}
             style={jobDetails.is_exclusive ? {
               background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
               borderRadius: '1rem',
@@ -129,8 +129,8 @@ export function PromotionalBanner() {
             {/* Left side - Content */}
             <div className="flex-1 space-y-2 -mt-6">
               {/* Title and exclusive badge on same line */}
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold leading-tight">
+              <div className="flex flex-wrap items-center gap-2 pr-20 md:pr-4">
+                <h3 className="text-base md:text-lg font-bold leading-tight">
                   {currentBanner.title || jobDetails.title}
                 </h3>
                 {jobDetails.is_exclusive && (
@@ -212,12 +212,12 @@ export function PromotionalBanner() {
           </div>
 
             {/* Right side - Action buttons */}
-            <div className="flex flex-col gap-2 shrink-0 w-32 relative z-10">
+            <div className="flex flex-row md:flex-col gap-2 w-full md:w-32 lg:w-36 relative z-10">
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
                 size="sm"
-                className="w-full text-xs px-2 py-1 h-8"
+                className="flex-1 md:flex-none md:w-full text-xs px-2 py-1 h-8"
               >
                 View
               </Button>
@@ -225,7 +225,7 @@ export function PromotionalBanner() {
                 onClick={handleApply}
                 variant="hero"
                 size="sm"
-                className="w-full text-xs px-2 py-1 h-8"
+                className="flex-1 md:flex-none md:w-full text-xs px-2 py-1 h-8"
               >
                 Apply
               </Button>
