@@ -30,6 +30,7 @@ export function PromotionalBanner() {
       if (error) throw error;
       return data || [];
     },
+    staleTime: 60000,
   });
 
   if (!banners.length) return null;
@@ -52,6 +53,8 @@ export function PromotionalBanner() {
       return data;
     },
     enabled: !!currentBanner?.job_id && currentBanner?.content_type === 'job',
+    staleTime: 60000,
+    gcTime: 300000,
   });
 
   const nextBanner = () => {
