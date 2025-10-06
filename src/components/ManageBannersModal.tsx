@@ -187,9 +187,9 @@ export function ManageBannersModal({
     if (!file) return;
 
     // Validate file type
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
     if (!validTypes.includes(file.type)) {
-      toast.error('Please upload a valid image file (PNG, JPG, GIF, or WebP)');
+      toast.error('Please upload a valid image file (PNG, JPG, or GIF)');
       return;
     }
 
@@ -291,6 +291,47 @@ export function ManageBannersModal({
                 </>}
 
               {formData.content_type === 'image' && <>
+                  <div>
+                    <Label htmlFor="image_upload">Image Upload *</Label>
+                    <div className="space-y-2">
+                      <Input 
+                        id="image_upload" 
+                        type="file" 
+                        accept="image/png,image/jpeg,image/jpg,image/gif"
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Accepted formats: JPG, PNG, GIF<br />
+                        Recommended size: 1200x400px (3:1 ratio)<br />
+                        Image will display at full banner width
+                      </p>
+                      {uploading && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Uploading...
+                        </div>
+                      )}
+                      {formData.image_url && !uploading && (
+                        <div className="relative">
+                          <img 
+                            src={formData.image_url} 
+                            alt="Preview" 
+                            className="w-full h-32 object-cover rounded border"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-2 right-2 h-6 w-6 bg-background/80 hover:bg-background"
+                            onClick={() => setFormData({ ...formData, image_url: '' })}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <div>
                     <Label htmlFor="link_url">Link URL (Optional)</Label>
                     <Input id="link_url" type="url" value={formData.link_url} onChange={e => setFormData({
