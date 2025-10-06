@@ -487,14 +487,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               {/* Outer glow ring */}
               <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
                 isExclusive 
-                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] animate-[spin_2s_linear_infinite] blur-sm opacity-70' 
+                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] animate-[spin_6s_linear_infinite] blur-sm opacity-70' 
                   : 'bg-border'
               }`} />
               
               {/* Main dot border */}
               <div className={`absolute inset-0.5 rounded-full transition-all duration-500 ${
                 isExclusive 
-                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-[spin_3s_linear_infinite]' 
+                  ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-[spin_8s_linear_infinite]' 
                   : 'bg-muted-foreground/30'
               }`} />
               
@@ -503,12 +503,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               
               {/* Center active dot */}
               {isExclusive && (
-                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] z-20 animate-pulse" />
+                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] z-20 animate-[spin_5s_linear_infinite]" />
               )}
             </button>
             <span className={`text-sm font-medium transition-all duration-300 ${
               isExclusive 
-                ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent' 
+                ? 'text-[hsl(var(--primary))]' 
                 : 'text-muted-foreground'
             }`}>
               Exclusive on HuntoriX
