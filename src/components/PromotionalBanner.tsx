@@ -169,8 +169,14 @@ export function PromotionalBanner() {
               </div>
             </div>
 
-            {/* Right side - Action buttons */}
-            
+            {/* Apply button - absolute positioned at bottom right */}
+            <Button 
+              onClick={handleApply}
+              size="sm"
+              className="absolute bottom-2.5 right-2.5"
+            >
+              Apply
+            </Button>
           </div>
         </div>;
     }
