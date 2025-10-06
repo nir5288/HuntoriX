@@ -89,6 +89,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [isPublic, setIsPublic] = useState(true);
   const [isParsing, setIsParsing] = useState(false);
   const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
+  const [isExclusive, setIsExclusive] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -469,9 +470,28 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 {isParsing && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyzing...
+                    <span>Parsing job description...</span>
                   </div>
                 )}
+              </div>
+              
+              {/* Exclusive Toggle */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsExclusive(!isExclusive)}
+                  className="relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-primary transition-all duration-300 hover:scale-110 group"
+                >
+                  <div className={`absolute inset-0.5 rounded-full transition-all duration-500 ${
+                    isExclusive 
+                      ? 'bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-[spin_3s_linear_infinite]' 
+                      : 'bg-transparent'
+                  }`} />
+                  {isExclusive && (
+                    <div className="absolute inset-1 rounded-full bg-background z-10" />
+                  )}
+                </button>
+                <span className="text-sm font-medium">Exclusive on HuntoriX</span>
               </div>
             </div>
           </Card>
