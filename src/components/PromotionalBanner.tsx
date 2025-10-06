@@ -155,7 +155,7 @@ export function PromotionalBanner() {
 
     // Default banner content (image/video/custom)
     const content = <div className="flex justify-center items-center flex-1">
-        {currentBanner.image_url && <div className="w-full h-[400px] overflow-hidden rounded-lg">
+        {currentBanner.image_url && <div className="w-full h-[100px] overflow-hidden rounded-lg">
             <img 
               src={currentBanner.image_url} 
               alt="Banner" 
