@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Carousel, CarouselContent, CarouselItem, CarouselApi } from '@/components/ui/carousel';
-import { MapPin, DollarSign, Calendar, Briefcase, Sparkles, Heart } from 'lucide-react';
+import { MapPin, DollarSign, Calendar, Briefcase, Sparkles, Heart, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
@@ -353,8 +353,18 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       job.is_exclusive ? 'exclusive-job-card' : ''
     }`}>
       {job.is_exclusive && (
-        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1 px-4 text-xs font-semibold">
-          HuntoriX Exclusive
+        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1.5">
+          <span>HuntoriX Exclusive</span>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-3 w-3 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>This job is exclusively available on the HuntoriX platform</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
       <CardHeader className="space-y-3">
