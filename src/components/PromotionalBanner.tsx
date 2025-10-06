@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ChevronLeft, ChevronRight, Settings, MapPin, DollarSign, Briefcase, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
@@ -137,36 +137,12 @@ export function PromotionalBanner() {
                   </Badge>
                 </div>}
             
-              {/* Employment type and seniority */}
-              {(jobDetails.employment_type || jobDetails.seniority) && <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Briefcase className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">
-                    {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type === 'contract' ? 'Contract' : jobDetails.employment_type)}
-                    {jobDetails.employment_type && jobDetails.seniority && ' • '}
-                    {jobDetails.seniority && jobDetails.seniority.charAt(0).toUpperCase() + jobDetails.seniority.slice(1)}
-                  </span>
-                </div>}
 
               {/* Description */}
               {jobDetails.description && <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 md:line-clamp-2">
                   {jobDetails.description}
                 </p>}
 
-              {/* Meta information - compact single row on mobile, grid on desktop */}
-              <div className="flex flex-wrap gap-x-3 gap-y-0 text-xs text-muted-foreground">
-                {jobDetails.location && <div className="flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{jobDetails.location}</span>
-                  </div>}
-                
-                {(jobDetails.budget_min || jobDetails.budget_max) && <div className="flex items-center gap-1">
-                    <DollarSign className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">
-                      {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
-                      {jobDetails.budget_max && ` - ${jobDetails.budget_max.toLocaleString()}`}
-                    </span>
-                  </div>}
-              </div>
             </div>
 
             {/* Action buttons - responsive positioning */}
@@ -174,18 +150,10 @@ export function PromotionalBanner() {
               <Button 
                 onClick={handleApply}
                 size="sm"
-                variant="outline"
-                className="flex-1 md:flex-initial h-7 text-xs"
-              >
-                View Details
-              </Button>
-              <Button 
-                onClick={handleApply}
-                size="sm"
                 variant="hero"
                 className="flex-1 md:flex-initial h-7 text-xs"
               >
-                Apply
+                View Details
               </Button>
             </div>
           </div>
