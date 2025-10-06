@@ -116,7 +116,7 @@ export function PromotionalBanner() {
             {/* Main content with proper spacing to avoid button overlap */}
             <div className="space-y-0.5 pb-10 md:pb-0 md:pr-40">
               {/* Title and badges on same line */}
-              <div className="flex flex-wrap items-center gap-1.5 pr-16 md:pr-0">
+              <div className="flex items-center gap-1.5 pr-16 md:pr-0 overflow-hidden">
                 <h3 className="text-lg md:text-xl font-bold leading-tight">
                   {currentBanner.title || jobDetails.title}
                 </h3>
