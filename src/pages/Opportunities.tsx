@@ -535,7 +535,7 @@ const Opportunities = () => {
         <div className="flex gap-8 items-start">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
-            <div className="bg-card rounded-2xl border p-6">
+            <div className="mt-9 bg-card rounded-2xl border p-6">
               <h3 className="font-semibold mb-4">Filters</h3>
 
               {/* Sort by filter */}
