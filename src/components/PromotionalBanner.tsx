@@ -111,9 +111,9 @@ export function PromotionalBanner() {
           borderColor: 'hsl(var(--border))',
           borderRadius: '1rem'
         }}>
-            {/* Promoted badge - absolute positioned at top right */}
+            {/* Sponsored badge - absolute positioned at top right */}
             <Badge variant="secondary" className="absolute top-2.5 right-2.5 text-primary shrink-0 z-10 bg-[#ffe208] rounded-md">
-              Promoted
+              Sponsored
             </Badge>
 
             {/* Left side - Content */}
