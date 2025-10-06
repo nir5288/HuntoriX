@@ -35,6 +35,16 @@ interface ColorPalette {
 const colorPalettes: ColorPalette[] = [
   {
     id: "default",
+    name: "Original",
+    colors: {
+      primary: "220 27% 11%",
+      accentPink: "337 76% 91%",
+      accentMint: "150 48% 88%",
+      accentLilac: "252 100% 95%",
+    },
+  },
+  {
+    id: "klarna",
     name: "Klarna Pink",
     colors: {
       primary: "340 82% 52%",
