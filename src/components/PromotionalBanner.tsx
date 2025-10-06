@@ -165,6 +165,13 @@ export function PromotionalBanner() {
                 </div>
               )}
 
+              {/* Description */}
+              {jobDetails.description && (
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {jobDetails.description}
+                </p>
+              )}
+
               {/* Meta information - compact grid */}
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 {jobDetails.location && (
