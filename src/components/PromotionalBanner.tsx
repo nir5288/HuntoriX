@@ -111,7 +111,7 @@ export function PromotionalBanner() {
       return (
         <div className="flex justify-center items-center flex-1">
           <div 
-            className={`relative flex flex-col gap-4 w-full md:w-full lg:w-[78%] xl:w-[47%] p-4 pt-6 border-2`}
+            className={`relative flex flex-col gap-2 w-full md:w-full lg:w-[78%] xl:w-[47%] p-3 pt-5 border-2`}
             style={jobDetails.is_exclusive ? {
               background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
               borderRadius: '1rem',
@@ -127,7 +127,7 @@ export function PromotionalBanner() {
             </Badge>
 
             {/* Left side - Content */}
-            <div className="flex-1 space-y-1 -mt-4">
+            <div className="flex-1 space-y-0.5 -mt-2">
               {/* Title and exclusive badge on same line */}
               <div className="flex flex-wrap items-center gap-2 pr-20 md:pr-4">
                 <h3 className="text-base md:text-lg font-bold leading-tight">
