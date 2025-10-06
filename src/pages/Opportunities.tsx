@@ -498,7 +498,21 @@ const Opportunities = () => {
           
 
           {/* Search + Mobile Filters */}
-          <div className="flex gap-4 items-start justify-center">
+          <div className="flex gap-4 items-center justify-center">
+            {/* Sort by filter */}
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">Sort by:</Label>
+              <Select value={sortBy} onValueChange={handleSortChange}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Most Recent</SelectItem>
+                  <SelectItem value="relevance">Relevance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="w-full max-w-[50%]">
               <SearchAutocomplete value={searchQuery} onChange={setSearchQuery} onFilterAdd={handleFilterAdd} placeholder="Search jobs, skills, companies..." />
               
@@ -530,28 +544,11 @@ const Opportunities = () => {
             </Sheet>
           </div>
 
-          {/* Job count display */}
-          <div className="mt-3 flex justify-end">
+          {/* Job count and Show applied jobs toggle */}
+          <div className="mt-3 flex justify-center items-center gap-4">
             <p className="text-sm text-muted-foreground">
               {totalCount} {totalCount === 1 ? 'job' : 'jobs'} found
             </p>
-          </div>
-
-          {/* Sort and Applied Jobs Filter */}
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium">Sort by:</Label>
-              <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">Most Recent</SelectItem>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {user && profile?.role === 'headhunter' && <div className="flex items-center gap-2">
                 <Switch id="show-applied" checked={showAppliedJobs} onCheckedChange={handleShowAppliedChange} />
                 <Label htmlFor="show-applied" className="text-sm font-medium cursor-pointer">

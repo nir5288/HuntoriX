@@ -257,10 +257,21 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
     }
   };
 
+  const [triggerWidth, setTriggerWidth] = useState<number>(0);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  // Measure trigger width for popover
+  useEffect(() => {
+    if (triggerRef.current) {
+      setTriggerWidth(triggerRef.current.offsetWidth);
+    }
+  }, [open]);
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <div
+          ref={triggerRef}
           className="relative"
           role="combobox"
           aria-expanded={open}
@@ -320,7 +331,8 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
         </div>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-[600px] p-0" 
+        className="p-0" 
+        style={{ width: triggerWidth > 0 ? `${triggerWidth}px` : 'auto' }}
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
