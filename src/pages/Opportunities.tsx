@@ -530,13 +530,6 @@ const Opportunities = () => {
               </SheetContent>
             </Sheet>
           </div>
-
-          {/* Job count */}
-          <div className="mt-3 flex justify-center">
-            <p className="text-sm text-muted-foreground">
-              {totalCount} {totalCount === 1 ? 'job' : 'jobs'} found
-            </p>
-          </div>
         </div>
 
         <div className="flex gap-8">
@@ -574,7 +567,14 @@ const Opportunities = () => {
 
           {/* Results */}
           <div className="flex-1">
-            {loading ? <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* Job count */}
+            <div className="mb-4 flex justify-end">
+              <p className="text-sm text-muted-foreground">
+                {totalCount} {totalCount === 1 ? 'job' : 'jobs'} found
+              </p>
+            </div>
+
+            {loading ? <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                 {[...Array(6)].map((_, i) => <div key={i} className="h-80 bg-card rounded-2xl animate-pulse" />)}
               </div> : filteredJobs.length === 0 && !isRefreshing ? <div className="bg-gradient-to-br from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 rounded-2xl p-12 text-center">
                 <h3 className="text-2xl font-semibold mb-2">No opportunities match your filters</h3>
