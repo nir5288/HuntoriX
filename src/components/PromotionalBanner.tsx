@@ -122,7 +122,7 @@ export function PromotionalBanner() {
             }}
           >
             {/* Promoted badge - absolute positioned at top right */}
-            <Badge variant="secondary" className="absolute top-2.5 right-2.5 bg-primary/10 text-primary shrink-0 text-xs z-10">
+            <Badge variant="secondary" className="absolute top-2.5 right-2.5 bg-primary/10 text-primary shrink-0 z-10">
               Promoted
             </Badge>
 
@@ -130,11 +130,11 @@ export function PromotionalBanner() {
             <div className="flex-1 space-y-0.5 -mt-1">
               {/* Title and exclusive badge on same line */}
               <div className="flex flex-wrap items-center gap-2 pr-20 md:pr-4">
-                <h3 className="text-base md:text-lg font-bold leading-tight">
+                <h3 className="text-xl font-bold leading-tight">
                   {currentBanner.title || jobDetails.title}
                 </h3>
                 {jobDetails.is_exclusive && (
-                  <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-xs">
+                  <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0">
                     HuntoriX Exclusive
                   </Badge>
                 )}
@@ -146,7 +146,7 @@ export function PromotionalBanner() {
                   <Badge 
                     variant="filter"
                     style={{ backgroundColor: getIndustryColor(jobDetails.industry) }}
-                    className="text-foreground border-0 text-xs"
+                    className="text-foreground border-0"
                   >
                     {jobDetails.industry}
                   </Badge>
@@ -155,8 +155,8 @@ export function PromotionalBanner() {
             
               {/* Employment type and seniority */}
               {(jobDetails.employment_type || jobDetails.seniority) && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Briefcase className="h-3 w-3 shrink-0" />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Briefcase className="h-4 w-4 shrink-0" />
                   <span className="truncate">
                     {jobDetails.employment_type && (jobDetails.employment_type === 'full_time' ? 'Full-time' : jobDetails.employment_type === 'contract' ? 'Contract' : jobDetails.employment_type)}
                     {jobDetails.employment_type && jobDetails.seniority && ' • '}
@@ -167,23 +167,23 @@ export function PromotionalBanner() {
 
               {/* Description */}
               {jobDetails.description && (
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-snug">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   {jobDetails.description}
                 </p>
               )}
 
               {/* Meta information - compact grid */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm text-muted-foreground">
                 {jobDetails.location && (
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="h-3 w-3 shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 shrink-0" />
                     <span className="truncate">{jobDetails.location}</span>
                   </div>
                 )}
                 
                 {(jobDetails.budget_min || jobDetails.budget_max) && (
-                  <div className="flex items-center gap-1.5">
-                    <DollarSign className="h-3 w-3 shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 shrink-0" />
                     <span className="truncate">
                       {jobDetails.budget_currency} {jobDetails.budget_min?.toLocaleString()}
                       {jobDetails.budget_max && ` - ${jobDetails.budget_max.toLocaleString()}`}
