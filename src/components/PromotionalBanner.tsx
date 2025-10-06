@@ -154,12 +154,17 @@ export function PromotionalBanner() {
     }
 
     // Default banner content (image/video/custom)
-    const content = <div className="flex items-center gap-6 flex-1 min-w-0">
-        {currentBanner.image_url && <img src={currentBanner.image_url} alt={currentBanner.title} className="h-24 w-32 object-cover rounded-lg flex-shrink-0" />}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-lg mb-1">{currentBanner.title}</h3>
-          {currentBanner.description && <p className="text-sm text-muted-foreground line-clamp-2">{currentBanner.description}</p>}
-        </div>
+    const content = <div className="flex justify-center items-center flex-1">
+        {currentBanner.image_url && <div className="w-full">
+            <img 
+              src={currentBanner.image_url} 
+              alt="Banner" 
+              className="w-full h-auto object-cover rounded-lg"
+              style={{
+                maxHeight: '400px'
+              }}
+            />
+          </div>}
       </div>;
 
     // Priority: job_id > link_url
