@@ -443,7 +443,8 @@ const HeadhunterDashboard = () => {
                 <p className="text-sm text-muted-foreground">No applications yet</p>
               </div> : filteredApplications.length === 0 ? <div className="text-center py-6">
                 <p className="text-sm text-muted-foreground">No applications match your filters</p>
-              </div> : <div className="space-y-3">
+              </div> : <>
+                <div className="space-y-3">
                 {filteredApplications.slice(0, 5).map(app => <Card key={`${app.type}-${app.id}`} className={`hover:shadow-md transition-shadow ${
                     app.job?.is_exclusive ? 'exclusive-job-card' : ''
                   }`}>
@@ -511,7 +512,19 @@ const HeadhunterDashboard = () => {
                       </div>
                     </CardContent>
                   </Card>)}
-              </div>}
+              </div>
+              {applications.length > 5 && (
+                <div className="mt-4 text-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate('/applications')}
+                    className="w-full"
+                  >
+                    View All Applications
+                  </Button>
+                </div>
+              )}
+              </>}
           </CardContent>
         </Card>
 
