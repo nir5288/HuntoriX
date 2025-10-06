@@ -25,6 +25,7 @@ type Job = {
   status: string | null;
   created_by: string;
   created_at: string;
+  is_exclusive?: boolean;
 };
 
 type OpportunityCardProps = {
@@ -348,7 +349,9 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   return (
-    <Card className="rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+    <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
+      job.is_exclusive ? 'exclusive-job-card' : ''
+    }`}>
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>

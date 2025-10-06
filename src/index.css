@@ -160,3 +160,31 @@
 .animate-scroll-right {
   animation: scroll-right 40s linear infinite;
 }
+
+.exclusive-job-card {
+  position: relative;
+}
+
+.exclusive-job-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(90deg, #8b5cf6, #06b6d4, #8b5cf6, #06b6d4);
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: neon-border-move 4s linear infinite;
+}
+
+@keyframes neon-border-move {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}

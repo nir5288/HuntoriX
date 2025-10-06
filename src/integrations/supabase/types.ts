@@ -270,6 +270,7 @@ export type Database = {
           employment_type: string | null
           id: string
           industry: string | null
+          is_exclusive: boolean
           job_id_number: number
           location: string | null
           remote_policy: string | null
@@ -295,6 +296,7 @@ export type Database = {
           employment_type?: string | null
           id?: string
           industry?: string | null
+          is_exclusive?: boolean
           job_id_number: number
           location?: string | null
           remote_policy?: string | null
@@ -320,6 +322,7 @@ export type Database = {
           employment_type?: string | null
           id?: string
           industry?: string | null
+          is_exclusive?: boolean
           job_id_number?: number
           location?: string | null
           remote_policy?: string | null

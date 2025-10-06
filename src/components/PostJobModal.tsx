@@ -417,7 +417,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           skills_nice: skillsNice,
           created_by: userId,
           visibility: isPublic ? 'public' : 'private',
-          status: 'open'
+          status: 'open',
+          is_exclusive: isExclusive
         } as any])
         .select()
         .single();

@@ -123,14 +123,17 @@ const SavedJobs = () => {
           </Card>
         ) : (
           <div className="space-y-3">
-            {savedJobs.map((savedJob, index) => {
-              const isMyJob = savedJob.job.created_by === user?.id;
-              return (
-                <Card 
-                  key={savedJob.id} 
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardHeader className="px-4 py-3">
+          {savedJobs.map((savedJob, index) => {
+            const job = savedJob.job;
+            const isMyJob = savedJob.job.created_by === user?.id;
+            return (
+              <Card 
+                key={savedJob.id} 
+                className={`hover:shadow-md transition-shadow ${
+                  job.is_exclusive ? 'exclusive-job-card' : ''
+                }`}
+              >
+                <CardHeader className="px-4 py-3">
                     <div className="flex items-start justify-between gap-4">
                       <div 
                         className="flex-1 cursor-pointer group" 

@@ -21,6 +21,7 @@ type Job = {
   status: string | null;
   skills_must: string[] | null;
   created_by: string;
+  is_exclusive?: boolean;
 };
 
 export function HotOpportunities() {
@@ -83,7 +84,7 @@ export function HotOpportunities() {
   const fetchJobs = async () => {
     const { data, error } = await supabase
       .from('jobs')
-      .select('id, title, description, industry, location, budget_currency, budget_min, budget_max, status, skills_must, created_by')
+      .select('id, title, description, industry, location, budget_currency, budget_min, budget_max, status, skills_must, created_by, is_exclusive')
       .eq('status', 'open')
       .eq('visibility', 'public')
       .order('created_at', { ascending: false })
@@ -188,7 +189,9 @@ export function HotOpportunities() {
             <CarouselContent className="-ml-2 md:-ml-4">
               {jobs.map((job) => (
                 <CarouselItem key={job.id} className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                  <Card className="rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 h-full bg-gradient-to-br from-background via-[hsl(var(--surface)/0.3)] to-background">
+                  <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 h-full bg-gradient-to-br from-background via-[hsl(var(--surface)/0.3)] to-background ${
+                    job.is_exclusive ? 'exclusive-job-card' : ''
+                  }`}>
                     <CardContent className="p-6 flex flex-col h-full">
                       <div className="space-y-4 flex-grow">
                       <div className="space-y-2">
