@@ -86,6 +86,8 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
   const [skillNiceInput, setSkillNiceInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
+  const [isExclusive, setIsExclusive] = useState(false);
+  const [showExclusiveInfo, setShowExclusiveInfo] = useState(false);
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -134,6 +136,7 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
       setSkillsMust(job.skills_must || []);
       setSkillsNice(job.skills_nice || []);
       setIsPublic(job.visibility === 'public');
+      setIsExclusive(job.is_exclusive || false);
     }
   }, [job, open, reset]);
 
@@ -189,6 +192,7 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
         skills_nice: skillsNice,
         visibility: isPublic ? 'public' : 'private',
         status: data.status,
+        is_exclusive: isExclusive,
       };
 
       // Compare and track changes
@@ -480,6 +484,72 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
                   </Badge>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Exclusive Toggle */}
+          <div className="relative flex items-center gap-3 p-3 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
+            <button
+              type="button"
+              onClick={() => {
+                setIsExclusive(!isExclusive);
+                setShowExclusiveInfo(!showExclusiveInfo);
+              }}
+              className="relative w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 group"
+            >
+              {isExclusive ? (
+                <>
+                  {/* Animated gradient ring */}
+                  <div 
+                    className="absolute inset-0 rounded-full opacity-100 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      background: 'conic-gradient(from 0deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4)',
+                      animation: 'spin 10s linear infinite'
+                    }}
+                  />
+                  {/* Pulse effect on click */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 group-active:opacity-60 group-active:scale-150 transition-all duration-200" />
+                  {/* Dark center circle */}
+                  <div className="absolute inset-[2px] rounded-full bg-background" />
+                </>
+              ) : (
+                <>
+                  {/* Default soft ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-muted-foreground/30 group-hover:border-muted-foreground/50 transition-colors opacity-100 group-disabled:opacity-40" />
+                  {/* Dark center */}
+                  <div className="absolute inset-[2px] rounded-full bg-background" />
+                </>
+              )}
+            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowExclusiveInfo(!showExclusiveInfo);
+                }}
+                className={`text-sm font-medium underline decoration-dotted underline-offset-4 transition-all duration-300 hover:decoration-solid ${
+                  isExclusive 
+                    ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Mark as Exclusive on Huntorix
+              </button>
+              <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0">
+                Premium
+              </Badge>
+              {showExclusiveInfo && (
+                <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg text-sm text-popover-foreground z-50 max-w-xs">
+                  <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
+                  <button 
+                    onClick={() => setShowExclusiveInfo(false)}
+                    className="mt-2 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

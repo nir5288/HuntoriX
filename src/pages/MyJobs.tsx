@@ -279,7 +279,9 @@ const MyJobs = () => {
                         return (
                           <Card 
                             key={job.id} 
-                            className="group hover:shadow-md transition-shadow cursor-pointer" 
+                            className={`group hover:shadow-md transition-shadow cursor-pointer ${
+                              job.is_exclusive ? 'exclusive-job-card' : ''
+                            }`}
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
                             <CardHeader className="px-4 py-3">

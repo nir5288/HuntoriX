@@ -518,7 +518,9 @@ const HeadhunterDashboard = () => {
             {jobs.length === 0 ? <div className="text-center py-6">
                 <p className="text-sm text-muted-foreground">No jobs available at the moment</p>
               </div> : <div className="space-y-3">
-                {jobs.map(job => <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, {
+                {jobs.map(job => <Card key={job.id} className={`hover:shadow-md transition-shadow cursor-pointer ${
+                  job.is_exclusive ? 'exclusive-job-card' : ''
+                }`} onClick={() => navigate(`/jobs/${job.id}`, {
             state: {
               from: 'dashboard'
             }

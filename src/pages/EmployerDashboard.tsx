@@ -429,7 +429,9 @@ const EmployerDashboard = () => {
                       {visibleJobs.map(job => {
               const jobApplications = applications.filter(a => a.job_id === job.id);
               const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
-              return <Card key={job.id} className="group hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
+              return <Card key={job.id} className={`group hover:shadow-md transition-shadow cursor-pointer ${
+                job.is_exclusive ? 'exclusive-job-card' : ''
+              }`} onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                       <CardHeader className="px-4 py-3">
                         <div className="flex items-start justify-between">
                            <div className="flex-1">
