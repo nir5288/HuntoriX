@@ -483,35 +483,28 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <button
               type="button"
               onClick={() => setIsExclusive(!isExclusive)}
-              className="relative flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 hover:scale-110 group"
+              className="relative flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 hover:scale-110 group"
             >
-              {/* Main dot */}
-              <div className={`relative w-full h-full rounded-full transition-all duration-500 overflow-hidden ${
-                isExclusive 
-                  ? 'bg-gradient-to-br from-purple-500 via-blue-400 to-cyan-400' 
-                  : 'bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40 border-2 border-muted-foreground/30 hover:border-muted-foreground/50'
-              }`}>
-                {isExclusive && (
-                  <>
-                    {/* First flowing layer */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-600/80 via-transparent to-cyan-500/80 animate-[spin_4s_ease-in-out_infinite]" />
-                    
-                    {/* Second flowing layer (opposite direction) */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-bl from-blue-500/60 via-purple-400/60 to-transparent animate-[spin_6s_ease-in-out_infinite_reverse]" />
-                    
-                    {/* Pulsing center glow */}
-                    <div className="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-300/40 via-purple-300/40 to-blue-300/40 animate-pulse" />
-                    
-                    {/* Organic wave effect */}
-                    <div className="absolute inset-0 rounded-full">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[wave_3s_ease-in-out_infinite]" 
-                           style={{ 
-                             transform: 'skewX(-20deg)',
-                           }} />
-                    </div>
-                  </>
-                )}
-              </div>
+              {isExclusive ? (
+                <>
+                  {/* Outer glow layers */}
+                  <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 blur-xl opacity-60 animate-[spin_3s_linear_infinite]" />
+                  <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-blue-400 via-purple-600 to-pink-400 blur-lg opacity-80 animate-[spin_3s_linear_infinite]" />
+                  
+                  {/* Main neon ring */}
+                  <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-[spin_3s_linear_infinite]">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-400" style={{ transform: 'rotate(180deg)' }} />
+                  </div>
+                  
+                  {/* Inner white/cyan bright ring */}
+                  <div className="absolute inset-[3px] rounded-full bg-gradient-to-tr from-cyan-300 via-white to-purple-300 opacity-90 animate-[spin_2s_linear_infinite_reverse]" />
+                  
+                  {/* Dark center */}
+                  <div className="absolute inset-[4px] rounded-full bg-gradient-to-br from-blue-950 via-purple-950 to-blue-950" />
+                </>
+              ) : (
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40 border-2 border-muted-foreground/30 hover:border-muted-foreground/50 transition-colors" />
+              )}
             </button>
             <div className="flex items-center gap-1">
               <button
