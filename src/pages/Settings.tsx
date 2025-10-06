@@ -176,8 +176,6 @@ const Settings = () => {
   const [expertiseInput, setExpertiseInput] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [languageInput, setLanguageInput] = useState("");
   const [regions, setRegions] = useState<string[]>([]);
   const [regionInput, setRegionInput] = useState("");
   const [yearsExperience, setYearsExperience] = useState("");
@@ -220,7 +218,6 @@ const Settings = () => {
       setBio(profile.bio || "");
       setExpertise(profile.expertise || []);
       setSkills(profile.skills || []);
-      setLanguages(profile.languages || []);
       setRegions(profile.regions || []);
       setIndustries(profile.industries || []);
       setYearsExperience(profile.years_experience?.toString() || "");
@@ -257,7 +254,6 @@ const Settings = () => {
         updates.bio = bio;
         updates.expertise = expertise;
         updates.skills = skills;
-        updates.languages = languages;
         updates.regions = regions;
         updates.industries = industries;
         updates.years_experience = yearsExperience ? parseInt(yearsExperience) : null;
@@ -332,17 +328,6 @@ const Settings = () => {
 
   const removeSkill = (skill: string) => {
     setSkills(skills.filter((s) => s !== skill));
-  };
-
-  const addLanguage = () => {
-    if (languageInput.trim() && !languages.includes(languageInput.trim())) {
-      setLanguages([...languages, languageInput.trim()]);
-      setLanguageInput("");
-    }
-  };
-
-  const removeLanguage = (language: string) => {
-    setLanguages(languages.filter((l) => l !== language));
   };
 
   const addRegion = () => {
@@ -680,59 +665,7 @@ const Settings = () => {
                 <CardDescription>Add your recruiting skills</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && addSkill()}
-                    placeholder="Enter skill and press Enter"
-                  />
-                  <Button type="button" onClick={addSkill}>
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {skills.map((skill) => (
-                    <Badge key={skill} variant="secondary" className="gap-1">
-                      {skill}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => removeSkill(skill)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
-              <CardHeader>
-                <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Languages</CardTitle>
-                <CardDescription>Languages you speak</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    value={languageInput}
-                    onChange={(e) => setLanguageInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && addLanguage()}
-                    placeholder="Enter language and press Enter"
-                  />
-                  <Button type="button" onClick={addLanguage}>
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {languages.map((language) => (
-                    <Badge key={language} variant="secondary" className="gap-1">
-                      {language}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => removeLanguage(language)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
+...
               </CardContent>
             </Card>
 

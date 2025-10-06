@@ -6,6 +6,7 @@ import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Hea
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +28,7 @@ export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  const { status, language, setStatus, setLanguage } = useUserPreferences();
+  const { status, setStatus } = useUserPreferences();
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -218,54 +219,24 @@ export function Header() {
 
                 {/* Status Selector */}
                 <div className="px-2 py-2">
-                  <Label className="text-sm font-medium mb-2 block">Status</Label>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setStatus('online')}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
-                        status === 'online' ? 'bg-muted' : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <Circle className="h-3 w-3 fill-green-500 text-green-500" />
-                      <span>Online</span>
-                    </button>
-                    <button
-                      onClick={() => setStatus('away')}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
-                        status === 'away' ? 'bg-muted' : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                      <span>Away</span>
-                    </button>
-                  </div>
-                </div>
-
-                <DropdownMenuSeparator />
-
-                {/* Language Selector */}
-                <div className="px-2 py-2">
-                  <Label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Language
-                  </Label>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setLanguage('en')}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
-                        language === 'en' ? 'bg-muted' : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <span>English</span>
-                    </button>
-                    <button
-                      onClick={() => setLanguage('he')}
-                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${
-                        language === 'he' ? 'bg-muted' : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <span>עברית</span>
-                    </button>
+                  <div className="flex items-center gap-3">
+                    <Label className="text-sm font-medium">Status</Label>
+                    <RadioGroup value={status} onValueChange={(value: 'online' | 'away') => setStatus(value)} className="flex gap-3">
+                      <div className="flex items-center gap-1.5">
+                        <RadioGroupItem value="online" id="status-online" />
+                        <Label htmlFor="status-online" className="text-sm cursor-pointer flex items-center gap-1">
+                          <Circle className="h-2.5 w-2.5 fill-green-500 text-green-500" />
+                          Online
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <RadioGroupItem value="away" id="status-away" />
+                        <Label htmlFor="status-away" className="text-sm cursor-pointer flex items-center gap-1">
+                          <Circle className="h-2.5 w-2.5 fill-yellow-500 text-yellow-500" />
+                          Away
+                        </Label>
+                      </div>
+                    </RadioGroup>
                   </div>
                 </div>
 
