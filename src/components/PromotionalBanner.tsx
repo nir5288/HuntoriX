@@ -122,7 +122,7 @@ export function PromotionalBanner() {
             }}
           >
             {/* Promoted badge - absolute positioned at top right */}
-            <Badge variant="secondary" className="absolute top-2 right-2 bg-primary/10 text-primary shrink-0 text-xs z-10">
+            <Badge variant="secondary" className="absolute top-3 right-3 bg-primary/10 text-primary shrink-0 text-xs z-10">
               Promoted
             </Badge>
 
