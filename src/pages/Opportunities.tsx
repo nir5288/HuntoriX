@@ -532,7 +532,7 @@ const Opportunities = () => {
           </div>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex gap-8 items-start">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
             <div className="bg-card rounded-2xl border p-6">
