@@ -109,25 +109,31 @@ export function PromotionalBanner() {
     // If it's a job banner and we have job details, show the job card
     if (currentBanner.content_type === 'job' && jobDetails) {
       return (
-        <div className={`flex gap-4 items-center flex-1 p-3 rounded-2xl ${
-          jobDetails.is_exclusive ? 'border-2' : ''
-        }`} style={jobDetails.is_exclusive ? {
-          borderImage: 'linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) 1',
-          borderRadius: '1rem'
-        } : {}}>
-          {/* Left side - Content */}
-          <div className="flex-1 space-y-2">
-            {/* Title with exclusive badge */}
-            <div className="flex items-center gap-2">
-              {jobDetails.is_exclusive && (
-                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0">
-                  HuntoriX Exclusive
+        <div className="flex justify-center items-center flex-1">
+          <div className={`flex gap-4 items-center w-[60%] p-3 rounded-2xl border-2 ${
+            jobDetails.is_exclusive 
+              ? 'bg-gradient-to-r from-purple-500/5 via-blue-500/5 to-cyan-500/5' 
+              : 'bg-card'
+          }`} style={jobDetails.is_exclusive ? {
+            borderImage: 'linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) 1',
+            borderRadius: '1rem'
+          } : { borderColor: 'hsl(var(--border))' }}>
+            {/* Left side - Content */}
+            <div className="flex-1 space-y-2">
+              {/* Promoted badge and Title with exclusive badge */}
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-primary/10 text-primary shrink-0 text-xs">
+                  Promoted
                 </Badge>
-              )}
-              <h3 className="text-lg font-bold leading-tight">
-                {currentBanner.title || jobDetails.title}
-              </h3>
-            </div>
+                {jobDetails.is_exclusive && (
+                  <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-xs">
+                    HuntoriX Exclusive
+                  </Badge>
+                )}
+                <h3 className="text-lg font-bold leading-tight">
+                  {currentBanner.title || jobDetails.title}
+                </h3>
+              </div>
             
             {/* Badges row - Industry and Status */}
             <div className="flex flex-wrap gap-2">
@@ -215,24 +221,25 @@ export function PromotionalBanner() {
             )}
           </div>
 
-          {/* Right side - Action buttons */}
-          <div className="flex flex-col gap-2 shrink-0 w-32">
-            <Button
-              onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
-              variant="outline"
-              size="sm"
-              className="w-full"
-            >
-              View Details
-            </Button>
-            <Button
-              onClick={handleApply}
-              variant="hero"
-              size="sm"
-              className="w-full"
-            >
-              Apply
-            </Button>
+            {/* Right side - Action buttons */}
+            <div className="flex flex-col gap-2 shrink-0 w-32">
+              <Button
+                onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                View Details
+              </Button>
+              <Button
+                onClick={handleApply}
+                variant="hero"
+                size="sm"
+                className="w-full"
+              >
+                Apply
+              </Button>
+            </div>
           </div>
         </div>
       );
