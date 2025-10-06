@@ -90,6 +90,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [isParsing, setIsParsing] = useState(false);
   const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
   const [isExclusive, setIsExclusive] = useState(false);
+  const [showExclusiveInfo, setShowExclusiveInfo] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -484,35 +485,63 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               onClick={() => setIsExclusive(!isExclusive)}
               className="relative flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 hover:scale-110 group"
             >
-              {/* Outer glow effect */}
+              {/* Outer glow effect - only when active */}
               {isExclusive && (
                 <>
-                  <div className="absolute inset-0 rounded-full bg-purple-500/40 blur-md animate-pulse" />
-                  <div className="absolute inset-0 rounded-full bg-cyan-400/40 blur-md animate-pulse" style={{ animationDelay: '0.5s' }} />
+                  <div className="absolute -inset-1 rounded-full bg-purple-500/30 blur-lg animate-pulse" />
+                  <div className="absolute -inset-1 rounded-full bg-cyan-400/30 blur-lg animate-pulse" style={{ animationDelay: '1s' }} />
                 </>
               )}
               
               {/* Main dot */}
-              <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
+              <div className={`relative w-full h-full rounded-full transition-all duration-500 ${
                 isExclusive 
                   ? 'bg-gradient-to-br from-purple-500 via-blue-400 to-cyan-400 shadow-lg shadow-purple-500/50' 
-                  : 'bg-muted-foreground/30'
+                  : 'bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40 border-2 border-muted-foreground/30 hover:border-muted-foreground/50'
               }`}>
                 {isExclusive && (
                   <>
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-400 via-purple-500 to-blue-500 opacity-0 animate-pulse" />
-                    <div className="absolute inset-1 rounded-full bg-gradient-to-br from-purple-400/50 via-transparent to-cyan-400/50 animate-[spin_4s_linear_infinite]" />
+                    {/* Moving gradient overlay */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite]" 
+                         style={{ 
+                           backgroundSize: '200% 100%',
+                           animation: 'shimmer 3s ease-in-out infinite'
+                         }} />
+                    {/* Rotating color layer */}
+                    <div className="absolute inset-0 rounded-full opacity-60">
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-400 via-purple-500 to-blue-500 animate-[spin_6s_linear_infinite]" />
+                    </div>
                   </>
                 )}
               </div>
             </button>
-            <span className={`text-sm font-medium transition-all duration-300 ${
-              isExclusive 
-                ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
-                : 'text-muted-foreground'
-            }`}>
-              Exclusive on HuntoriX
-            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowExclusiveInfo(!showExclusiveInfo);
+                }}
+                className={`text-sm font-medium underline decoration-dotted underline-offset-4 transition-all duration-300 hover:decoration-solid ${
+                  isExclusive 
+                    ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Exclusive on HuntoriX
+              </button>
+              {showExclusiveInfo && (
+                <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-50 max-w-xs">
+                  <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
+                  <button 
+                    onClick={() => setShowExclusiveInfo(false)}
+                    className="mt-2 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* A. Basics */}
