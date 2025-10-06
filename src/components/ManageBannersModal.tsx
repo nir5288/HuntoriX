@@ -76,9 +76,9 @@ export function ManageBannersModal({
         title: '',
         description: '',
         content_type: data.content_type,
-        link_url: data.link_url,
-        image_url: data.image_url,
-        video_url: data.video_url,
+        link_url: data.link_url || '',
+        image_url: data.image_url || '',
+        video_url: data.video_url || '',
         job_id: resolvedJobId,
         is_active: data.is_active,
         display_order: data.display_order,
@@ -111,12 +111,17 @@ export function ManageBannersModal({
       id: string;
       data: Partial<typeof formData>;
     }) => {
-      let updateData = {
+      let updateData: any = {
         ...data
       };
 
+      // Convert empty strings to null for UUID fields
+      if (updateData.job_id === '') {
+        updateData.job_id = null;
+      }
+
       // If content_type is job and job_id is provided, resolve it
-      if (data.content_type === 'job' && data.job_id) {
+      if (data.content_type === 'job' && data.job_id && data.job_id !== '') {
         // Check if it's a UUID or a job number
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.job_id);
         if (!isUUID) {
@@ -131,6 +136,7 @@ export function ManageBannersModal({
           updateData.job_id = jobData.id;
         }
       }
+      
       const {
         error
       } = await supabase.from('promotional_banners').update(updateData).eq('id', id);
