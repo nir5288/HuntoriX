@@ -388,6 +388,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
         
         <div className="flex flex-wrap gap-2">
+          {job.is_exclusive && (
+            <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold">
+              HuntoriX Exclusive
+            </Badge>
+          )}
+          
           {job.industry && (
             <Badge 
               variant="filter"

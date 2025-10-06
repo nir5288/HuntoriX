@@ -197,6 +197,12 @@ export function HotOpportunities() {
                       <div className="space-y-2">
                         <h3 className="font-bold text-lg line-clamp-1">{job.title}</h3>
                         <div className="flex flex-wrap gap-2">
+                          {job.is_exclusive && (
+                            <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold">
+                              HuntoriX Exclusive
+                            </Badge>
+                          )}
+                          
                           {job.industry && (
                             <Badge className={`${getIndustryColor(job.industry)} border-0`}>
                               {job.industry}

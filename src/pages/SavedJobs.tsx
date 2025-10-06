@@ -139,13 +139,18 @@ const SavedJobs = () => {
                         className="flex-1 cursor-pointer group" 
                         onClick={() => navigate(`/jobs/${savedJob.job.id}`, { state: { from: 'saved' } })}
                       >
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <CardTitle className="text-base group-hover:text-[hsl(var(--accent-mint))] transition-colors">
                             {savedJob.job?.title}
                           </CardTitle>
                           {savedJob.job?.job_id_number && (
                             <Badge variant="outline" className="text-xs h-5">
                               #{savedJob.job?.job_id_number}
+                            </Badge>
+                          )}
+                          {job.is_exclusive && (
+                            <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                              HuntoriX Exclusive
                             </Badge>
                           )}
                         </div>

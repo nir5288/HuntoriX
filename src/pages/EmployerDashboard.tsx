@@ -435,11 +435,16 @@ const EmployerDashboard = () => {
                       <CardHeader className="px-4 py-3">
                         <div className="flex items-start justify-between">
                            <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <CardTitle className="text-base">{job.title}</CardTitle>
                               {job.job_id_number && (
                                 <Badge variant="outline" className="text-xs h-5">
                                   #{job.job_id_number}
+                                </Badge>
+                              )}
+                              {job.is_exclusive && (
+                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                                  HuntoriX Exclusive
                                 </Badge>
                               )}
                               {pendingCount > 0 && <Badge className="bg-[hsl(var(--warning))] text-white text-xs h-5">

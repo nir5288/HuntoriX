@@ -528,8 +528,15 @@ const HeadhunterDashboard = () => {
                     <CardHeader className="px-4 py-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-base">{job.title}</CardTitle>
-                          <CardDescription className="text-xs mt-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <CardTitle className="text-base">{job.title}</CardTitle>
+                            {job.is_exclusive && (
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                                HuntoriX Exclusive
+                              </Badge>
+                            )}
+                          </div>
+                          <CardDescription className="text-xs">
                             {job.employer?.company_name || job.employer?.name} • {job.location}
                           </CardDescription>
                           {job.skills_must && job.skills_must.length > 0 && <div className="flex flex-wrap gap-1.5 mt-2">
