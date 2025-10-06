@@ -129,17 +129,20 @@ export function AIAssistant() {
       {/* Floating Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed left-6 bottom-6 h-16 px-6 rounded-full shadow-[0_0_30px_rgba(124,58,237,0.5)] z-[9999] bg-gradient-to-r from-primary via-accent-purple to-primary bg-[length:200%_100%] animate-gradient hover:scale-105 transition-all duration-300 flex items-center gap-3"
+        className="fixed left-6 bottom-6 h-12 px-4 rounded-full shadow-lg hover:shadow-xl z-[9999] bg-gradient-to-r from-primary via-primary-glow to-primary transition-all duration-300 flex items-center gap-2.5 group border border-white/20"
       >
         {isOpen ? (
           <>
-            <X className="h-5 w-5 text-white" />
-            <span className="text-white font-semibold text-sm">Close</span>
+            <X className="h-4 w-4 text-white" />
+            <span className="text-white font-medium text-xs tracking-wide">Close</span>
           </>
         ) : (
           <>
-            <MessageCircle className="h-5 w-5 text-white" />
-            <span className="text-white font-semibold text-sm">HuntoriX AI</span>
+            <div className="relative">
+              <MessageCircle className="h-4 w-4 text-white" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            </div>
+            <span className="text-white font-medium text-xs tracking-wide">HuntoriX AI</span>
           </>
         )}
       </Button>
@@ -148,15 +151,15 @@ export function AIAssistant() {
       {isOpen && (
         <div className="fixed left-6 bottom-24 w-96 h-[500px] bg-background border border-border rounded-lg shadow-2xl z-[9999] flex flex-col">
           {/* Header */}
-          <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-primary/10 to-accent-purple/10">
-            <Avatar className="h-10 w-10 border-2 border-primary">
-              <AvatarFallback className="bg-gradient-to-br from-primary to-accent-purple text-white font-bold">
+          <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
+            <Avatar className="h-9 w-9 border border-primary/20">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white font-semibold text-xs">
                 AI
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-foreground">Avatar AI</h3>
-              <p className="text-xs text-muted-foreground">Your Huntorix Guide</p>
+              <h3 className="font-semibold text-sm text-foreground">HuntoriX AI</h3>
+              <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
             </div>
           </div>
 
