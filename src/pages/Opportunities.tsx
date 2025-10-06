@@ -655,7 +655,7 @@ const Opportunities = () => {
         <div className="flex gap-8">
           {/* Desktop Filters */}
           <aside className="hidden md:block w-64 flex-shrink-0">
-            <div className="sticky top-8 bg-card rounded-2xl border p-6">
+            <div className="sticky top-24 bg-card rounded-2xl border p-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
               <h3 className="font-semibold mb-4">Filters</h3>
               <OpportunitiesFilters
                 industries={industries}
@@ -686,8 +686,8 @@ const Opportunities = () => {
           {/* Results */}
           <div className="flex-1">
             {loading ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, i) => (
                   <div key={i} className="h-80 bg-card rounded-2xl animate-pulse" />
                 ))}
               </div>
@@ -701,7 +701,7 @@ const Opportunities = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
                   {filteredJobs.map(job => (
                     <OpportunityCard
                       key={job.id}
