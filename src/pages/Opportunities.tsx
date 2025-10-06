@@ -538,7 +538,7 @@ const Opportunities = () => {
             {/* Spacer to align with job count */}
             <div className="h-[2.5rem] mb-4"></div>
             
-            <div className="bg-card rounded-2xl border p-6">
+            <div className="bg-card rounded-2xl border p-6 -mt-1">
               <h3 className="font-semibold mb-4">Filters</h3>
 
               {/* Sort by filter */}
