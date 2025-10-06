@@ -57,9 +57,14 @@ export function PromotionalBanner() {
       </div>
     );
 
-    if (currentBanner.link_url) {
+    // Priority: job_id > link_url
+    const linkTo = currentBanner.job_id 
+      ? `/job-detail/${currentBanner.job_id}`
+      : currentBanner.link_url;
+
+    if (linkTo) {
       return (
-        <Link to={currentBanner.link_url} className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80 transition">
+        <Link to={linkTo} className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80 transition">
           {content}
         </Link>
       );

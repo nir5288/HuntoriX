@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Trash2, Plus, GripVertical, Settings } from 'lucide-react';
+import { Trash2, Plus, GripVertical, Settings, Upload, X, Loader2 } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 
 interface ManageBannersModalProps {
@@ -22,13 +22,15 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    content_type: 'custom' as const,
+    content_type: 'custom' as 'job' | 'company' | 'service' | 'image' | 'video' | 'custom',
     link_url: '',
     image_url: '',
     video_url: '',
+    job_id: '',
     is_active: true,
     display_order: 0,
   });
@@ -49,12 +51,22 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      const insertData: any = {
+        title: data.title,
+        description: data.description,
+        content_type: data.content_type,
+        link_url: data.link_url,
+        image_url: data.image_url,
+        video_url: data.video_url,
+        job_id: data.job_id || null,
+        is_active: data.is_active,
+        display_order: data.display_order,
+        created_by: user!.id,
+      };
+
       const { error } = await supabase
         .from('promotional_banners')
-        .insert({
-          ...data,
-          created_by: user!.id,
-        });
+        .insert(insertData);
 
       if (error) throw error;
     },
@@ -117,10 +129,54 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
       link_url: '',
       image_url: '',
       video_url: '',
+      job_id: '',
       is_active: true,
       display_order: 0,
     });
     setEditingId(null);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a valid image file (PNG, JPG, GIF, or WebP)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage
+        .from('banner-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('banner-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      toast.success('Image uploaded successfully');
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload image: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -140,6 +196,7 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
       link_url: banner.link_url || '',
       image_url: banner.image_url || '',
       video_url: banner.video_url || '',
+      job_id: banner.job_id || '',
       is_active: banner.is_active,
       display_order: banner.display_order,
     });
@@ -197,26 +254,98 @@ export function ManageBannersModal({ open, onOpenChange }: ManageBannersModalPro
                 </Select>
               </div>
 
+              {formData.content_type === 'job' && (
+                <div>
+                  <Label htmlFor="job_id">Job ID</Label>
+                  <Input
+                    id="job_id"
+                    value={formData.job_id}
+                    onChange={(e) => setFormData({ ...formData, job_id: e.target.value })}
+                    placeholder="Enter job UUID or job number"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This will create a link to /job-detail/{'{job_id}'}
+                  </p>
+                </div>
+              )}
+
+              {formData.content_type !== 'job' && (
+                <div>
+                  <Label htmlFor="link_url">Link URL</Label>
+                  <Input
+                    id="link_url"
+                    type="url"
+                    value={formData.link_url}
+                    onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
+              )}
+
               <div>
-                <Label htmlFor="link_url">Link URL</Label>
-                <Input
-                  id="link_url"
-                  type="url"
-                  value={formData.link_url}
-                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                  placeholder="https://..."
-                />
+                <Label htmlFor="image_upload">Upload Image/GIF</Label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      id="image_upload"
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      disabled={uploading}
+                    >
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  {formData.image_url && (
+                    <div className="relative">
+                      <img 
+                        src={formData.image_url} 
+                        alt="Banner preview" 
+                        className="w-full h-32 object-cover rounded border"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6"
+                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Or paste URL below (max 5MB, PNG/JPG/GIF/WebP)
+                  </p>
+                  <Input
+                    id="image_url"
+                    type="url"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="video_url">Video URL</Label>
                 <Input
-                  id="image_url"
+                  id="video_url"
                   type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://..."
+                  value={formData.video_url}
+                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                  placeholder="https://youtube.com/... or https://vimeo.com/..."
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  YouTube, Vimeo, or direct video URLs supported
+                </p>
               </div>
 
               <div>

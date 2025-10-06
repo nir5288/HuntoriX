@@ -732,6 +732,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean | null
+          job_id: string | null
           link_url: string | null
           title: string
           updated_at: string | null
@@ -747,6 +748,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          job_id?: string | null
           link_url?: string | null
           title: string
           updated_at?: string | null
@@ -762,12 +764,21 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          job_id?: string | null
           link_url?: string | null
           title?: string
           updated_at?: string | null
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "promotional_banners_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_headhunters: {
         Row: {
