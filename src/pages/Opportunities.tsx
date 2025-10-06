@@ -615,6 +615,13 @@ const Opportunities = () => {
             </Sheet>
           </div>
 
+          {/* Job count display */}
+          <div className="mt-3 flex justify-end">
+            <p className="text-sm text-muted-foreground">
+              {totalCount} {totalCount === 1 ? 'job' : 'jobs'} found
+            </p>
+          </div>
+
           {/* Sort and Applied Jobs Filter */}
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
