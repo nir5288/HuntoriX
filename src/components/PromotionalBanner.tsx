@@ -111,7 +111,7 @@ export function PromotionalBanner() {
       return (
         <div className="flex justify-center items-center flex-1">
           <div 
-            className={`relative flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-full lg:w-[78%] xl:w-[47%] p-2 pt-6 border-2`}
+            className={`relative flex flex-col gap-4 w-full md:w-full lg:w-[78%] xl:w-[47%] p-4 pt-6 border-2`}
             style={jobDetails.is_exclusive ? {
               background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
               borderRadius: '1rem',
@@ -187,12 +187,12 @@ export function PromotionalBanner() {
             </div>
 
             {/* Right side - Action buttons */}
-            <div className="flex flex-row gap-2 w-full md:w-auto relative z-10">
+            <div className="flex flex-row gap-2 self-end">
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
                 size="sm"
-                className="flex-1 md:flex-none md:w-full text-xs px-2 py-1 h-8"
+                className="text-xs px-2 py-1 h-8"
               >
                 View
               </Button>
@@ -200,7 +200,7 @@ export function PromotionalBanner() {
                 onClick={handleApply}
                 variant="hero"
                 size="sm"
-                className="flex-1 md:flex-none md:w-full text-xs px-2 py-1 h-8"
+                className="text-xs px-2 py-1 h-8"
               >
                 Apply
               </Button>
