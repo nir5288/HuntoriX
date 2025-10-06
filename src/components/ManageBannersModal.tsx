@@ -5,6 +5,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Switch } from './ui/switch';
+import { Badge } from './ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -188,7 +189,7 @@ export function ManageBannersModal({
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = 1200;
-        canvas.height = 400;
+        canvas.height = 100;
         const ctx = canvas.getContext('2d');
         
         if (!ctx) {
@@ -196,8 +197,8 @@ export function ManageBannersModal({
           return;
         }
         
-        // Draw image scaled to 1200x400
-        ctx.drawImage(img, 0, 0, 1200, 400);
+        // Draw image scaled to 1200x100
+        ctx.drawImage(img, 0, 0, 1200, 100);
         
         // Convert to blob
         canvas.toBlob(
@@ -260,7 +261,7 @@ export function ManageBannersModal({
         ...formData,
         image_url: publicUrl
       });
-      toast.success('Image resized to 1200x400 and uploaded successfully');
+      toast.success('Image resized to 1200×100px and uploaded successfully');
     } catch (error: any) {
       console.error('Upload error:', error);
       toast.error('Failed to upload image: ' + error.message);
@@ -292,172 +293,246 @@ export function ManageBannersModal({
     setEditingId(banner.id);
   };
   return <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
+      <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Manage Promotional Banners</DialogTitle>
+          <DialogTitle className="text-2xl">Manage Promotional Banners</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-semibold mb-4">{editingId ? 'Edit' : 'Add'} Banner</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="content_type">Content Type *</Label>
-                <Select value={formData.content_type} onValueChange={(value: any) => setFormData({
-                ...formData,
-                content_type: value
-              })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="job">Job</SelectItem>
-                    <SelectItem value="image">Image</SelectItem>
-                    <SelectItem value="video">Video</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {formData.content_type === 'job' && <>
+        <ScrollArea className="h-[calc(85vh-8rem)] pr-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="bg-accent/30 p-4 rounded-lg border">
+                <h3 className="font-semibold mb-4 text-lg">{editingId ? 'Edit' : 'Add'} Banner</h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="job_id">Job ID *</Label>
-                    <Input id="job_id" value={formData.job_id} onChange={e => setFormData({
-                  ...formData,
-                  job_id: e.target.value
-                })} placeholder="Enter job UUID or job number" required />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      This will link to /job-detail/{'{job_id}'}
-                    </p>
+                    <Label htmlFor="content_type" className="text-sm font-medium">Content Type *</Label>
+                    <Select value={formData.content_type} onValueChange={(value: any) => setFormData({
+                    ...formData,
+                    content_type: value
+                  })}>
+                      <SelectTrigger className="mt-1.5">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="job">Job</SelectItem>
+                        <SelectItem value="image">Image</SelectItem>
+                        <SelectItem value="video">Video</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  
-                  
-                </>}
 
-              {formData.content_type === 'image' && <>
-                  <div>
-                    <Label htmlFor="image_upload">Image Upload *</Label>
-                    <div className="space-y-2">
-                      <Input 
-                        id="image_upload" 
-                        type="file" 
-                        accept="image/png,image/jpeg,image/jpg,image/gif"
-                        onChange={handleFileUpload}
-                        disabled={uploading}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Accepted formats: JPG, PNG, GIF<br />
-                        Recommended size: 1200x400px (3:1 ratio)<br />
-                        Image will display at full banner width
-                      </p>
-                      {uploading && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading...
-                        </div>
-                      )}
-                      {formData.image_url && !uploading && (
-                        <div className="relative">
-                          <img 
-                            src={formData.image_url} 
-                            alt="Preview" 
-                            className="w-full h-32 object-cover rounded border"
+                  {formData.content_type === 'job' && <>
+                      <div>
+                        <Label htmlFor="job_id" className="text-sm font-medium">Job ID *</Label>
+                        <Input 
+                          id="job_id" 
+                          value={formData.job_id} 
+                          onChange={e => setFormData({
+                          ...formData,
+                          job_id: e.target.value
+                        })} 
+                          placeholder="Enter job UUID or job number" 
+                          required 
+                          className="mt-1.5"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          This will link to /job-detail/{'{job_id}'}
+                        </p>
+                      </div>
+                    </>}
+
+                  {formData.content_type === 'image' && <>
+                      <div>
+                        <Label htmlFor="image_upload" className="text-sm font-medium">Image Upload *</Label>
+                        <div className="space-y-2 mt-1.5">
+                          <Input 
+                            id="image_upload" 
+                            type="file" 
+                            accept="image/png,image/jpeg,image/jpg,image/gif"
+                            onChange={handleFileUpload}
+                            disabled={uploading}
+                            className="cursor-pointer"
                           />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-2 right-2 h-6 w-6 bg-background/80 hover:bg-background"
-                            onClick={() => setFormData({ ...formData, image_url: '' })}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="link_url">Link URL (Optional)</Label>
-                    <Input id="link_url" type="url" value={formData.link_url} onChange={e => setFormData({
-                  ...formData,
-                  link_url: e.target.value
-                })} placeholder="https://..." />
-                  </div>
-                </>}
-
-              {formData.content_type === 'video' && <>
-                  <div>
-                    <Label htmlFor="video_url">Video URL *</Label>
-                    <Input id="video_url" type="url" value={formData.video_url} onChange={e => setFormData({
-                  ...formData,
-                  video_url: e.target.value
-                })} placeholder="https://youtube.com/... or https://vimeo.com/..." required />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      YouTube, Vimeo, or direct video URLs supported
-                    </p>
-                  </div>
-                  <div>
-                    <Label htmlFor="link_url">Link URL (Optional)</Label>
-                    <Input id="link_url" type="url" value={formData.link_url} onChange={e => setFormData({
-                  ...formData,
-                  link_url: e.target.value
-                })} placeholder="https://..." />
-                  </div>
-                </>}
-
-              
-
-              <div className="flex items-center gap-2">
-                <Switch id="is_active" checked={formData.is_active} onCheckedChange={checked => setFormData({
-                ...formData,
-                is_active: checked
-              })} />
-                <Label htmlFor="is_active">Active</Label>
-              </div>
-
-              <div className="flex gap-2">
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                  {editingId ? 'Update' : 'Create'} Banner
-                </Button>
-                {editingId && <Button type="button" variant="outline" onClick={resetForm}>
-                    Cancel
-                  </Button>}
-              </div>
-            </form>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-4">Existing Banners</h3>
-            <ScrollArea className="h-[500px] pr-4">
-              <div className="space-y-3">
-                {banners.map(banner => <div key={banner.id} className="p-3 border rounded-lg hover:bg-accent/50 transition">
-                    <div className="flex items-start gap-3">
-                      <GripVertical className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs bg-secondary px-2 py-0.5 rounded">
-                                {banner.content_type}
-                              </span>
-                              {!banner.is_active && <span className="text-xs bg-muted px-2 py-0.5 rounded">Inactive</span>}
-                            </div>
+                          <div className="bg-muted/50 p-3 rounded border text-xs space-y-1">
+                            <p className="font-medium">Upload Requirements:</p>
+                            <p>• Formats: JPG, PNG, GIF</p>
+                            <p>• Recommended: 1200×100px (12:1 ratio)</p>
+                            <p>• Banner displays at 100px height</p>
+                            <p>• Max file size: 5MB</p>
                           </div>
-                          <div className="flex gap-1 flex-shrink-0">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(banner)}>
-                              <Settings className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteMutation.mutate(banner.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                          {uploading && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-accent/50 p-2 rounded">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Uploading and resizing...
+                            </div>
+                          )}
+                          {formData.image_url && !uploading && (
+                            <div className="relative">
+                              <img 
+                                src={formData.image_url} 
+                                alt="Preview" 
+                                className="w-full h-24 object-cover rounded border"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2 h-6 w-6 bg-background/90 hover:bg-background shadow-sm"
+                                onClick={() => setFormData({ ...formData, image_url: '' })}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="link_url" className="text-sm font-medium">Link URL (Optional)</Label>
+                        <Input 
+                          id="link_url" 
+                          type="url" 
+                          value={formData.link_url} 
+                          onChange={e => setFormData({
+                          ...formData,
+                          link_url: e.target.value
+                        })} 
+                          placeholder="https://..." 
+                          className="mt-1.5"
+                        />
+                      </div>
+                    </>}
+
+                  {formData.content_type === 'video' && <>
+                      <div>
+                        <Label htmlFor="video_url" className="text-sm font-medium">Video URL *</Label>
+                        <Input 
+                          id="video_url" 
+                          type="url" 
+                          value={formData.video_url} 
+                          onChange={e => setFormData({
+                          ...formData,
+                          video_url: e.target.value
+                        })} 
+                          placeholder="https://youtube.com/... or https://vimeo.com/..." 
+                          required 
+                          className="mt-1.5"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          YouTube, Vimeo, or direct video URLs supported
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="link_url" className="text-sm font-medium">Link URL (Optional)</Label>
+                        <Input 
+                          id="link_url" 
+                          type="url" 
+                          value={formData.link_url} 
+                          onChange={e => setFormData({
+                          ...formData,
+                          link_url: e.target.value
+                        })} 
+                          placeholder="https://..." 
+                          className="mt-1.5"
+                        />
+                      </div>
+                    </>}
+
+                  <div className="flex items-center gap-3 bg-muted/50 p-3 rounded border">
+                    <Switch 
+                      id="is_active" 
+                      checked={formData.is_active} 
+                      onCheckedChange={checked => setFormData({
+                      ...formData,
+                      is_active: checked
+                    })} 
+                    />
+                    <Label htmlFor="is_active" className="text-sm font-medium cursor-pointer">
+                      {formData.is_active ? 'Active' : 'Inactive'}
+                    </Label>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      type="submit" 
+                      disabled={createMutation.isPending || updateMutation.isPending}
+                      className="flex-1"
+                    >
+                      {(createMutation.isPending || updateMutation.isPending) && (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      )}
+                      {editingId ? 'Update' : 'Create'} Banner
+                    </Button>
+                    {editingId && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={resetForm}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-accent/30 p-4 rounded-lg border">
+                <h3 className="font-semibold mb-4 text-lg">Existing Banners ({banners.length})</h3>
+                <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
+                  {banners.map(banner => (
+                    <div 
+                      key={banner.id} 
+                      className="p-3 border rounded-lg hover:bg-accent/50 transition bg-background"
+                    >
+                      <div className="flex items-start gap-3">
+                        <GripVertical className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="secondary" className="text-xs">
+                                  {banner.content_type}
+                                </Badge>
+                                {!banner.is_active && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Inactive
+                                  </Badge>
+                                )}
+                                <span className="text-xs text-muted-foreground">
+                                  Order: {banner.display_order}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex gap-1 flex-shrink-0">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8" 
+                                onClick={() => handleEdit(banner)}
+                              >
+                                <Settings className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 text-destructive hover:text-destructive" 
+                                onClick={() => deleteMutation.mutate(banner.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>)}
+                  ))}
+                </div>
               </div>
-            </ScrollArea>
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>;
 }
