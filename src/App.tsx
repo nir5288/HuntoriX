@@ -30,6 +30,7 @@ import Executives from "./pages/Executives";
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
 import { DashboardLayoutWrapper } from './components/DashboardLayoutWrapper';
+import { AIAssistant } from './components/AIAssistant';
 
 const AppContent = () => {
   const location = useLocation();
@@ -74,6 +75,7 @@ const AppContent = () => {
         </Routes>
       </VerificationWrapper>
       {!hideFooter && <Footer />}
+      <AIAssistant />
     </>
   );
 };

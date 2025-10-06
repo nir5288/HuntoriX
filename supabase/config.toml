@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.parse-document]
 verify_jwt = true
+
+[functions.ai-assistant]
+verify_jwt = false
