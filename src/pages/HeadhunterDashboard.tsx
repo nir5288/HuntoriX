@@ -56,7 +56,7 @@ const HeadhunterDashboard = () => {
       const {
         data: appsData,
         error: appsError
-      } = await supabase.from('applications').select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))').eq('headhunter_id', user?.id).order('created_at', {
+      } = await supabase.from('applications').select('*, job:jobs(id, title, job_id_number, is_exclusive, created_by, employer:profiles!jobs_created_by_fkey(*))').eq('headhunter_id', user?.id).order('created_at', {
         ascending: false
       });
       if (appsError) throw appsError;
@@ -65,7 +65,7 @@ const HeadhunterDashboard = () => {
       const {
         data: invitesData,
         error: invitesError
-      } = await supabase.from('job_invitations').select('*, job:jobs(*, employer:profiles!jobs_created_by_fkey(*))').eq('headhunter_id', user?.id).order('created_at', {
+      } = await supabase.from('job_invitations').select('*, job:jobs(id, title, job_id_number, is_exclusive, created_by, employer:profiles!jobs_created_by_fkey(*))').eq('headhunter_id', user?.id).order('created_at', {
         ascending: false
       });
       if (invitesError) throw invitesError;
@@ -444,7 +444,9 @@ const HeadhunterDashboard = () => {
               </div> : filteredApplications.length === 0 ? <div className="text-center py-6">
                 <p className="text-sm text-muted-foreground">No applications match your filters</p>
               </div> : <div className="space-y-3">
-                {filteredApplications.slice(0, 5).map(app => <Card key={`${app.type}-${app.id}`} className="hover:shadow-md transition-shadow">
+                {filteredApplications.slice(0, 5).map(app => <Card key={`${app.type}-${app.id}`} className={`hover:shadow-md transition-shadow ${
+                    app.job?.is_exclusive ? 'exclusive-job-card' : ''
+                  }`}>
                     <CardHeader className="px-4 py-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 cursor-pointer" onClick={() => navigate(`/jobs/${app.job_id}`, {
@@ -457,6 +459,11 @@ const HeadhunterDashboard = () => {
                             <Badge variant="outline" className="text-xs h-5">
                               #{app.job?.job_id_number}
                             </Badge>
+                            {app.job?.is_exclusive && (
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                                Exclusive
+                              </Badge>
+                            )}
                             {app.type === 'invitation' && <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5 bg-fuchsia-500">
                                 Invitation
                               </Badge>}
@@ -530,6 +537,9 @@ const HeadhunterDashboard = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <CardTitle className="text-base">{job.title}</CardTitle>
+                            <Badge variant="outline" className="text-xs h-5">
+                              #{job.job_id_number}
+                            </Badge>
                             {job.is_exclusive && (
                               <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
                                 HuntoriX Exclusive
