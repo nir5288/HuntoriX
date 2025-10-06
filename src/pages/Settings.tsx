@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth";
 import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
+import { Palette } from "lucide-react";
 
 interface TeamMember {
   name: string;
@@ -19,6 +20,120 @@ interface TeamMember {
   email?: string;
   phone?: string;
 }
+
+interface ColorPalette {
+  id: string;
+  name: string;
+  colors: {
+    primary: string;
+    accentPink: string;
+    accentMint: string;
+    accentLilac: string;
+  };
+}
+
+const colorPalettes: ColorPalette[] = [
+  {
+    id: "default",
+    name: "Klarna Pink",
+    colors: {
+      primary: "340 82% 52%",
+      accentPink: "340 82% 52%",
+      accentMint: "160 60% 65%",
+      accentLilac: "260 60% 75%",
+    },
+  },
+  {
+    id: "ocean",
+    name: "Ocean Blue",
+    colors: {
+      primary: "210 100% 50%",
+      accentPink: "190 85% 55%",
+      accentMint: "175 65% 60%",
+      accentLilac: "220 70% 65%",
+    },
+  },
+  {
+    id: "sunset",
+    name: "Sunset Orange",
+    colors: {
+      primary: "25 95% 53%",
+      accentPink: "15 90% 60%",
+      accentMint: "40 80% 60%",
+      accentLilac: "35 85% 65%",
+    },
+  },
+  {
+    id: "forest",
+    name: "Forest Green",
+    colors: {
+      primary: "140 65% 42%",
+      accentPink: "160 60% 50%",
+      accentMint: "155 70% 55%",
+      accentLilac: "145 65% 60%",
+    },
+  },
+  {
+    id: "royal",
+    name: "Royal Purple",
+    colors: {
+      primary: "270 70% 55%",
+      accentPink: "290 75% 60%",
+      accentMint: "250 65% 65%",
+      accentLilac: "280 70% 70%",
+    },
+  },
+  {
+    id: "cherry",
+    name: "Cherry Red",
+    colors: {
+      primary: "355 85% 50%",
+      accentPink: "350 90% 55%",
+      accentMint: "10 80% 60%",
+      accentLilac: "340 75% 65%",
+    },
+  },
+  {
+    id: "sunshine",
+    name: "Sunshine Yellow",
+    colors: {
+      primary: "45 100% 51%",
+      accentPink: "50 95% 60%",
+      accentMint: "55 90% 65%",
+      accentLilac: "40 85% 60%",
+    },
+  },
+  {
+    id: "lavender",
+    name: "Lavender Dream",
+    colors: {
+      primary: "280 60% 65%",
+      accentPink: "300 65% 70%",
+      accentMint: "270 55% 70%",
+      accentLilac: "290 60% 75%",
+    },
+  },
+  {
+    id: "mint",
+    name: "Fresh Mint",
+    colors: {
+      primary: "165 60% 55%",
+      accentPink: "175 65% 60%",
+      accentMint: "170 70% 65%",
+      accentLilac: "160 60% 70%",
+    },
+  },
+  {
+    id: "midnight",
+    name: "Midnight Blue",
+    colors: {
+      primary: "230 70% 45%",
+      accentPink: "240 65% 50%",
+      accentMint: "220 60% 55%",
+      accentLilac: "235 65% 60%",
+    },
+  },
+];
 
 const Settings = () => {
   const { user, profile, refreshProfile } = useAuth();
@@ -28,6 +143,9 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
+  const [selectedPalette, setSelectedPalette] = useState<string>(() => {
+    return localStorage.getItem("color-palette") || "default";
+  });
 
   // Employer fields
   const [companyName, setCompanyName] = useState("");
@@ -227,6 +345,38 @@ const Settings = () => {
   const removeRegion = (region: string) => {
     setRegions(regions.filter((r) => r !== region));
   };
+
+  const applyColorPalette = (paletteId: string) => {
+    const palette = colorPalettes.find((p) => p.id === paletteId);
+    if (!palette) return;
+
+    const root = document.documentElement;
+    root.style.setProperty("--primary", palette.colors.primary);
+    root.style.setProperty("--accent-pink", palette.colors.accentPink);
+    root.style.setProperty("--accent-mint", palette.colors.accentMint);
+    root.style.setProperty("--accent-lilac", palette.colors.accentLilac);
+
+    localStorage.setItem("color-palette", paletteId);
+    setSelectedPalette(paletteId);
+
+    toast({
+      title: "Color Palette Updated",
+      description: `Applied ${palette.name} color palette`,
+    });
+  };
+
+  useEffect(() => {
+    // Apply saved palette on load
+    const savedPalette = localStorage.getItem("color-palette") || "default";
+    const palette = colorPalettes.find((p) => p.id === savedPalette);
+    if (palette) {
+      const root = document.documentElement;
+      root.style.setProperty("--primary", palette.colors.primary);
+      root.style.setProperty("--accent-pink", palette.colors.accentPink);
+      root.style.setProperty("--accent-mint", palette.colors.accentMint);
+      root.style.setProperty("--accent-lilac", palette.colors.accentLilac);
+    }
+  }, []);
 
 
   if (!profile) {
@@ -639,6 +789,47 @@ const Settings = () => {
             </Card>
           </div>
         )}
+
+        <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
+          <CardHeader>
+            <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent flex items-center gap-2">
+              <Palette className="h-6 w-6" />
+              Color Palette
+            </CardTitle>
+            <CardDescription>Choose your preferred color scheme</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {colorPalettes.map((palette) => (
+                <button
+                  key={palette.id}
+                  onClick={() => applyColorPalette(palette.id)}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:scale-105 ${
+                    selectedPalette === palette.id
+                      ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10"
+                      : "border-border hover:border-[hsl(var(--primary))]/50"
+                  }`}
+                >
+                  <div className="flex gap-1">
+                    <div
+                      className="w-6 h-6 rounded-full border border-border"
+                      style={{ backgroundColor: `hsl(${palette.colors.accentPink})` }}
+                    />
+                    <div
+                      className="w-6 h-6 rounded-full border border-border"
+                      style={{ backgroundColor: `hsl(${palette.colors.accentMint})` }}
+                    />
+                    <div
+                      className="w-6 h-6 rounded-full border border-border"
+                      style={{ backgroundColor: `hsl(${palette.colors.accentLilac})` }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-center">{palette.name}</span>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
           <CardHeader>
