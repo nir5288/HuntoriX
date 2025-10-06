@@ -111,7 +111,7 @@ export function PromotionalBanner() {
       return (
         <div className="flex justify-center items-center flex-1">
           <div 
-            className={`flex gap-4 items-center w-[60%] p-3 border-2`} 
+            className={`flex gap-4 items-center w-[36%] p-3 border-2`}
             style={jobDetails.is_exclusive ? {
               background: 'linear-gradient(white, white) padding-box, linear-gradient(to right, rgb(168, 85, 247), rgb(59, 130, 246), rgb(6, 182, 212)) border-box',
               borderRadius: '1rem',
@@ -123,16 +123,21 @@ export function PromotionalBanner() {
           >
             {/* Left side - Content */}
             <div className="flex-1 space-y-2">
-              {/* Title and exclusive badge on same row */}
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold leading-tight">
-                  {currentBanner.title || jobDetails.title}
-                </h3>
-                {jobDetails.is_exclusive && (
-                  <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-xs">
-                    HuntoriX Exclusive
-                  </Badge>
-                )}
+              {/* Title, exclusive badge, and promoted badge on same row */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold leading-tight">
+                    {currentBanner.title || jobDetails.title}
+                  </h3>
+                  {jobDetails.is_exclusive && (
+                    <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 shrink-0 text-xs">
+                      HuntoriX Exclusive
+                    </Badge>
+                  )}
+                </div>
+                <Badge variant="secondary" className="bg-primary/10 text-primary shrink-0 text-xs">
+                  Promoted
+                </Badge>
               </div>
 
               {/* Industry badge under title */}
@@ -206,15 +211,8 @@ export function PromotionalBanner() {
             )}
           </div>
 
-            {/* Right side - Badges and Action buttons */}
+            {/* Right side - Action buttons */}
             <div className="flex flex-col gap-2 shrink-0 w-48">
-              {/* Promoted badge at top */}
-              <div className="flex flex-col items-end gap-2">
-                <Badge variant="secondary" className="bg-primary/10 text-primary shrink-0 text-xs">
-                  Promoted
-                </Badge>
-              </div>
-              
               <Button
                 onClick={() => navigate(`/job-detail/${currentBanner.job_id}`)}
                 variant="outline"
