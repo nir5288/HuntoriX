@@ -182,6 +182,42 @@ export function ManageBannersModal({
     });
     setEditingId(null);
   };
+  const resizeImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 400;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+        
+        // Draw image scaled to 1200x400
+        ctx.drawImage(img, 0, 0, 1200, 400);
+        
+        // Convert to blob
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to create blob'));
+            }
+          },
+          file.type,
+          0.95
+        );
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -198,26 +234,33 @@ export function ManageBannersModal({
       toast.error('File size must be less than 5MB');
       return;
     }
+    
     setUploading(true);
     try {
+      // Resize image to 1200x400
+      const resizedBlob = await resizeImage(file);
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
+      
       const {
         error: uploadError,
         data
-      } = await supabase.storage.from('banner-images').upload(filePath, file);
+      } = await supabase.storage.from('banner-images').upload(filePath, resizedBlob);
       if (uploadError) throw uploadError;
+      
       const {
         data: {
           publicUrl
         }
       } = supabase.storage.from('banner-images').getPublicUrl(filePath);
+      
       setFormData({
         ...formData,
         image_url: publicUrl
       });
-      toast.success('Image uploaded successfully');
+      toast.success('Image resized to 1200x400 and uploaded successfully');
     } catch (error: any) {
       console.error('Upload error:', error);
       toast.error('Failed to upload image: ' + error.message);
