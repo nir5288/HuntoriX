@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown, Menu } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -30,6 +30,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ManageBannersModal } from './ManageBannersModal';
 import EditLegalDocumentModal from './EditLegalDocumentModal';
 import { supabase } from '@/integrations/supabase/client';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
@@ -41,6 +42,7 @@ export function Header() {
   const [showManageBanners, setShowManageBanners] = useState(false);
   const [showEditLegal, setShowEditLegal] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<{ name: string; price_usd: number } | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -170,7 +172,65 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Mobile Menu */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[280px] sm:w-[340px]">
+              <nav className="flex flex-col gap-4 mt-8">
+                <Link 
+                  to={user ? getDashboardPath() : '/auth'} 
+                  className="text-base font-medium py-2 hover:text-primary transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/opportunities" 
+                  className="text-base font-medium py-2 hover:text-primary transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Opportunities
+                </Link>
+                <Link 
+                  to="/headhunters" 
+                  className="text-base font-medium py-2 hover:text-primary transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Find a Headhunter
+                </Link>
+                <Link 
+                  to="/huntrank" 
+                  className="text-base font-medium py-2 hover:text-primary transition flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  HuntRank
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+                </Link>
+                <Link 
+                  to="/huntbase" 
+                  className="text-base font-medium py-2 hover:text-primary transition flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  HuntBase
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+                </Link>
+                <Link 
+                  to="/executives" 
+                  className="text-base font-medium py-2 hover:text-primary transition flex items-center gap-2 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Executives
+                  <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
+
           <Link to="/executives" className="hidden md:flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-bold hover:opacity-80 transition">
             Executives
             <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>

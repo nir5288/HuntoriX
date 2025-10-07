@@ -376,12 +376,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       job.is_exclusive ? 'exclusive-job-card' : ''
     }`}>
       {job.is_exclusive && (
-        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1.5 rounded-t-2xl -m-[1px] mx-0 mt-0">
-          <span>HuntoriX Exclusive</span>
+        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1.5 sm:py-1 px-2 sm:px-4 text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 sm:gap-1.5 rounded-t-2xl -m-[1px] mx-0 mt-0">
+          <span className="truncate">HuntoriX Exclusive</span>
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Info className="h-3 w-3 cursor-help" />
+                <Info className="h-3 w-3 cursor-help shrink-0" />
               </TooltipTrigger>
               <TooltipContent>
                 <p>This job is exclusively available on the HuntoriX platform</p>
@@ -392,8 +392,8 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       )}
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
-          <div className="flex items-center gap-2 shrink-0">
+          <h3 className="text-lg sm:text-xl font-bold leading-tight flex-1 break-words">{job.title}</h3>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -425,12 +425,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {job.industry && (
             <Badge 
               variant="filter"
               style={{ backgroundColor: getIndustryColor(job.industry) }}
-              className="text-foreground border-0"
+              className="text-foreground border-0 text-[10px] sm:text-xs px-2 py-0.5"
               onClick={(e) => {
                 e.stopPropagation();
                 onIndustryClick?.(job.industry!);
@@ -441,7 +441,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           )}
           
           {job.status && (
-            <Badge className={`${getStatusColor(job.status)} text-white border-0`}>
+            <Badge className={`${getStatusColor(job.status)} text-white border-0 text-[10px] sm:text-xs px-2 py-0.5`}>
               {job.status}
             </Badge>
           )}
