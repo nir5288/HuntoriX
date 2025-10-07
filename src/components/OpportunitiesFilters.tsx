@@ -7,58 +7,35 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Building2, 
-  MapPin, 
-  DollarSign, 
-  Briefcase, 
-  Clock, 
-  Star,
-  ChevronDown,
-  RotateCcw
-} from 'lucide-react';
-
+import { Building2, MapPin, DollarSign, Briefcase, Clock, Star, ChevronDown, RotateCcw } from 'lucide-react';
 interface OpportunitiesFiltersProps {
   industries: string[];
   seniorities: string[];
   employmentTypes: string[];
   currencies: string[];
-
   filterIndustry: string[];
   setFilterIndustry: React.Dispatch<React.SetStateAction<string[]>>;
-
   filterLocation: string;
   setFilterLocation: React.Dispatch<React.SetStateAction<string>>;
-
   filterSalaryMin: string;
   setFilterSalaryMin: React.Dispatch<React.SetStateAction<string>>;
-
   filterSalaryMax: string;
   setFilterSalaryMax: React.Dispatch<React.SetStateAction<string>>;
-
   filterCurrency: string;
   setFilterCurrency: (value: string) => void;
-
   filterSalaryPeriod: string;
   setFilterSalaryPeriod: (value: string) => void;
-
   filterSeniority: string;
   setFilterSeniority: (value: string) => void;
-
   filterEmploymentType: string;
   setFilterEmploymentType: (value: string) => void;
-
   filterPosted: string;
   setFilterPosted: (value: string) => void;
-
   filterExclusive: boolean;
   setFilterExclusive: (value: boolean) => void;
-
   hasHuntorix: boolean;
-
   resetFilters: () => void;
 }
-
 export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
   industries,
   seniorities,
@@ -85,50 +62,37 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
   filterExclusive,
   setFilterExclusive,
   hasHuntorix,
-  resetFilters,
+  resetFilters
 }) => {
   const [industryOpen, setIndustryOpen] = React.useState(true);
   const [advancedOpen, setAdvancedOpen] = React.useState(false);
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b">
         <h3 className="font-semibold text-lg">
           Filters
         </h3>
-        <Button 
-          variant="destructive" 
-          size="sm" 
-          onClick={resetFilters}
-          className="h-9 px-3"
-        >
+        <Button variant="destructive" size="sm" onClick={resetFilters} className="h-9 px-3 bg-yellow-500 hover:bg-yellow-400 text-slate-950">
           <RotateCcw className="h-4 w-4 mr-2" />
           Reset All
         </Button>
       </div>
 
       {/* Huntorix Exclusive - Compact premium feature */}
-      {hasHuntorix && (
-        <div className="p-2.5 rounded-lg bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 border border-purple-500/30">{/* ... keep existing code */}
-          <div className="flex items-center justify-between gap-2">
+      {hasHuntorix && <div className="p-3 rounded-md bg-primary/10 border border-primary/20">
+          <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
-              <Star className="h-3.5 w-3.5 text-purple-500 fill-purple-500" />
-              <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-xs">
+              <Star className="h-4 w-4 text-primary fill-primary" />
+              <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-sm">
                 Exclusive Jobs
               </Label>
             </div>
-            <Switch
-              id="filter-exclusive"
-              checked={filterExclusive}
-              onCheckedChange={setFilterExclusive}
-            />
+            <Switch id="filter-exclusive" checked={filterExclusive} onCheckedChange={setFilterExclusive} />
           </div>
-          <p className="text-[10px] text-purple-600 ml-5 mt-0.5 font-medium">
-            Premium filter
+          <p className="text-xs text-muted-foreground ml-6">
+            Eligible: Huntorix plan • Premium feature
           </p>
-        </div>
-      )}
+        </div>}
 
       {/* Location */}
       <div className="space-y-2">
@@ -136,14 +100,7 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
           <MapPin className="h-4 w-4 text-muted-foreground" />
           Location
         </Label>
-        <Input
-          id="filter-location"
-          value={filterLocation}
-          onChange={(e) => setFilterLocation(e.target.value)}
-          placeholder="City, country, or remote"
-          className="h-9"
-          autoComplete="off"
-        />
+        <Input id="filter-location" value={filterLocation} onChange={e => setFilterLocation(e.target.value)} placeholder="City, country, or remote" className="h-9" autoComplete="off" />
       </div>
 
       {/* Industry - Collapsible */}
@@ -152,38 +109,26 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
             <div className="flex items-center gap-2 text-sm font-medium cursor-pointer">
               <Building2 className="h-4 w-4 text-muted-foreground" />
               Industry
-              {filterIndustry.length > 0 && (
-                <span className="text-xs text-muted-foreground">
+              {filterIndustry.length > 0 && <span className="text-xs text-muted-foreground">
                   ({filterIndustry.length} selected)
-                </span>
-              )}
+                </span>}
             </div>
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${industryOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-2">
-          {industries.map((industry) => {
-            const checked = filterIndustry.includes(industry);
-            return (
-              <label 
-                key={industry} 
-                className="flex items-center gap-2 cursor-pointer py-1.5 px-2 rounded-md hover:bg-accent/50 transition-colors"
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setFilterIndustry((prev) => [...prev, industry]);
-                    } else {
-                      setFilterIndustry((prev) => prev.filter((i) => i !== industry));
-                    }
-                  }}
-                  className="rounded border-border w-4 h-4"
-                />
+          {industries.map(industry => {
+          const checked = filterIndustry.includes(industry);
+          return <label key={industry} className="flex items-center gap-2 cursor-pointer py-1.5 px-2 rounded-md hover:bg-accent/50 transition-colors">
+                <input type="checkbox" checked={checked} onChange={e => {
+              if (e.target.checked) {
+                setFilterIndustry(prev => [...prev, industry]);
+              } else {
+                setFilterIndustry(prev => prev.filter(i => i !== industry));
+              }
+            }} className="rounded border-border w-4 h-4" />
                 <span className="text-sm">{industry}</span>
-              </label>
-            );
-          })}
+              </label>;
+        })}
         </CollapsibleContent>
       </Collapsible>
 
@@ -200,11 +145,9 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {currencies.map((curr) => (
-                <SelectItem key={curr} value={curr}>
+              {currencies.map(curr => <SelectItem key={curr} value={curr}>
                   {curr}
-                </SelectItem>
-              ))}
+                </SelectItem>)}
             </SelectContent>
           </Select>
           
@@ -234,20 +177,10 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               </span>
             </div>
           </div>
-          <Slider
-            min={0}
-            max={500000}
-            step={5000}
-            value={[
-              filterSalaryMin ? parseInt(filterSalaryMin) : 0,
-              filterSalaryMax ? parseInt(filterSalaryMax) : 500000
-            ]}
-            onValueChange={(values) => {
-              setFilterSalaryMin(values[0] > 0 ? values[0].toString() : '');
-              setFilterSalaryMax(values[1] < 500000 ? values[1].toString() : '');
-            }}
-            className="cursor-pointer"
-          />
+          <Slider min={0} max={500000} step={5000} value={[filterSalaryMin ? parseInt(filterSalaryMin) : 0, filterSalaryMax ? parseInt(filterSalaryMax) : 500000]} onValueChange={values => {
+          setFilterSalaryMin(values[0] > 0 ? values[0].toString() : '');
+          setFilterSalaryMax(values[1] < 500000 ? values[1].toString() : '');
+        }} className="cursor-pointer" />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{filterCurrency} 0</span>
             <span>{filterCurrency} 500,000+</span>
@@ -276,11 +209,9 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All levels</SelectItem>
-                {seniorities.map((level) => (
-                  <SelectItem key={level} value={level}>
+                {seniorities.map(level => <SelectItem key={level} value={level}>
                     {level.charAt(0).toUpperCase() + level.slice(1)}
-                  </SelectItem>
-                ))}
+                  </SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -297,11 +228,9 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All types</SelectItem>
-                {employmentTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
+                {employmentTypes.map(type => <SelectItem key={type} value={type}>
                     {type === 'full_time' ? 'Full-time' : type.charAt(0).toUpperCase() + type.slice(1)}
-                  </SelectItem>
-                ))}
+                  </SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -326,6 +255,5 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
           </div>
         </CollapsibleContent>
       </Collapsible>
-    </div>
-  );
+    </div>;
 };
