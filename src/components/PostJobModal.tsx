@@ -545,7 +545,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </Badge>
               </div>
               <span className="text-[10px] text-muted-foreground/80">
-                14-day minimum commitment once marked
+                14-day minimum commitment once published
               </span>
             </div>
             {showExclusiveInfo && (
