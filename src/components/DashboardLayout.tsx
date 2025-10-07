@@ -17,12 +17,7 @@ function getSidebarStateFromCookie(): boolean {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { profile } = useAuth();
   const role = (profile?.role as 'employer' | 'headhunter') || 'employer';
-  const [sidebarOpen, setSidebarOpen] = useState(getSidebarStateFromCookie);
-
-  // Read cookie state on mount to ensure persistence across navigation
-  useEffect(() => {
-    setSidebarOpen(getSidebarStateFromCookie());
-  }, []);
+  const [sidebarOpen, setSidebarOpen] = useState(() => getSidebarStateFromCookie());
 
   return (
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
