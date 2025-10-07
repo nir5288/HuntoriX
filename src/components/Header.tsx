@@ -176,8 +176,8 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8 sm:h-9 sm:w-9">
-                <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10 flex items-center justify-center">
+                <Menu className="h-6 w-6 sm:h-6 sm:w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[280px] sm:w-[340px]">
@@ -285,13 +285,13 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition">
                   <div className="relative">
-                    <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
+                    <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
                       <AvatarImage src={profile.avatar_url} />
-                      <AvatarFallback className="text-xs">
+                      <AvatarFallback className="text-sm">
                         {profile.name?.[0]?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <div className={`absolute bottom-0 right-0 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full border-2 border-background ${
+                    <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full border-2 border-background ${
                       status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
                     }`} />
                   </div>
