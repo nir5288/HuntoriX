@@ -346,6 +346,8 @@ export type Database = {
           created_by: string
           description: string
           employment_type: string | null
+          exclusive_since: string | null
+          exclusive_until: string | null
           id: string
           industry: string | null
           is_exclusive: boolean
@@ -373,6 +375,8 @@ export type Database = {
           created_by: string
           description: string
           employment_type?: string | null
+          exclusive_since?: string | null
+          exclusive_until?: string | null
           id?: string
           industry?: string | null
           is_exclusive?: boolean
@@ -400,6 +404,8 @@ export type Database = {
           created_by?: string
           description?: string
           employment_type?: string | null
+          exclusive_since?: string | null
+          exclusive_until?: string | null
           id?: string
           industry?: string | null
           is_exclusive?: boolean

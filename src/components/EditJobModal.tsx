@@ -170,6 +170,20 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
       return;
     }
 
+    // Prevent unmarking exclusive before allowed date
+    if (job?.is_exclusive && !isExclusive) {
+      const exclusiveUntilRaw = (job as any).exclusive_until;
+      if (exclusiveUntilRaw) {
+        const exclusiveUntil = new Date(exclusiveUntilRaw);
+        const now = new Date();
+        if (now < exclusiveUntil) {
+          const formattedDate = exclusiveUntil.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          toast.error(`Cannot unmark exclusive until ${formattedDate}.`);
+          return;
+        }
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -246,9 +260,10 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
       onOpenChange(false);
       onSuccess();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating job:', error);
-      toast.error('Failed to update job');
+      const msg = error?.message || 'Failed to update job';
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
