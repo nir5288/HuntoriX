@@ -181,15 +181,26 @@ export function AIAssistant() {
                 <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDismiss}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              title="Hide AI Assistant"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                title="Minimize chat"
+              >
+                <span className="text-lg font-bold">−</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleDismiss}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                title="Hide AI Assistant permanently"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Messages */}
