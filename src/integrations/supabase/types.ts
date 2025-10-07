@@ -593,6 +593,7 @@ export type Database = {
           response_time_hours: number | null
           role: string
           second_reminder_sent_at: string | null
+          show_ai_assistant: boolean | null
           show_applied_jobs: boolean | null
           show_status: boolean | null
           skills: string[] | null
@@ -649,6 +650,7 @@ export type Database = {
           response_time_hours?: number | null
           role: string
           second_reminder_sent_at?: string | null
+          show_ai_assistant?: boolean | null
           show_applied_jobs?: boolean | null
           show_status?: boolean | null
           skills?: string[] | null
@@ -705,6 +707,7 @@ export type Database = {
           response_time_hours?: number | null
           role?: string
           second_reminder_sent_at?: string | null
+          show_ai_assistant?: boolean | null
           show_applied_jobs?: boolean | null
           show_status?: boolean | null
           skills?: string[] | null

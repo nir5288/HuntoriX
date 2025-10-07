@@ -5,6 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import aiAvatar from "@/assets/huntorix-ai-avatar.jpg";
 
 interface Message {
@@ -14,10 +17,6 @@ interface Message {
 
 export function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(() => {
-    const saved = localStorage.getItem('huntorixi-ai-visible');
-    return saved !== 'false'; // Show by default unless explicitly hidden
-  });
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -28,6 +27,23 @@ export function AIAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fetch user's AI assistant preference from database
+  const { data: profile } = useQuery({
+    queryKey: ['profile-ai-preference', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('show_ai_assistant')
+        .eq('id', user.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -129,17 +145,35 @@ export function AIAssistant() {
     }
   };
 
-  const handleDismiss = () => {
-    setIsVisible(false);
+  const handleDismiss = async () => {
+    if (!user?.id) return;
+    
     setIsOpen(false);
-    localStorage.setItem('huntorixi-ai-visible', 'false');
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({ show_ai_assistant: false })
+      .eq('id', user.id);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to hide AI assistant",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     toast({
       title: "AI Assistant Hidden",
       description: "You can re-enable it from your Settings page.",
     });
   };
 
-  if (!isVisible) return null;
+  // Don't show if user preference is to hide it (default is true/show)
+  if (profile?.show_ai_assistant === false) {
+    return null;
+  }
 
   return (
     <>

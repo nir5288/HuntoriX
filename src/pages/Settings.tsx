@@ -156,6 +156,7 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
+  const [showAiAssistant, setShowAiAssistant] = useState(true);
   const [showManageBanners, setShowManageBanners] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState<string>(() => {
     return localStorage.getItem("color-palette") || "default";
@@ -205,6 +206,9 @@ const Settings = () => {
   const loadProfileData = () => {
     if (!profile) return;
 
+    // Load AI assistant preference (default to true if not set)
+    setShowAiAssistant(profile.show_ai_assistant !== false);
+
     if (profile.role === "employer") {
       setCompanyName(profile.company_name || "");
       setAvatarUrl(profile.avatar_url || "");
@@ -239,6 +243,7 @@ const Settings = () => {
       const updates: any = {
         id: user.id,
         show_status: localShowStatus,
+        show_ai_assistant: showAiAssistant,
       };
 
       if (profile?.role === "employer") {
@@ -829,11 +834,8 @@ const Settings = () => {
               </div>
               <Switch
                 id="show-ai-assistant"
-                checked={localStorage.getItem('huntorixi-ai-visible') !== 'false'}
-                onCheckedChange={(checked) => {
-                  localStorage.setItem('huntorixi-ai-visible', String(checked));
-                  window.location.reload(); // Refresh to show/hide the assistant
-                }}
+                checked={showAiAssistant}
+                onCheckedChange={setShowAiAssistant}
               />
             </div>
           </CardContent>
