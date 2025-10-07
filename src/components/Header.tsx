@@ -141,14 +141,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-4 sm:gap-8 min-w-0 flex-1">
+      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0">
             <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="font-bold text-base sm:text-xl">HUNTORIX</span>
+            <span className="font-bold text-sm sm:text-base md:text-xl whitespace-nowrap">HUNTORIX</span>
           </Link>
           
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
               className={getNavLinkClass('/dashboard')}
@@ -172,12 +172,12 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8 sm:h-9 sm:w-9">
+                <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[280px] sm:w-[340px]">
@@ -231,71 +231,73 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/executives" className="hidden md:flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-bold hover:opacity-80 transition">
+          <Link to="/executives" className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-bold hover:opacity-80 transition whitespace-nowrap text-sm">
             Executives
             <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>
           </Link>
           {user && profile ? (
             <TooltipProvider delayDuration={0}>
-              <NotificationDropdown />
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate('/saved-jobs')}
-                    className="relative"
-                  >
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>My Saved Jobs</TooltipContent>
-              </Tooltip>
-              {profile.role === 'employer' && (
+              <div className="hidden sm:flex items-center gap-1">
+                <NotificationDropdown />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => navigate('/saved-headhunters')}
-                      className="relative"
+                      onClick={() => navigate('/saved-jobs')}
+                      className="relative h-8 w-8 sm:h-9 sm:w-9"
                     >
-                      <Star className="h-5 w-5" />
+                      <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>My Saved Headhunters</TooltipContent>
+                  <TooltipContent>My Saved Jobs</TooltipContent>
                 </Tooltip>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigate('/messages')}
-                    className="relative"
-                  >
-                    <MessagesSquare className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Messages</TooltipContent>
-              </Tooltip>
+                {profile.role === 'employer' && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate('/saved-headhunters')}
+                        className="relative h-8 w-8 sm:h-9 sm:w-9"
+                      >
+                        <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>My Saved Headhunters</TooltipContent>
+                  </Tooltip>
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate('/messages')}
+                      className="relative h-8 w-8 sm:h-9 sm:w-9"
+                    >
+                      <MessagesSquare className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Messages</TooltipContent>
+                </Tooltip>
+              </div>
               <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 hover:opacity-80 transition">
+                <button className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition">
                   <div className="relative">
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
                       <AvatarImage src={profile.avatar_url} />
-                      <AvatarFallback>
+                      <AvatarFallback className="text-xs">
                         {profile.name?.[0]?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background ${
+                    <div className={`absolute bottom-0 right-0 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full border-2 border-background ${
                       status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
                     }`} />
                   </div>
                   <div className="hidden md:flex flex-col items-start">
-                    <span className="text-sm font-medium">{profile.name || profile.email}</span>
-                    <Badge variant="outline" className="text-xs capitalize">
+                    <span className="text-xs sm:text-sm font-medium truncate max-w-[120px]">{profile.name || profile.email}</span>
+                    <Badge variant="outline" className="text-[10px] sm:text-xs capitalize">
                       {profile.role}
                     </Badge>
                   </div>
@@ -434,12 +436,12 @@ export function Header() {
             </DropdownMenu>
             </TooltipProvider>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Button 
                 variant="ghost" 
                 size="sm"
                 onClick={() => navigate('/auth?mode=signin')}
-                className="text-sm px-3"
+                className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               >
                 Log in
               </Button>
@@ -447,7 +449,7 @@ export function Header() {
                 variant="hero" 
                 size="sm"
                 onClick={() => navigate('/auth?mode=signup')}
-                className="text-sm px-3"
+                className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
               >
                 Sign up
               </Button>
