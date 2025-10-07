@@ -452,7 +452,7 @@ const EmployerDashboard = () => {
                 job.is_exclusive ? 'exclusive-job-card' : ''
               }`} onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                       <CardHeader className="px-4 py-3">
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
                            <div className="flex-1 w-full sm:w-auto">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <CardTitle className="text-sm sm:text-base break-words">{job.title}</CardTitle>
@@ -478,7 +478,7 @@ const EmployerDashboard = () => {
                               {job.location} • {job.employment_type?.replace('_', ' ')}
                             </CardDescription>
                           </div>
-                          <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                          <div className="flex items-start gap-1.5 w-full sm:w-auto justify-end">
                             <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
                               {job.status}
                             </Badge>
