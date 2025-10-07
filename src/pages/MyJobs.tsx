@@ -285,7 +285,7 @@ const MyJobs = () => {
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
                             <CardHeader className="px-4 py-3">
-                              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                              <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
                                 <div className="flex-1 w-full sm:w-auto">
                                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                                     <CardTitle className="text-sm sm:text-base break-words">{job.title}</CardTitle>
@@ -294,27 +294,27 @@ const MyJobs = () => {
                                         #{job.job_id_number}
                                       </Badge>
                                     )}
-                                  </div>
-                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                                     {job.is_exclusive && (
                                       <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
                                         HuntoriX Exclusive
                                       </Badge>
                                     )}
-                                    {pendingCount > 0 && (
+                                  </div>
+                                  {pendingCount > 0 && (
+                                    <div className="flex items-center gap-2 mb-2">
                                       <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
                                         {pendingCount} Pending
                                       </Badge>
-                                    )}
-                                    <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
-                                      {job.status}
-                                    </Badge>
-                                  </div>
+                                    </div>
+                                  )}
                                   <CardDescription className="text-xs">
                                     {job.location} • {job.employment_type?.replace('_', ' ')}
                                   </CardDescription>
                                 </div>
-                                <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                                <div className="flex items-start gap-1.5 w-full sm:w-auto justify-end">
+                                  <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
+                                    {job.status}
+                                  </Badge>
                                   <div className="relative">
                                     <Button
                                       variant="outline"
