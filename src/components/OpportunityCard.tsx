@@ -219,6 +219,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       return;
     }
 
+    // Guard: Job pending approval
+    if (job.status === 'pending') {
+      return; // Button should be disabled
+    }
+
     // Guard: Job closed
     if (job.status === 'closed') {
       return; // Button should be disabled
@@ -236,6 +241,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const getCTAText = () => {
     if (!currentUser) return 'Sign in to Apply';
     if (currentUserRole !== 'headhunter') return 'Apply';
+    if (job.status === 'pending') return 'Being Reviewed';
     if (job.status === 'closed') return 'Closed';
     if (checkingApplication) return '...';
     if (hasApplied) return 'Applied';
@@ -243,12 +249,13 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   const getCTAVariant = () => {
-    if (hasApplied || job.status === 'closed') return 'outline';
+    if (hasApplied || job.status === 'closed' || job.status === 'pending') return 'outline';
     return 'hero';
   };
 
   const isButtonDisabled = () => {
     if (checkingApplication) return true;
+    if (job.status === 'pending') return true;
     if (job.status === 'closed') return true;
     if (currentUserRole === 'headhunter' && hasApplied) return true;
     return false;
@@ -269,6 +276,22 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         {getCTAText()}
       </Button>
     );
+
+    // Show tooltip for pending jobs
+    if (job.status === 'pending') {
+      return (
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {button}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>This job is pending admin approval</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
 
     // Show tooltip for closed jobs
     if (job.status === 'closed') {

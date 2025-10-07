@@ -505,6 +505,21 @@ const JobDetail = () => {
                           : 'You have already applied to this job'}
                       </p>
                     </div>
+                  ) : job.status === 'pending' ? (
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <Button variant="outline" size="lg" className="w-full" disabled>
+                              Being Reviewed
+                            </Button>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>This job is pending admin approval</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   ) : hasInvitation ? (
                     <Button 
                       variant="hero" 
