@@ -907,7 +907,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               type="submit" 
               disabled={isSubmitting || !isFormValid}
               variant={isFormValid ? "hero" : "default"}
-              size={isFormValid ? "lg" : "sm"}
+              size="default"
               className={cn(
                 "transition-all duration-300 font-bold",
                 isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
