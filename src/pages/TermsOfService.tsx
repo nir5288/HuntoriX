@@ -32,12 +32,22 @@ const TermsOfService = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="prose prose-slate dark:prose-invert max-w-none">
-        <ReactMarkdown>{document?.content || ""}</ReactMarkdown>
-      </div>
-      <div className="mt-8 text-sm text-muted-foreground">
-        Last updated: {document?.updated_at ? new Date(document.updated_at).toLocaleDateString() : "N/A"}
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <h1 className="text-4xl font-bold mb-2">{document?.title || "Terms of Service"}</h1>
+        <div className="mb-8 text-sm text-muted-foreground">
+          Last updated: {document?.updated_at ? new Date(document.updated_at).toLocaleDateString() : "N/A"}
+        </div>
+        <div className="prose prose-lg prose-slate dark:prose-invert max-w-none
+          prose-headings:font-bold prose-headings:text-foreground
+          prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
+          prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+          prose-p:text-base prose-p:leading-7 prose-p:mb-4
+          prose-ul:my-4 prose-li:my-2
+          prose-strong:text-foreground prose-strong:font-semibold
+          prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+          <ReactMarkdown>{document?.content || ""}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );
