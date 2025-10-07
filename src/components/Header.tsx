@@ -141,11 +141,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <Briefcase className="h-6 w-6" />
-            <span className="font-bold text-xl">HUNTORIX</span>
+      <div className="container mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-4 sm:gap-8 min-w-0 flex-1">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0">
+            <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="font-bold text-base sm:text-xl">HUNTORIX</span>
           </Link>
           
           <nav className="hidden md:flex items-center gap-6">
@@ -435,10 +435,20 @@ export function Header() {
             </TooltipProvider>
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => navigate('/auth?mode=signin')}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/auth?mode=signin')}
+                className="text-sm px-3"
+              >
                 Log in
               </Button>
-              <Button variant="hero" onClick={() => navigate('/auth?mode=signup')}>
+              <Button 
+                variant="hero" 
+                size="sm"
+                onClick={() => navigate('/auth?mode=signup')}
+                className="text-sm px-3"
+              >
                 Sign up
               </Button>
             </div>
