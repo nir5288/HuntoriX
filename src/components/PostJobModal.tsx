@@ -393,11 +393,74 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     }
   };
 
+  const scrollToField = (fieldName: string) => {
+    const element = document.querySelector(`[name="${fieldName}"]`) || 
+                    document.getElementById(fieldName);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Flash the field
+      element.classList.add('ring-2', 'ring-destructive', 'ring-offset-2');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-destructive', 'ring-offset-2');
+      }, 2000);
+    }
+  };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    if (skillsMust.length === 0) {
-      toast('Please add at least one must-have skill', { 
-        description: 'You need to add at least one required skill for this position'
+    // Validate all required fields
+    if (!data.title) {
+      toast.error('Job title is required', { 
+        description: 'Please select or enter a job title'
       });
+      scrollToField('title');
+      return;
+    }
+
+    if (!data.industry) {
+      toast.error('Industry is required', { 
+        description: 'Please select an industry'
+      });
+      scrollToField('industry');
+      return;
+    }
+
+    if (!data.seniority) {
+      toast.error('Seniority level is required', { 
+        description: 'Please select the seniority level'
+      });
+      scrollToField('seniority');
+      return;
+    }
+
+    if (!data.employment_type) {
+      toast.error('Employment type is required', { 
+        description: 'Please select full-time, contract, or temp'
+      });
+      scrollToField('employment_type');
+      return;
+    }
+
+    if (data.location_type !== 'remote' && !data.location) {
+      toast.error('Location is required', { 
+        description: 'Please select a location for on-site or hybrid positions'
+      });
+      scrollToField('location');
+      return;
+    }
+
+    if (!data.description || data.description.length < 10) {
+      toast.error('Job description is required', { 
+        description: 'Please provide a description (minimum 10 characters)'
+      });
+      scrollToField('description');
+      return;
+    }
+
+    if (skillsMust.length === 0) {
+      toast.error('Must-have skills are required', { 
+        description: 'Please add at least one required skill for this position'
+      });
+      scrollToField('skills-must');
       return;
     }
 
@@ -802,7 +865,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           {/* Skills */}
-          <Card className="p-6">
+          <Card className="p-6" id="skills-must">
             <h3 className="font-semibold text-base mb-5">Required Skills</h3>
             
             <div className="space-y-5">
@@ -905,7 +968,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </Button>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !isFormValid}
               variant={isFormValid ? "hero" : "default"}
               className={cn(
                 "h-9 transition-all duration-300 font-bold",
