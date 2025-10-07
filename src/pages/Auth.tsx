@@ -37,8 +37,14 @@ const Auth = () => {
 
   useEffect(() => {
     if (user && profile && !showPlanSelection) {
-      const redirectPath = profile.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter';
-      navigate(redirectPath);
+      // Only redirect if onboarding is completed, otherwise let VerificationWrapper handle it
+      if (profile.onboarding_completed) {
+        const redirectPath = profile.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter';
+        navigate(redirectPath);
+      } else {
+        // Navigate to root and let VerificationWrapper show welcome screen
+        navigate('/');
+      }
     }
   }, [user, profile, navigate, showPlanSelection]);
 
