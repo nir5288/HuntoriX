@@ -9,12 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, Save, Loader2, Plus, X, MessageSquare } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
-import { Palette, Settings as SettingsIcon } from "lucide-react";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { ManageBannersModal } from "@/components/ManageBannersModal";
+import { Palette } from "lucide-react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 interface TeamMember {
@@ -153,14 +151,12 @@ const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { showStatus, setShowStatus } = useUserPreferences();
-  const { isAdmin } = useIsAdmin();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
   const [showAiAssistant, setShowAiAssistant] = useState(true);
   const [aiPrefInitialized, setAiPrefInitialized] = useState(false);
-  const [showManageBanners, setShowManageBanners] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState<string>(() => {
     return localStorage.getItem("color-palette") || "default";
   });
@@ -454,36 +450,6 @@ const Settings = () => {
         </Button>
 
         <h1 className="text-3xl font-bold mb-8">Profile Settings</h1>
-
-        {isAdmin && (
-          <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mb-8">
-            <CardHeader>
-              <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent flex items-center gap-2">
-                <SettingsIcon className="h-6 w-6" />
-                Admin
-              </CardTitle>
-              <CardDescription>Administrative controls and analytics</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                onClick={() => setShowManageBanners(true)}
-                variant="outline"
-                className="w-full justify-start"
-              >
-                <SettingsIcon className="h-4 w-4 mr-2" />
-                Manage Promotional Banners
-              </Button>
-              <Button 
-                onClick={() => navigate('/ai-analytics')}
-                variant="outline"
-                className="w-full justify-start"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                AI Assistant Analytics
-              </Button>
-            </CardContent>
-          </Card>
-        )}
 
         {profile.role === "employer" ? (
           // Employer Settings
@@ -947,13 +913,6 @@ const Settings = () => {
           </Button>
         </div>
       </div>
-
-      {isAdmin && (
-        <ManageBannersModal
-          open={showManageBanners}
-          onOpenChange={setShowManageBanners}
-        />
-      )}
     </div>
   );
 };

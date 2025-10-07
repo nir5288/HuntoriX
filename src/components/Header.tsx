@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -14,6 +14,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +26,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { ManageBannersModal } from './ManageBannersModal';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
@@ -29,6 +35,8 @@ export function Header() {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
   const { status, setStatus } = useUserPreferences();
+  const { isAdmin } = useIsAdmin();
+  const [showManageBanners, setShowManageBanners] = useState(false);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -262,6 +270,28 @@ export function Header() {
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
+                
+                {isAdmin && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem onClick={() => setShowManageBanners(true)}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Manage Banners
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/ai-analytics')}>
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          AI Analytics
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                )}
+                
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => {
                   // Clear persisted sidebar state on logout
@@ -294,6 +324,13 @@ export function Header() {
         currentRole={switchRoleModal.currentRole}
         targetRole={switchRoleModal.targetRole}
       />
+      
+      {isAdmin && (
+        <ManageBannersModal
+          open={showManageBanners}
+          onOpenChange={setShowManageBanners}
+        />
+      )}
     </header>
   );
 }
