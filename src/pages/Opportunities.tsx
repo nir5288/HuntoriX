@@ -303,6 +303,11 @@ const Opportunities = () => {
     };
   }, [fetchPage, currentPage]);
 
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
   // Client-side filter for skills (case-insensitive partial match)
   const filteredJobs = useMemo(() => {
     if (!debouncedQuery) return jobs;
