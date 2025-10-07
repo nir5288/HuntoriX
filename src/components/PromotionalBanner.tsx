@@ -133,7 +133,7 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
       navigate(`/auth?role=headhunter`);
       return;
     }
-    navigate(`/job-detail/${currentBanner.job_id}`);
+    navigate(`/job/${currentBanner.job_id}`);
   };
   const renderBannerContent = () => {
     // If it's a job banner and we have job details, show the job card
@@ -205,7 +205,7 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
       </div>;
 
     // Priority: job_id > link_url
-    const linkTo = currentBanner.job_id ? `/job-detail/${currentBanner.job_id}` : currentBanner.link_url;
+    const linkTo = currentBanner.job_id ? `/job/${currentBanner.job_id}` : currentBanner.link_url;
     if (linkTo) {
       return <Link to={linkTo} className="flex items-center gap-6 flex-1 min-w-0 hover:opacity-80 transition">
           {content}
