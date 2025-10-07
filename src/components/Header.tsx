@@ -298,17 +298,22 @@ export function Header() {
                 {/* Subscription Plan - Only for headhunters */}
                 {profile?.role === 'headhunter' && currentPlan && (
                   <>
-                    <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <div className="px-2 py-2">
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">Plan:</span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-medium">{currentPlan.name}</span>
+                        <button
+                          onClick={() => navigate('/settings')}
+                          className="flex items-center gap-1.5 hover:opacity-80 transition"
+                        >
+                          <span className={`text-sm font-medium ${currentPlan.name === 'Huntorix' ? 'underline' : ''}`}>
+                            {currentPlan.name}
+                          </span>
                           {currentPlan.name === 'Huntorix' && (
                             <Crown className="h-3.5 w-3.5 text-yellow-500" />
                           )}
-                        </div>
+                        </button>
                       </div>
-                    </DropdownMenuItem>
+                    </div>
                     <DropdownMenuSeparator />
                   </>
                 )}
