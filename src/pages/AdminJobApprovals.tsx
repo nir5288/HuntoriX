@@ -284,11 +284,11 @@ export default function AdminJobApprovals() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/settings')}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          Back to Settings
         </Button>
 
         <div className="mb-8">
