@@ -278,7 +278,7 @@ const EmployerDashboard = () => {
   }
   return (
     <>
-      <div className="container px-4 sm:px-6 py-6 max-w-7xl">
+      <div className="w-full px-4 sm:px-6 py-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div className="w-full sm:w-auto">
             <h1 className="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
