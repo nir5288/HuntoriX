@@ -118,20 +118,15 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
         </Button>
       </div>
 
-      {/* Huntorix Exclusive - Prominent placement for premium feature */}
+      {/* Huntorix Exclusive - Compact premium feature */}
       {hasHuntorix && (
-        <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
-          <div className="flex items-center justify-between">
+        <div className="p-3 rounded-md bg-primary/10 border border-primary/20">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-primary" />
-              <div>
-                <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-base">
-                  Huntorix Exclusive
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Premium opportunities for you
-                </p>
-              </div>
+              <Star className="h-4 w-4 text-primary fill-primary" />
+              <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-sm">
+                Exclusive Jobs
+              </Label>
             </div>
             <Switch
               id="filter-exclusive"
