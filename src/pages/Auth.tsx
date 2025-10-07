@@ -229,7 +229,7 @@ const Auth = () => {
   const handleGoogleAuth = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/?role=${activeTab}`,
@@ -237,15 +237,34 @@ const Auth = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
-          skipBrowserRedirect: false,
+          // Avoid redirecting inside the preview iframe
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) {
         toast.error(error.message);
         setLoading(false);
+        return;
       }
-      // Note: Loading state will persist during redirect
+
+      const url = data?.url;
+      if (url) {
+        try {
+          // Try navigating the top window first (best UX)
+          if (window.top) {
+            (window.top as Window).location.href = url;
+          } else {
+            window.location.href = url;
+          }
+        } catch {
+          // Fallback: open in a new tab if cross-origin blocks top navigation
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }
+      } else {
+        toast.error('Failed to start Google sign-in.');
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Google auth error:', error);
       toast.error('Failed to sign in with Google');
