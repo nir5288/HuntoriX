@@ -33,10 +33,6 @@ type Job = {
   status: string | null;
   created_by: string;
   created_at: string;
-  company_name: string | null;
-  remote_policy: string | null;
-  benefits: string[] | null;
-  is_exclusive?: boolean;
 };
 const PAGE_SIZE = 12;
 const industries = ['Software/Tech', 'Biotech/Healthcare', 'Finance/Fintech', 'Energy/Cleantech', 'Public/Non-profit'];
