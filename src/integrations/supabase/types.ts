@@ -735,6 +735,7 @@ export type Database = {
           job_id: string | null
           link_url: string | null
           location: string
+          target_audience: string
           title: string
           updated_at: string | null
           video_url: string | null
@@ -752,6 +753,7 @@ export type Database = {
           job_id?: string | null
           link_url?: string | null
           location?: string
+          target_audience?: string
           title: string
           updated_at?: string | null
           video_url?: string | null
@@ -769,6 +771,7 @@ export type Database = {
           job_id?: string | null
           link_url?: string | null
           location?: string
+          target_audience?: string
           title?: string
           updated_at?: string | null
           video_url?: string | null

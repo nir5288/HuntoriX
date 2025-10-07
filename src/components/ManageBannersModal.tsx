@@ -53,7 +53,8 @@ export function ManageBannersModal({
     job_id: '',
     is_active: true,
     display_order: 0,
-    location: 'home_top'
+    location: 'home_top',
+    target_audience: 'all'
   });
   const [locationFilter, setLocationFilter] = useState('home_top');
 
@@ -247,7 +248,8 @@ export function ManageBannersModal({
       job_id: '',
       is_active: true,
       display_order: 0,
-      location: locationFilter
+      location: locationFilter,
+      target_audience: 'all'
     });
     setEditingId(null);
   };
@@ -357,7 +359,8 @@ export function ManageBannersModal({
       job_id: banner.job_id || '',
       is_active: banner.is_active,
       display_order: banner.display_order,
-      location: banner.location || 'home_top'
+      location: banner.location || 'home_top',
+      target_audience: banner.target_audience || 'all'
     });
     setEditingId(banner.id);
   };
@@ -428,8 +431,11 @@ export function ManageBannersModal({
                   <Badge variant="secondary" className="text-xs">
                     {banner.content_type}
                   </Badge>
-                  <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">
+                   <Badge variant="outline" className="text-xs bg-primary/10 border-primary/20">
                     {banner.location?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Home Top'}
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    {banner.target_audience === 'all' ? 'All Users' : banner.target_audience === 'headhunter' ? 'Headhunters' : 'Employers'}
                   </Badge>
                   {!banner.is_active && (
                     <Badge variant="outline" className="text-xs">
@@ -512,6 +518,26 @@ export function ManageBannersModal({
                      </Select>
                      <p className="text-xs text-muted-foreground mt-1.5">
                        Choose where this banner will be displayed
+                     </p>
+                   </div>
+
+                   <div>
+                     <Label htmlFor="target_audience" className="text-sm font-medium">Target Audience *</Label>
+                     <Select value={formData.target_audience} onValueChange={(value: string) => setFormData({
+                     ...formData,
+                     target_audience: value
+                   })}>
+                       <SelectTrigger className="mt-1.5">
+                         <SelectValue />
+                       </SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="all">All Users</SelectItem>
+                         <SelectItem value="headhunter">Headhunters Only</SelectItem>
+                         <SelectItem value="employer">Employers Only</SelectItem>
+                       </SelectContent>
+                     </Select>
+                     <p className="text-xs text-muted-foreground mt-1.5">
+                       Choose who will see this banner
                      </p>
                    </div>
 

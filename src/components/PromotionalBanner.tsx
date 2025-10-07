@@ -25,10 +25,27 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
     user
   } = useAuth();
   const navigate = useNavigate();
+  // Fetch user profile to get role
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 60000
+  });
+
   const {
     data: banners = []
   } = useQuery({
-    queryKey: ['promotional-banners', location],
+    queryKey: ['promotional-banners', location, userProfile?.role],
     queryFn: async () => {
       const {
         data,
@@ -42,7 +59,16 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
           ascending: true
         });
       if (error) throw error;
-      return data || [];
+      
+      // Filter banners based on user role
+      const userRole = userProfile?.role;
+      const filtered = data?.filter(banner => {
+        if (banner.target_audience === 'all') return true;
+        if (!userRole) return banner.target_audience === 'all';
+        return banner.target_audience === userRole;
+      }) || [];
+      
+      return filtered;
     },
     staleTime: 60000
   });
