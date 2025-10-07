@@ -185,8 +185,7 @@ const Auth = () => {
 
   const handlePlanSelected = () => {
     setShowPlanSelection(false);
-    toast.success('Plan selected! Let’s complete your profile.');
-    navigate('/settings');
+    // Let VerificationWrapper show the welcome screen after plan selection
   };
 
   // Show plan selection for headhunters after signup
