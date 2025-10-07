@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, CreditCard, Crown } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -299,29 +299,14 @@ export function Header() {
                 {profile?.role === 'headhunter' && currentPlan && (
                   <>
                     <div className="px-2 py-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="h-4 w-4 text-muted-foreground" />
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-medium">{currentPlan.name}</span>
-                              {currentPlan.name === 'Huntorix' && (
-                                <Crown className="h-3.5 w-3.5 text-yellow-500" />
-                              )}
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              ${currentPlan.price_usd}/month
-                            </span>
-                          </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Plan:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium">{currentPlan.name}</span>
+                          {currentPlan.name === 'Huntorix' && (
+                            <Crown className="h-3.5 w-3.5 text-yellow-500" />
+                          )}
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => navigate(getProfilePath())}
-                          className="text-xs h-7"
-                        >
-                          Change
-                        </Button>
                       </div>
                     </div>
                     <DropdownMenuSeparator />
