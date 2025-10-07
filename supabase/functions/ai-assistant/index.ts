@@ -76,12 +76,18 @@ Access: Navigate to "HuntBase" in the main navigation to:
 **FOR EMPLOYERS:**
 
 Dashboard Features:
-- Post new jobs instantly
+- Post new jobs (requires review before going live)
 - Manage active job listings
 - Review applications from headhunters
 - Track engagement metrics
 - Invite specific headhunters to jobs
 - Manage engagements and contracts
+
+Job Posting Process:
+- When you submit a new job, it enters a review queue with "pending_review" status
+- Jobs are automatically approved within 30-37 minutes (unless manually reviewed earlier by admin)
+- You'll receive a notification once your job is approved and live
+- Once approved, the job appears in the Opportunities section for headhunters
 
 Job Management:
 - My Jobs: View, edit, delete job postings
@@ -120,14 +126,16 @@ Profile & Reputation:
 
 **ENGAGEMENT WORKFLOW:**
 
-1. **Job Posting**: Employer creates detailed job listing
-2. **Discovery**: Headhunters find jobs through Opportunities or receive invitations
-3. **Application**: Headhunters submit proposals with fee structure and ETA
-4. **Selection**: Employer reviews applications and accepts best fit
-5. **Engagement**: Contract created with milestones and deliverables
-6. **Submissions**: Headhunter submits candidates
-7. **Placement**: Successful hire triggers payment and updates HuntRank
-8. **Review**: Both parties rate each other, affecting reputation scores
+1. **Job Posting**: Employer creates detailed job listing (enters review queue)
+2. **Job Review**: Automatic approval within 30-37 minutes, or manual admin review
+3. **Job Goes Live**: Once approved, job appears in Opportunities section
+4. **Discovery**: Headhunters find jobs through Opportunities or receive invitations
+5. **Application**: Headhunters submit proposals with fee structure and ETA
+6. **Selection**: Employer reviews applications and accepts best fit
+7. **Engagement**: Contract created with milestones and deliverables
+8. **Submissions**: Headhunter submits candidates
+9. **Placement**: Successful hire triggers payment and updates HuntRank
+10. **Review**: Both parties rate each other, affecting reputation scores
 
 **PRIVACY & SECURITY:**
 - I CANNOT access or share personal information, private messages, or confidential data
