@@ -90,7 +90,7 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
             <Switch id="filter-exclusive" checked={filterExclusive} onCheckedChange={setFilterExclusive} />
           </div>
           <p className="text-xs text-purple-600 dark:text-purple-400 ml-6">
-            Eligible: Huntorix plan • Premium feature
+            Premium feature
           </p>
         </div>}
 
