@@ -32,7 +32,7 @@ const Index = () => {
       alert("You're signed in as an Employer. Please log out to switch roles.");
     }
   };
-  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background overflow-x-hidden">
       <Header />
       
       {/* Hero Section */}
@@ -45,7 +45,7 @@ const Index = () => {
             </span>
           </div>
           
-          <h1 className="text-6xl md:text-7xl font-bold tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight break-words">
             Find the perfect
             <span className="block bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
               headhunter match
@@ -214,7 +214,7 @@ const Index = () => {
       <section className="container mx-auto px-4 py-20">
         <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* For Employers */}
-          <Card className="border-2 hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="border-2 hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-3xl flex items-center gap-3">
                 <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center">
@@ -252,7 +252,7 @@ const Index = () => {
           </Card>
 
           {/* For Headhunters */}
-          <Card className="border-2 hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <Card className="border-2 hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-3xl flex items-center gap-3">
                 <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] flex items-center justify-center">

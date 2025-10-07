@@ -158,8 +158,8 @@ export function FeaturedHeadhunters() {
   if (headhunters.length === 0) return null;
 
   return (
-    <section className="relative py-16 bg-gradient-to-br from-[hsl(var(--accent-pink)/0.4)] via-[hsl(var(--accent-mint)/0.35)] to-[hsl(var(--accent-lilac)/0.4)]">
-      <div className="container mx-auto px-4 space-y-8">
+    <section className="relative py-16 bg-gradient-to-br from-[hsl(var(--accent-pink)/0.4)] via-[hsl(var(--accent-mint)/0.35)] to-[hsl(var(--accent-lilac)/0.4)] overflow-hidden">
+      <div className="container mx-auto px-4 space-y-8 max-w-full">
         <div className="text-center space-y-2">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
             Featured Headhunters
@@ -174,9 +174,9 @@ export function FeaturedHeadhunters() {
               align: 'start',
               loop: true,
             }}
-            className="w-full"
+            className="w-full max-w-full"
           >
-            <CarouselContent className="-ml-2 md:-ml-4">
+            <CarouselContent className="-ml-2 md:-ml-4 max-w-full">
               {headhunters.map((headhunter) => (
                 <CarouselItem key={headhunter.id} className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
                   <Card className="rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 h-full bg-gradient-to-br from-background via-[hsl(var(--surface)/0.3)] to-background">
