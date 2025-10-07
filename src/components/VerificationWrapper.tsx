@@ -34,13 +34,25 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
 
     checkVerificationStatus();
 
-    // Listen for new subscriptions
+    // Listen for subscription changes (insert or update)
     const channel = supabase
       .channel('user_subscriptions_changes')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
+          schema: 'public',
+          table: 'user_subscriptions',
+          filter: `user_id=eq.${user?.id}`
+        },
+        () => {
+          checkVerificationStatus();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
           schema: 'public',
           table: 'user_subscriptions',
           filter: `user_id=eq.${user?.id}`
