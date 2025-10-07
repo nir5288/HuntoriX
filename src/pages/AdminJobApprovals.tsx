@@ -9,6 +9,7 @@ import { Loader2, CheckCircle, XCircle, Clock, ArrowLeft, ExternalLink, Trending
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Header } from "@/components/Header";
 import {
   Table,
   TableBody,
@@ -266,7 +267,8 @@ export default function AdminJobApprovals() {
   if (isLoadingAdmin || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <div className="container mx-auto px-4 py-8">
+        <Header />
+        <div className="container mx-auto px-4 py-8 mt-20">
           <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
@@ -281,14 +283,15 @@ export default function AdminJobApprovals() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <Header />
+      <div className="container mx-auto px-4 py-8 mt-20 max-w-7xl">
         <Button
           variant="ghost"
-          onClick={() => navigate('/settings')}
+          onClick={() => navigate('/')}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Settings
+          Back to Home
         </Button>
 
         <div className="mb-8">
