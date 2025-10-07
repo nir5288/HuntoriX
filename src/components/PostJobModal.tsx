@@ -864,37 +864,31 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             )}
           </div>
 
-          {/* Visibility */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Visibility</h3>
-            
-            <div className="flex items-start space-x-3 rounded-lg border p-4 bg-gradient-to-br from-[hsl(var(--accent-mint))]/5 to-[hsl(var(--accent-lilac))]/5">
+          {/* Visibility & Review Notice */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 p-2 rounded-lg border bg-muted/30">
               <Checkbox 
                 id="visibility" 
                 checked={isPublic}
                 onCheckedChange={(checked) => setIsPublic(checked as boolean)}
               />
-              <div className="space-y-1 leading-none">
-                <Label 
-                  htmlFor="visibility"
-                  className="text-sm font-medium cursor-pointer"
-                >
-                  Make this job public
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  {isPublic 
-                    ? "This job will appear in the opportunities page and headhunters can apply to it" 
-                    : "This job will be private and won't appear in the opportunities page"}
-                </p>
-              </div>
+              <Label 
+                htmlFor="visibility"
+                className="text-xs font-medium cursor-pointer flex-1"
+              >
+                Make public
+              </Label>
+              <span className="text-[10px] text-muted-foreground">
+                {isPublic ? "Visible to all" : "Private"}
+              </span>
             </div>
-          </div>
-
-          <div className="rounded-lg bg-muted/50 border border-border p-4 text-sm">
-            <p className="flex items-start gap-2 text-muted-foreground">
-              <span className="text-primary text-lg">ℹ️</span>
-              <span>All job postings are reviewed for quality and compliance. Verification typically takes up to 1 hour.</span>
-            </p>
+            
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
+              <Info className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <p className="text-[10px] text-blue-700 dark:text-blue-300 leading-tight">
+                Jobs are reviewed within 1 hour
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-3 justify-end">
