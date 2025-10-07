@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, CreditCard, Crown } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -24,11 +24,12 @@ import { Badge } from '@/components/ui/badge';
 import { SwitchRoleModal } from './SwitchRoleModal';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ManageBannersModal } from './ManageBannersModal';
 import EditLegalDocumentModal from './EditLegalDocumentModal';
+import { supabase } from '@/integrations/supabase/client';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
@@ -39,6 +40,7 @@ export function Header() {
   const { isAdmin } = useIsAdmin();
   const [showManageBanners, setShowManageBanners] = useState(false);
   const [showEditLegal, setShowEditLegal] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<{ name: string; price_usd: number } | null>(null);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -48,6 +50,39 @@ export function Header() {
     currentRole: 'headhunter',
     targetRole: 'employer',
   });
+
+  // Fetch subscription plan for headhunters
+  useEffect(() => {
+    if (user && profile?.role === 'headhunter') {
+      fetchCurrentPlan();
+    }
+  }, [user, profile]);
+
+  const fetchCurrentPlan = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_subscriptions')
+        .select(`
+          subscription_plans (
+            name,
+            price_usd
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (error) throw error;
+      
+      if (data?.subscription_plans) {
+        setCurrentPlan(data.subscription_plans as { name: string; price_usd: number });
+      }
+    } catch (error) {
+      console.error('Error fetching plan:', error);
+    }
+  };
 
   const handleForEmployers = () => {
     if (!user) {
@@ -259,6 +294,39 @@ export function Header() {
                 </div>
 
                 <DropdownMenuSeparator />
+
+                {/* Subscription Plan - Only for headhunters */}
+                {profile?.role === 'headhunter' && currentPlan && (
+                  <>
+                    <div className="px-2 py-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-medium">{currentPlan.name}</span>
+                              {currentPlan.name === 'Huntorix' && (
+                                <Crown className="h-3.5 w-3.5 text-yellow-500" />
+                              )}
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              ${currentPlan.price_usd}/month
+                            </span>
+                          </div>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => navigate(getProfilePath())}
+                          className="text-xs h-7"
+                        >
+                          Change
+                        </Button>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
 
                 <DropdownMenuItem onClick={() => navigate(getDashboardPath())}>
                   <LayoutDashboard className="mr-2 h-4 w-4" />
