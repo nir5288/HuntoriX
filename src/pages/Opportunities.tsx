@@ -170,74 +170,6 @@ const Opportunities = () => {
     fetchAppliedJobs();
   }, [user, profile]);
 
-  // Build base query with *debounced* filters
-  const buildBaseQuery = useCallback(() => {
-    let q = supabase.from('jobs').select('*', {
-      count: 'exact'
-    }).in('status', ['open', 'shortlisted', 'awarded']).eq('visibility', 'public');
-
-    // Filter out applied jobs at database level if needed
-    if (!showAppliedJobs && user && profile?.role === 'headhunter' && appliedJobIds.size > 0) {
-      q = q.not('id', 'in', `(${Array.from(appliedJobIds).join(',')})`);
-    }
-
-    // Sort order
-    if (sortBy === 'recent') {
-      q = q.order('created_at', {
-        ascending: false
-      });
-    } else {
-      // For relevance, still order by created_at but we can enhance this later
-      q = q.order('created_at', {
-        ascending: false
-      });
-    }
-
-    // Industry
-    if (filterIndustry.length > 0) {
-      q = q.in('industry', filterIndustry);
-    }
-
-    // Seniority
-    if (filterSeniority !== 'all') {
-      q = q.eq('seniority', filterSeniority as any);
-    }
-
-    // Employment type
-    if (filterEmploymentType !== 'all') {
-      q = q.eq('employment_type', filterEmploymentType as any);
-    }
-
-    // Location (partial, debounced)
-    if (debouncedLocation) {
-      q = q.ilike('location', `%${debouncedLocation}%`);
-    }
-
-    // Salary range + currency (overlap logic, debounced)
-    if ((debouncedSalaryMin || debouncedSalaryMax) && filterCurrency) {
-      const min = Number(debouncedSalaryMin) || 0;
-      const max = Number(debouncedSalaryMax) || Number.MAX_SAFE_INTEGER;
-      // Overlap: job_max >= min AND job_min <= max
-      q = q.eq('budget_currency', filterCurrency).gte('budget_max', min).lte('budget_min', max);
-    }
-
-    // Posted window
-    if (filterPosted !== 'all') {
-      const now = new Date();
-      const cutoff = new Date(now);
-      if (filterPosted === '24h') cutoff.setDate(now.getDate() - 1);
-      if (filterPosted === '7d') cutoff.setDate(now.getDate() - 7);
-      if (filterPosted === '30d') cutoff.setDate(now.getDate() - 30);
-      q = q.gte('created_at', cutoff.toISOString());
-    }
-
-    // Search on title/industry (DB query only - array search done client-side)
-    if (debouncedQuery) {
-      q = q.or(`title.ilike.%${debouncedQuery}%,industry.ilike.%${debouncedQuery}%`);
-    }
-    return q;
-  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, appliedJobIds, user, profile]);
-
   // Fetch page with count
   const fetchPage = useCallback(async (page: number, isInitial = false) => {
     if (isInitial) {
@@ -286,7 +218,7 @@ const Opportunities = () => {
       setJobs(mapped);
       setTotalCount(data && data[0] ? Number(data[0].total_count) : 0);
 
-      // Update URL params
+      // Update URL params (don't include in dependency to avoid loops)
       const params = new URLSearchParams();
       params.set('page', page.toString());
       if (searchQuery) params.set('q', searchQuery);
@@ -311,21 +243,21 @@ const Opportunities = () => {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [buildBaseQuery, searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, setSearchParams]);
+  }, [searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, debouncedQuery, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, sortBy, showAppliedJobs, appliedJobIds, user, profile, filterPosted, setSearchParams]);
 
   // Initial load - use page from URL (wait for preferences to load)
   useEffect(() => {
     if (preferencesLoaded && appliedJobIds !== undefined) {
       fetchPage(currentPage, true);
     }
-  }, [preferencesLoaded, appliedJobIds]);
+  }, [preferencesLoaded]);
 
   // On filter/search change (deps use *debounced* values) - reset to page 1
   useEffect(() => {
     if (!loading && preferencesLoaded) {
       fetchPage(1, false);
     }
-  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs]);
+  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, fetchPage, loading, preferencesLoaded]);
 
   // Realtime: throttle bursts
   useEffect(() => {
