@@ -285,76 +285,85 @@ const MyJobs = () => {
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
                             <CardHeader className="px-4 py-3">
-                              <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
-                                <div className="flex-1 w-full sm:w-auto">
-                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                    <CardTitle className="text-sm sm:text-base break-words">{job.title}</CardTitle>
-                                    {job.job_id_number && (
-                                      <Badge variant="outline" className="text-[10px] sm:text-xs h-5 shrink-0">
-                                        #{job.job_id_number}
-                                      </Badge>
-                                    )}
+                              <div className="space-y-3">
+                                {/* Title row with badges */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                      <CardTitle className="text-sm sm:text-base break-words">{job.title}</CardTitle>
+                                      {job.job_id_number && (
+                                        <Badge variant="outline" className="text-[10px] sm:text-xs h-5 shrink-0">
+                                          #{job.job_id_number}
+                                        </Badge>
+                                      )}
+                                    </div>
                                     {job.is_exclusive && (
-                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2 mb-2">
                                         HuntoriX Exclusive
                                       </Badge>
                                     )}
-                                  </div>
-                                  {pendingCount > 0 && (
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
+                                    {pendingCount > 0 && (
+                                      <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5 mb-2">
                                         {pendingCount} Pending
                                       </Badge>
-                                    </div>
-                                  )}
-                                  <CardDescription className="text-xs">
-                                    {job.location} • {job.employment_type?.replace('_', ' ')}
-                                  </CardDescription>
-                                </div>
-                                <div className="flex items-start gap-1.5 w-full sm:w-auto justify-end">
-                                  <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
+                                    )}
+                                    <CardDescription className="text-xs">
+                                      {job.location} • {job.employment_type?.replace('_', ' ')}
+                                    </CardDescription>
+                                  </div>
+                                  {/* Desktop: Status badge on the right */}
+                                  <Badge className={`hidden sm:block text-[10px] sm:text-xs h-5 shrink-0 ${getStatusColor(job.status)}`}>
                                     {job.status}
                                   </Badge>
-                                  <div className="relative">
+                                </div>
+
+                                {/* Action buttons row */}
+                                <div className="flex items-center justify-between gap-2 pt-2 border-t">
+                                  <Badge className={`sm:hidden text-[10px] h-5 ${getStatusColor(job.status)}`}>
+                                    {job.status}
+                                  </Badge>
+                                  <div className="flex items-center gap-1.5 ml-auto">
+                                    <div className="relative">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate('/headhunters');
+                                        }}
+                                        className="h-7 text-[10px] sm:text-xs px-2 gap-1"
+                                        title="Invite headhunters to this job"
+                                      >
+                                        <Users className="h-3 w-3" />
+                                        <span className="hidden sm:inline">Invite</span>
+                                      </Button>
+                                      <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
+                                        New
+                                      </Badge>
+                                    </div>
                                     <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate('/headhunters');
-                                      }}
-                                      className="h-7 text-[10px] sm:text-xs px-2 gap-1"
-                                      title="Invite headhunters to this job"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => handleEditJob(job, e)}
+                                      className="h-7 w-7"
+                                      title="Edit job"
                                     >
-                                      <Users className="h-3 w-3" />
-                                      <span className="hidden sm:inline">Invite</span>
+                                      <Pencil className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[hsl(var(--accent-pink))]" />
                                     </Button>
-                                    <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
-                                      New
-                                    </Badge>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
+                                      className="h-7 w-7"
+                                      title={job.visibility === 'public' ? 'Make private' : 'Make public'}
+                                    >
+                                      {job.visibility === 'public' ? (
+                                        <Eye className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[hsl(var(--accent-mint))]" />
+                                      ) : (
+                                        <EyeOff className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground" />
+                                      )}
+                                    </Button>
                                   </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => handleEditJob(job, e)}
-                                    className="h-7 w-7"
-                                    title="Edit job"
-                                  >
-                                    <Pencil className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[hsl(var(--accent-pink))]" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                    className="h-7 w-7"
-                                    title={job.visibility === 'public' ? 'Make private' : 'Make public'}
-                                  >
-                                    {job.visibility === 'public' ? (
-                                      <Eye className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[hsl(var(--accent-mint))]" />
-                                    ) : (
-                                      <EyeOff className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground" />
-                                    )}
-                                  </Button>
                                 </div>
                               </div>
                             </CardHeader>
