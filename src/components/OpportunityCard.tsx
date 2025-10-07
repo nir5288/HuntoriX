@@ -19,6 +19,7 @@ type Job = {
   employment_type: string | null;
   seniority: string | null;
   skills_must: string[] | null;
+  skills_nice: string[] | null;
   budget_currency: string | null;
   budget_min: number | null;
   budget_max: number | null;
@@ -26,6 +27,9 @@ type Job = {
   created_by: string;
   created_at: string;
   is_exclusive?: boolean;
+  company_name: string | null;
+  remote_policy: string | null;
+  benefits: string[] | null;
 };
 
 type OpportunityCardProps = {
@@ -190,8 +194,15 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   const getPreviewDescription = (text: string) => {
-    // Truncate to 150 characters for consistent preview length
-    return truncateText(text, 150);
+    // Remove common markdown and HTML, then truncate
+    const cleaned = text
+      .replace(/#{1,6}\s/g, '') // Remove markdown headers
+      .replace(/\*\*/g, '') // Remove bold
+      .replace(/\*/g, '') // Remove italic
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/\n+/g, ' ') // Replace newlines with spaces
+      .trim();
+    return truncateText(cleaned, 180);
   };
 
   const isNewJob = () => {
@@ -392,7 +403,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       )}
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-xl font-bold leading-tight flex-1">{job.title}</h3>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold leading-tight">{job.title}</h3>
+            {job.company_name && (
+              <p className="text-sm text-muted-foreground mt-1">{job.company_name}</p>
+            )}
+          </div>
           <div className="flex items-center gap-2 shrink-0">
             <TooltipProvider delayDuration={0}>
               <Tooltip>
@@ -430,7 +446,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
             <Badge 
               variant="filter"
               style={{ backgroundColor: getIndustryColor(job.industry) }}
-              className="text-foreground border-0"
+              className="text-foreground border-0 cursor-pointer hover:opacity-80"
               onClick={(e) => {
                 e.stopPropagation();
                 onIndustryClick?.(job.industry!);
@@ -445,6 +461,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
               {job.status}
             </Badge>
           )}
+
+          {job.remote_policy && (
+            <Badge variant="secondary" className="text-xs">
+              {job.remote_policy}
+            </Badge>
+          )}
         </div>
       </CardHeader>
 
@@ -453,14 +475,14 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <div className="space-y-2 text-sm text-muted-foreground">
           {job.location && (
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
+              <MapPin className="h-4 w-4 shrink-0" />
+              <span className="truncate">{job.location}</span>
             </div>
           )}
           
           {(job.budget_min || job.budget_max) && (
             <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
+              <DollarSign className="h-4 w-4 shrink-0" />
               <span>
                 {job.budget_currency} {job.budget_min?.toLocaleString()}
                 {job.budget_max && ` - ${job.budget_max.toLocaleString()}`}
@@ -469,7 +491,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           )}
           
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 shrink-0" />
             <span>Posted {job.created_at && !isNaN(new Date(job.created_at).getTime()) 
               ? formatDistanceToNow(new Date(job.created_at), { addSuffix: true })
               : 'recently'
@@ -478,9 +500,9 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           
           {(job.employment_type || job.seniority) && (
             <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
+              <Briefcase className="h-4 w-4 shrink-0" />
               <span>
-                {job.employment_type && (job.employment_type === 'full_time' ? 'Full-time' : job.employment_type)}
+                {job.employment_type && (job.employment_type === 'full_time' ? 'Full-time' : job.employment_type.replace('_', ' '))}
                 {job.employment_type && job.seniority && ' • '}
                 {job.seniority && job.seniority.charAt(0).toUpperCase() + job.seniority.slice(1)}
               </span>
@@ -488,22 +510,41 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           )}
         </div>
 
-        {/* Description teaser - fixed preview length */}
-        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
-          {getPreviewDescription(job.description)}
-        </p>
+        {/* Description preview */}
+        <div className="space-y-2">
+          <p className="text-sm line-clamp-3">
+            {getPreviewDescription(job.description)}
+          </p>
+          
+          {/* Benefits preview */}
+          {job.benefits && job.benefits.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {job.benefits.slice(0, 3).map((benefit, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs">
+                  {benefit}
+                </Badge>
+              ))}
+              {job.benefits.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{job.benefits.length - 3} more
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
         
         {/* Spacer to push skills to bottom */}
         <div className="flex-1" />
         
-        {/* Skills carousel - auto-scroll with consistent height - always at bottom */}
-        <div className="h-10 flex items-center">
+        {/* Skills section - must-have and nice-to-have */}
+        <div className="space-y-2">
           {job.skills_must && job.skills_must.length > 0 && (
             <div 
-              className="relative overflow-hidden w-full"
+              className="relative overflow-hidden"
               onMouseEnter={() => setIsHoveringSkills(true)}
               onMouseLeave={() => setIsHoveringSkills(false)}
             >
+              <p className="text-xs font-medium text-muted-foreground mb-1.5">Required Skills</p>
               <Carousel
                 setApi={setCarouselApi}
                 opts={{
@@ -517,8 +558,8 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
                   {job.skills_must.map((skill, idx) => (
                     <CarouselItem key={idx} className="pl-2 basis-auto">
                       <Badge 
-                        variant="filter" 
-                        className="text-xs whitespace-nowrap"
+                        variant="default" 
+                        className="text-xs whitespace-nowrap cursor-pointer hover:opacity-80"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSkillClick?.(skill);
@@ -530,6 +571,32 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
                   ))}
                 </CarouselContent>
               </Carousel>
+            </div>
+          )}
+
+          {job.skills_nice && job.skills_nice.length > 0 && (
+            <div className="relative overflow-hidden">
+              <p className="text-xs font-medium text-muted-foreground mb-1.5">Nice to Have</p>
+              <div className="flex flex-wrap gap-1.5">
+                {job.skills_nice.slice(0, 5).map((skill, idx) => (
+                  <Badge 
+                    key={idx}
+                    variant="outline" 
+                    className="text-xs cursor-pointer hover:bg-accent"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSkillClick?.(skill);
+                    }}
+                  >
+                    {skill}
+                  </Badge>
+                ))}
+                {job.skills_nice.length > 5 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{job.skills_nice.length - 5}
+                  </Badge>
+                )}
+              </div>
             </div>
           )}
         </div>
