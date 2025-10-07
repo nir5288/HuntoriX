@@ -268,12 +268,12 @@ const Opportunities = () => {
     }
   }, [searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, filterExclusive, debouncedQuery, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, sortBy, showAppliedJobs, appliedJobIds, user, profile, hasHuntorix, setSearchParams]);
 
-  // Initial load - use page from URL (wait for preferences to load)
+  // Initial load and page changes - use page from URL (wait for preferences to load)
   useEffect(() => {
     if (preferencesLoaded && appliedJobIds !== undefined) {
       fetchPage(currentPage, true);
     }
-  }, [preferencesLoaded]);
+  }, [preferencesLoaded, currentPage]);
 
   // On filter/search change (deps use *debounced* values) - reset to page 1
   useEffect(() => {
