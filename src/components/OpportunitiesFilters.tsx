@@ -79,20 +79,20 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
       </div>
 
       {/* Huntorix Exclusive - Compact premium feature */}
-      {hasHuntorix && <div className="p-3 rounded-md bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-cyan-500/30 border border-purple-500/50">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-purple-500 fill-purple-500" />
-              <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-sm">
-                Exclusive Jobs
-              </Label>
-            </div>
-            <Switch id="filter-exclusive" checked={filterExclusive} onCheckedChange={setFilterExclusive} />
+      <div className="p-3 rounded-md bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-cyan-500/30 border border-purple-500/50">
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2">
+            <Star className="h-4 w-4 text-purple-500 fill-purple-500" />
+            <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-sm">
+              Exclusive Jobs
+            </Label>
           </div>
-          <p className="text-xs text-purple-600 dark:text-purple-400 ml-6">
-            Premium feature
-          </p>
-        </div>}
+          <Switch id="filter-exclusive" checked={filterExclusive} onCheckedChange={setFilterExclusive} />
+        </div>
+        <p className="text-xs text-purple-600 dark:text-purple-400 ml-6">
+          {hasHuntorix ? 'Premium feature' : 'Requires Huntorix plan'}
+        </p>
+      </div>
 
       {/* Location */}
       <div className="space-y-2">
