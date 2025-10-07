@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import aiAvatar from "@/assets/huntorix-ai-avatar.jpg";
 
 interface Message {
@@ -28,6 +28,7 @@ export function AIAssistant() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch user's AI assistant preference from database
   const { data: profile } = useQuery({
@@ -163,6 +164,9 @@ export function AIAssistant() {
       });
       return;
     }
+    
+    // Invalidate the query to trigger a re-fetch and hide the component
+    queryClient.invalidateQueries({ queryKey: ['profile-ai-preference', user.id] });
     
     toast({
       title: "AI Assistant Hidden",
