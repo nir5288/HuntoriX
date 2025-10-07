@@ -19,7 +19,7 @@ const defaultSettings: AccessibilitySettings = {
   highContrast: false,
   underlineLinks: false,
   readableFont: false,
-  keyboardNav: true,
+  keyboardNav: false,
 };
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
