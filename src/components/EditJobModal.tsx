@@ -497,8 +497,12 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
                   const exclusiveUntil = new Date(job.exclusive_until);
                   const now = new Date();
                   if (now < exclusiveUntil) {
-                    const daysRemaining = Math.ceil((exclusiveUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                    toast.error(`Cannot unmark exclusive status. Must remain exclusive for ${daysRemaining} more day${daysRemaining > 1 ? 's' : ''}.`);
+                    const formattedDate = exclusiveUntil.toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    });
+                    toast.error(`Cannot unmark exclusive status until ${formattedDate}. This job must remain exclusive for the 14-day minimum commitment period.`);
                     return;
                   }
                 }
