@@ -159,6 +159,7 @@ const Settings = () => {
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
   const [showAiAssistant, setShowAiAssistant] = useState(true);
+  const [aiPrefInitialized, setAiPrefInitialized] = useState(false);
   const [showManageBanners, setShowManageBanners] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState<string>(() => {
     return localStorage.getItem("color-palette") || "default";
@@ -208,8 +209,11 @@ const Settings = () => {
   const loadProfileData = () => {
     if (!profile) return;
 
-    // Load AI assistant preference (default to true if not set)
-    setShowAiAssistant(profile.show_ai_assistant !== false);
+    // Load AI assistant preference once (default to true if not set)
+    if (!aiPrefInitialized) {
+      setShowAiAssistant(profile.show_ai_assistant !== false);
+      setAiPrefInitialized(true);
+    }
 
     if (profile.role === "employer") {
       setCompanyName(profile.company_name || "");
