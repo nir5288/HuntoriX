@@ -466,46 +466,50 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* AI Quick Fill Circle */}
-          <div className="flex items-center justify-between">
-            <div className="flex-1" />
-            <div className="relative">
-              <Input
-                id="ai-upload"
-                type="file"
-                accept=".pdf,.docx,.txt"
-                onChange={handleFileUpload}
-                disabled={isParsing}
-                className="hidden"
-              />
-              <label htmlFor="ai-upload">
-                <div className={cn(
-                  "relative w-12 h-12 rounded-full cursor-pointer group transition-all duration-300",
-                  isParsing ? "animate-pulse" : "hover:scale-110"
-                )}>
-                  <div 
-                    className="absolute inset-0 rounded-full opacity-75 group-hover:opacity-100 transition-opacity"
-                    style={{
-                      background: 'conic-gradient(from 0deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4)',
-                      animation: isParsing ? 'spin 2s linear infinite' : 'spin 10s linear infinite'
-                    }}
-                  />
-                  <div className="absolute inset-[2px] rounded-full bg-background flex items-center justify-center">
-                    {isParsing ? (
-                      <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-5 w-5 text-purple-500" />
-                    )}
-                  </div>
-                </div>
-              </label>
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                <span className="text-[10px] text-muted-foreground">
-                  {isParsing ? "Parsing..." : "AI Fill"}
-                </span>
+          {/* AI Quick Fill */}
+          <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-1">
+                <Sparkles className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-foreground mb-1">AI Quick Fill</h3>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Upload your job description and let AI automatically fill in the form fields. 
+                  Accepts PDF, DOCX, or TXT files.
+                </p>
+                <Input
+                  id="ai-upload"
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={isParsing}
+                />
+                <Label 
+                  htmlFor="ai-upload"
+                  className={cn(
+                    "inline-flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer transition-all",
+                    "bg-primary text-primary-foreground hover:bg-primary/90",
+                    "text-xs font-medium",
+                    isParsing && "opacity-50 pointer-events-none"
+                  )}
+                >
+                  {isParsing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Parsing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Upload Job Description
+                    </>
+                  )}
+                </Label>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Exclusive Toggle */}
           <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
