@@ -36,11 +36,11 @@ const Auth = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (user && profile) {
+    if (user && profile && !showPlanSelection) {
       const redirectPath = profile.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter';
       navigate(redirectPath);
     }
-  }, [user, profile, navigate]);
+  }, [user, profile, navigate, showPlanSelection]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};

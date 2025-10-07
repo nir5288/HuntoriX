@@ -61,15 +61,37 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
   const handleSelectPlan = async (planId: string) => {
     setSubmitting(true);
     try {
-      const { error } = await supabase
+      // Check if user already has a subscription
+      const { data: existing } = await supabase
         .from('user_subscriptions')
-        .insert({
-          user_id: userId,
-          plan_id: planId,
-          status: 'active',
-        });
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (existing) {
+        // Update existing subscription
+        const { error } = await supabase
+          .from('user_subscriptions')
+          .update({
+            plan_id: planId,
+            status: 'active',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', userId);
+
+        if (error) throw error;
+      } else {
+        // Insert new subscription
+        const { error } = await supabase
+          .from('user_subscriptions')
+          .insert({
+            user_id: userId,
+            plan_id: planId,
+            status: 'active',
+          });
+
+        if (error) throw error;
+      }
 
       toast.success('Plan selected successfully!');
       onPlanSelected();

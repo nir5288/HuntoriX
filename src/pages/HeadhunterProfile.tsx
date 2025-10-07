@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { toast as sonnerToast } from "sonner";
+import { SubscriptionPlanBadge } from "@/components/SubscriptionPlanBadge";
 import { 
   User, 
   MapPin, 
@@ -489,6 +490,13 @@ const HeadhunterProfile = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Subscription Plan - Only visible for own profile */}
+        {isOwnProfile && (
+          <div className="mt-6">
+            <SubscriptionPlanBadge userId={id!} />
+          </div>
+        )}
 
         {/* Skills & Tools */}
         {profile.skills && profile.skills.length > 0 && (

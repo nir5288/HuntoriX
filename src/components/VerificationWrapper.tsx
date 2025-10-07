@@ -19,8 +19,15 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
       // Only check for headhunters
       if (profile.role !== 'headhunter') return;
 
-      // If just verified and onboarding not completed, show welcome
-      if (profile.email_verified && !profile.onboarding_completed) {
+      // Check if user has a subscription plan
+      const { data: subscription } = await supabase
+        .from('user_subscriptions')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      // Only show welcome if they have a plan AND onboarding not completed
+      if (subscription && profile.email_verified && !profile.onboarding_completed) {
         setShowWelcome(true);
       }
     };
