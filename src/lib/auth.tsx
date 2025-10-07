@@ -39,6 +39,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
+      // SECURITY: Prevent profile role changes during active session
+      // If profile role changes unexpectedly, force re-authentication
+      if (profile && profile.role && profile.role !== data.role) {
+        console.error('Profile role mismatch detected - forcing sign out for security');
+        await supabase.auth.signOut();
+        toast.error('Session security issue detected. Please sign in again.');
+        return;
+      }
+      
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -55,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -70,6 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -89,8 +100,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
-      // Clear sidebar state cookie on logout
+      // Clear all auth-related storage
       document.cookie = 'sidebar:state=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      localStorage.clear();
+      sessionStorage.clear();
       navigate('/');
       toast.success('Signed out successfully');
     } catch (error) {
