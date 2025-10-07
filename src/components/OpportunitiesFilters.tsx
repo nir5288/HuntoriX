@@ -85,43 +85,28 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
   const [industryOpen, setIndustryOpen] = React.useState(true);
   const [advancedOpen, setAdvancedOpen] = React.useState(false);
 
-  const activeFiltersCount = [
-    filterIndustry.length > 0,
-    filterLocation,
-    filterSalaryMin || filterSalaryMax,
-    filterSeniority !== 'all',
-    filterEmploymentType !== 'all',
-    filterPosted !== 'all',
-    filterExclusive
-  ].filter(Boolean).length;
-
   return (
     <div className="space-y-4">
-      {/* Header with Active Filters Badge */}
+      {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b">
-        <h3 className="font-semibold text-lg flex items-center gap-2">
+        <h3 className="font-semibold text-lg">
           Filters
-          {activeFiltersCount > 0 && (
-            <Badge variant="secondary" className="rounded-full">
-              {activeFiltersCount}
-            </Badge>
-          )}
         </h3>
         <Button 
-          variant="ghost" 
+          variant="destructive" 
           size="sm" 
           onClick={resetFilters}
-          className="h-8 px-2 text-muted-foreground hover:text-foreground"
+          className="h-9 px-3"
         >
-          <RotateCcw className="h-4 w-4 mr-1" />
-          Reset
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Reset All
         </Button>
       </div>
 
       {/* Huntorix Exclusive - Compact premium feature */}
       {hasHuntorix && (
         <div className="p-3 rounded-md bg-primary/10 border border-primary/20">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
               <Star className="h-4 w-4 text-primary fill-primary" />
               <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-sm">
@@ -134,6 +119,9 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               onCheckedChange={setFilterExclusive}
             />
           </div>
+          <p className="text-xs text-muted-foreground ml-6">
+            Eligible: Huntorix plan • Premium feature
+          </p>
         </div>
       )}
 
@@ -156,15 +144,15 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
       {/* Industry - Collapsible */}
       <Collapsible open={industryOpen} onOpenChange={setIndustryOpen}>
         <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:text-foreground transition-colors">
-          <Label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-            Industry
-            {filterIndustry.length > 0 && (
-              <Badge variant="secondary" className="h-5 px-1.5 text-xs">
-                {filterIndustry.length}
-              </Badge>
-            )}
-          </Label>
+            <div className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+              Industry
+              {filterIndustry.length > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  ({filterIndustry.length} selected)
+                </span>
+              )}
+            </div>
           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${industryOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-2">
@@ -215,12 +203,18 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
         
         <div className="space-y-3 pt-1">
           <div className="flex justify-between text-sm">
-            <span className="font-medium">
-              {filterSalaryMin ? `${filterCurrency} ${parseInt(filterSalaryMin).toLocaleString()}` : `${filterCurrency} 0`}
-            </span>
-            <span className="font-medium">
-              {filterSalaryMax ? `${filterCurrency} ${parseInt(filterSalaryMax).toLocaleString()}` : `${filterCurrency} 500K+`}
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground">Minimum</span>
+              <span className="font-medium">
+                {filterSalaryMin ? `${filterCurrency} ${parseInt(filterSalaryMin).toLocaleString()}` : `${filterCurrency} 0`}
+              </span>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="text-xs text-muted-foreground">Maximum</span>
+              <span className="font-medium">
+                {filterSalaryMax ? `${filterCurrency} ${parseInt(filterSalaryMax).toLocaleString()}` : `${filterCurrency} 500K+`}
+              </span>
+            </div>
           </div>
           <Slider
             min={0}
@@ -236,6 +230,10 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
             }}
             className="cursor-pointer"
           />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>{filterCurrency} 0</span>
+            <span>{filterCurrency} 500,000+</span>
+          </div>
         </div>
       </div>
 
