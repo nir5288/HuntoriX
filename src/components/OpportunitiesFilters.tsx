@@ -110,11 +110,11 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
 
       {/* Huntorix Exclusive - Compact premium feature */}
       {hasHuntorix && (
-        <div className="p-3 rounded-md bg-primary/10 border border-primary/20">
-          <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="p-2.5 rounded-lg bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-primary fill-primary" />
-              <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-sm">
+              <Star className="h-3.5 w-3.5 text-primary fill-primary" />
+              <Label htmlFor="filter-exclusive" className="cursor-pointer font-medium text-xs">
                 Exclusive Jobs
               </Label>
             </div>
@@ -124,8 +124,8 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               onCheckedChange={setFilterExclusive}
             />
           </div>
-          <p className="text-xs text-muted-foreground ml-6">
-            Eligible: Huntorix plan • Premium feature
+          <p className="text-[10px] text-primary/70 ml-5 mt-0.5 font-medium">
+            Premium filter
           </p>
         </div>
       )}
