@@ -277,10 +277,22 @@ const Opportunities = () => {
 
   // On filter/search change (deps use *debounced* values) - reset to page 1
   useEffect(() => {
-    if (!loading && preferencesLoaded) {
-      fetchPage(1, false);
-    }
-  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterExclusive, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, loading, preferencesLoaded]);
+    if (!preferencesLoaded) return;
+    fetchPage(1, false);
+  }, [
+    filterIndustry,
+    filterSeniority,
+    filterEmploymentType,
+    filterPosted,
+    filterExclusive,
+    filterCurrency,
+    debouncedLocation,
+    debouncedSalaryMin,
+    debouncedSalaryMax,
+    debouncedQuery,
+    sortBy,
+    showAppliedJobs,
+  ]);
 
   // Realtime: throttle bursts
   useEffect(() => {
