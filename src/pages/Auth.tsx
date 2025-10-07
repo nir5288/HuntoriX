@@ -124,6 +124,12 @@ const Auth = () => {
           toast.success('Welcome back!');
         }
       } else {
+        // Sign up flow
+        if (activeTab === 'headhunter') {
+          // Prevent auto-redirect race by enabling plan selection immediately
+          setShowPlanSelection(true);
+        }
+
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -160,9 +166,8 @@ const Auth = () => {
               console.error('Error sending verification email:', emailError);
             }
             
-            // Show plan selection for headhunters
+            // Ensure we have the user id for plan selection
             setNewUserId(data.user.id);
-            setShowPlanSelection(true);
             toast.success('Account created! Please select your subscription plan.');
           } else {
             // Employers don't need plan selection
@@ -180,12 +185,13 @@ const Auth = () => {
 
   const handlePlanSelected = () => {
     setShowPlanSelection(false);
-    toast.success('Welcome to Huntorix! Please check your email to verify your account.');
-    navigate('/');
+    toast.success('Plan selected! Let’s complete your profile.');
+    navigate('/settings');
   };
 
   // Show plan selection for headhunters after signup
-  if (showPlanSelection && newUserId) {
+  if (showPlanSelection) {
+    const uid = newUserId || user?.id || null;
     return (
       <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] flex items-center justify-center p-4">
         <div className="w-full max-w-6xl">
@@ -195,7 +201,13 @@ const Auth = () => {
               <CardDescription>Complete your registration by selecting a subscription plan</CardDescription>
             </CardHeader>
             <CardContent>
-              <PlanSelection userId={newUserId} onPlanSelected={handlePlanSelected} />
+              {uid ? (
+                <PlanSelection userId={uid} onPlanSelected={handlePlanSelected} />
+              ) : (
+                <div className="flex items-center justify-center p-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
