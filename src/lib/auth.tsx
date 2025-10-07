@@ -130,11 +130,23 @@ export function useRequireAuth(requiredRole?: string) {
     
     // Only check role if we have a profile and a required role
     if (requiredRole && profile?.role && profile.role !== requiredRole) {
-      // Prevent navigation loops - only navigate if we're not already on the correct path
-      const correctPath = profile.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter';
-      if (!location.pathname.startsWith(correctPath)) {
+      // More defensive check: only navigate if we're actually ON a page that requires the wrong role
+      // This prevents redirects when components briefly mount during render
+      const isOnEmployerPage = location.pathname.startsWith('/dashboard/employer') || 
+                               location.pathname.startsWith('/my-jobs') || 
+                               location.pathname.startsWith('/saved-headhunters');
+      const isOnHeadhunterPage = location.pathname.startsWith('/dashboard/headhunter') || 
+                                 location.pathname.startsWith('/applications');
+      
+      // Only redirect if user is actually viewing a page that requires different access
+      const shouldRedirect = 
+        (requiredRole === 'employer' && isOnEmployerPage && profile.role !== 'employer') ||
+        (requiredRole === 'headhunter' && isOnHeadhunterPage && profile.role !== 'headhunter');
+      
+      if (shouldRedirect) {
+        const correctPath = profile.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter';
         toast.error(`This page requires ${requiredRole} access`);
-        navigate(correctPath);
+        navigate(correctPath, { replace: true });
       }
     }
   }, [user, profile?.role, loading, requiredRole, navigate, location.pathname]);
