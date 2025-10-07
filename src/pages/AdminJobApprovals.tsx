@@ -2,28 +2,36 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle, XCircle, Clock, ArrowLeft, ExternalLink } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Clock, ArrowLeft, ExternalLink, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-interface PendingJob {
+interface Job {
   id: string;
   title: string;
   industry: string;
   location: string;
   created_at: string;
-  created_by: string;
-  auto_approve_at: string;
-  description: string;
+  updated_at: string;
+  status: string;
+  seniority: string;
+  employment_type: string;
   budget_min: number;
   budget_max: number;
   budget_currency: string;
-  seniority: string;
-  employment_type: string;
+  is_exclusive: boolean;
   profiles: {
     name: string;
     email: string;
@@ -34,8 +42,11 @@ interface PendingJob {
 export default function AdminJobApprovals() {
   const { user } = useAuth();
   const { isAdmin, isLoading: isLoadingAdmin } = useIsAdmin();
-  const [jobs, setJobs] = useState<PendingJob[]>([]);
+  const [pendingJobs, setPendingJobs] = useState<Job[]>([]);
+  const [approvedJobs, setApprovedJobs] = useState<Job[]>([]);
+  const [rejectedJobs, setRejectedJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("pending");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,13 +56,34 @@ export default function AdminJobApprovals() {
     }
 
     if (isAdmin) {
-      fetchPendingJobs();
+      fetchJobs();
+      
+      // Set up realtime subscription
+      const channel = supabase
+        .channel('job-approvals-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'jobs'
+          },
+          () => {
+            fetchJobs();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [isAdmin, isLoadingAdmin, navigate]);
 
-  const fetchPendingJobs = async () => {
+  const fetchJobs = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch pending jobs
+      const { data: pending, error: pendingError } = await supabase
         .from("jobs")
         .select(`
           *,
@@ -64,13 +96,49 @@ export default function AdminJobApprovals() {
         .eq("status", "pending_review")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setJobs(data || []);
+      if (pendingError) throw pendingError;
+      setPendingJobs(pending || []);
+
+      // Fetch approved jobs (last 50)
+      const { data: approved, error: approvedError } = await supabase
+        .from("jobs")
+        .select(`
+          *,
+          profiles (
+            name,
+            email,
+            company_name
+          )
+        `)
+        .eq("status", "open")
+        .order("updated_at", { ascending: false })
+        .limit(50);
+
+      if (approvedError) throw approvedError;
+      setApprovedJobs(approved || []);
+
+      // Fetch rejected jobs (last 50)
+      const { data: rejected, error: rejectedError } = await supabase
+        .from("jobs")
+        .select(`
+          *,
+          profiles (
+            name,
+            email,
+            company_name
+          )
+        `)
+        .eq("status", "closed")
+        .order("updated_at", { ascending: false })
+        .limit(50);
+
+      if (rejectedError) throw rejectedError;
+      setRejectedJobs(rejected || []);
     } catch (error) {
-      console.error("Error fetching pending jobs:", error);
+      console.error("Error fetching jobs:", error);
       toast({
         title: "Error",
-        description: "Failed to load pending jobs",
+        description: "Failed to load jobs",
         variant: "destructive",
       });
     } finally {
@@ -82,7 +150,7 @@ export default function AdminJobApprovals() {
     try {
       const { error } = await supabase
         .from("jobs")
-        .update({ status: "open" })
+        .update({ status: "open", updated_at: new Date().toISOString() })
         .eq("id", jobId);
 
       if (error) throw error;
@@ -92,7 +160,7 @@ export default function AdminJobApprovals() {
         description: "The job has been approved and is now live",
       });
 
-      fetchPendingJobs();
+      fetchJobs();
     } catch (error) {
       console.error("Error approving job:", error);
       toast({
@@ -107,7 +175,7 @@ export default function AdminJobApprovals() {
     try {
       const { error } = await supabase
         .from("jobs")
-        .update({ status: "closed" })
+        .update({ status: "closed", updated_at: new Date().toISOString() })
         .eq("id", jobId);
 
       if (error) throw error;
@@ -117,7 +185,7 @@ export default function AdminJobApprovals() {
         description: "The job has been rejected",
       });
 
-      fetchPendingJobs();
+      fetchJobs();
     } catch (error) {
       console.error("Error rejecting job:", error);
       toast({
@@ -127,6 +195,73 @@ export default function AdminJobApprovals() {
       });
     }
   };
+
+  const renderJobRow = (job: Job, showActions: boolean = true) => (
+    <TableRow key={job.id} className="hover:bg-muted/50">
+      <TableCell className="font-medium max-w-[200px]">
+        <div className="flex flex-col gap-1">
+          <span className="truncate">{job.title}</span>
+          {job.is_exclusive && (
+            <Badge className="w-fit bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[9px] px-1.5 py-0 h-4 border-0">
+              Exclusive
+            </Badge>
+          )}
+        </div>
+      </TableCell>
+      <TableCell className="text-xs text-muted-foreground max-w-[150px] truncate">
+        {job.profiles?.company_name || job.profiles?.name}
+      </TableCell>
+      <TableCell className="text-xs">
+        <Badge variant="outline" className="text-[10px]">{job.industry}</Badge>
+      </TableCell>
+      <TableCell className="text-xs text-muted-foreground">
+        {job.location || 'Remote'}
+      </TableCell>
+      <TableCell className="text-xs capitalize">{job.seniority}</TableCell>
+      <TableCell className="text-xs">
+        {job.budget_currency} {job.budget_min?.toLocaleString()}-{job.budget_max?.toLocaleString()}
+      </TableCell>
+      <TableCell className="text-xs text-muted-foreground">
+        {format(new Date(job.created_at), "MMM d, h:mm a")}
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1">
+          {showActions ? (
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleApprove(job.id)}
+                className="h-7 w-7 p-0 text-[hsl(var(--accent-mint))] hover:bg-[hsl(var(--accent-mint))]/10"
+              >
+                <CheckCircle className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleReject(job.id)}
+                className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
+              >
+                <XCircle className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <Badge variant={job.status === 'open' ? 'default' : 'secondary'} className="text-[10px]">
+              {job.status === 'open' ? 'Approved' : 'Rejected'}
+            </Badge>
+          )}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => navigate(`/jobs/${job.id}`)}
+            className="h-7 w-7 p-0"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
 
   if (isLoadingAdmin || isLoading) {
     return (
@@ -146,7 +281,7 @@ export default function AdminJobApprovals() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -158,100 +293,121 @@ export default function AdminJobApprovals() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-            Job Approval Queue
+            Job Approval Management
           </h1>
           <p className="text-muted-foreground mt-2">
-            Review and approve pending job postings • {jobs.length} pending
+            Review, approve, and manage job postings
           </p>
         </div>
 
-        {jobs.length === 0 ? (
-          <Card className="border-[hsl(var(--accent-mint))]/20">
-            <CardContent className="py-12 text-center">
-              <CheckCircle className="h-12 w-12 text-[hsl(var(--accent-mint))] mx-auto mb-4" />
-              <p className="text-muted-foreground">No jobs pending review</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4">
-            {jobs.map((job) => (
-              <Card key={job.id} className="border-[hsl(var(--accent-pink))]/20 hover:border-[hsl(var(--accent-pink))]/40 transition-colors">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg mb-1">{job.title}</CardTitle>
-                      <CardDescription className="text-sm">
-                        {job.profiles?.company_name || job.profiles?.name} • {job.industry}
-                      </CardDescription>
-                    </div>
-                    <Badge variant="secondary" className="flex-shrink-0">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Pending
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                    <div>
-                      <span className="text-muted-foreground block mb-0.5">Location</span>
-                      <span className="font-medium">{job.location || 'Remote'}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground block mb-0.5">Seniority</span>
-                      <span className="font-medium capitalize">{job.seniority}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground block mb-0.5">Type</span>
-                      <span className="font-medium">{job.employment_type?.replace('_', ' ')}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground block mb-0.5">Budget</span>
-                      <span className="font-medium">
-                        {job.budget_currency} {job.budget_min?.toLocaleString()}-{job.budget_max?.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 max-w-md">
+            <TabsTrigger value="pending" className="relative">
+              <Clock className="h-4 w-4 mr-2" />
+              Pending
+              {pendingJobs.length > 0 && (
+                <Badge className="ml-2 h-5 w-5 flex items-center justify-center rounded-full bg-[hsl(var(--accent-pink))] p-0">
+                  {pendingJobs.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="approved">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Approved
+            </TabsTrigger>
+            <TabsTrigger value="rejected">
+              <XCircle className="h-4 w-4 mr-2" />
+              Rejected
+            </TabsTrigger>
+          </TabsList>
 
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-                    <div>
-                      <span className="font-medium">Submitted:</span> {format(new Date(job.created_at), "MMM d, h:mm a")}
-                    </div>
-                    <div>
-                      <span className="font-medium">Auto-approve:</span> {format(new Date(job.auto_approve_at), "MMM d, h:mm a")}
-                    </div>
-                  </div>
+          <TabsContent value="pending" className="mt-6">
+            {pendingJobs.length === 0 ? (
+              <div className="text-center py-12 border rounded-lg bg-card">
+                <CheckCircle className="h-12 w-12 text-[hsl(var(--accent-mint))] mx-auto mb-4" />
+                <p className="text-muted-foreground">No jobs pending review</p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden bg-card">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[200px]">Job Title</TableHead>
+                      <TableHead className="w-[150px]">Company</TableHead>
+                      <TableHead>Industry</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Seniority</TableHead>
+                      <TableHead>Budget</TableHead>
+                      <TableHead>Submitted</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingJobs.map((job) => renderJobRow(job, true))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
 
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      onClick={() => handleApprove(job.id)}
-                      size="sm"
-                      className="flex-1 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
-                    >
-                      <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-                      Approve
-                    </Button>
-                    <Button
-                      onClick={() => handleReject(job.id)}
-                      variant="destructive"
-                      size="sm"
-                      className="flex-1"
-                    >
-                      <XCircle className="h-3.5 w-3.5 mr-1.5" />
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={() => navigate(`/jobs/${job.id}`)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+          <TabsContent value="approved" className="mt-6">
+            {approvedJobs.length === 0 ? (
+              <div className="text-center py-12 border rounded-lg bg-card">
+                <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No approved jobs yet</p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden bg-card">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[200px]">Job Title</TableHead>
+                      <TableHead className="w-[150px]">Company</TableHead>
+                      <TableHead>Industry</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Seniority</TableHead>
+                      <TableHead>Budget</TableHead>
+                      <TableHead>Approved</TableHead>
+                      <TableHead className="text-right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {approvedJobs.map((job) => renderJobRow(job, false))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="rejected" className="mt-6">
+            {rejectedJobs.length === 0 ? (
+              <div className="text-center py-12 border rounded-lg bg-card">
+                <XCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No rejected jobs</p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden bg-card">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="w-[200px]">Job Title</TableHead>
+                      <TableHead className="w-[150px]">Company</TableHead>
+                      <TableHead>Industry</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Seniority</TableHead>
+                      <TableHead>Budget</TableHead>
+                      <TableHead>Rejected</TableHead>
+                      <TableHead className="text-right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {rejectedJobs.map((job) => renderJobRow(job, false))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
