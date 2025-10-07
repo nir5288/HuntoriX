@@ -525,7 +525,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </>
               )}
             </button>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 relative">
               <button
                 type="button"
                 onClick={(e) => {
@@ -545,7 +545,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 Premium
               </Badge>
               {showExclusiveInfo && (
-                <div className="absolute left-10 top-full mt-2 p-3 bg-popover border rounded-lg text-sm text-popover-foreground z-50 max-w-xs">
+                <div className="absolute left-0 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-[100] max-w-xs">
                   <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
                   <button 
                     onClick={() => setShowExclusiveInfo(false)}
