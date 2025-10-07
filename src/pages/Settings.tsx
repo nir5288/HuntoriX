@@ -15,7 +15,7 @@ import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { Palette, Settings as SettingsIcon } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { ManageBannersModal } from "@/components/ManageBannersModal";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 interface TeamMember {
   name: string;
@@ -164,6 +164,28 @@ const Settings = () => {
   const [selectedPalette, setSelectedPalette] = useState<string>(() => {
     return localStorage.getItem("color-palette") || "default";
   });
+
+  // Subscribe to AI assistant preference so the toggle updates live
+  const { data: aiPref } = useQuery({
+    queryKey: ['profile-ai-preference', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('show_ai_assistant')
+        .eq('id', user.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
+  useEffect(() => {
+    if (aiPref) {
+      setShowAiAssistant(aiPref.show_ai_assistant !== false);
+    }
+  }, [aiPref]);
 
   // Employer fields
   const [companyName, setCompanyName] = useState("");
