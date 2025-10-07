@@ -547,6 +547,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               {showExclusiveInfo && (
                 <div className="absolute left-0 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-[100] max-w-xs">
                   <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
+                  <p className="mt-2 font-semibold text-primary">Minimum duration: 14 days</p>
                   <button 
                     onClick={() => setShowExclusiveInfo(false)}
                     className="mt-2 text-xs text-muted-foreground hover:text-foreground"
