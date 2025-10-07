@@ -488,14 +488,23 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
           </div>
 
           {/* Exclusive Toggle */}
-          <div className="relative flex items-center gap-3 p-3 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
+          <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
             <button
               type="button"
               onClick={() => {
+                // Check if trying to unmark exclusive before 14 days
+                if (isExclusive && job.exclusive_until) {
+                  const exclusiveUntil = new Date(job.exclusive_until);
+                  const now = new Date();
+                  if (now < exclusiveUntil) {
+                    const daysRemaining = Math.ceil((exclusiveUntil.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    toast.error(`Cannot unmark exclusive status. Must remain exclusive for ${daysRemaining} more day${daysRemaining > 1 ? 's' : ''}.`);
+                    return;
+                  }
+                }
                 setIsExclusive(!isExclusive);
-                setShowExclusiveInfo(!showExclusiveInfo);
               }}
-              className="relative w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 group"
+              className="relative w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 group flex-shrink-0"
             >
               {isExclusive ? (
                 <>
@@ -521,41 +530,41 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
                 </>
               )}
             </button>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 relative">
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setShowExclusiveInfo(!showExclusiveInfo);
                   }}
-                  className={`text-sm font-medium underline decoration-dotted underline-offset-4 transition-all duration-300 hover:decoration-solid ${
+                  className={`text-xs font-medium underline decoration-dotted underline-offset-2 transition-all duration-300 hover:decoration-solid ${
                     isExclusive 
                       ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Mark as Exclusive on Huntorix
+                  Exclusive on Huntorix
                 </button>
-                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0">
+                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[9px] px-1 py-0 h-3.5 border-0 leading-none">
                   Premium
                 </Badge>
-                {showExclusiveInfo && (
-                  <div className="absolute left-0 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-[100] max-w-xs">
-                    <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
-                    <button 
-                      onClick={() => setShowExclusiveInfo(false)}
-                      className="mt-2 text-xs text-muted-foreground hover:text-foreground"
-                    >
-                      Close
-                    </button>
-                  </div>
-                )}
               </div>
-              <span className="text-xs text-muted-foreground">
-                Once marked, must remain exclusive for at least 14 days
+              <span className="text-[10px] text-muted-foreground/80">
+                14-day minimum commitment once marked
               </span>
             </div>
+            {showExclusiveInfo && (
+              <div className="absolute left-0 top-full mt-2 p-2.5 bg-popover border rounded-lg shadow-lg text-xs text-popover-foreground z-[100] max-w-xs">
+                <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
+                <button 
+                  onClick={() => setShowExclusiveInfo(false)}
+                  className="mt-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+                >
+                  Close
+                </button>
+              </div>
+            )}
           </div>
 
           {/* F. Visibility */}
