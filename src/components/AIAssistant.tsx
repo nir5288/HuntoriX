@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,6 +13,8 @@ import aiAvatar from "@/assets/huntorix-ai-avatar.jpg";
 interface Message {
   role: "user" | "assistant";
   content: string;
+  id?: string;
+  liked?: boolean;
 }
 
 export function AIAssistant() {
@@ -25,6 +27,7 @@ export function AIAssistant() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -52,10 +55,62 @@ export function AIAssistant() {
     }
   }, [messages]);
 
+  // Create conversation when component mounts or opens
+  useEffect(() => {
+    const createConversation = async () => {
+      if (!user?.id || conversationId) return;
+      
+      const { data, error } = await supabase
+        .from('ai_conversations')
+        .insert({ user_id: user.id })
+        .select('id')
+        .single();
+      
+      if (!error && data) {
+        setConversationId(data.id);
+      }
+    };
+    
+    if (isOpen && user?.id) {
+      createConversation();
+    }
+  }, [isOpen, user?.id, conversationId]);
+
+  // Track open/hide events
+  const trackEvent = async (eventType: 'opened' | 'hidden') => {
+    if (!user?.id) return;
+    
+    await supabase
+      .from('ai_assistant_events')
+      .insert({
+        user_id: user.id,
+        event_type: eventType
+      });
+  };
+
+  const saveMessage = async (role: "user" | "assistant", content: string) => {
+    if (!conversationId || !user?.id) return null;
+    
+    const { data, error } = await supabase
+      .from('ai_messages')
+      .insert({
+        conversation_id: conversationId,
+        role,
+        content
+      })
+      .select('id')
+      .single();
+    
+    return error ? null : data?.id;
+  };
+
   const streamChat = async (userMessage: string) => {
     const newMessages = [...messages, { role: "user" as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
+
+    // Save user message
+    const userMessageId = await saveMessage("user", userMessage);
 
     try {
       const response = await fetch(
@@ -78,6 +133,7 @@ export function AIAssistant() {
       const decoder = new TextDecoder();
       let textBuffer = "";
       let assistantMessage = "";
+      let assistantMessageId: string | null = null;
 
       setMessages(prev => [...prev, { role: "assistant", content: "" }]);
 
@@ -108,7 +164,8 @@ export function AIAssistant() {
                 const newMessages = [...prev];
                 newMessages[newMessages.length - 1] = {
                   role: "assistant",
-                  content: assistantMessage
+                  content: assistantMessage,
+                  id: assistantMessageId || undefined
                 };
                 return newMessages;
               });
@@ -117,6 +174,19 @@ export function AIAssistant() {
             continue;
           }
         }
+      }
+
+      // Save complete assistant message
+      if (assistantMessage) {
+        assistantMessageId = await saveMessage("assistant", assistantMessage);
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1] = {
+            ...newMessages[newMessages.length - 1],
+            id: assistantMessageId || undefined
+          };
+          return newMessages;
+        });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -146,10 +216,42 @@ export function AIAssistant() {
     }
   };
 
+  const handleLike = async (messageId: string, currentLiked?: boolean) => {
+    if (!messageId) return;
+    
+    const newLikedState = currentLiked ? null : true;
+    
+    const { error } = await supabase
+      .from('ai_messages')
+      .update({ liked: newLikedState })
+      .eq('id', messageId);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save feedback",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setMessages(prev => prev.map(msg => 
+      msg.id === messageId ? { ...msg, liked: newLikedState || undefined } : msg
+    ));
+    
+    if (newLikedState) {
+      toast({
+        title: "Thanks for your feedback!",
+        description: "This helps Huntorix AI learn and improve.",
+      });
+    }
+  };
+
   const handleDismiss = async () => {
     if (!user?.id) return;
     
     setIsOpen(false);
+    await trackEvent('hidden');
     
     const { error } = await supabase
       .from('profiles')
@@ -165,7 +267,6 @@ export function AIAssistant() {
       return;
     }
     
-    // Invalidate the query to trigger a re-fetch and hide the component
     queryClient.invalidateQueries({ queryKey: ['profile-ai-preference', user.id] });
     
     toast({
@@ -183,7 +284,13 @@ export function AIAssistant() {
     <>
       {/* Floating Button */}
       <Button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const newOpenState = !isOpen;
+          setIsOpen(newOpenState);
+          if (newOpenState) {
+            trackEvent('opened');
+          }
+        }}
         className="fixed left-6 bottom-6 h-12 px-4 rounded-full shadow-lg hover:shadow-xl z-[9999] bg-gradient-to-r from-primary via-primary-glow to-primary transition-all duration-300 flex items-center gap-2.5 group border border-white/20"
       >
         {isOpen ? (
@@ -259,14 +366,27 @@ export function AIAssistant() {
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <div
-                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <div className="flex flex-col gap-1">
+                    <div
+                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-foreground"
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                    {message.role === "assistant" && message.id && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleLike(message.id!, message.liked)}
+                        className={`h-6 w-6 p-0 ${message.liked ? 'text-primary' : 'text-muted-foreground'}`}
+                        title={message.liked ? "Unlike this response" : "Like this response"}
+                      >
+                        <ThumbsUp className={`h-3 w-3 ${message.liked ? 'fill-current' : ''}`} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}

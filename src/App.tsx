@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import HuntRank from "./pages/HuntRank";
 import HuntBase from "./pages/HuntBase";
 import Executives from "./pages/Executives";
+import AIAnalytics from "./pages/AIAnalytics";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -57,6 +58,7 @@ const AppContent = () => {
             <Route path="/saved-headhunters" element={<SavedHeadhunters />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/ai-analytics" element={<AIAnalytics />} />
           </Route>
 
           {/* Public routes without dashboard layout */}
