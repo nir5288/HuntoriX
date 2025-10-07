@@ -216,16 +216,7 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
   return <>
       <div className="w-full relative z-10">
         <div className="container mx-auto px-4 pt-5">
-          <div className="flex items-center gap-4">
-            {renderBannerContent()}
-
-            {isAdmin && <div className="flex items-center gap-2 flex-shrink-0">
-              <Button variant="outline" size="sm" onClick={() => setShowManageModal(true)}>
-                <Settings className="h-4 w-4 mr-2" />
-                Manage
-              </Button>
-            </div>}
-          </div>
+          {renderBannerContent()}
         </div>
       </div>
 
