@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { X, Upload, Loader2 } from 'lucide-react';
+import { X, Upload, Loader2, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
@@ -392,7 +392,9 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (skillsMust.length === 0) {
-      toast.error('Please add at least one must-have skill');
+      toast('Please add at least one must-have skill', { 
+        description: 'You need to add at least one required skill for this position'
+      });
       return;
     }
 
@@ -423,9 +425,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating job:', error);
+        throw error;
+      }
 
-      toast.success('Job submitted for review. You\'ll be notified once it\'s approved.');
+      toast('Job Submitted for Review', {
+        description: 'Your job has been submitted and will be reviewed within 1 hour'
+      });
       onOpenChange(false);
       
       // Navigate to job detail page
@@ -433,7 +440,9 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
     } catch (error) {
       console.error('Error creating job:', error);
-      toast.error('Failed to create job');
+      toast('Failed to create job', {
+        description: error instanceof Error ? error.message : 'Please try again',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -517,13 +526,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   e.preventDefault();
                   setShowExclusiveInfo(!showExclusiveInfo);
                 }}
-                className={`text-sm font-medium underline decoration-dotted underline-offset-4 transition-all duration-300 hover:decoration-solid ${
+                className={`text-sm font-medium flex items-center gap-1.5 transition-all duration-300 ${
                   isExclusive 
                     ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Mark as Exclusive on Huntorix
+                <Info className="h-4 w-4" />
               </button>
               <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0">
                 Premium
