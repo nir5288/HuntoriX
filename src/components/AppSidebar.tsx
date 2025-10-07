@@ -1,5 +1,6 @@
 import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import React from "react";
 
 import {
   Sidebar,
@@ -22,6 +23,7 @@ interface AppSidebarProps {
 export function AppSidebar({ role }: AppSidebarProps) {
   const { open, setOpen, toggleSidebar } = useSidebar();
   const location = useLocation();
+  const [isHovered, setIsHovered] = React.useState(false);
   
   const items = [
     {
@@ -65,10 +67,18 @@ export function AppSidebar({ role }: AppSidebarProps) {
     if (open) return undefined;
     return title;
   };
+  const shouldShowText = open || isHovered;
+
   return (
-    <Sidebar collapsible="icon" className="border-r bg-sidebar transition-all duration-200">
+    <Sidebar 
+      collapsible="icon" 
+      className="border-r bg-sidebar transition-all duration-200 group/sidebar hover:w-[16rem]"
+      style={{ width: open ? '16rem' : '11.2rem' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <SidebarHeader className="border-b p-3 flex flex-row items-center justify-between transition-all duration-200">
-        {open && (
+        {shouldShowText && (
           <div className="flex items-center gap-2 px-1">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center text-white font-bold text-sm">
               {role === 'employer' ? 'E' : 'H'}
@@ -112,12 +122,12 @@ export function AppSidebar({ role }: AppSidebarProps) {
                       {item.url === '#' ? (
                         <div className="flex items-center gap-3 w-full cursor-not-allowed opacity-50">
                           <item.icon className="h-5 w-5 shrink-0" />
-                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                          {shouldShowText && <span className="text-sm font-medium">{item.title}</span>}
                         </div>
                       ) : (
                         <NavLink to={item.url} className="flex items-center gap-3 w-full">
                           <item.icon className="h-5 w-5 shrink-0" />
-                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                          {shouldShowText && <span className="text-sm font-medium">{item.title}</span>}
                         </NavLink>
                       )}
                     </SidebarMenuButton>
