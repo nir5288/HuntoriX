@@ -30,7 +30,7 @@ const EditLegalDocumentModal = ({ open, onOpenChange }: EditLegalDocumentModalPr
       const { data, error } = await supabase
         .from("legal_documents")
         .select("*")
-        .in("document_type", ["privacy_policy", "terms_of_service"]);
+        .in("document_type", ["privacy_policy", "terms_of_service", "accessibility_statement"]);
 
       if (error) throw error;
       return data;
@@ -39,11 +39,14 @@ const EditLegalDocumentModal = ({ open, onOpenChange }: EditLegalDocumentModalPr
 
   const privacyPolicy = documents?.find(d => d.document_type === "privacy_policy");
   const termsOfService = documents?.find(d => d.document_type === "terms_of_service");
+  const accessibilityStatement = documents?.find(d => d.document_type === "accessibility_statement");
 
   const [privacyTitle, setPrivacyTitle] = useState("");
   const [privacyContent, setPrivacyContent] = useState("");
   const [termsTitle, setTermsTitle] = useState("");
   const [termsContent, setTermsContent] = useState("");
+  const [accessibilityTitle, setAccessibilityTitle] = useState("");
+  const [accessibilityContent, setAccessibilityContent] = useState("");
 
   // Update local state when documents are loaded
   useEffect(() => {
@@ -55,7 +58,11 @@ const EditLegalDocumentModal = ({ open, onOpenChange }: EditLegalDocumentModalPr
       setTermsTitle(termsOfService.title);
       setTermsContent(termsOfService.content);
     }
-  }, [privacyPolicy, termsOfService]);
+    if (accessibilityStatement) {
+      setAccessibilityTitle(accessibilityStatement.title);
+      setAccessibilityContent(accessibilityStatement.content);
+    }
+  }, [privacyPolicy, termsOfService, accessibilityStatement]);
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, title, content }: { id: string; title: string; content: string }) => {
@@ -95,6 +102,12 @@ const EditLegalDocumentModal = ({ open, onOpenChange }: EditLegalDocumentModalPr
         title: termsTitle,
         content: termsContent,
       });
+    } else if (activeTab === "accessibility_statement" && accessibilityStatement) {
+      updateMutation.mutate({
+        id: accessibilityStatement.id,
+        title: accessibilityTitle,
+        content: accessibilityContent,
+      });
     }
   };
 
@@ -104,14 +117,15 @@ const EditLegalDocumentModal = ({ open, onOpenChange }: EditLegalDocumentModalPr
         <DialogHeader>
           <DialogTitle>Edit Legal Documents</DialogTitle>
           <DialogDescription>
-            Update your Privacy Policy and Terms of Service. Changes will be visible to all users immediately.
+            Update your Privacy Policy, Terms of Service, and Accessibility Statement. Changes will be visible to all users immediately.
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="privacy_policy">Privacy Policy</TabsTrigger>
             <TabsTrigger value="terms_of_service">Terms of Service</TabsTrigger>
+            <TabsTrigger value="accessibility_statement">Accessibility</TabsTrigger>
           </TabsList>
 
           <TabsContent value="privacy_policy" className="space-y-4">
@@ -152,6 +166,28 @@ const EditLegalDocumentModal = ({ open, onOpenChange }: EditLegalDocumentModalPr
                 id="terms-content"
                 value={termsContent}
                 onChange={(e) => setTermsContent(e.target.value)}
+                rows={20}
+                className="font-mono text-sm"
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="accessibility_statement" className="space-y-4">
+            <div>
+              <Label htmlFor="accessibility-title">Title</Label>
+              <Input
+                id="accessibility-title"
+                value={accessibilityTitle}
+                onChange={(e) => setAccessibilityTitle(e.target.value)}
+                placeholder="Accessibility Statement"
+              />
+            </div>
+            <div>
+              <Label htmlFor="accessibility-content">Content (Markdown supported)</Label>
+              <Textarea
+                id="accessibility-content"
+                value={accessibilityContent}
+                onChange={(e) => setAccessibilityContent(e.target.value)}
                 rows={20}
                 className="font-mono text-sm"
               />

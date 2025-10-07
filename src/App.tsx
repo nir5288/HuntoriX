@@ -29,6 +29,7 @@ import Executives from "./pages/Executives";
 import AIAnalytics from "./pages/AIAnalytics";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Accessibility from "./pages/Accessibility";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -75,8 +76,9 @@ const AppContent = () => {
           <Route path="/huntrank" element={<HuntRank />} />
           <Route path="/huntbase" element={<HuntBase />} />
           <Route path="/executives" element={<Executives />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/accessibility" element={<Accessibility />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </VerificationWrapper>
