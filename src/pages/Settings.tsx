@@ -882,7 +882,35 @@ const Settings = () => {
               <Switch
                 id="show-ai-assistant"
                 checked={showAiAssistant}
-                onCheckedChange={setShowAiAssistant}
+                onCheckedChange={async (checked) => {
+                  setShowAiAssistant(checked);
+                  
+                  // Immediately update database and hide/show AI assistant
+                  if (user?.id) {
+                    const { error } = await supabase
+                      .from('profiles')
+                      .update({ show_ai_assistant: checked })
+                      .eq('id', user.id);
+                    
+                    if (error) {
+                      toast({
+                        title: "Error",
+                        description: "Failed to update AI assistant preference",
+                        variant: "destructive"
+                      });
+                      setShowAiAssistant(!checked); // Revert on error
+                    } else {
+                      // Invalidate query to trigger AI assistant to hide/show
+                      queryClient.invalidateQueries({ queryKey: ['profile-ai-preference', user.id] });
+                      toast({
+                        title: checked ? "AI Assistant Enabled" : "AI Assistant Hidden",
+                        description: checked 
+                          ? "The AI assistant is now visible" 
+                          : "The AI assistant has been hidden",
+                      });
+                    }
+                  }
+                }}
               />
             </div>
           </CardContent>
