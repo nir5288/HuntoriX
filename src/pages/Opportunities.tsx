@@ -68,7 +68,7 @@ const Opportunities = () => {
   const [filterSalaryMin, setFilterSalaryMin] = useState(searchParams.get('salaryMin') || '');
   const [filterSalaryMax, setFilterSalaryMax] = useState(searchParams.get('salaryMax') || '');
   const [filterCurrency, setFilterCurrency] = useState(searchParams.get('currency') || 'ILS');
-  const [filterSalaryPeriod, setFilterSalaryPeriod] = useState(searchParams.get('salaryPeriod') || 'yearly');
+  const [filterSalaryPeriod, setFilterSalaryPeriod] = useState(searchParams.get('salaryPeriod') || 'monthly');
   const [filterSeniority, setFilterSeniority] = useState(searchParams.get('seniority') || 'all');
   const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
   const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');

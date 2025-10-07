@@ -196,23 +196,35 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
             <div className="flex flex-col">
               <span className="text-xs text-muted-foreground">Minimum</span>
               <span className="font-medium">
-                {filterSalaryMin ? `${filterCurrency} ${parseInt(filterSalaryMin).toLocaleString()}` : `${filterCurrency} 0`}
+                {filterSalaryMin ? `${parseInt(filterSalaryMin).toLocaleString()} ${filterCurrency}` : `${filterSalaryPeriod === 'monthly' ? '5,000' : '60,000'} ${filterCurrency}`}
               </span>
             </div>
             <div className="flex flex-col items-end">
               <span className="text-xs text-muted-foreground">Maximum</span>
               <span className="font-medium">
-                {filterSalaryMax ? `${filterCurrency} ${parseInt(filterSalaryMax).toLocaleString()}` : `${filterCurrency} 500K+`}
+                {filterSalaryMax ? `${parseInt(filterSalaryMax).toLocaleString()} ${filterCurrency}` : `${filterSalaryPeriod === 'monthly' ? '150,000' : '1,800,000'}+ ${filterCurrency}`}
               </span>
             </div>
           </div>
-          <Slider min={0} max={500000} step={5000} value={[filterSalaryMin ? parseInt(filterSalaryMin) : 0, filterSalaryMax ? parseInt(filterSalaryMax) : 500000]} onValueChange={values => {
-          setFilterSalaryMin(values[0] > 0 ? values[0].toString() : '');
-          setFilterSalaryMax(values[1] < 500000 ? values[1].toString() : '');
-        }} className="cursor-pointer" />
+          <Slider 
+            min={filterSalaryPeriod === 'monthly' ? 5000 : 60000} 
+            max={filterSalaryPeriod === 'monthly' ? 150000 : 1800000} 
+            step={filterSalaryPeriod === 'monthly' ? 1000 : 10000} 
+            value={[
+              filterSalaryMin ? parseInt(filterSalaryMin) : (filterSalaryPeriod === 'monthly' ? 5000 : 60000), 
+              filterSalaryMax ? parseInt(filterSalaryMax) : (filterSalaryPeriod === 'monthly' ? 150000 : 1800000)
+            ]} 
+            onValueChange={values => {
+              const min = filterSalaryPeriod === 'monthly' ? 5000 : 60000;
+              const max = filterSalaryPeriod === 'monthly' ? 150000 : 1800000;
+              setFilterSalaryMin(values[0] > min ? values[0].toString() : '');
+              setFilterSalaryMax(values[1] < max ? values[1].toString() : '');
+            }} 
+            className="cursor-pointer" 
+          />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{filterCurrency} 0</span>
-            <span>{filterCurrency} 500,000+</span>
+            <span>{filterSalaryPeriod === 'monthly' ? '5,000' : '60,000'} {filterCurrency}</span>
+            <span>{filterSalaryPeriod === 'monthly' ? '150,000' : '1,800,000'}+ {filterCurrency}</span>
           </div>
         </div>
       </div>
