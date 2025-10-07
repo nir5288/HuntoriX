@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { Briefcase, Users, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
 import { Link } from 'react-router-dom';
+import { PlanSelection } from '@/components/PlanSelection';
 
 const emailSchema = z.string().trim().email({ message: "Invalid email address" }).max(255);
 const passwordSchema = z.string().min(8, { message: "Password must be at least 8 characters" });
@@ -25,6 +26,8 @@ const Auth = () => {
   );
   const [isLogin, setIsLogin] = useState(searchParams.get('mode') === 'signin');
   const [loading, setLoading] = useState(false);
+  const [showPlanSelection, setShowPlanSelection] = useState(false);
+  const [newUserId, setNewUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -156,8 +159,15 @@ const Auth = () => {
             } catch (emailError) {
               console.error('Error sending verification email:', emailError);
             }
+            
+            // Show plan selection for headhunters
+            setNewUserId(data.user.id);
+            setShowPlanSelection(true);
+            toast.success('Account created! Please select your subscription plan.');
+          } else {
+            // Employers don't need plan selection
+            toast.success('Account created! Please check your email to verify your account.');
           }
-          toast.success('Account created! Please check your email to verify your account.');
         }
       }
     } catch (error) {
@@ -167,6 +177,31 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const handlePlanSelected = () => {
+    setShowPlanSelection(false);
+    toast.success('Welcome to Huntorix! Please check your email to verify your account.');
+    navigate('/');
+  };
+
+  // Show plan selection for headhunters after signup
+  if (showPlanSelection && newUserId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] flex items-center justify-center p-4">
+        <div className="w-full max-w-6xl">
+          <Card className="shadow-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold">Welcome to Huntorix!</CardTitle>
+              <CardDescription>Complete your registration by selecting a subscription plan</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PlanSelection userId={newUserId} onPlanSelected={handlePlanSelected} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] flex items-center justify-center p-4">
