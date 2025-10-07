@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Plus, X, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { Palette, Settings as SettingsIcon } from "lucide-react";
@@ -455,6 +455,36 @@ const Settings = () => {
 
         <h1 className="text-3xl font-bold mb-8">Profile Settings</h1>
 
+        {isAdmin && (
+          <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent flex items-center gap-2">
+                <SettingsIcon className="h-6 w-6" />
+                Admin
+              </CardTitle>
+              <CardDescription>Administrative controls and analytics</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                onClick={() => setShowManageBanners(true)}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <SettingsIcon className="h-4 w-4 mr-2" />
+                Manage Promotional Banners
+              </Button>
+              <Button 
+                onClick={() => navigate('/ai-analytics')}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                AI Assistant Analytics
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {profile.role === "employer" ? (
           // Employer Settings
           <div className="space-y-6">
@@ -829,28 +859,6 @@ const Settings = () => {
             </div>
           </CardContent>
         </Card>
-
-        {isAdmin && (
-          <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
-            <CardHeader>
-              <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent flex items-center gap-2">
-                <SettingsIcon className="h-6 w-6" />
-                Admin Controls
-              </CardTitle>
-              <CardDescription>Manage promotional banners and site content</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => setShowManageBanners(true)}
-                variant="outline"
-                className="w-full"
-              >
-                <SettingsIcon className="h-4 w-4 mr-2" />
-                Manage Promotional Banners
-              </Button>
-            </CardContent>
-          </Card>
-        )}
 
         <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mt-6">
           <CardHeader>
