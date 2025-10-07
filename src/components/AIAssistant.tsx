@@ -1,17 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Settings } from "lucide-react";
+import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import aiAvatar from "@/assets/huntorix-ai-avatar.jpg";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface Message {
   role: "user" | "assistant";
@@ -187,22 +181,15 @@ export function AIAssistant() {
                 <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
               </div>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleDismiss} className="text-destructive focus:text-destructive">
-                  Hide Assistant Permanently
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDismiss}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title="Hide AI Assistant"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Messages */}
