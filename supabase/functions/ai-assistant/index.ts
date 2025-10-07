@@ -84,8 +84,8 @@ Dashboard Features:
 - Manage engagements and contracts
 
 Job Posting Process:
-- When you submit a new job, it enters a review queue with "pending_review" status
-- Jobs are automatically approved within 30-37 minutes (unless manually reviewed earlier by admin)
+- When you submit a new job, it enters a review queue
+- Jobs are typically approved and go live within 1 hour
 - You'll receive a notification once your job is approved and live
 - Once approved, the job appears in the Opportunities section for headhunters
 
@@ -127,7 +127,7 @@ Profile & Reputation:
 **ENGAGEMENT WORKFLOW:**
 
 1. **Job Posting**: Employer creates detailed job listing (enters review queue)
-2. **Job Review**: Automatic approval within 30-37 minutes, or manual admin review
+2. **Job Review**: Jobs are reviewed and approved within 1 hour
 3. **Job Goes Live**: Once approved, job appears in Opportunities section
 4. **Discovery**: Headhunters find jobs through Opportunities or receive invitations
 5. **Application**: Headhunters submit proposals with fee structure and ETA
