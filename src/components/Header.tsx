@@ -141,9 +141,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2 relative">
-        {/* Left side - Hamburger */}
-        <div className="flex items-center gap-2 shrink-0">
+      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+        {/* Left side - Hamburger (mobile) + Logo & Nav (desktop) */}
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
+          {/* Mobile Hamburger */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10" aria-label="Open menu">
@@ -249,16 +250,15 @@ export function Header() {
               </nav>
             </SheetContent>
           </Sheet>
-        </div>
 
-        {/* Center - Logo */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0">
+          {/* Logo - centered on mobile, left on tablet+ */}
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0">
             <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
             <span className="font-bold text-sm sm:text-base md:text-xl whitespace-nowrap">HUNTORIX</span>
           </Link>
           
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-6 ml-8">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
               className={getNavLinkClass('/dashboard')}
