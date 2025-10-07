@@ -272,6 +272,8 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         onClick={handleCTA} 
         variant={getCTAVariant() as any}
         disabled={isButtonDisabled()}
+        size="sm"
+        className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
       >
         {getCTAText()}
       </Button>
@@ -376,7 +378,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
       job.is_exclusive ? 'exclusive-job-card' : ''
     }`}>
       {job.is_exclusive && (
-        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1.5 sm:py-1 px-2 sm:px-4 text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 sm:gap-1.5 rounded-t-2xl -m-[1px] mx-0 mt-0">
+        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white text-center py-1.5 px-2 sm:px-3 text-[10px] sm:text-xs font-semibold flex items-center justify-center gap-1 rounded-t-2xl -m-[1px] mx-0 mt-0">
           <span className="truncate">HuntoriX Exclusive</span>
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -390,22 +392,22 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           </TooltipProvider>
         </div>
       )}
-      <CardHeader className="space-y-3">
+      <CardHeader className="space-y-2 sm:space-y-3 p-4 sm:p-6">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-lg sm:text-xl font-bold leading-tight flex-1 break-words">{job.title}</h3>
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold leading-tight flex-1 break-words pr-2">{job.title}</h3>
+          <div className="flex items-center gap-1 shrink-0">
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7 sm:h-8 sm:w-8"
                     onClick={handleSaveToggle}
                     disabled={savingJob}
                   >
                     <Heart
-                      className={`h-4 w-4 transition-colors ${
+                      className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-colors ${
                         isSaved ? 'fill-[hsl(var(--accent-pink))] text-[hsl(var(--accent-pink))]' : ''
                       }`}
                     />
@@ -417,20 +419,20 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
               </Tooltip>
             </TooltipProvider>
             {isNewJob() && (
-              <Badge className="bg-[hsl(var(--warning))] text-white border-0 flex items-center gap-1">
-                <Sparkles className="h-3 w-3" />
+              <Badge className="bg-[hsl(var(--warning))] text-white border-0 flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 text-[9px] sm:text-xs">
+                <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 NEW
               </Badge>
             )}
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {job.industry && (
             <Badge 
               variant="filter"
               style={{ backgroundColor: getIndustryColor(job.industry) }}
-              className="text-foreground border-0 text-[10px] sm:text-xs px-2 py-0.5"
+              className="text-foreground border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5"
               onClick={(e) => {
                 e.stopPropagation();
                 onIndustryClick?.(job.industry!);
@@ -441,45 +443,45 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           )}
           
           {job.status && (
-            <Badge className={`${getStatusColor(job.status)} text-white border-0 text-[10px] sm:text-xs px-2 py-0.5`}>
+            <Badge className={`${getStatusColor(job.status)} text-white border-0 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5`}>
               {job.status}
             </Badge>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col space-y-4">
+      <CardContent className="flex-1 flex flex-col space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
         {/* Meta row with icons */}
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
           {job.location && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className="truncate">{job.location}</span>
             </div>
           )}
           
           {(job.budget_min || job.budget_max) && (
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              <span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className="truncate">
                 {job.budget_currency} {job.budget_min?.toLocaleString()}
                 {job.budget_max && ` - ${job.budget_max.toLocaleString()}`}
               </span>
             </div>
           )}
           
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span>Posted {job.created_at && !isNaN(new Date(job.created_at).getTime()) 
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+            <span className="truncate">Posted {job.created_at && !isNaN(new Date(job.created_at).getTime()) 
               ? formatDistanceToNow(new Date(job.created_at), { addSuffix: true })
               : 'recently'
             }</span>
           </div>
           
           {(job.employment_type || job.seniority) && (
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              <span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className="truncate">
                 {job.employment_type && (job.employment_type === 'full_time' ? 'Full-time' : job.employment_type)}
                 {job.employment_type && job.seniority && ' • '}
                 {job.seniority && job.seniority.charAt(0).toUpperCase() + job.seniority.slice(1)}
@@ -489,7 +491,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
 
         {/* Description teaser - fixed preview length */}
-        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
           {getPreviewDescription(job.description)}
         </p>
         
@@ -497,7 +499,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         <div className="flex-1" />
         
         {/* Skills carousel - auto-scroll with consistent height - always at bottom */}
-        <div className="h-10 flex items-center">
+        <div className="h-8 sm:h-10 flex items-center">
           {job.skills_must && job.skills_must.length > 0 && (
             <div 
               className="relative overflow-hidden w-full"
@@ -513,12 +515,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
                 }}
                 className="w-full"
               >
-                <CarouselContent className="-ml-2">
+                <CarouselContent className="-ml-1.5 sm:-ml-2">
                   {job.skills_must.map((skill, idx) => (
-                    <CarouselItem key={idx} className="pl-2 basis-auto">
+                    <CarouselItem key={idx} className="pl-1.5 sm:pl-2 basis-auto">
                       <Badge 
                         variant="filter" 
-                        className="text-xs whitespace-nowrap"
+                        className="text-[10px] sm:text-xs whitespace-nowrap px-1.5 sm:px-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           onSkillClick?.(skill);
@@ -535,10 +537,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between gap-2 pt-4 border-t">
+      <CardFooter className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-4 sm:p-6 pt-4 border-t">
         <Button 
           variant="outline" 
           size="sm"
+          className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
           onClick={() => navigate(`/job/${job.id}`, { state: { from: 'opportunities' } })}
         >
           View Details
