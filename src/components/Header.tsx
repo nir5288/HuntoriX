@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3 } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -28,6 +28,7 @@ import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ManageBannersModal } from './ManageBannersModal';
+import EditLegalDocumentModal from './EditLegalDocumentModal';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
@@ -37,6 +38,7 @@ export function Header() {
   const { status, setStatus } = useUserPreferences();
   const { isAdmin } = useIsAdmin();
   const [showManageBanners, setShowManageBanners] = useState(false);
+  const [showEditLegal, setShowEditLegal] = useState(false);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -283,6 +285,10 @@ export function Header() {
                           <Settings className="mr-2 h-4 w-4" />
                           Manage Banners
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowEditLegal(true)}>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Edit Legal Documents
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/ai-analytics')}>
                           <BarChart3 className="mr-2 h-4 w-4" />
                           AI Analytics
@@ -326,10 +332,16 @@ export function Header() {
       />
       
       {isAdmin && (
-        <ManageBannersModal
-          open={showManageBanners}
-          onOpenChange={setShowManageBanners}
-        />
+        <>
+          <ManageBannersModal
+            open={showManageBanners}
+            onOpenChange={setShowManageBanners}
+          />
+          <EditLegalDocumentModal
+            open={showEditLegal}
+            onOpenChange={setShowEditLegal}
+          />
+        </>
       )}
     </header>
   );

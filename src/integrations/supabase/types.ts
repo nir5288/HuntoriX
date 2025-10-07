@@ -423,6 +423,36 @@ export type Database = {
           },
         ]
       }
+      legal_documents: {
+        Row: {
+          content: string
+          created_at: string
+          document_type: string
+          id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          document_type: string
+          id?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          document_type?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           attachments: Json | null
