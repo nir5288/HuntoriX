@@ -497,7 +497,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               type="button"
               onClick={() => {
                 if (!isExclusive) {
-                  setShowExclusiveInfo(true);
                   toast('Marking as Exclusive', {
                     description: 'This job will be locked as exclusive for 14 days once posted. You cannot unmark it during this period.'
                   });
