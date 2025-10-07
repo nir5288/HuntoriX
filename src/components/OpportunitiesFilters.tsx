@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 
 interface OpportunitiesFiltersProps {
   industries: string[];
@@ -114,7 +115,7 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
       {/* Salary Range */}
       <div>
         <Label>Salary Range</Label>
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 space-y-3">
           <Select value={filterCurrency} onValueChange={setFilterCurrency}>
             <SelectTrigger>
               <SelectValue />
@@ -127,22 +128,25 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               ))}
             </SelectContent>
           </Select>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              value={filterSalaryMin}
-              onChange={(e) => setFilterSalaryMin(e.target.value)}
-              placeholder="Min"
-              inputMode="numeric"
-              autoComplete="off"
-            />
-            <Input
-              type="number"
-              value={filterSalaryMax}
-              onChange={(e) => setFilterSalaryMax(e.target.value)}
-              placeholder="Max"
-              inputMode="numeric"
-              autoComplete="off"
+          
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>{filterSalaryMin ? `${filterCurrency} ${parseInt(filterSalaryMin).toLocaleString()}` : 'Min'}</span>
+              <span>{filterSalaryMax ? `${filterCurrency} ${parseInt(filterSalaryMax).toLocaleString()}` : 'Max'}</span>
+            </div>
+            <Slider
+              min={0}
+              max={500000}
+              step={5000}
+              value={[
+                filterSalaryMin ? parseInt(filterSalaryMin) : 0,
+                filterSalaryMax ? parseInt(filterSalaryMax) : 500000
+              ]}
+              onValueChange={(values) => {
+                setFilterSalaryMin(values[0] > 0 ? values[0].toString() : '');
+                setFilterSalaryMax(values[1] < 500000 ? values[1].toString() : '');
+              }}
+              className="cursor-pointer"
             />
           </div>
         </div>
