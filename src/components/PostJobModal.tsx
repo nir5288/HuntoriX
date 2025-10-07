@@ -439,7 +439,13 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       navigate(`/jobs/${newJob.id}`);
 
     } catch (error) {
-      console.error('Error creating job:', error);
+      console.error('Error creating job - Full error:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        error: error,
+        userId: userId,
+        formData: data
+      });
       toast('Failed to create job', {
         description: error instanceof Error ? error.message : 'Please try again',
       });
