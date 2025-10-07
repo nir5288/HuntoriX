@@ -9,7 +9,7 @@ interface VerificationWrapperProps {
 }
 
 export function VerificationWrapper({ children }: VerificationWrapperProps) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
@@ -41,6 +41,9 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
         .from('profiles')
         .update({ onboarding_completed: true })
         .eq('id', user.id);
+      
+      // Refresh the profile to update the local state
+      await refreshProfile();
     }
     setShowWelcome(false);
   };
