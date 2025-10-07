@@ -34,26 +34,13 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
 
     checkVerificationStatus();
 
-    // Listen for subscription changes (insert or update)
+    // Listen for subscription changes
     const channel = supabase
       .channel('user_subscriptions_changes')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_subscriptions',
-          filter: `user_id=eq.${user?.id}`
-        },
-        async () => {
-          await refreshProfile();
-          await checkVerificationStatus();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'user_subscriptions',
           filter: `user_id=eq.${user?.id}`
@@ -89,8 +76,6 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
     </div>;
   }
-
-  // Verification disabled - all users can access immediately
 
   // Show welcome screen for newly verified headhunters
   if (showWelcome && profile) {

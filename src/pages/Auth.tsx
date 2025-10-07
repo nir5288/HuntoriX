@@ -44,7 +44,6 @@ const Auth = () => {
         // If user just signed in with Google and we have a role preference
         if (profile.role !== roleParam) {
           try {
-            // Update the profile role for new Google users
             const { error } = await supabase
               .from('profiles')
               .update({ role: roleParam })
@@ -53,9 +52,8 @@ const Auth = () => {
             if (error) {
               console.error('Error updating role:', error);
             } else {
-              // Clear the role param from URL
               window.history.replaceState({}, '', '/');
-              window.location.reload(); // Reload to get updated profile
+              await refreshProfile(); // Refresh instead of full reload
             }
           } catch (error) {
             console.error('Error in OAuth callback:', error);
@@ -65,7 +63,7 @@ const Auth = () => {
     };
 
     handleOAuthCallback();
-  }, [searchParams, user, profile]);
+  }, [searchParams, user, profile, refreshProfile]);
 
   useEffect(() => {
     if (user && profile && !showPlanSelection) {
@@ -230,12 +228,8 @@ const Auth = () => {
   };
 
   const handlePlanSelected = async () => {
-    // Wait a moment for the subscription to be written to the database
-    await new Promise(resolve => setTimeout(resolve, 500));
-    // Refresh profile to get the latest data
     await refreshProfile();
     setShowPlanSelection(false);
-    // Navigation will happen in the next useEffect when profile updates
   };
 
   const handleGoogleAuth = async () => {
