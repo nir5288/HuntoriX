@@ -280,7 +280,7 @@ const Opportunities = () => {
     if (!loading && preferencesLoaded) {
       fetchPage(1, false);
     }
-  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterExclusive, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, fetchPage, loading, preferencesLoaded]);
+  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterExclusive, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, loading, preferencesLoaded]);
 
   // Realtime: throttle bursts
   useEffect(() => {
