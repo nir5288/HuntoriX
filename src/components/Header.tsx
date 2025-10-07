@@ -151,52 +151,101 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[280px] sm:w-[340px]">
-              <nav className="flex flex-col gap-4 mt-8">
-                <Link 
-                  to={user ? getDashboardPath() : '/auth'} 
-                  className="text-base font-medium py-2 hover:text-primary transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  to="/opportunities" 
-                  className="text-base font-medium py-2 hover:text-primary transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Opportunities
-                </Link>
-                <Link 
-                  to="/headhunters" 
-                  className="text-base font-medium py-2 hover:text-primary transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Find a Headhunter
-                </Link>
-                <Link 
-                  to="/huntrank" 
-                  className="text-base font-medium py-2 hover:text-primary transition flex items-center gap-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  HuntRank
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-                </Link>
-                <Link 
-                  to="/huntbase" 
-                  className="text-base font-medium py-2 hover:text-primary transition flex items-center gap-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  HuntBase
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-                </Link>
-                <Link 
-                  to="/executives" 
-                  className="text-base font-medium py-2 hover:text-primary transition flex items-center gap-2 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Executives
-                  <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>
-                </Link>
+              <nav className="flex flex-col gap-1 mt-8">
+                {/* Main Navigation */}
+                <div className="mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">MAIN MENU</p>
+                  <Link 
+                    to={user ? getDashboardPath() : '/auth'} 
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+                    Dashboard
+                  </Link>
+                  {user && profile?.role === 'employer' && (
+                    <Link 
+                      to="/my-jobs" 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Briefcase className="h-5 w-5 text-muted-foreground" />
+                      My Jobs
+                    </Link>
+                  )}
+                  {user && profile?.role === 'headhunter' && (
+                    <Link 
+                      to="/applications" 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Briefcase className="h-5 w-5 text-muted-foreground" />
+                      Applications
+                    </Link>
+                  )}
+                  {user && (
+                    <Link 
+                      to="/messages" 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <MessagesSquare className="h-5 w-5 text-muted-foreground" />
+                      Messages
+                    </Link>
+                  )}
+                </div>
+
+                {/* Discover Section */}
+                <div className="border-t pt-2 mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">DISCOVER</p>
+                  <Link 
+                    to="/opportunities" 
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Star className="h-5 w-5 text-muted-foreground" />
+                    Opportunities
+                  </Link>
+                  <Link 
+                    to="/headhunters" 
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    Find a Headhunter
+                  </Link>
+                </div>
+
+                {/* Premium Features */}
+                <div className="border-t pt-2 mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">PREMIUM</p>
+                  <Link 
+                    to="/executives" 
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium bg-gradient-to-r from-[hsl(var(--luxury-gold))]/10 via-[hsl(var(--luxury-rose-gold))]/10 to-[hsl(var(--luxury-purple))]/10"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Crown className="h-5 w-5 text-[hsl(var(--luxury-gold))]" />
+                    <span className="bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-semibold">
+                      Executives
+                    </span>
+                    <Badge variant="locked" className="ml-auto text-[9px] px-1.5 py-0">Locked</Badge>
+                  </Link>
+                </div>
+
+                {/* Coming Soon */}
+                <div className="border-t pt-2">
+                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
+                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
+                    <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                    HuntRank
+                    <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
+                  </div>
+                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
+                    <Globe className="h-5 w-5 text-muted-foreground" />
+                    HuntBase
+                    <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
+                  </div>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
