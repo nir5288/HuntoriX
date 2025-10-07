@@ -298,7 +298,7 @@ export function Header() {
                 {/* Subscription Plan - Only for headhunters */}
                 {profile?.role === 'headhunter' && currentPlan && (
                   <>
-                    <div className="px-2 py-2">
+                    <DropdownMenuItem onClick={() => navigate('/settings')}>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">Plan:</span>
                         <div className="flex items-center gap-1.5">
@@ -308,7 +308,7 @@ export function Header() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
