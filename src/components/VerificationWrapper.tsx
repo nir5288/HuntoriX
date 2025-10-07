@@ -33,6 +33,27 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
     };
 
     checkVerificationStatus();
+
+    // Listen for new subscriptions
+    const channel = supabase
+      .channel('user_subscriptions_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'user_subscriptions',
+          filter: `user_id=eq.${user?.id}`
+        },
+        () => {
+          checkVerificationStatus();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, profile, loading]);
 
   const handleWelcomeComplete = async () => {
