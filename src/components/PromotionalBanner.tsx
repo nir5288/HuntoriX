@@ -217,26 +217,14 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
       <div className="w-full relative z-10">
         <div className="container mx-auto px-4 pt-5">
           <div className="flex items-center gap-4">
-            {banners.length > 1 && <Button variant="ghost" size="icon" onClick={prevBanner} className="flex-shrink-0 h-8 w-8">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>}
-
             {renderBannerContent()}
 
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {banners.length > 1 && <>
-                  <Button variant="ghost" size="icon" onClick={nextBanner} className="h-8 w-8">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                  <span className="text-xs text-muted-foreground">
-                    {currentIndex + 1} / {banners.length}
-                  </span>
-                </>}
-              {isAdmin && <Button variant="outline" size="sm" onClick={() => setShowManageModal(true)} className="ml-2">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Manage
-                </Button>}
-            </div>
+            {isAdmin && <div className="flex items-center gap-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={() => setShowManageModal(true)}>
+                <Settings className="h-4 w-4 mr-2" />
+                Manage
+              </Button>
+            </div>}
           </div>
         </div>
       </div>
