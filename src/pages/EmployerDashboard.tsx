@@ -462,26 +462,28 @@ const EmployerDashboard = () => {
                                 </Badge>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              {job.is_exclusive && (
-                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
-                                  HuntoriX Exclusive
-                                </Badge>
-                              )}
-                              {pendingCount > 0 && (
-                                <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
-                                  {pendingCount} Pending
-                                </Badge>
-                              )}
-                              <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
-                                {job.status}
-                              </Badge>
-                            </div>
+                            {(job.is_exclusive || pendingCount > 0) && (
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                {job.is_exclusive && (
+                                  <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                                    HuntoriX Exclusive
+                                  </Badge>
+                                )}
+                                {pendingCount > 0 && (
+                                  <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
+                                    {pendingCount} Pending
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
                             <CardDescription className="text-xs">
                               {job.location} • {job.employment_type?.replace('_', ' ')}
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                            <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
+                              {job.status}
+                            </Badge>
                             <div className="relative">
                               <Button
                                 variant="outline"
