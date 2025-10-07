@@ -461,19 +461,17 @@ const EmployerDashboard = () => {
                                   #{job.job_id_number}
                                 </Badge>
                               )}
+                              {job.is_exclusive && (
+                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                                  HuntoriX Exclusive
+                                </Badge>
+                              )}
                             </div>
-                            {(job.is_exclusive || pendingCount > 0) && (
-                              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                {job.is_exclusive && (
-                                  <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
-                                    HuntoriX Exclusive
-                                  </Badge>
-                                )}
-                                {pendingCount > 0 && (
-                                  <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
-                                    {pendingCount} Pending
-                                  </Badge>
-                                )}
+                            {pendingCount > 0 && (
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
+                                  {pendingCount} Pending
+                                </Badge>
                               </div>
                             )}
                             <CardDescription className="text-xs">
