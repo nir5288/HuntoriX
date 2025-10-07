@@ -38,6 +38,21 @@ const EmployerDashboard = () => {
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
   const [visibleJobCount, setVisibleJobCount] = useState(3);
   
+  // Show loading screen while auth is loading
+  if (loading || !user || !profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -263,22 +278,22 @@ const EmployerDashboard = () => {
   }
   return (
     <>
-      <div className="container px-6 py-6 max-w-7xl">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+      <div className="container px-4 sm:px-6 py-6 max-w-7xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+          <div className="w-full sm:w-auto">
+            <h1 className="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
               Employer Dashboard
             </h1>
-            <p className="text-sm text-muted-foreground">Manage your job postings and applications</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Manage your job postings and applications</p>
           </div>
-          <Button size="sm" onClick={() => setPostJobModalOpen(true)} className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
+          <Button size="sm" onClick={() => setPostJobModalOpen(true)} className="w-full sm:w-auto bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
             <Plus className="mr-1.5 h-4 w-4" />
             Post Job
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
               <CardTitle className="text-xs font-medium">Active Jobs</CardTitle>

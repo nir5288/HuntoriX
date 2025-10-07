@@ -34,6 +34,21 @@ const HeadhunterDashboard = () => {
   const [showPendingOnly, setShowPendingOnly] = useState(() => {
     return localStorage.getItem('headhunter_show_pending') === 'true';
   });
+  
+  // Show loading screen while auth is loading
+  if (loading || !user || !profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
