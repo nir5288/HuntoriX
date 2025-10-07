@@ -110,7 +110,7 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
 
       {/* Huntorix Exclusive - Compact premium feature */}
       {hasHuntorix && (
-        <div className="p-2.5 rounded-lg bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 border border-purple-500/30">{/* ... keep existing code */}
+        <div className="p-2.5 rounded-lg bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 border border-purple-500/30">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Star className="h-3.5 w-3.5 text-purple-500 fill-purple-500" />
