@@ -71,6 +71,10 @@ const Opportunities = () => {
   const [filterSeniority, setFilterSeniority] = useState(searchParams.get('seniority') || 'all');
   const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
   const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');
+  const [filterExclusive, setFilterExclusive] = useState(searchParams.get('exclusive') === 'true');
+
+  // Check if user has Huntorix subscription
+  const [hasHuntorix, setHasHuntorix] = useState(false);
 
   // Sort and applied filters - initialize from localStorage first
   const [sortBy, setSortBy] = useState<'recent' | 'relevance'>('recent');
@@ -115,7 +119,7 @@ const Opportunities = () => {
     return () => clearTimeout(t);
   }, [filterSalaryMax]);
 
-  // Load user preferences
+  // Load user preferences and check Huntorix subscription
   useEffect(() => {
     const loadPreferences = async () => {
       if (!user) {
@@ -145,10 +149,25 @@ const Opportunities = () => {
           localStorage.setItem('showAppliedJobs', data.show_applied_jobs.toString());
         }
       }
+
+      // Check if user has Huntorix subscription
+      if (profile?.role === 'headhunter') {
+        const { data: subscription } = await supabase
+          .from('user_subscriptions')
+          .select('plan_id, subscription_plans(name)')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .single();
+        
+        if (subscription?.subscription_plans?.name === 'Huntorix') {
+          setHasHuntorix(true);
+        }
+      }
+
       setPreferencesLoaded(true);
     };
     loadPreferences();
-  }, [user]);
+  }, [user, profile]);
 
   // Fetch applied jobs for current user
   useEffect(() => {
@@ -209,6 +228,7 @@ const Opportunities = () => {
         p_budget_max: debouncedSalaryMax ? Number(debouncedSalaryMax) : null,
         p_posted_cutoff: postedCutoff,
         p_exclude_job_ids: excludeIds,
+        p_is_exclusive: filterExclusive && hasHuntorix ? true : null,
         p_sort: sortBy,
         p_limit: PAGE_SIZE,
         p_offset: from
@@ -230,6 +250,7 @@ const Opportunities = () => {
       if (filterSeniority !== 'all') params.set('seniority', filterSeniority);
       if (filterEmploymentType !== 'all') params.set('employmentType', filterEmploymentType);
       if (filterPosted !== 'all') params.set('posted', filterPosted);
+      if (filterExclusive) params.set('exclusive', 'true');
       if (sortBy !== 'recent') params.set('sort', sortBy);
       if (showAppliedJobs) params.set('showApplied', 'true');
       setSearchParams(params, {
@@ -243,7 +264,7 @@ const Opportunities = () => {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, debouncedQuery, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, sortBy, showAppliedJobs, appliedJobIds, user, profile, filterPosted, setSearchParams]);
+  }, [searchQuery, filterIndustry, filterLocation, filterSalaryMin, filterSalaryMax, filterCurrency, filterSeniority, filterEmploymentType, filterPosted, filterExclusive, debouncedQuery, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, sortBy, showAppliedJobs, appliedJobIds, user, profile, hasHuntorix, setSearchParams]);
 
   // Initial load - use page from URL (wait for preferences to load)
   useEffect(() => {
@@ -257,7 +278,7 @@ const Opportunities = () => {
     if (!loading && preferencesLoaded) {
       fetchPage(1, false);
     }
-  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, fetchPage, loading, preferencesLoaded]);
+  }, [filterIndustry, filterSeniority, filterEmploymentType, filterPosted, filterExclusive, filterCurrency, debouncedLocation, debouncedSalaryMin, debouncedSalaryMax, debouncedQuery, sortBy, showAppliedJobs, fetchPage, loading, preferencesLoaded]);
 
   // Realtime: throttle bursts
   useEffect(() => {
@@ -306,6 +327,7 @@ const Opportunities = () => {
     setFilterSeniority('all');
     setFilterEmploymentType('all');
     setFilterPosted('all');
+    setFilterExclusive(false);
     setSearchQuery('');
     setSortBy('recent');
     setShowAppliedJobs(true);
@@ -459,7 +481,7 @@ const Opportunities = () => {
                   <SheetTitle>Filters</SheetTitle>
                 </SheetHeader>
                 <div className="mt-6">
-                  <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} resetFilters={resetFilters} />
+                  <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} filterExclusive={filterExclusive} setFilterExclusive={setFilterExclusive} hasHuntorix={hasHuntorix} resetFilters={resetFilters} />
                 </div>
               </SheetContent>
             </Sheet>
@@ -495,7 +517,7 @@ const Opportunities = () => {
                 </div>
               )}
               
-              <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} resetFilters={resetFilters} />
+            <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} filterExclusive={filterExclusive} setFilterExclusive={setFilterExclusive} hasHuntorix={hasHuntorix} resetFilters={resetFilters} />
             </div>
           </aside>
 

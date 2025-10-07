@@ -1248,23 +1248,42 @@ export type Database = {
         Returns: boolean
       }
       search_jobs: {
-        Args: {
-          p_budget_currency?: string
-          p_budget_max?: number
-          p_budget_min?: number
-          p_employment_type?: string
-          p_exclude_job_ids?: string[]
-          p_industries?: string[]
-          p_limit?: number
-          p_location?: string
-          p_offset?: number
-          p_posted_cutoff?: string
-          p_query?: string
-          p_seniority?: string
-          p_sort?: string
-          p_status?: string[]
-          p_visibility?: string
-        }
+        Args:
+          | {
+              p_budget_currency?: string
+              p_budget_max?: number
+              p_budget_min?: number
+              p_employment_type?: string
+              p_exclude_job_ids?: string[]
+              p_industries?: string[]
+              p_is_exclusive?: boolean
+              p_limit?: number
+              p_location?: string
+              p_offset?: number
+              p_posted_cutoff?: string
+              p_query?: string
+              p_seniority?: string
+              p_sort?: string
+              p_status?: string[]
+              p_visibility?: string
+            }
+          | {
+              p_budget_currency?: string
+              p_budget_max?: number
+              p_budget_min?: number
+              p_employment_type?: string
+              p_exclude_job_ids?: string[]
+              p_industries?: string[]
+              p_limit?: number
+              p_location?: string
+              p_offset?: number
+              p_posted_cutoff?: string
+              p_query?: string
+              p_seniority?: string
+              p_sort?: string
+              p_status?: string[]
+              p_visibility?: string
+            }
         Returns: {
           job_data: Json
           total_count: number

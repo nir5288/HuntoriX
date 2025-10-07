@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 
 interface OpportunitiesFiltersProps {
   industries: string[];
@@ -34,6 +35,11 @@ interface OpportunitiesFiltersProps {
   filterPosted: string;
   setFilterPosted: (value: string) => void;
 
+  filterExclusive: boolean;
+  setFilterExclusive: (value: boolean) => void;
+
+  hasHuntorix: boolean;
+
   resetFilters: () => void;
 }
 
@@ -58,6 +64,9 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
   setFilterEmploymentType,
   filterPosted,
   setFilterPosted,
+  filterExclusive,
+  setFilterExclusive,
+  hasHuntorix,
   resetFilters,
 }) => {
   return (
@@ -190,6 +199,20 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Exclusive Jobs - Only for Huntorix subscribers */}
+      {hasHuntorix && (
+        <div className="flex items-center justify-between">
+          <Label htmlFor="filter-exclusive" className="cursor-pointer">
+            Huntorix Exclusive
+          </Label>
+          <Switch
+            id="filter-exclusive"
+            checked={filterExclusive}
+            onCheckedChange={setFilterExclusive}
+          />
+        </div>
+      )}
 
       <Button variant="outline" onClick={resetFilters} className="w-full">
         Reset Filters
