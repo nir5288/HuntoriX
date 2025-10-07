@@ -14,6 +14,10 @@ interface Message {
 
 export function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => {
+    const saved = localStorage.getItem('huntorixi-ai-visible');
+    return saved !== 'false'; // Show by default unless explicitly hidden
+  });
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -125,6 +129,18 @@ export function AIAssistant() {
     }
   };
 
+  const handleDismiss = () => {
+    setIsVisible(false);
+    setIsOpen(false);
+    localStorage.setItem('huntorixi-ai-visible', 'false');
+    toast({
+      title: "AI Assistant Hidden",
+      description: "You can re-enable it from your Settings page.",
+    });
+  };
+
+  if (!isVisible) return null;
+
   return (
     <>
       {/* Floating Button */}
@@ -152,17 +168,28 @@ export function AIAssistant() {
       {isOpen && (
         <div className="fixed left-6 bottom-24 w-96 h-[500px] bg-background border border-border rounded-lg shadow-2xl z-[9999] flex flex-col">
           {/* Header */}
-          <div className="flex items-center gap-3 p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
-            <Avatar className="h-9 w-9 border border-primary/20">
-              <AvatarImage src={aiAvatar} alt="Huntorix AI" />
-              <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white font-semibold text-xs">
-                AI
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-semibold text-sm text-foreground">Huntorix AI</h3>
-              <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
+          <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-9 w-9 border border-primary/20">
+                <AvatarImage src={aiAvatar} alt="Huntorix AI" />
+                <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white font-semibold text-xs">
+                  AI
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-semibold text-sm text-foreground">Huntorix AI</h3>
+                <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
+              </div>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDismiss}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title="Hide AI Assistant"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Messages */}

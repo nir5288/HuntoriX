@@ -819,6 +819,23 @@ const Settings = () => {
                 onCheckedChange={setLocalShowStatus}
               />
             </div>
+            
+            <div className="flex items-center justify-between border-t pt-4">
+              <div className="space-y-0.5">
+                <Label htmlFor="show-ai-assistant">Show AI Assistant</Label>
+                <p className="text-sm text-muted-foreground">
+                  Display the Huntorix AI navigation assistant button
+                </p>
+              </div>
+              <Switch
+                id="show-ai-assistant"
+                checked={localStorage.getItem('huntorixi-ai-visible') !== 'false'}
+                onCheckedChange={(checked) => {
+                  localStorage.setItem('huntorixi-ai-visible', String(checked));
+                  window.location.reload(); // Refresh to show/hide the assistant
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
 
