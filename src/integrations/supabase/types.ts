@@ -336,6 +336,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          auto_approve_at: string | null
           benefits: string[] | null
           budget_currency: string | null
           budget_max: number | null
@@ -362,6 +363,7 @@ export type Database = {
           visibility: string | null
         }
         Insert: {
+          auto_approve_at?: string | null
           benefits?: string[] | null
           budget_currency?: string | null
           budget_max?: number | null
@@ -388,6 +390,7 @@ export type Database = {
           visibility?: string | null
         }
         Update: {
+          auto_approve_at?: string | null
           benefits?: string[] | null
           budget_currency?: string | null
           budget_max?: number | null

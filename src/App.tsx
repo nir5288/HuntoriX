@@ -13,6 +13,7 @@ import MyJobs from "./pages/MyJobs";
 import HeadhunterDashboard from "./pages/HeadhunterDashboard";
 import JobDetail from "./pages/JobDetail";
 import JobReview from "./pages/JobReview";
+import JobReviewAdmin from "./pages/JobReviewAdmin";
 import Opportunities from "./pages/Opportunities";
 import Applications from "./pages/Applications";
 import SavedJobs from "./pages/SavedJobs";
@@ -81,6 +82,7 @@ const AppContent = () => {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/accessibility" element={<Accessibility />} />
+            <Route path="/admin/job-review" element={<JobReviewAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </VerificationWrapper>

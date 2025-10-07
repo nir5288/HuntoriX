@@ -417,7 +417,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           skills_nice: skillsNice,
           created_by: userId,
           visibility: isPublic ? 'public' : 'private',
-          status: 'open',
+          status: 'pending_review',
           is_exclusive: isExclusive
         } as any])
         .select()
@@ -425,14 +425,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
       if (error) throw error;
 
-      toast.success('Job posted successfully');
+      toast.success('Job submitted for review. You\'ll be notified once it\'s approved.');
       onOpenChange(false);
       
       // Navigate to job detail page
       navigate(`/jobs/${newJob.id}`);
-      
-      // Refresh will happen on navigation
-      window.location.reload();
 
     } catch (error) {
       console.error('Error creating job:', error);
@@ -795,6 +792,13 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </div>
           </div>
 
+          <div className="rounded-lg bg-muted/50 border border-border p-4 text-sm">
+            <p className="flex items-start gap-2 text-muted-foreground">
+              <span className="text-primary text-lg">ℹ️</span>
+              <span>All job postings are reviewed for quality and compliance. Verification typically takes up to 1 hour.</span>
+            </p>
+          </div>
+
           <div className="flex gap-3 justify-end">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
@@ -806,7 +810,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 isFormValid ? 'opacity-100' : 'opacity-50'
               }`}
             >
-              {isSubmitting ? 'Creating...' : 'Create Job'}
+              {isSubmitting ? 'Submitting...' : 'Submit for Review'}
             </Button>
           </div>
         </form>

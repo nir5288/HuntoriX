@@ -1,4 +1,4 @@
-import { Bell, Check, Mail, UserPlus, AlertCircle, Briefcase, MailOpen } from 'lucide-react';
+import { Bell, Check, Mail, UserPlus, AlertCircle, Briefcase, MailOpen, ClipboardCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -28,6 +28,8 @@ export const NotificationDropdown = () => {
         return <Briefcase className="h-4 w-4 text-[hsl(var(--accent-pink))]" />;
       case 'status_change':
         return <AlertCircle className="h-4 w-4 text-[hsl(var(--warning))]" />;
+      case 'job_review_required':
+        return <ClipboardCheck className="h-4 w-4 text-[hsl(var(--accent-lilac))]" />;
       default:
         return <Bell className="h-4 w-4" />;
     }
@@ -62,6 +64,9 @@ export const NotificationDropdown = () => {
         if (payload.job_id) {
           navigate(`/jobs/${payload.job_id}`);
         }
+        break;
+      case 'job_review_required':
+        navigate('/admin/job-review');
         break;
     }
   };
