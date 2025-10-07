@@ -699,15 +699,15 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           {/* Compensation */}
-          <Card className="p-6">
-            <h3 className="font-semibold text-base mb-5">Compensation Range</h3>
+          <Card className="p-5">
+            <h3 className="font-semibold text-base mb-4">Compensation Range</h3>
             
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2.5">
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
                   <Label htmlFor="budget_currency" className="text-sm font-medium">Currency</Label>
                   <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                    <SelectTrigger className={cn("h-11", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <SelectTrigger className={cn("h-10", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -718,8 +718,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   </Select>
                 </div>
                 
-                <div className="space-y-2.5">
-                  <Label htmlFor="salary_period" className="text-sm font-medium">Pay Period</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="salary_period" className="text-sm font-medium">Period</Label>
                   <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
                     const budgetMin = watch('budget_min');
                     const budgetMax = watch('budget_max');
@@ -734,7 +734,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     
                     setSalaryPeriod(value);
                   }}>
-                    <SelectTrigger className="h-11">
+                    <SelectTrigger className="h-10">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -745,26 +745,20 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </div>
               </div>
               
-              <div className="space-y-3 pt-2">
-                <div className="flex justify-between items-center">
-                  <div className="text-left">
-                    <p className="text-xs text-muted-foreground mb-1">Minimum</p>
-                    <p className="text-base font-semibold">
-                      {watch('budget_min') 
-                        ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                        : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
-                      }
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground mb-1">Maximum</p>
-                    <p className="text-base font-semibold">
-                      {watch('budget_max') 
-                        ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                        : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
-                      }
-                    </p>
-                  </div>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-semibold">
+                    {watch('budget_min') 
+                      ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                      : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
+                    }
+                  </span>
+                  <span className="font-semibold">
+                    {watch('budget_max') 
+                      ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                      : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
+                    }
+                  </span>
                 </div>
                 <Slider 
                   min={salaryPeriod === 'monthly' ? 5000 : 60000}
