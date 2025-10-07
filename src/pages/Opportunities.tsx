@@ -68,6 +68,7 @@ const Opportunities = () => {
   const [filterSalaryMin, setFilterSalaryMin] = useState(searchParams.get('salaryMin') || '');
   const [filterSalaryMax, setFilterSalaryMax] = useState(searchParams.get('salaryMax') || '');
   const [filterCurrency, setFilterCurrency] = useState(searchParams.get('currency') || 'ILS');
+  const [filterSalaryPeriod, setFilterSalaryPeriod] = useState(searchParams.get('salaryPeriod') || 'yearly');
   const [filterSeniority, setFilterSeniority] = useState(searchParams.get('seniority') || 'all');
   const [filterEmploymentType, setFilterEmploymentType] = useState(searchParams.get('employmentType') || 'all');
   const [filterPosted, setFilterPosted] = useState(searchParams.get('posted') || 'all');
@@ -247,6 +248,7 @@ const Opportunities = () => {
       if (filterSalaryMin) params.set('salaryMin', filterSalaryMin);
       if (filterSalaryMax) params.set('salaryMax', filterSalaryMax);
       if (filterCurrency !== 'ILS') params.set('currency', filterCurrency);
+      if (filterSalaryPeriod !== 'yearly') params.set('salaryPeriod', filterSalaryPeriod);
       if (filterSeniority !== 'all') params.set('seniority', filterSeniority);
       if (filterEmploymentType !== 'all') params.set('employmentType', filterEmploymentType);
       if (filterPosted !== 'all') params.set('posted', filterPosted);
@@ -324,6 +326,7 @@ const Opportunities = () => {
     setFilterSalaryMin('');
     setFilterSalaryMax('');
     setFilterCurrency('ILS');
+    setFilterSalaryPeriod('yearly');
     setFilterSeniority('all');
     setFilterEmploymentType('all');
     setFilterPosted('all');
@@ -481,7 +484,7 @@ const Opportunities = () => {
                   <SheetTitle>Filters</SheetTitle>
                 </SheetHeader>
                 <div className="mt-6">
-                  <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} filterExclusive={filterExclusive} setFilterExclusive={setFilterExclusive} hasHuntorix={hasHuntorix} resetFilters={resetFilters} />
+                  <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSalaryPeriod={filterSalaryPeriod} setFilterSalaryPeriod={setFilterSalaryPeriod} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} filterExclusive={filterExclusive} setFilterExclusive={setFilterExclusive} hasHuntorix={hasHuntorix} resetFilters={resetFilters} />
                 </div>
               </SheetContent>
             </Sheet>
@@ -517,7 +520,7 @@ const Opportunities = () => {
                 </div>
               )}
               
-            <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} filterExclusive={filterExclusive} setFilterExclusive={setFilterExclusive} hasHuntorix={hasHuntorix} resetFilters={resetFilters} />
+            <OpportunitiesFilters industries={industries} seniorities={seniorities} employmentTypes={employmentTypes} currencies={currencies} filterIndustry={filterIndustry} setFilterIndustry={setFilterIndustry} filterLocation={filterLocation} setFilterLocation={setFilterLocation} filterSalaryMin={filterSalaryMin} setFilterSalaryMin={setFilterSalaryMin} filterSalaryMax={filterSalaryMax} setFilterSalaryMax={setFilterSalaryMax} filterCurrency={filterCurrency} setFilterCurrency={setFilterCurrency} filterSalaryPeriod={filterSalaryPeriod} setFilterSalaryPeriod={setFilterSalaryPeriod} filterSeniority={filterSeniority} setFilterSeniority={setFilterSeniority} filterEmploymentType={filterEmploymentType} setFilterEmploymentType={setFilterEmploymentType} filterPosted={filterPosted} setFilterPosted={setFilterPosted} filterExclusive={filterExclusive} setFilterExclusive={setFilterExclusive} hasHuntorix={hasHuntorix} resetFilters={resetFilters} />
             </div>
           </aside>
 

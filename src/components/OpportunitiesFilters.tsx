@@ -39,6 +39,9 @@ interface OpportunitiesFiltersProps {
   filterCurrency: string;
   setFilterCurrency: (value: string) => void;
 
+  filterSalaryPeriod: string;
+  setFilterSalaryPeriod: (value: string) => void;
+
   filterSeniority: string;
   setFilterSeniority: (value: string) => void;
 
@@ -71,6 +74,8 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
   setFilterSalaryMax,
   filterCurrency,
   setFilterCurrency,
+  filterSalaryPeriod,
+  setFilterSalaryPeriod,
   filterSeniority,
   setFilterSeniority,
   filterEmploymentType,
@@ -188,18 +193,31 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
           <DollarSign className="h-4 w-4 text-muted-foreground" />
           Salary Range
         </Label>
-        <Select value={filterCurrency} onValueChange={setFilterCurrency}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {currencies.map((curr) => (
-              <SelectItem key={curr} value={curr}>
-                {curr}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <Select value={filterCurrency} onValueChange={setFilterCurrency}>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {currencies.map((curr) => (
+                <SelectItem key={curr} value={curr}>
+                  {curr}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Select value={filterSalaryPeriod} onValueChange={setFilterSalaryPeriod}>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="yearly">Yearly</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         
         <div className="space-y-3 pt-1">
           <div className="flex justify-between text-sm">
