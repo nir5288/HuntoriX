@@ -199,12 +199,28 @@ const Settings = () => {
 
     if (profile) {
       loadProfileData();
+      // Fetch the latest AI assistant preference from database
+      fetchAiAssistantPreference();
     }
   }, [user, profile]);
 
   useEffect(() => {
     setLocalShowStatus(showStatus);
   }, [showStatus]);
+
+  const fetchAiAssistantPreference = async () => {
+    if (!user?.id) return;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('show_ai_assistant')
+      .eq('id', user.id)
+      .single();
+    
+    if (!error && data) {
+      setShowAiAssistant(data.show_ai_assistant !== false);
+    }
+  };
 
   const loadProfileData = () => {
     if (!profile) return;
