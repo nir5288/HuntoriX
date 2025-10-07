@@ -15,6 +15,7 @@ import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { Palette, Settings as SettingsIcon } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { ManageBannersModal } from "@/components/ManageBannersModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TeamMember {
   name: string;
@@ -153,6 +154,7 @@ const Settings = () => {
   const { toast } = useToast();
   const { showStatus, setShowStatus } = useUserPreferences();
   const { isAdmin } = useIsAdmin();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
@@ -280,6 +282,9 @@ const Settings = () => {
 
       // Update context
       setShowStatus(localShowStatus);
+
+      // Invalidate AI assistant query to show/hide button immediately
+      queryClient.invalidateQueries({ queryKey: ['profile-ai-preference', user.id] });
 
       await refreshProfile();
 
