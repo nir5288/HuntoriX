@@ -581,17 +581,16 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             )}
           </div>
 
-          {/* Basics & Location in 2 columns */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Left: Basics */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm">Basics</h3>
-              
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-xs">Job Title <span className="text-destructive">*</span></Label>
+          {/* Basics */}
+          <Card className="p-6">
+            <h3 className="font-semibold text-base mb-5">Job Basics</h3>
+            
+            <div className="space-y-4">
+              <div className="space-y-2.5">
+                <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
                 <Select onValueChange={(value) => setValue('title', value)} value={selectedTitle}>
-                  <SelectTrigger className={cn("h-9", autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                    <SelectValue placeholder="Select title" />
+                  <SelectTrigger className={cn("h-11", autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <SelectValue placeholder="Select job title" />
                   </SelectTrigger>
                   <SelectContent>
                     {jobTitles.map(title => (
@@ -599,19 +598,20 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+                {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
 
               {selectedTitle === 'Other' && (
-                <div className="space-y-2">
-                  <Input {...register('custom_title')} placeholder="Custom title" className="h-9" />
+                <div className="space-y-2.5">
+                  <Label className="text-sm font-medium">Custom Title</Label>
+                  <Input {...register('custom_title')} placeholder="Enter custom job title" className="h-11" />
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="industry" className="text-xs">Industry <span className="text-destructive">*</span></Label>
+              <div className="space-y-2.5">
+                <Label htmlFor="industry" className="text-sm font-medium">Industry <span className="text-destructive">*</span></Label>
                 <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
-                  <SelectTrigger className={cn("h-9", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  <SelectTrigger className={cn("h-11", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -620,76 +620,71 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.industry && <p className="text-xs text-destructive">{errors.industry.message}</p>}
+                {errors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-2">
-                  <Label htmlFor="seniority" className="text-xs">Seniority <span className="text-destructive">*</span></Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2.5">
+                  <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
                   <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
-                    <SelectTrigger className={cn("h-9", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                      <SelectValue />
+                    <SelectTrigger className={cn("h-11", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="junior">Junior</SelectItem>
-                      <SelectItem value="mid">Mid</SelectItem>
+                      <SelectItem value="mid">Mid-Level</SelectItem>
                       <SelectItem value="senior">Senior</SelectItem>
                       <SelectItem value="lead">Lead</SelectItem>
                       <SelectItem value="exec">Executive</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.seniority?.message && <p className="text-xs text-destructive">{String(errors.seniority.message)}</p>}
+                  {errors.seniority?.message && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="employment_type" className="text-xs">Type <span className="text-destructive">*</span></Label>
+                <div className="space-y-2.5">
+                  <Label htmlFor="employment_type" className="text-sm font-medium">Employment Type <span className="text-destructive">*</span></Label>
                   <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
-                    <SelectTrigger className={cn("h-9", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                      <SelectValue />
+                    <SelectTrigger className={cn("h-11", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="full_time">Full Time</SelectItem>
+                      <SelectItem value="full_time">Full-Time</SelectItem>
                       <SelectItem value="contract">Contract</SelectItem>
                       <SelectItem value="temp">Temporary</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.employment_type?.message && <p className="text-xs text-destructive">{String(errors.employment_type.message)}</p>}
+                  {errors.employment_type?.message && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
                 </div>
               </div>
-            </div>
 
-            {/* Right: Location */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm">Location</h3>
-              
-              <div className="space-y-2">
-                <Label className="text-xs">Type</Label>
+              <div className="space-y-2.5">
+                <Label className="text-sm font-medium">Work Location</Label>
                 <RadioGroup
                   value={locationType || 'remote'}
                   onValueChange={(value) => setValue('location_type', value)}
-                  className={cn("grid grid-cols-3 gap-2", autoFilledFields.has('location_type') && 'bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded')}
+                  className={cn("grid grid-cols-3 gap-3", autoFilledFields.has('location_type') && 'bg-yellow-50 dark:bg-yellow-950/20 p-3 rounded-lg')}
                 >
-                  <div className="flex items-center space-x-1.5">
-                    <RadioGroupItem value="on_site" id="on_site" className="h-3.5 w-3.5" />
-                    <Label htmlFor="on_site" className="text-xs cursor-pointer">On-site</Label>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="on_site" id="on_site" />
+                    <Label htmlFor="on_site" className="text-sm cursor-pointer font-normal">On-site</Label>
                   </div>
-                  <div className="flex items-center space-x-1.5">
-                    <RadioGroupItem value="hybrid" id="hybrid" className="h-3.5 w-3.5" />
-                    <Label htmlFor="hybrid" className="text-xs cursor-pointer">Hybrid</Label>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="hybrid" id="hybrid" />
+                    <Label htmlFor="hybrid" className="text-sm cursor-pointer font-normal">Hybrid</Label>
                   </div>
-                  <div className="flex items-center space-x-1.5">
-                    <RadioGroupItem value="remote" id="remote" className="h-3.5 w-3.5" />
-                    <Label htmlFor="remote" className="text-xs cursor-pointer">Remote</Label>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="remote" id="remote" />
+                    <Label htmlFor="remote" className="text-sm cursor-pointer font-normal">Remote</Label>
                   </div>
                 </RadioGroup>
               </div>
 
               {locationType !== 'remote' && (
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-xs">City <span className="text-destructive">*</span></Label>
+                <div className="space-y-2.5">
+                  <Label htmlFor="location" className="text-sm font-medium">City <span className="text-destructive">*</span></Label>
                   <Select onValueChange={(value) => setValue('location', value)}>
-                    <SelectTrigger className={cn("h-9", autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                      <SelectValue placeholder="Select location" />
+                    <SelectTrigger className={cn("h-11", autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue placeholder="Select city" />
                     </SelectTrigger>
                     <SelectContent>
                       {locations.map(loc => (
@@ -697,189 +692,218 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.location && <p className="text-xs text-destructive">{errors.location.message}</p>}
+                  {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
                 </div>
               )}
             </div>
-          </div>
+          </Card>
 
           {/* Compensation */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">Compensation</h3>
+          <Card className="p-6">
+            <h3 className="font-semibold text-base mb-5">Compensation Range</h3>
             
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <Label htmlFor="budget_currency" className="text-xs">Currency</Label>
-                <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                  <SelectTrigger className={cn("h-9", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currencies.map(curr => (
-                      <SelectItem key={curr} value={curr}>{curr}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2.5">
+                  <Label htmlFor="budget_currency" className="text-sm font-medium">Currency</Label>
+                  <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
+                    <SelectTrigger className={cn("h-11", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {currencies.map(curr => (
+                        <SelectItem key={curr} value={curr}>{curr}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2.5">
+                  <Label htmlFor="salary_period" className="text-sm font-medium">Pay Period</Label>
+                  <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
+                    const budgetMin = watch('budget_min');
+                    const budgetMax = watch('budget_max');
+                    
+                    if (value === 'yearly' && salaryPeriod === 'monthly') {
+                      if (budgetMin) setValue('budget_min', (parseInt(budgetMin) * 12).toString());
+                      if (budgetMax) setValue('budget_max', (parseInt(budgetMax) * 12).toString());
+                    } else if (value === 'monthly' && salaryPeriod === 'yearly') {
+                      if (budgetMin) setValue('budget_min', Math.round(parseInt(budgetMin) / 12).toString());
+                      if (budgetMax) setValue('budget_max', Math.round(parseInt(budgetMax) / 12).toString());
+                    }
+                    
+                    setSalaryPeriod(value);
+                  }}>
+                    <SelectTrigger className="h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                      <SelectItem value="yearly">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="salary_period" className="text-xs">Period</Label>
-                <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
-                  const budgetMin = watch('budget_min');
-                  const budgetMax = watch('budget_max');
-                  
-                  if (value === 'yearly' && salaryPeriod === 'monthly') {
-                    if (budgetMin) setValue('budget_min', (parseInt(budgetMin) * 12).toString());
-                    if (budgetMax) setValue('budget_max', (parseInt(budgetMax) * 12).toString());
-                  } else if (value === 'monthly' && salaryPeriod === 'yearly') {
-                    if (budgetMin) setValue('budget_min', Math.round(parseInt(budgetMin) / 12).toString());
-                    if (budgetMax) setValue('budget_max', Math.round(parseInt(budgetMax) / 12).toString());
-                  }
-                  
-                  setSalaryPeriod(value);
-                }}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="yearly">Yearly</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3 pt-2">
+                <div className="flex justify-between items-center">
+                  <div className="text-left">
+                    <p className="text-xs text-muted-foreground mb-1">Minimum</p>
+                    <p className="text-base font-semibold">
+                      {watch('budget_min') 
+                        ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                        : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
+                      }
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground mb-1">Maximum</p>
+                    <p className="text-base font-semibold">
+                      {watch('budget_max') 
+                        ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                        : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
+                      }
+                    </p>
+                  </div>
+                </div>
+                <Slider 
+                  min={salaryPeriod === 'monthly' ? 5000 : 60000}
+                  max={salaryPeriod === 'monthly' ? 150000 : 1800000}
+                  step={salaryPeriod === 'monthly' ? 1000 : 10000}
+                  value={[
+                    watch('budget_min') 
+                      ? parseInt(watch('budget_min')) 
+                      : salaryPeriod === 'monthly' ? 5000 : 60000,
+                    watch('budget_max') 
+                      ? parseInt(watch('budget_max')) 
+                      : salaryPeriod === 'monthly' ? 150000 : 1800000
+                  ]}
+                  onValueChange={(values) => {
+                    const min = salaryPeriod === 'monthly' ? 5000 : 60000;
+                    const max = salaryPeriod === 'monthly' ? 150000 : 1800000;
+                    setValue('budget_min', values[0] > min ? values[0].toString() : '');
+                    setValue('budget_max', values[1] < max ? values[1].toString() : '');
+                  }}
+                  className="cursor-pointer"
+                />
               </div>
+              {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
             </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs">
-                <span className="font-medium">
-                  {watch('budget_min') 
-                    ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                    : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
-                  }
-                </span>
-                <span className="font-medium">
-                  {watch('budget_max') 
-                    ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                    : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
-                  }
-                </span>
-              </div>
-              <Slider 
-                min={salaryPeriod === 'monthly' ? 5000 : 60000}
-                max={salaryPeriod === 'monthly' ? 150000 : 1800000}
-                step={salaryPeriod === 'monthly' ? 1000 : 10000}
-                value={[
-                  watch('budget_min') 
-                    ? parseInt(watch('budget_min')) 
-                    : salaryPeriod === 'monthly' ? 5000 : 60000,
-                  watch('budget_max') 
-                    ? parseInt(watch('budget_max')) 
-                    : salaryPeriod === 'monthly' ? 150000 : 1800000
-                ]}
-                onValueChange={(values) => {
-                  const min = salaryPeriod === 'monthly' ? 5000 : 60000;
-                  const max = salaryPeriod === 'monthly' ? 150000 : 1800000;
-                  setValue('budget_min', values[0] > min ? values[0].toString() : '');
-                  setValue('budget_max', values[1] < max ? values[1].toString() : '');
-                }}
-                className="cursor-pointer"
-              />
-            </div>
-            {errors.budget_max && <p className="text-xs text-destructive">{errors.budget_max.message}</p>}
-          </div>
+          </Card>
 
-          {/* Description & Skills */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">Description & Skills</h3>
+          {/* Description */}
+          <Card className="p-6">
+            <h3 className="font-semibold text-base mb-5">Job Description</h3>
             
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-xs">Role Description <span className="text-destructive">*</span></Label>
+            <div className="space-y-2.5">
+              <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
               <Textarea 
                 {...register('description')} 
-                rows={4} 
-                placeholder="Describe the role, responsibilities, and requirements..."
-                className={cn("text-sm", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                rows={6} 
+                placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
+                className={cn("text-sm resize-none", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
               />
-              {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
+              {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
+          </Card>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label className="text-xs">Must-Have Skills <span className="text-destructive">*</span></Label>
+          {/* Skills */}
+          <Card className="p-6">
+            <h3 className="font-semibold text-base mb-5">Required Skills</h3>
+            
+            <div className="space-y-5">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Must-Have Skills <span className="text-destructive">*</span></Label>
                 <div className="flex gap-2">
                   <Input 
                     value={skillMustInput}
                     onChange={(e) => setSkillMustInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
-                    placeholder="Type & press Enter"
-                    className="h-8 text-xs"
+                    placeholder="Type a skill and press Enter"
+                    className="h-11"
                   />
-                  <Button type="button" onClick={addSkillMust} variant="secondary" size="sm" className="h-8">+</Button>
+                  <Button type="button" onClick={addSkillMust} variant="secondary" size="lg" className="h-11 px-6">
+                    Add
+                  </Button>
                 </div>
-                <div className={cn("flex flex-wrap gap-1.5 min-h-[40px] p-2 rounded border", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                   {skillsMust.map(skill => (
-                    <Badge key={skill} variant="secondary" className="gap-1 text-xs h-6">
+                    <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
                       {skill}
-                      <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillMust(skill)} />
+                      <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillMust(skill)} />
                     </Badge>
                   ))}
                   {skillsMust.length === 0 && (
-                    <span className="text-xs text-muted-foreground">Add at least one</span>
+                    <span className="text-sm text-muted-foreground">Add at least one required skill</span>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs">Nice-to-Have Skills</Label>
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Nice-to-Have Skills</Label>
                 <div className="flex gap-2">
                   <Input 
                     value={skillNiceInput}
                     onChange={(e) => setSkillNiceInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
-                    placeholder="Type & press Enter"
-                    className="h-8 text-xs"
+                    placeholder="Type a skill and press Enter"
+                    className="h-11"
                   />
-                  <Button type="button" onClick={addSkillNice} variant="secondary" size="sm" className="h-8">+</Button>
+                  <Button type="button" onClick={addSkillNice} variant="secondary" size="lg" className="h-11 px-6">
+                    Add
+                  </Button>
                 </div>
-                <div className={cn("flex flex-wrap gap-1.5 min-h-[40px] p-2 rounded border", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                   {skillsNice.map(skill => (
-                    <Badge key={skill} variant="outline" className="gap-1 text-xs h-6">
+                    <Badge key={skill} variant="outline" className="gap-1.5 text-sm h-8 px-3">
                       {skill}
-                      <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillNice(skill)} />
+                      <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillNice(skill)} />
                     </Badge>
                   ))}
+                  {skillsNice.length === 0 && (
+                    <span className="text-sm text-muted-foreground">Optional skills that would be beneficial</span>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Visibility & Review Notice */}
-          <div className="flex items-center justify-between gap-3 pt-2">
-            <div className="flex items-center gap-2">
-              <Checkbox 
-                id="visibility" 
-                checked={isPublic}
-                onCheckedChange={(checked) => setIsPublic(checked as boolean)}
-                className="h-4 w-4"
-              />
-              <Label 
-                htmlFor="visibility"
-                className="text-xs font-medium cursor-pointer"
-              >
-                Make public
-              </Label>
-              <span className="text-[10px] text-muted-foreground px-2 py-0.5 rounded-full bg-muted/50">
-                {isPublic ? "Visible to all" : "Private"}
-              </span>
+          <Card className="p-5 bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-blue-50/50 dark:from-blue-950/20 dark:via-purple-950/10 dark:to-blue-950/20 border-blue-200/50 dark:border-blue-800/30">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Checkbox 
+                  id="visibility" 
+                  checked={isPublic}
+                  onCheckedChange={(checked) => setIsPublic(checked as boolean)}
+                  className="h-5 w-5"
+                />
+                <div>
+                  <Label 
+                    htmlFor="visibility"
+                    className="text-sm font-semibold cursor-pointer block"
+                  >
+                    Make Job Public
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {isPublic ? "Visible to all candidates" : "Only visible to invited candidates"}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-100/80 dark:bg-blue-900/30 border border-blue-300/50 dark:border-blue-700/50">
+                <Info className="h-4 w-4 text-blue-700 dark:text-blue-300 flex-shrink-0" />
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                    Reviewed in ~1 hour
+                  </p>
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                    Our team will review your posting
+                  </p>
+                </div>
+              </div>
             </div>
-            
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
-              <Info className="h-3 w-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <p className="text-[10px] text-blue-700 dark:text-blue-300">
-                Reviewed in ~1hr
-              </p>
-            </div>
-          </div>
+          </Card>
 
           <div className="flex gap-3 justify-end pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
