@@ -905,10 +905,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </Button>
             <Button 
               type="submit" 
-              disabled={isSubmitting || !isFormValid} 
+              disabled={isSubmitting || !isFormValid}
+              variant={isFormValid ? "hero" : "default"}
+              size={isFormValid ? "default" : "sm"}
               className={cn(
-                "h-9 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] transition-opacity",
-                isFormValid ? 'opacity-100' : 'opacity-50'
+                "transition-all duration-300",
+                !isFormValid && 'opacity-40'
               )}
             >
               {isSubmitting ? 'Submitting...' : 'Submit for Review'}
