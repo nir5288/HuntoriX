@@ -142,41 +142,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2 relative">
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0">
-            <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="font-bold text-sm sm:text-base md:text-xl whitespace-nowrap">HUNTORIX</span>
-          </Link>
-          
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
-            <Link 
-              to={user ? getDashboardPath() : '/auth'} 
-              className={getNavLinkClass('/dashboard')}
-            >
-              Dashboard
-            </Link>
-            <Link to="/opportunities" className={getNavLinkClass('/opportunities')}>
-              Opportunities
-            </Link>
-            <Link to="/headhunters" className={getNavLinkClass('/headhunters')}>
-              Find a Headhunter
-            </Link>
-            <Link to="/huntrank" className={`${getNavLinkClass('/huntrank')} flex items-center gap-1.5`}>
-              HuntRank
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-            </Link>
-            <Link to="/huntbase" className={`${getNavLinkClass('/huntbase')} flex items-center gap-1.5`}>
-              HuntBase
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-            </Link>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
-          {/* Mobile Menu */}
+        {/* Left side - Hamburger */}
+        <div className="flex items-center gap-2 shrink-0">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10" aria-label="Open menu">
                 <Menu className="h-6 w-6 sm:h-6 sm:w-6" />
               </Button>
             </SheetTrigger>
@@ -230,7 +200,41 @@ export function Header() {
               </nav>
             </SheetContent>
           </Sheet>
+        </div>
 
+        {/* Center - Logo */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0">
+            <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="font-bold text-sm sm:text-base md:text-xl whitespace-nowrap">HUNTORIX</span>
+          </Link>
+          
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-6 ml-8">
+            <Link 
+              to={user ? getDashboardPath() : '/auth'} 
+              className={getNavLinkClass('/dashboard')}
+            >
+              Dashboard
+            </Link>
+            <Link to="/opportunities" className={getNavLinkClass('/opportunities')}>
+              Opportunities
+            </Link>
+            <Link to="/headhunters" className={getNavLinkClass('/headhunters')}>
+              Find a Headhunter
+            </Link>
+            <Link to="/huntrank" className={`${getNavLinkClass('/huntrank')} flex items-center gap-1.5`}>
+              HuntRank
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+            </Link>
+            <Link to="/huntbase" className={`${getNavLinkClass('/huntbase')} flex items-center gap-1.5`}>
+              HuntBase
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+            </Link>
+          </nav>
+        </div>
+
+        {/* Right side - Actions */}
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
           <Link to="/executives" className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-bold hover:opacity-80 transition whitespace-nowrap text-sm">
             Executives
             <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>
