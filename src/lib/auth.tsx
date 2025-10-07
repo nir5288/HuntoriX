@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -117,15 +117,27 @@ export function useAuth() {
 export function useRequireAuth(requiredRole?: string) {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
+    // Only run auth checks after loading is complete and we have stable data
+    if (loading) return;
+    
+    if (!user) {
       navigate('/auth');
-    } else if (!loading && requiredRole && profile?.role !== requiredRole) {
-      toast.error(`This page requires ${requiredRole} access`);
-      navigate(profile?.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter');
+      return;
     }
-  }, [user, profile, loading, requiredRole, navigate]);
+    
+    // Only check role if we have a profile and a required role
+    if (requiredRole && profile?.role && profile.role !== requiredRole) {
+      // Prevent navigation loops - only navigate if we're not already on the correct path
+      const correctPath = profile.role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter';
+      if (!location.pathname.startsWith(correctPath)) {
+        toast.error(`This page requires ${requiredRole} access`);
+        navigate(correctPath);
+      }
+    }
+  }, [user, profile?.role, loading, requiredRole, navigate, location.pathname]);
 
   return { user, profile, loading };
 }

@@ -81,10 +81,12 @@ export function ManageBannersModal({
     enabled: open
   });
 
-  // Update local banners when data changes
+  // Update local banners when data changes - only when modal opens or banners change
   useEffect(() => {
-    setLocalBanners(banners);
-  }, [banners]);
+    if (open) {
+      setLocalBanners(banners);
+    }
+  }, [banners, open]);
 
   const reorderMutation = useMutation({
     mutationFn: async (reorderedBanners: any[]) => {
