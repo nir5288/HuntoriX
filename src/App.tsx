@@ -14,6 +14,7 @@ import HeadhunterDashboard from "./pages/HeadhunterDashboard";
 import JobDetail from "./pages/JobDetail";
 import JobReview from "./pages/JobReview";
 import JobReviewAdmin from "./pages/JobReviewAdmin";
+import AdminJobApprovals from "./pages/AdminJobApprovals";
 import Opportunities from "./pages/Opportunities";
 import Applications from "./pages/Applications";
 import SavedJobs from "./pages/SavedJobs";
@@ -83,6 +84,7 @@ const AppContent = () => {
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/accessibility" element={<Accessibility />} />
             <Route path="/admin/job-review" element={<JobReviewAdmin />} />
+            <Route path="/admin/job-approvals" element={<AdminJobApprovals />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </VerificationWrapper>
