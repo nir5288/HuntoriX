@@ -9,11 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Plus, X, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { Palette } from "lucide-react";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { JobReviewSection } from "@/components/JobReviewSection";
 
 interface TeamMember {
   name: string;
@@ -152,6 +155,7 @@ const Settings = () => {
   const { toast } = useToast();
   const { showStatus, setShowStatus } = useUserPreferences();
   const queryClient = useQueryClient();
+  const { isAdmin } = useIsAdmin();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [localShowStatus, setLocalShowStatus] = useState(showStatus);
@@ -449,9 +453,21 @@ const Settings = () => {
           Back
         </Button>
 
-        <h1 className="text-3xl font-bold mb-8">Profile Settings</h1>
+        <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
-        {profile.role === "employer" ? (
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="admin">
+                <Shield className="h-4 w-4 mr-2" />
+                Admin
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          <TabsContent value="profile" className="mt-6">
+            {profile.role === "employer" ? (
           // Employer Settings
           <div className="space-y-6">
             <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
@@ -912,6 +928,26 @@ const Settings = () => {
             )}
           </Button>
         </div>
+          </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="admin" className="mt-6">
+              <Card className="border-[hsl(var(--accent-pink))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))] mb-6">
+                <CardHeader>
+                  <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+                    Job Review Queue
+                  </CardTitle>
+                  <CardDescription>
+                    Review and approve pending job postings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <JobReviewSection />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </div>
   );
