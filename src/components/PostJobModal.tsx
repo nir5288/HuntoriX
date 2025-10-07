@@ -682,7 +682,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               {locationType !== 'remote' && (
                 <div className="space-y-2.5">
                   <Label htmlFor="location" className="text-sm font-medium">City <span className="text-destructive">*</span></Label>
-                  <Select onValueChange={(value) => setValue('location', value)}>
+                  <Select onValueChange={(value) => setValue('location', value)} value={watch('location') || undefined}>
                     <SelectTrigger className={cn("h-11", autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                       <SelectValue placeholder="Select city" />
                     </SelectTrigger>
@@ -900,18 +900,27 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           <div className="flex gap-3 justify-end pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-10">
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={isSubmitting || !isFormValid} 
               className={cn(
-                "h-9 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] transition-opacity",
-                isFormValid ? 'opacity-100' : 'opacity-50'
+                "transition-all duration-300 font-semibold text-base px-8",
+                isFormValid 
+                  ? "h-12 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:shadow-xl hover:scale-105 shadow-lg" 
+                  : "h-10 opacity-40 cursor-not-allowed"
               )}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit for Review'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit for Review'
+              )}
             </Button>
           </div>
         </form>
