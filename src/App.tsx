@@ -35,6 +35,8 @@ import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
 import { DashboardLayoutWrapper } from './components/DashboardLayoutWrapper';
 import { AIAssistant } from './components/AIAssistant';
+import { AccessibilityProvider } from './contexts/AccessibilityContext';
+import { AccessibilityWidget } from './components/AccessibilityWidget';
 
 const AppContent = () => {
   const location = useLocation();
@@ -84,6 +86,7 @@ const AppContent = () => {
       </VerificationWrapper>
       {!hideFooter && <Footer />}
       <AIAssistant />
+      <AccessibilityWidget />
     </>
   );
 };
@@ -93,15 +96,17 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <UserPreferencesProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
-        </BrowserRouter>
-      </UserPreferencesProvider>
+      <AccessibilityProvider>
+        <UserPreferencesProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </BrowserRouter>
+        </UserPreferencesProvider>
+      </AccessibilityProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
