@@ -141,7 +141,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2 relative">
         <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0">
             <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -176,7 +176,7 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10 self-center flex items-center justify-center" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10" aria-label="Open menu">
                 <Menu className="h-6 w-6 sm:h-6 sm:w-6" />
               </Button>
             </SheetTrigger>
