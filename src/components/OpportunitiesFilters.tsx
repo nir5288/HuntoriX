@@ -8,6 +8,8 @@ import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Building2, MapPin, DollarSign, Briefcase, Clock, Star, ChevronDown, RotateCcw } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 interface OpportunitiesFiltersProps {
   industries: string[];
   seniorities: string[];
@@ -66,6 +68,28 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
 }) => {
   const [industryOpen, setIndustryOpen] = React.useState(true);
   const [advancedOpen, setAdvancedOpen] = React.useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleExclusiveToggle = (checked: boolean) => {
+    if (!hasHuntorix) {
+      toast({
+        title: "Upgrade to Huntorix",
+        description: "Access exclusive jobs with a Huntorix plan subscription",
+        action: (
+          <Button
+            size="sm"
+            onClick={() => navigate('/settings?tab=subscription')}
+            className="ml-2"
+          >
+            Upgrade Plan
+          </Button>
+        ),
+      });
+      return;
+    }
+    setFilterExclusive(checked);
+  };
   return <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b">
@@ -87,7 +111,12 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               Exclusive Jobs
             </Label>
           </div>
-          <Switch id="filter-exclusive" checked={filterExclusive} onCheckedChange={setFilterExclusive} />
+          <Switch 
+            id="filter-exclusive" 
+            checked={filterExclusive} 
+            onCheckedChange={handleExclusiveToggle}
+            disabled={!hasHuntorix}
+          />
         </div>
         <p className="text-xs text-purple-600 dark:text-purple-400 ml-6">
           {hasHuntorix ? 'Premium feature' : 'Requires Huntorix plan'}
