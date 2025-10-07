@@ -68,23 +68,18 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
 }) => {
   const [industryOpen, setIndustryOpen] = React.useState(true);
   const [advancedOpen, setAdvancedOpen] = React.useState(false);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
-
   const handleExclusiveToggle = (checked: boolean) => {
     if (!hasHuntorix) {
       toast({
         title: "Upgrade to Huntorix",
         description: "Access exclusive jobs with a Huntorix plan subscription",
-        action: (
-          <Button
-            size="sm"
-            onClick={() => navigate('/settings?tab=subscription')}
-            className="ml-2"
-          >
+        action: <Button size="sm" onClick={() => navigate('/settings?tab=subscription')} className="ml-2">
             Upgrade Plan
           </Button>
-        ),
       });
       return;
     }
@@ -111,12 +106,7 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               Exclusive Jobs
             </Label>
           </div>
-          <Switch 
-            id="filter-exclusive" 
-            checked={filterExclusive} 
-            onCheckedChange={handleExclusiveToggle}
-            disabled={!hasHuntorix}
-          />
+          <Switch id="filter-exclusive" checked={filterExclusive} onCheckedChange={handleExclusiveToggle} disabled={!hasHuntorix} />
         </div>
         <p className="text-xs text-purple-600 dark:text-purple-400 ml-6">
           {hasHuntorix ? 'Premium feature' : 'Requires Huntorix plan'}
@@ -164,7 +154,7 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
       {/* Salary Range */}
       <div className="space-y-3">
         <Label className="flex items-center gap-2 text-sm font-medium">
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
+          
           Salary Range
         </Label>
         
@@ -206,22 +196,12 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               </span>
             </div>
           </div>
-          <Slider 
-            min={filterSalaryPeriod === 'monthly' ? 5000 : 60000} 
-            max={filterSalaryPeriod === 'monthly' ? 150000 : 1800000} 
-            step={filterSalaryPeriod === 'monthly' ? 1000 : 10000} 
-            value={[
-              filterSalaryMin ? parseInt(filterSalaryMin) : (filterSalaryPeriod === 'monthly' ? 5000 : 60000), 
-              filterSalaryMax ? parseInt(filterSalaryMax) : (filterSalaryPeriod === 'monthly' ? 150000 : 1800000)
-            ]} 
-            onValueChange={values => {
-              const min = filterSalaryPeriod === 'monthly' ? 5000 : 60000;
-              const max = filterSalaryPeriod === 'monthly' ? 150000 : 1800000;
-              setFilterSalaryMin(values[0] > min ? values[0].toString() : '');
-              setFilterSalaryMax(values[1] < max ? values[1].toString() : '');
-            }} 
-            className="cursor-pointer" 
-          />
+          <Slider min={filterSalaryPeriod === 'monthly' ? 5000 : 60000} max={filterSalaryPeriod === 'monthly' ? 150000 : 1800000} step={filterSalaryPeriod === 'monthly' ? 1000 : 10000} value={[filterSalaryMin ? parseInt(filterSalaryMin) : filterSalaryPeriod === 'monthly' ? 5000 : 60000, filterSalaryMax ? parseInt(filterSalaryMax) : filterSalaryPeriod === 'monthly' ? 150000 : 1800000]} onValueChange={values => {
+          const min = filterSalaryPeriod === 'monthly' ? 5000 : 60000;
+          const max = filterSalaryPeriod === 'monthly' ? 150000 : 1800000;
+          setFilterSalaryMin(values[0] > min ? values[0].toString() : '');
+          setFilterSalaryMax(values[1] < max ? values[1].toString() : '');
+        }} className="cursor-pointer" />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{filterSalaryPeriod === 'monthly' ? '5,000' : '60,000'} {filterCurrency}</span>
             <span>{filterSalaryPeriod === 'monthly' ? '150,000' : '1,800,000'}+ {filterCurrency}</span>
