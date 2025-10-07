@@ -220,7 +220,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     }
 
     // Guard: Job pending approval
-    if (job.status === 'pending') {
+    if (job.status === 'pending_review') {
       return; // Button should be disabled
     }
 
@@ -241,7 +241,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const getCTAText = () => {
     if (!currentUser) return 'Sign in to Apply';
     if (currentUserRole !== 'headhunter') return 'Apply';
-    if (job.status === 'pending') return 'Being Reviewed';
+    if (job.status === 'pending_review') return 'Being Reviewed';
     if (job.status === 'closed') return 'Closed';
     if (checkingApplication) return '...';
     if (hasApplied) return 'Applied';
@@ -249,13 +249,13 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   const getCTAVariant = () => {
-    if (hasApplied || job.status === 'closed' || job.status === 'pending') return 'outline';
+    if (hasApplied || job.status === 'closed' || job.status === 'pending_review') return 'outline';
     return 'hero';
   };
 
   const isButtonDisabled = () => {
     if (checkingApplication) return true;
-    if (job.status === 'pending') return true;
+    if (job.status === 'pending_review') return true;
     if (job.status === 'closed') return true;
     if (currentUserRole === 'headhunter' && hasApplied) return true;
     return false;
@@ -278,7 +278,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     );
 
     // Show tooltip for pending jobs
-    if (job.status === 'pending') {
+    if (job.status === 'pending_review') {
       return (
         <TooltipProvider delayDuration={0}>
           <Tooltip>

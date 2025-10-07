@@ -505,7 +505,7 @@ const JobDetail = () => {
                           : 'You have already applied to this job'}
                       </p>
                     </div>
-                  ) : job.status === 'pending' ? (
+                  ) : job.status === 'pending_review' ? (
                     <TooltipProvider delayDuration={0}>
                       <Tooltip>
                         <TooltipTrigger asChild>
