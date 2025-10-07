@@ -32,7 +32,7 @@ const Index = () => {
       alert("You're signed in as an Employer. Please log out to switch roles.");
     }
   };
-  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background overflow-x-hidden">
+  return <div className="relative min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background overflow-x-hidden">
       <Header />
       
       {/* Hero Section */}
