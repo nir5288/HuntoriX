@@ -16,6 +16,8 @@ import { X, Upload, Loader2, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -91,6 +93,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
   const [isExclusive, setIsExclusive] = useState(false);
   const [showExclusiveInfo, setShowExclusiveInfo] = useState(false);
+  const [salaryPeriod, setSalaryPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -682,46 +685,94 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </div>
 
           {/* C. Compensation */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <h3 className="font-semibold">Compensation (Optional)</h3>
             
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <Label htmlFor="budget_currency">Currency</Label>
+                <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
+                  <SelectTrigger className={cn("h-9", autoFilledFields.has('budget_currency') ? 'bg-yellow-50 dark:bg-yellow-950/20' : '')}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map(curr => (
+                      <SelectItem key={curr} value={curr}>{curr}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="salary_period">Period</Label>
+                <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
+                  const budgetMin = watch('budget_min');
+                  const budgetMax = watch('budget_max');
+                  
+                  if (value === 'yearly' && salaryPeriod === 'monthly') {
+                    if (budgetMin) setValue('budget_min', (parseInt(budgetMin) * 12).toString());
+                    if (budgetMax) setValue('budget_max', (parseInt(budgetMax) * 12).toString());
+                  } else if (value === 'monthly' && salaryPeriod === 'yearly') {
+                    if (budgetMin) setValue('budget_min', Math.round(parseInt(budgetMin) / 12).toString());
+                    if (budgetMax) setValue('budget_max', Math.round(parseInt(budgetMax) / 12).toString());
+                  }
+                  
+                  setSalaryPeriod(value);
+                }}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="budget_currency">Currency</Label>
-              <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                <SelectTrigger className={autoFilledFields.has('budget_currency') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencies.map(curr => (
-                    <SelectItem key={curr} value={curr}>{curr}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="budget_min">Salary Min</Label>
-                <Input 
-                  {...register('budget_min')} 
-                  type="number" 
-                  min="0" 
-                  placeholder="0"
-                  className={autoFilledFields.has('budget_min') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
-                />
+              <div className="flex justify-between text-sm">
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground">Minimum</span>
+                  <span className="font-medium">
+                    {watch('budget_min') 
+                      ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                      : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
+                    }
+                  </span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-xs text-muted-foreground">Maximum</span>
+                  <span className="font-medium">
+                    {watch('budget_max') 
+                      ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                      : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
+                    }
+                  </span>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="budget_max">Salary Max</Label>
-                <Input 
-                  {...register('budget_max')} 
-                  type="number" 
-                  min="0" 
-                  placeholder="0"
-                  className={autoFilledFields.has('budget_max') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
-                />
-                {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
-              </div>
+              <Slider 
+                min={salaryPeriod === 'monthly' ? 5000 : 60000}
+                max={salaryPeriod === 'monthly' ? 150000 : 1800000}
+                step={salaryPeriod === 'monthly' ? 1000 : 10000}
+                value={[
+                  watch('budget_min') 
+                    ? parseInt(watch('budget_min')) 
+                    : salaryPeriod === 'monthly' ? 5000 : 60000,
+                  watch('budget_max') 
+                    ? parseInt(watch('budget_max')) 
+                    : salaryPeriod === 'monthly' ? 150000 : 1800000
+                ]}
+                onValueChange={(values) => {
+                  const min = salaryPeriod === 'monthly' ? 5000 : 60000;
+                  const max = salaryPeriod === 'monthly' ? 150000 : 1800000;
+                  setValue('budget_min', values[0] > min ? values[0].toString() : '');
+                  setValue('budget_max', values[1] < max ? values[1].toString() : '');
+                }}
+                className="cursor-pointer"
+              />
             </div>
+            {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
           </div>
 
           {/* D. Description & Skills */}
