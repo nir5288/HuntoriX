@@ -791,7 +791,16 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
             <button
               type="button"
-              onClick={() => setIsExclusive(!isExclusive)}
+              onClick={() => {
+                if (!isExclusive) {
+                  // Show info when marking as exclusive for the first time
+                  setShowExclusiveInfo(true);
+                  toast('Marking as Exclusive', {
+                    description: 'This job will be locked as exclusive for 14 days once posted. You cannot unmark it during this period.'
+                  });
+                }
+                setIsExclusive(!isExclusive);
+              }}
               className="relative w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 group flex-shrink-0"
             >
               {isExclusive ? (
