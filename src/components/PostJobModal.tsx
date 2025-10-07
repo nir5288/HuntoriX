@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { X, Upload, Loader2, Info } from 'lucide-react';
+import { X, Loader2, Info, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
@@ -459,40 +459,53 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Post a Job</DialogTitle>
+          <DialogTitle className="text-2xl">Post a Job</DialogTitle>
           <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Upload Job Description */}
-          <Card className="p-4 border-2 border-dashed border-[hsl(var(--accent-mint))] bg-gradient-to-br from-[hsl(var(--accent-mint))]/5 to-[hsl(var(--accent-lilac))]/5">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Upload className="h-5 w-5 text-[hsl(var(--accent-pink))]" />
-                <h3 className="font-semibold">Upload Job Description (Optional)</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Upload a PDF, DOCX, or TXT file and let AI auto-fill the form for you
-              </p>
-              <div className="flex items-center gap-3">
-                <Input
-                  type="file"
-                  accept=".pdf,.docx,.txt"
-                  onChange={handleFileUpload}
-                  disabled={isParsing}
-                  className="cursor-pointer"
-                />
-                {isParsing && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Parsing job description...</span>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* AI Quick Fill Circle */}
+          <div className="flex items-center justify-between">
+            <div className="flex-1" />
+            <div className="relative">
+              <Input
+                id="ai-upload"
+                type="file"
+                accept=".pdf,.docx,.txt"
+                onChange={handleFileUpload}
+                disabled={isParsing}
+                className="hidden"
+              />
+              <label htmlFor="ai-upload">
+                <div className={cn(
+                  "relative w-12 h-12 rounded-full cursor-pointer group transition-all duration-300",
+                  isParsing ? "animate-pulse" : "hover:scale-110"
+                )}>
+                  <div 
+                    className="absolute inset-0 rounded-full opacity-75 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      background: 'conic-gradient(from 0deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4)',
+                      animation: isParsing ? 'spin 2s linear infinite' : 'spin 10s linear infinite'
+                    }}
+                  />
+                  <div className="absolute inset-[2px] rounded-full bg-background flex items-center justify-center">
+                    {isParsing ? (
+                      <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-5 w-5 text-purple-500" />
+                    )}
                   </div>
-                )}
+                </div>
+              </label>
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                <span className="text-[10px] text-muted-foreground">
+                  {isParsing ? "Parsing..." : "AI Fill"}
+                </span>
               </div>
             </div>
-          </Card>
+          </div>
 
           {/* Exclusive Toggle */}
           <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
@@ -564,135 +577,137 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             )}
           </div>
 
-          {/* A. Basics */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Basics</h3>
-            
-            <div className="space-y-2">
-              <Label htmlFor="title">Job Title <span className="text-destructive">• Required</span></Label>
-              <Select onValueChange={(value) => setValue('title', value)} value={selectedTitle}>
-                <SelectTrigger className={autoFilledFields.has('title') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
-                  <SelectValue placeholder="Select job title" />
-                </SelectTrigger>
-                <SelectContent>
-                  {jobTitles.map(title => (
-                    <SelectItem key={title} value={title}>{title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
-            </div>
-
-            {selectedTitle === 'Other' && (
+          {/* Basics & Location in 2 columns */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left: Basics */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm">Basics</h3>
+              
               <div className="space-y-2">
-                <Label htmlFor="custom_title">Custom Job Title</Label>
-                <Input {...register('custom_title')} placeholder="Enter job title" />
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="industry">Industry <span className="text-destructive">• Required</span></Label>
-              <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
-                <SelectTrigger className={autoFilledFields.has('industry') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
-                  <SelectValue placeholder="Select industry" />
-                </SelectTrigger>
-                <SelectContent>
-                  {industries.map(ind => (
-                    <SelectItem key={ind} value={ind}>{ind}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="seniority">Seniority <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
-                  <SelectTrigger className={autoFilledFields.has('seniority') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
-                    <SelectValue />
+                <Label htmlFor="title" className="text-xs">Job Title <span className="text-destructive">*</span></Label>
+                <Select onValueChange={(value) => setValue('title', value)} value={selectedTitle}>
+                  <SelectTrigger className={cn("h-9", autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <SelectValue placeholder="Select title" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="junior">Junior</SelectItem>
-                    <SelectItem value="mid">Mid</SelectItem>
-                    <SelectItem value="senior">Senior</SelectItem>
-                    <SelectItem value="lead">Lead</SelectItem>
-                    <SelectItem value="exec">Executive</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.seniority?.message && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="employment_type">Employment Type <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
-                  <SelectTrigger className={autoFilledFields.has('employment_type') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="full_time">Full Time</SelectItem>
-                    <SelectItem value="contract">Contract</SelectItem>
-                    <SelectItem value="temp">Temporary</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.employment_type?.message && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
-              </div>
-            </div>
-          </div>
-
-          {/* B. Location */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Location</h3>
-            
-            <div className="space-y-2">
-              <Label>Location Type</Label>
-              <RadioGroup
-                value={locationType || 'remote'}
-                onValueChange={(value) => setValue('location_type', value)}
-                className={autoFilledFields.has('location_type') ? 'bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded' : ''}
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="on_site" id="on_site" />
-                  <Label htmlFor="on_site">On-site</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="hybrid" id="hybrid" />
-                  <Label htmlFor="hybrid">Hybrid</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="remote" id="remote" />
-                  <Label htmlFor="remote">Remote</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            {locationType !== 'remote' && (
-              <div className="space-y-2">
-                <Label htmlFor="location">Location <span className="text-destructive">• Required</span></Label>
-                <Select onValueChange={(value) => setValue('location', value)}>
-                  <SelectTrigger className={autoFilledFields.has('location') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}>
-                    <SelectValue placeholder="Select location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations.map(loc => (
-                      <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                    {jobTitles.map(title => (
+                      <SelectItem key={title} value={title}>{title}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
+                {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
               </div>
-            )}
+
+              {selectedTitle === 'Other' && (
+                <div className="space-y-2">
+                  <Input {...register('custom_title')} placeholder="Custom title" className="h-9" />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="industry" className="text-xs">Industry <span className="text-destructive">*</span></Label>
+                <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
+                  <SelectTrigger className={cn("h-9", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <SelectValue placeholder="Select industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industries.map(ind => (
+                      <SelectItem key={ind} value={ind}>{ind}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.industry && <p className="text-xs text-destructive">{errors.industry.message}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
+                  <Label htmlFor="seniority" className="text-xs">Seniority <span className="text-destructive">*</span></Label>
+                  <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
+                    <SelectTrigger className={cn("h-9", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="junior">Junior</SelectItem>
+                      <SelectItem value="mid">Mid</SelectItem>
+                      <SelectItem value="senior">Senior</SelectItem>
+                      <SelectItem value="lead">Lead</SelectItem>
+                      <SelectItem value="exec">Executive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.seniority?.message && <p className="text-xs text-destructive">{String(errors.seniority.message)}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="employment_type" className="text-xs">Type <span className="text-destructive">*</span></Label>
+                  <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
+                    <SelectTrigger className={cn("h-9", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full_time">Full Time</SelectItem>
+                      <SelectItem value="contract">Contract</SelectItem>
+                      <SelectItem value="temp">Temporary</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.employment_type?.message && <p className="text-xs text-destructive">{String(errors.employment_type.message)}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Location */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm">Location</h3>
+              
+              <div className="space-y-2">
+                <Label className="text-xs">Type</Label>
+                <RadioGroup
+                  value={locationType || 'remote'}
+                  onValueChange={(value) => setValue('location_type', value)}
+                  className={cn("grid grid-cols-3 gap-2", autoFilledFields.has('location_type') && 'bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded')}
+                >
+                  <div className="flex items-center space-x-1.5">
+                    <RadioGroupItem value="on_site" id="on_site" className="h-3.5 w-3.5" />
+                    <Label htmlFor="on_site" className="text-xs cursor-pointer">On-site</Label>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <RadioGroupItem value="hybrid" id="hybrid" className="h-3.5 w-3.5" />
+                    <Label htmlFor="hybrid" className="text-xs cursor-pointer">Hybrid</Label>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <RadioGroupItem value="remote" id="remote" className="h-3.5 w-3.5" />
+                    <Label htmlFor="remote" className="text-xs cursor-pointer">Remote</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {locationType !== 'remote' && (
+                <div className="space-y-2">
+                  <Label htmlFor="location" className="text-xs">City <span className="text-destructive">*</span></Label>
+                  <Select onValueChange={(value) => setValue('location', value)}>
+                    <SelectTrigger className={cn("h-9", autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locations.map(loc => (
+                        <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.location && <p className="text-xs text-destructive">{errors.location.message}</p>}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* C. Compensation */}
+          {/* Compensation */}
           <div className="space-y-3">
-            <h3 className="font-semibold">Compensation (Optional)</h3>
+            <h3 className="font-semibold text-sm">Compensation</h3>
             
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-2">
-                <Label htmlFor="budget_currency">Currency</Label>
+                <Label htmlFor="budget_currency" className="text-xs">Currency</Label>
                 <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                  <SelectTrigger className={cn("h-9", autoFilledFields.has('budget_currency') ? 'bg-yellow-50 dark:bg-yellow-950/20' : '')}>
+                  <SelectTrigger className={cn("h-9", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -704,7 +719,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="salary_period">Period</Label>
+                <Label htmlFor="salary_period" className="text-xs">Period</Label>
                 <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
                   const budgetMin = watch('budget_min');
                   const budgetMax = watch('budget_max');
@@ -731,25 +746,19 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </div>
             
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground">Minimum</span>
-                  <span className="font-medium">
-                    {watch('budget_min') 
-                      ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                      : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
-                    }
-                  </span>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-xs text-muted-foreground">Maximum</span>
-                  <span className="font-medium">
-                    {watch('budget_max') 
-                      ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                      : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
-                    }
-                  </span>
-                </div>
+              <div className="flex justify-between text-xs">
+                <span className="font-medium">
+                  {watch('budget_min') 
+                    ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                    : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
+                  }
+                </span>
+                <span className="font-medium">
+                  {watch('budget_max') 
+                    ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                    : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
+                  }
+                </span>
               </div>
               <Slider 
                 min={salaryPeriod === 'monthly' ? 5000 : 60000}
@@ -772,107 +781,113 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 className="cursor-pointer"
               />
             </div>
-            {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
+            {errors.budget_max && <p className="text-xs text-destructive">{errors.budget_max.message}</p>}
           </div>
 
-          {/* D. Description & Skills */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Description & Skills</h3>
+          {/* Description & Skills */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Description & Skills</h3>
             
             <div className="space-y-2">
-              <Label htmlFor="description">Role Description <span className="text-destructive">• Required</span></Label>
+              <Label htmlFor="description" className="text-xs">Role Description <span className="text-destructive">*</span></Label>
               <Textarea 
                 {...register('description')} 
-                rows={5} 
+                rows={4} 
                 placeholder="Describe the role, responsibilities, and requirements..."
-                className={autoFilledFields.has('description') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}
+                className={cn("text-sm", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
               />
-              {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+              {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label>Must-Have Skills <span className="text-destructive">• Required</span></Label>
-              <div className="flex gap-2">
-                <Input 
-                  value={skillMustInput}
-                  onChange={(e) => setSkillMustInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
-                  placeholder="Type skill and press Enter"
-                />
-                <Button type="button" onClick={addSkillMust} variant="secondary">Add</Button>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs">Must-Have Skills <span className="text-destructive">*</span></Label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={skillMustInput}
+                    onChange={(e) => setSkillMustInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
+                    placeholder="Type & press Enter"
+                    className="h-8 text-xs"
+                  />
+                  <Button type="button" onClick={addSkillMust} variant="secondary" size="sm" className="h-8">+</Button>
+                </div>
+                <div className={cn("flex flex-wrap gap-1.5 min-h-[40px] p-2 rounded border", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  {skillsMust.map(skill => (
+                    <Badge key={skill} variant="secondary" className="gap-1 text-xs h-6">
+                      {skill}
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillMust(skill)} />
+                    </Badge>
+                  ))}
+                  {skillsMust.length === 0 && (
+                    <span className="text-xs text-muted-foreground">Add at least one</span>
+                  )}
+                </div>
               </div>
-              <div className={`flex flex-wrap gap-2 mt-2 p-2 rounded ${autoFilledFields.has('skills_must') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}`}>
-                {skillsMust.map(skill => (
-                  <Badge key={skill} variant="secondary" className="gap-1">
-                    {skill}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillMust(skill)} />
-                  </Badge>
-                ))}
-              </div>
-              {skillsMust.length === 0 && (
-                <p className="text-sm text-muted-foreground">Add at least one must-have skill</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label>Nice-to-Have Skills (Optional)</Label>
-              <div className="flex gap-2">
-                <Input 
-                  value={skillNiceInput}
-                  onChange={(e) => setSkillNiceInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
-                  placeholder="Type skill and press Enter"
-                />
-                <Button type="button" onClick={addSkillNice} variant="secondary">Add</Button>
-              </div>
-              <div className={`flex flex-wrap gap-2 mt-2 p-2 rounded ${autoFilledFields.has('skills_nice') ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''}`}>
-                {skillsNice.map(skill => (
-                  <Badge key={skill} variant="outline" className="gap-1">
-                    {skill}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillNice(skill)} />
-                  </Badge>
-                ))}
+              <div className="space-y-2">
+                <Label className="text-xs">Nice-to-Have Skills</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={skillNiceInput}
+                    onChange={(e) => setSkillNiceInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
+                    placeholder="Type & press Enter"
+                    className="h-8 text-xs"
+                  />
+                  <Button type="button" onClick={addSkillNice} variant="secondary" size="sm" className="h-8">+</Button>
+                </div>
+                <div className={cn("flex flex-wrap gap-1.5 min-h-[40px] p-2 rounded border", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  {skillsNice.map(skill => (
+                    <Badge key={skill} variant="outline" className="gap-1 text-xs h-6">
+                      {skill}
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillNice(skill)} />
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Visibility & Review Notice */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 p-2 rounded-lg border bg-muted/30">
+          <div className="flex items-center justify-between gap-3 pt-2">
+            <div className="flex items-center gap-2">
               <Checkbox 
                 id="visibility" 
                 checked={isPublic}
                 onCheckedChange={(checked) => setIsPublic(checked as boolean)}
+                className="h-4 w-4"
               />
               <Label 
                 htmlFor="visibility"
-                className="text-xs font-medium cursor-pointer flex-1"
+                className="text-xs font-medium cursor-pointer"
               >
                 Make public
               </Label>
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[10px] text-muted-foreground px-2 py-0.5 rounded-full bg-muted/50">
                 {isPublic ? "Visible to all" : "Private"}
               </span>
             </div>
             
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
-              <Info className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-              <p className="text-[10px] text-blue-700 dark:text-blue-300 leading-tight">
-                Jobs are reviewed within 1 hour
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30">
+              <Info className="h-3 w-3 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <p className="text-[10px] text-blue-700 dark:text-blue-300">
+                Reviewed in ~1hr
               </p>
             </div>
           </div>
 
-          <div className="flex gap-3 justify-end">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <div className="flex gap-3 justify-end pt-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={isSubmitting || !isFormValid} 
-              className={`bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] transition-opacity ${
+              className={cn(
+                "h-9 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] transition-opacity",
                 isFormValid ? 'opacity-100' : 'opacity-50'
-              }`}
+              )}
             >
               {isSubmitting ? 'Submitting...' : 'Submit for Review'}
             </Button>
