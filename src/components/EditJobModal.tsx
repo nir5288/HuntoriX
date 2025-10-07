@@ -521,36 +521,40 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
                 </>
               )}
             </button>
-            <div className="flex items-center gap-1 relative">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowExclusiveInfo(!showExclusiveInfo);
-                }}
-                className={`text-sm font-medium underline decoration-dotted underline-offset-4 transition-all duration-300 hover:decoration-solid ${
-                  isExclusive 
-                    ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Mark as Exclusive on Huntorix
-              </button>
-              <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0">
-                Premium
-              </Badge>
-              {showExclusiveInfo && (
-                <div className="absolute left-0 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-[100] max-w-xs">
-                  <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
-                  <p className="mt-2 font-semibold text-primary">Minimum duration: 14 days</p>
-                  <button 
-                    onClick={() => setShowExclusiveInfo(false)}
-                    className="mt-2 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 relative">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowExclusiveInfo(!showExclusiveInfo);
+                  }}
+                  className={`text-sm font-medium underline decoration-dotted underline-offset-4 transition-all duration-300 hover:decoration-solid ${
+                    isExclusive 
+                      ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Mark as Exclusive on Huntorix
+                </button>
+                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0">
+                  Premium
+                </Badge>
+                {showExclusiveInfo && (
+                  <div className="absolute left-0 top-full mt-2 p-3 bg-popover border rounded-lg shadow-lg text-sm text-popover-foreground z-[100] max-w-xs">
+                    <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
+                    <button 
+                      onClick={() => setShowExclusiveInfo(false)}
+                      className="mt-2 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
+              <span className="text-xs text-muted-foreground">
+                Once marked, must remain exclusive for at least 14 days
+              </span>
             </div>
           </div>
 
