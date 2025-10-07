@@ -45,8 +45,9 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
           table: 'user_subscriptions',
           filter: `user_id=eq.${user?.id}`
         },
-        () => {
-          checkVerificationStatus();
+        async () => {
+          await refreshProfile();
+          await checkVerificationStatus();
         }
       )
       .on(
@@ -57,8 +58,9 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
           table: 'user_subscriptions',
           filter: `user_id=eq.${user?.id}`
         },
-        () => {
-          checkVerificationStatus();
+        async () => {
+          await refreshProfile();
+          await checkVerificationStatus();
         }
       )
       .subscribe();
@@ -66,7 +68,7 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, profile, loading]);
+  }, [user, profile, loading, refreshProfile]);
 
   const handleWelcomeComplete = async () => {
     if (user) {

@@ -20,7 +20,7 @@ const nameSchema = z.string().trim().min(2, { message: "Name must be at least 2 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<'employer' | 'headhunter'>(
     (searchParams.get('role') as 'employer' | 'headhunter') || 'employer'
   );
@@ -221,9 +221,13 @@ const Auth = () => {
     }
   };
 
-  const handlePlanSelected = () => {
+  const handlePlanSelected = async () => {
+    // Wait a moment for the subscription to be written to the database
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // Refresh profile to get the latest data
+    await refreshProfile();
     setShowPlanSelection(false);
-    // Let VerificationWrapper show the welcome screen after plan selection
+    // Navigation will happen in the next useEffect when profile updates
   };
 
   const handleGoogleAuth = async () => {
