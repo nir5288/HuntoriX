@@ -118,9 +118,28 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const industry = watch('industry');
   const seniorityVal = watch('seniority');
   const employmentTypeVal = watch('employment_type');
+  const locationVal = watch('location');
 
-  // Check if all required fields are filled
-  const isFormValid = isValid && skillsMust.length > 0;
+  // Check if all required fields are filled - comprehensive validation
+  const isFormValid = !!(
+    selectedTitle && 
+    selectedTitle.trim().length > 0 &&
+    industry && 
+    industry.trim().length > 0 &&
+    seniorityVal && 
+    employmentTypeVal && 
+    locationVal && 
+    locationVal.trim().length > 0 &&
+    description && 
+    description.trim().length >= 10 &&
+    skillsMust.length > 0 &&
+    !errors.title &&
+    !errors.industry &&
+    !errors.seniority &&
+    !errors.employment_type &&
+    !errors.location &&
+    !errors.description
+  );
 
   // Auto-expand skills section when AI fills skills
   useEffect(() => {
