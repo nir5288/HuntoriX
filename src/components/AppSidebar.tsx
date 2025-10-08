@@ -1,4 +1,4 @@
-import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface AppSidebarProps {
   role: 'employer' | 'headhunter';
@@ -39,6 +40,12 @@ export function AppSidebar({ role }: AppSidebarProps) {
       url: '/messages',
       icon: MessageCircle,
     },
+    ...(role === 'headhunter' ? [{
+      title: 'Global Hiring',
+      url: '/global-hiring',
+      icon: Globe,
+      badge: 'Beta',
+    }] : []),
     {
       title: 'Tools',
       url: '#',
@@ -117,7 +124,16 @@ export function AppSidebar({ role }: AppSidebarProps) {
                       ) : (
                         <NavLink to={item.url} className="flex items-center gap-3 w-full">
                           <item.icon className="h-5 w-5 shrink-0" />
-                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                          {open && (
+                            <div className="flex items-center gap-2 flex-1">
+                              <span className="text-sm font-medium">{item.title}</span>
+                              {'badge' in item && item.badge && (
+                                <Badge variant="secondary" className="text-xs py-0 h-5">
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
                         </NavLink>
                       )}
                     </SidebarMenuButton>
