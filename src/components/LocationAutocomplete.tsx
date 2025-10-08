@@ -592,13 +592,17 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         </div>
       </PopoverTrigger>
       <PopoverContent 
-        className="p-0" 
+        className="p-0 z-[100]" 
         style={{ width: triggerWidth > 0 ? `${triggerWidth}px` : 'auto' }}
         align="start"
+        sideOffset={4}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[400px] overflow-y-auto overscroll-contain pointer-events-auto">
+        <Command className="rounded-lg border-none shadow-lg bg-popover">
+          <CommandList 
+            className="max-h-[400px] overflow-y-auto overscroll-contain"
+            onWheel={(e) => e.stopPropagation()}
+          >
             {showRecentSearches && recentSearches.length > 0 && (
               <CommandGroup heading={
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
