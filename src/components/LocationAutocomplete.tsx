@@ -6,7 +6,7 @@ import { MapPin, Clock, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type LocationOption = {
-  type: 'city' | 'country';
+  type: 'city' | 'country' | 'recent';
   city?: string;
   country: string;
   displayValue: string;
@@ -291,7 +291,6 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         'New York, United States',
         'London, United Kingdom',
         'Berlin, Germany',
-        'Remote',
       ];
       const trendingLocations = LOCATION_DATA.filter(loc => trending.includes(loc.displayValue));
       setFilteredLocations(trendingLocations);
@@ -375,7 +374,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
   };
 
   // Flatten all items for keyboard navigation
-  const allItems = [
+  const allItems: LocationOption[] = [
     ...(searchQuery.length === 0 ? recentSearches.map(s => ({ type: 'recent' as const, displayValue: s, country: '' })) : []),
     ...filteredLocations,
   ];
@@ -394,12 +393,13 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < allItems.length) {
         const selectedItem = allItems[selectedIndex];
-        if ('type' in selectedItem && selectedItem.type === 'recent') {
+        if (selectedItem.type === 'recent') {
           onChange(selectedItem.displayValue);
           setSearchQuery(selectedItem.displayValue);
           setOpen(false);
+          setSelectedIndex(-1);
         } else {
-          handleSelect(selectedItem as LocationOption);
+          handleSelect(selectedItem);
         }
       }
     } else if (e.key === 'Escape') {
