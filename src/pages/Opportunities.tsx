@@ -35,7 +35,7 @@ type Job = {
   created_at: string;
 };
 const PAGE_SIZE = 12;
-const industries = ['Software/Tech', 'Biotech/Healthcare', 'Finance/Fintech', 'Energy/Cleantech', 'Public/Non-profit'];
+const industries = ['Software/Tech', 'Biotech/Healthcare', 'Finance/Fintech', 'Energy/Cleantech', 'AI / Data Science', 'Cybersecurity', 'Semiconductors / Hardware', 'Telecom / Networking', 'Public/Non-profit', 'Other'];
 const seniorities = ['junior', 'mid', 'senior', 'lead', 'exec'];
 const employmentTypes = ['full_time', 'contract', 'temp'];
 const currencies = ['ILS', 'USD', 'EUR', 'GBP', 'INR'];

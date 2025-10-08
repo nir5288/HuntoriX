@@ -108,7 +108,12 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
       'Biotech/Healthcare': 'hsl(var(--accent-mint))',
       'Finance/Fintech': 'hsl(var(--accent-pink))',
       'Energy/Cleantech': 'hsl(var(--warning))',
-      'Public/Non-profit': 'hsl(var(--surface))'
+      'AI / Data Science': 'hsl(var(--primary))',
+      'Cybersecurity': 'hsl(var(--destructive))',
+      'Semiconductors / Hardware': 'hsl(var(--accent-ocean))',
+      'Telecom / Networking': 'hsl(var(--accent-lilac))',
+      'Public/Non-profit': 'hsl(var(--surface))',
+      'Other': 'hsl(var(--muted))'
     };
     return colorMap[industry] || 'hsl(var(--surface))';
   };

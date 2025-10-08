@@ -28,7 +28,9 @@ const jobTitles = [
 
 const industries = [
   'Software/Tech', 'Biotech/Healthcare', 'Finance/Fintech', 
-  'Energy/Cleantech', 'Public/Non-profit'
+  'Energy/Cleantech', 'AI / Data Science', 'Cybersecurity',
+  'Semiconductors / Hardware', 'Telecom / Networking',
+  'Public/Non-profit', 'Other'
 ];
 
 const locations = [

@@ -120,7 +120,12 @@ export function HotOpportunities() {
       'Biotech/Healthcare': 'bg-[hsl(var(--accent-mint))] text-foreground',
       'Finance/Fintech': 'bg-[hsl(var(--accent-pink))] text-foreground',
       'Energy/Cleantech': 'bg-[hsl(var(--warning))] text-foreground',
-      'Public/Non-profit': 'bg-[hsl(var(--surface))] text-foreground'
+      'AI / Data Science': 'bg-[hsl(var(--primary))] text-foreground',
+      'Cybersecurity': 'bg-[hsl(var(--destructive))] text-foreground',
+      'Semiconductors / Hardware': 'bg-[hsl(var(--accent-ocean))] text-foreground',
+      'Telecom / Networking': 'bg-[hsl(var(--accent-lilac))] text-foreground',
+      'Public/Non-profit': 'bg-[hsl(var(--surface))] text-foreground',
+      'Other': 'bg-[hsl(var(--muted))] text-foreground'
     };
     
     return colorMap[industry] || 'bg-[hsl(var(--surface))] text-foreground';
