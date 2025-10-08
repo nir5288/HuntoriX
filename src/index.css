@@ -119,14 +119,15 @@
 
   html {
     overflow-x: hidden;
-    scrollbar-gutter: stable;
+    overflow-y: scroll; /* prevent layout shift when overlays open */
+    scrollbar-gutter: stable both-edges;
   }
 
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
   }
   
   h1, h2, h3, h4, h5, h6 {
