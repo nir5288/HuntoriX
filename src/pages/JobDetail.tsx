@@ -352,21 +352,61 @@ const JobDetail = () => {
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-8">
                 <div>
-                  <h3 className="text-xl font-semibold mb-3">Role Description</h3>
-                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.description}</p>
+                  <h3 className="text-xl font-semibold mb-6">Role Description</h3>
+                  <div className="max-w-[800px] space-y-6">
+                    {job.description.split('\n').map((block: string, idx: number) => {
+                      // Remove markdown symbols and format sections
+                      const cleanBlock = block.replace(/^##\s*/, '').trim();
+                      
+                      if (!cleanBlock) return null;
+                      
+                      // Check if it's a section header (bold keywords)
+                      const sectionHeaders = ['About the Job', 'Key Responsibilities', 'Requirements', 'Nice-to-Have', 'Responsibilities', 'Qualifications'];
+                      const isHeader = sectionHeaders.some(header => cleanBlock.includes(header));
+                      
+                      if (isHeader) {
+                        return (
+                          <h4 key={idx} className="text-lg font-bold mt-6 first:mt-0 mb-4 text-foreground">
+                            {cleanBlock}
+                          </h4>
+                        );
+                      }
+                      
+                      // Check if it's a bullet point
+                      if (cleanBlock.startsWith('•') || cleanBlock.startsWith('-') || /^\d+\./.test(cleanBlock)) {
+                        return (
+                          <div key={idx} className="flex gap-3 mb-3">
+                            <span className="text-muted-foreground mt-1 flex-shrink-0">•</span>
+                            <p className="text-muted-foreground leading-7">
+                              {cleanBlock.replace(/^[•\-]\s*/, '').replace(/^\d+\.\s*/, '')}
+                            </p>
+                          </div>
+                        );
+                      }
+                      
+                      // Regular paragraph
+                      return (
+                        <p key={idx} className="text-muted-foreground leading-7 mb-4">
+                          {cleanBlock}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
 
+                <div className="border-t border-border/40 pt-6" />
+
                 {job.skills_must && job.skills_must.length > 0 && <div>
-                    <h3 className="text-xl font-semibold mb-3">Must-Have Skills</h3>
+                    <h3 className="text-xl font-semibold mb-4">Must-Have Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {job.skills_must.map((skill: string, idx: number) => <Badge key={idx} variant="secondary" className="text-sm">{skill}</Badge>)}
                     </div>
                   </div>}
 
-                {job.skills_nice && job.skills_nice.length > 0 && <div>
-                    <h3 className="text-xl font-semibold mb-3">Nice-to-Have Skills</h3>
+                {job.skills_nice && job.skills_nice.length > 0 && <div className="mt-6">
+                    <h3 className="text-xl font-semibold mb-4">Nice-to-Have Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {job.skills_nice.map((skill: string, idx: number) => <Badge key={idx} variant="outline" className="text-sm">{skill}</Badge>)}
                     </div>
