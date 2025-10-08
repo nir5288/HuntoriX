@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -121,6 +121,13 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
   // Check if all required fields are filled
   const isFormValid = isValid && skillsMust.length > 0;
+
+  // Auto-expand skills section when AI fills skills
+  useEffect(() => {
+    if (autoFilledFields.has('skills_must') || autoFilledFields.has('skills_nice')) {
+      setSkillsOpen(true);
+    }
+  }, [autoFilledFields]);
 
   const addSkillMust = () => {
     if (skillMustInput.trim() && !skillsMust.includes(skillMustInput.trim())) {
@@ -470,6 +477,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     }
 
     if (skillsMust.length === 0) {
+      setSkillsOpen(true);
       toast.error('Must-have skills are required', { 
         description: 'Please add at least one required skill for this position'
       });
