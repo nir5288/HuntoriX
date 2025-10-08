@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ApplyModal } from '@/components/ApplyModal';
 import { formatSeniority } from '@/lib/seniorityUtils';
+import { RichJobDescription } from '@/components/RichJobDescription';
 const JobDetail = () => {
   const {
     id
@@ -354,8 +355,8 @@ const JobDetail = () => {
 
               <CardContent className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-3">Role Description</h3>
-                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.description}</p>
+                  <h3 className="text-xl font-semibold mb-3">About the job</h3>
+                  <RichJobDescription description={job.description} />
                 </div>
 
                 {job.skills_must && job.skills_must.length > 0 && <div>
