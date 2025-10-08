@@ -91,12 +91,14 @@ DESCRIPTION (FORMAT AS BULLET POINTS):
 - Remove legal/EEO text
 - Keep concise - one sentence per bullet
 
-SKILLS (EXTRACT ALL, NOT JUST FIRST FEW):
-- Must-Have: Extract ALL from "Requirements" or "What You Need" sections
-- Nice-to-Have: Extract ALL from "Preferred", "Bonus", "Nice-to-Have", or "Advantage" sections
-- Include both hard skills (Node.js, AWS, Python) AND soft skills (communication, teamwork) - put soft skills last
-- Remove filler words like "strong", "proven", "solid"
-- NO LIMITS - extract all mentioned skills
+SKILLS (EXTRACT ALL - THEY WILL BE PROCESSED):
+- Must-Have: Extract ALL technical and core skills from "Requirements", "Must Have", or "Essential" sections
+- Nice-to-Have: Extract ALL from "Preferred", "Bonus", "Nice-to-Have", "Advantage", or "Plus" sections
+- Include technologies, frameworks, languages, tools, methodologies
+- Include up to 3 soft skills per list (communication, collaboration, proactive, etc.) - list these LAST
+- Extract skills exactly as written - they will be standardized automatically
+- Minimum: At least 1 must-have skill required
+- Extract ALL skills mentioned - no artificial limits
 
 REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS UP.`
           },
@@ -197,54 +199,138 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
     const raw = JSON.parse(toolCall.function.arguments) as any;
     const originalText: string = String(jobDescription || '');
 
+    // Step 1: Remove filler words
     function stripFiller(s: string) {
-      return s.replace(/^(strong|proven|solid|hands?-on|experience with|proficiency in|expertise in|knowledge of|ability to)\s+/i, '').trim();
+      let cleaned = s
+        .replace(/^(strong|proven|solid|excellent|good|hands?-on|deep|extensive)\s+/gi, '')
+        .replace(/^(experience with|proficiency in|expertise in|knowledge of|familiarity with|understanding of|ability to|skilled in)\s+/gi, '')
+        .replace(/\s+(experience|skills?|proficiency)$/gi, '')
+        .trim();
+      return cleaned;
     }
 
-    function normalizeTech(s: string) {
-      let out = s;
-      const rules = [
-        { re: /\bjavascript\s*\/?\s*typescript\b/i, to: 'JavaScript/TypeScript' },
-        { re: /\bnode(?:\.js)?\b/i, to: 'Node.js' },
-        { re: /\breact(?:\.js)?\b/i, to: 'React' },
-        { re: /\b(graphql)\b/i, to: 'GraphQL' },
-        { re: /\b(ci\/?cd|continuous integration(?: and)? continuous delivery)\b/i, to: 'CI/CD' },
-        { re: /\bgoogle cloud|gcp\b/i, to: 'GCP' },
-        { re: /\baws|amazon web services\b/i, to: 'AWS' },
-      ];
-      for (const r of rules) out = out.replace(r.re, r.to);
-      return out.trim();
-    }
-
-    function limitWords(s: string, max = 10) {
+    // Step 2: Canonicalize - map synonyms to standard terms
+    function canonicalize(s: string): string {
+      const lower = s.toLowerCase();
+      
+      // Cloud Providers
+      if (/\b(amazon web services|amazon aws|aws cloud)\b/i.test(lower)) return 'AWS';
+      if (/\b(google cloud platform|google cloud|gcp)\b/i.test(lower)) return 'GCP';
+      if (/\b(microsoft azure|azure cloud)\b/i.test(lower)) return 'Azure';
+      
+      // Languages
+      if (/\b(javascript|js)\b/i.test(lower) && !/typescript/i.test(lower)) return 'JavaScript';
+      if (/\b(typescript|ts)\b/i.test(lower)) return 'TypeScript';
+      if (/\b(python[0-9.]*)\b/i.test(lower)) return 'Python';
+      if (/\b(java)\b/i.test(lower) && !/javascript/i.test(lower)) return 'Java';
+      if (/\b(golang|go lang)\b/i.test(lower)) return 'Go';
+      
+      // Frameworks/Libraries
+      if (/\b(reactjs|react\.js)\b/i.test(lower)) return 'React';
+      if (/\b(nodejs|node\.js|node)\b/i.test(lower)) return 'Node.js';
+      if (/\b(expressjs|express\.js)\b/i.test(lower)) return 'Express';
+      if (/\b(nextjs|next\.js)\b/i.test(lower)) return 'Next.js';
+      if (/\b(spring boot framework)\b/i.test(lower)) return 'Spring Boot';
+      if (/\b(angular(?:js)?)\b/i.test(lower)) return 'Angular';
+      if (/\b(vue(?:\.js)?)\b/i.test(lower)) return 'Vue';
+      
+      // APIs & Architecture
+      if (/\b(restful apis?|rest apis?)\b/i.test(lower)) return 'REST APIs';
+      if (/\b(graphql)\b/i.test(lower)) return 'GraphQL';
+      if (/\b(micro-?services?|microservice architecture)\b/i.test(lower)) return 'Microservices';
+      if (/\b(serverless)\b/i.test(lower)) return 'Serverless';
+      
+      // Containers/DevOps
+      if (/\b(k8s)\b/i.test(lower)) return 'Kubernetes';
+      if (/\b(kubernetes|k8s)\b/i.test(lower)) return 'Kubernetes';
+      if (/\b(docker containers?)\b/i.test(lower)) return 'Docker';
+      if (/\b(ci\/?cd|continuous integration.*delivery|jenkins ci)\b/i.test(lower)) return 'CI/CD';
+      if (/\b(jenkins)\b/i.test(lower) && !/ci/i.test(lower)) return 'Jenkins';
+      if (/\b(infrastructure as code|iac tooling?)\b/i.test(lower)) return 'IaC';
+      if (/\b(hashi terraform|terraform)\b/i.test(lower)) return 'Terraform';
+      if (/\b(github actions?)\b/i.test(lower)) return 'GitHub Actions';
+      
+      // Databases
+      if (/\b(mysql db|mysql database)\b/i.test(lower)) return 'MySQL';
+      if (/\b(mongodb|mongo db|mongo)\b/i.test(lower)) return 'MongoDB';
+      if (/\b(postgresql|postgres)\b/i.test(lower)) return 'PostgreSQL';
+      if (/\b(sql databases?|relational databases?)\b/i.test(lower)) return 'SQL Databases';
+      if (/\b(nosql databases?|no sql)\b/i.test(lower)) return 'NoSQL Databases';
+      if (/\b(redis cache|redis)\b/i.test(lower)) return 'Redis';
+      
+      // Serverless
+      if (/\b(lambda functions?|aws lambda functions?)\b/i.test(lower)) return 'AWS Lambda';
+      
+      // Security/Monitoring
+      if (/\b(application security|appsec)\b/i.test(lower)) return 'Application Security';
+      if (/\b(monitoring (?:and|&) logging)\b/i.test(lower)) return 'Monitoring, Logging';
+      
+      // General Skills
+      if (/\b(system design principles?)\b/i.test(lower)) return 'System Design';
+      if (/\b(data structures?(?: and| &) algorithms?)\b/i.test(lower)) return 'Data Structures';
+      if (/\b(performance tuning|optimization)\b/i.test(lower)) return 'Optimization';
+      if (/\b(troubleshooting (?:and|&) debugging)\b/i.test(lower)) return 'Debugging';
+      if (/\b(debugging)\b/i.test(lower)) return 'Debugging';
+      
+      // Soft Skills (shorten)
+      if (/\b(strong communication skills?|communication skills?)\b/i.test(lower)) return 'Communication';
+      if (/\b(team player|collaboration|teamwork)\b/i.test(lower)) return 'Collaboration';
+      if (/\b(self[- ]?starter|proactive)\b/i.test(lower)) return 'Proactive';
+      
+      // No match - return original but shortened to max 3 words
       const words = s.split(/\s+/);
-      return words.length > max ? words.slice(0, max).join(' ') : s;
+      if (words.length > 3) {
+        return words.slice(0, 3).join(' ');
+      }
+      return s;
     }
 
-    function cleanList(arr?: string[]) {
+    // Step 3: Title Case (preserve acronyms)
+    function toTitleCase(s: string): string {
+      // If it's an acronym (all caps or contains .), keep as-is
+      if (/^[A-Z/.]+$/.test(s) || s.includes('.')) return s;
+      
+      // Otherwise title case
+      return s.split(' ').map(word => {
+        if (/^[A-Z]+$/.test(word)) return word; // Acronym
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }).join(' ');
+    }
+
+    // Step 4: Clean and deduplicate skills list
+    function cleanList(arr?: string[], maxSkills = 12) {
       const seen = new Set<string>();
-      const cleaned: string[] = [];
-      // Separate hard skills and soft skills
       const hardSkills: string[] = [];
       const softSkills: string[] = [];
-      const softSkillKeywords = ['communication', 'collaboration', 'teamwork', 'leadership', 'problem-solving', 'proactive', 'self-motivated'];
+      const softSkillKeywords = ['communication', 'collaboration', 'teamwork', 'leadership', 'problem-solving', 'proactive', 'self-motivated', 'self-starter'];
       
       for (const item of arr ?? []) {
-        const x = limitWords(normalizeTech(stripFiller(String(item))), 10);
-        const key = x.toLowerCase();
-        if (x && !seen.has(key)) {
-          seen.add(key);
-          // Check if it's a soft skill
-          const isSoftSkill = softSkillKeywords.some(kw => key.includes(kw));
-          if (isSoftSkill) {
-            softSkills.push(x);
-          } else {
-            hardSkills.push(x);
-          }
+        // Strip filler, canonicalize, then format
+        let cleaned = stripFiller(String(item));
+        cleaned = canonicalize(cleaned);
+        cleaned = toTitleCase(cleaned);
+        
+        const key = cleaned.toLowerCase();
+        
+        // Skip if empty or duplicate
+        if (!cleaned || seen.has(key)) continue;
+        seen.add(key);
+        
+        // Check if it's a soft skill
+        const isSoftSkill = softSkillKeywords.some(kw => key.includes(kw));
+        if (isSoftSkill) {
+          softSkills.push(cleaned);
+        } else {
+          hardSkills.push(cleaned);
         }
       }
-      // Return hard skills first, then soft skills
-      return [...hardSkills, ...softSkills];
+      
+      // Limit soft skills to 3
+      const limitedSoftSkills = softSkills.slice(0, 3);
+      
+      // Combine: hard skills first (up to maxSkills - softSkills.length), then soft skills
+      const maxHard = maxSkills - limitedSoftSkills.length;
+      return [...hardSkills.slice(0, maxHard), ...limitedSoftSkills];
     }
 
     // Description: remove EEO/legal, format as bullets
@@ -273,9 +359,14 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
     const jobInfo: any = {
       ...raw,
       description: cleanDescription(raw.description),
-      skills_must: cleanList(raw.skills_must),
-      skills_nice: cleanList(raw.skills_nice),
+      skills_must: cleanList(raw.skills_must, 12), // Max 10-12 must-have
+      skills_nice: cleanList(raw.skills_nice, 8),   // Max 6-8 nice-to-have
     };
+    
+    // Ensure at least 1 must-have skill
+    if (!jobInfo.skills_must || jobInfo.skills_must.length === 0) {
+      console.warn('No must-have skills extracted - this may indicate parsing issue');
+    }
 
     // Fallback: if hybrid and location missing but city in text
     if (jobInfo.location_type === 'hybrid' && !jobInfo.location) {
