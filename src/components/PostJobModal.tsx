@@ -533,8 +533,16 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Post a Job</DialogTitle>
+        <DialogHeader className="relative">
+          <Button 
+            type="button" 
+            variant="ghost" 
+            onClick={handleClear} 
+            className="absolute right-0 top-0 h-8 text-xs"
+          >
+            Clear Form
+          </Button>
+          <DialogTitle className="text-2xl pr-24">Post a Job</DialogTitle>
           <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
         </DialogHeader>
 
@@ -1147,31 +1155,21 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </div>
           </Card>
 
-          <div className="flex gap-3 justify-between pt-2">
-            <Button 
-              type="button" 
-              variant="ghost" 
-              onClick={handleClear} 
-              className="h-9"
-            >
-              Clear Form
+          <div className="flex gap-3 justify-end pt-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
+              Cancel
             </Button>
-            <div className="flex gap-3">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                variant={isFormValid ? "hero" : "default"}
-                className={cn(
-                  "h-9 transition-all duration-300 font-bold",
-                  isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
-                  !isFormValid && 'opacity-40'
-                )}
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit for Review'}
-              </Button>
-            </div>
+            <Button 
+              type="submit" 
+              variant={isFormValid ? "hero" : "default"}
+              className={cn(
+                "h-9 transition-all duration-300 font-bold",
+                isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
+                !isFormValid && 'opacity-40'
+              )}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit for Review'}
+            </Button>
           </div>
         </form>
       </DialogContent>
