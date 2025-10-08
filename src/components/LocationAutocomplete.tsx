@@ -263,7 +263,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         (location.city && location.city.toLowerCase().includes(query))
       );
       
-      // Sort by relevance
+      // Sort by relevance with improved multi-word matching
       const sorted = filtered.sort((a, b) => {
         const aDisplay = a.displayValue.toLowerCase();
         const bDisplay = b.displayValue.toLowerCase();
@@ -272,14 +272,24 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         const aCity = a.city?.toLowerCase() || '';
         const bCity = b.city?.toLowerCase() || '';
         
-        // Exact match priority (country or city name exactly matches query)
+        // Exact match priority - country name exactly matches query
         const aExactCountry = aCountry === query;
         const bExactCountry = bCountry === query;
-        const aExactCity = aCity === query;
-        const bExactCity = bCity === query;
         
         if (aExactCountry && !bExactCountry) return -1;
         if (!aExactCountry && bExactCountry) return 1;
+        
+        // If searching for a country name, prioritize country-only entries
+        if (aExactCountry || bExactCountry || aCountry.includes(query) || bCountry.includes(query)) {
+          // Prioritize country entries over city entries when country matches
+          if (a.type === 'country' && b.type === 'city' && aCountry.includes(query)) return -1;
+          if (a.type === 'city' && b.type === 'country' && bCountry.includes(query)) return 1;
+        }
+        
+        // Exact city match priority
+        const aExactCity = aCity === query;
+        const bExactCity = bCity === query;
+        
         if (aExactCity && !bExactCity) return -1;
         if (!aExactCity && bExactCity) return 1;
         
@@ -362,13 +372,13 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         </div>
       </PopoverTrigger>
       <PopoverContent 
-        className="p-0" 
+        className="p-0 bg-background z-50" 
         style={{ width: triggerWidth > 0 ? `${triggerWidth}px` : 'auto' }}
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[300px]">
+        <Command className="rounded-lg border-none shadow-lg bg-background">
+          <CommandList className="max-h-[300px] overflow-y-auto overscroll-contain">
             {filteredLocations.length === 0 && (
               <CommandEmpty>No locations found.</CommandEmpty>
             )}
