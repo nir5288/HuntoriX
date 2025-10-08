@@ -464,7 +464,7 @@ const Opportunities = () => {
 
   // Filters extracted into <OpportunitiesFilters /> component to prevent remounting and focus loss.
 
-  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+  return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background contain-layout contain-paint">
       <Header />
       <PromotionalBanner location="opportunities_top" />
 
