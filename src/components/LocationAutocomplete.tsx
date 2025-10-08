@@ -248,6 +248,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
   const inputRef = useRef<HTMLInputElement>(null);
   const [triggerWidth, setTriggerWidth] = useState<number>(0);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   // Filter and sort locations based on search query with smart prioritization
   useEffect(() => {
@@ -328,6 +329,31 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
     onChange(location.displayValue);
     setSearchQuery(location.displayValue);
     setOpen(false);
+    setSelectedIndex(-1);
+  };
+
+  // Flatten all items for keyboard navigation
+  const allItems = filteredLocations;
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => prev < allItems.length - 1 ? prev + 1 : prev);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => prev > -1 ? prev - 1 : -1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < allItems.length) {
+        handleSelect(allItems[selectedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+      setSelectedIndex(-1);
+    }
   };
 
   // Group by countries
@@ -357,9 +383,14 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
             onChange={(e) => {
               setSearchQuery(e.target.value);
               onChange(e.target.value);
+              setSelectedIndex(-1);
               if (!open) setOpen(true);
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              setOpen(true);
+              setSelectedIndex(-1);
+            }}
+            onKeyDown={handleKeyDown}
             className="flex h-11 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
@@ -371,30 +402,43 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[300px] overflow-y-auto overscroll-contain">
+          <CommandList className="max-h-[300px]">
             {filteredLocations.length === 0 && (
               <CommandEmpty>No locations found.</CommandEmpty>
             )}
 
-            {Object.keys(groupedLocations).map(country => (
-              <CommandGroup key={country} heading={country}>
-                {groupedLocations[country].map((location, idx) => (
-                  <CommandItem
-                    key={`${location.type}-${location.displayValue}-${idx}`}
-                    value={location.displayValue}
-                    onSelect={() => handleSelect(location)}
-                    className="flex items-center gap-2"
-                  >
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className={cn(
-                      location.type === 'country' && 'font-semibold'
-                    )}>
-                      {location.displayValue}
-                    </span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ))}
+            {Object.keys(groupedLocations).map((country, countryIdx) => {
+              const startIdx = filteredLocations.findIndex(loc => loc.country === country);
+              return (
+                <CommandGroup key={country} heading={country}>
+                  {groupedLocations[country].map((location, idx) => {
+                    const globalIdx = startIdx + idx;
+                    return (
+                      <CommandItem
+                        key={`${location.type}-${location.displayValue}-${idx}`}
+                        value={location.displayValue}
+                        onSelect={() => handleSelect(location)}
+                        onMouseEnter={() => setSelectedIndex(globalIdx)}
+                        onMouseLeave={() => setSelectedIndex(-1)}
+                        className={cn(
+                          "flex items-center gap-2",
+                          selectedIndex === globalIdx
+                            ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
+                            : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
+                        )}
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className={cn(
+                          location.type === 'country' && 'font-semibold'
+                        )}>
+                          {location.displayValue}
+                        </span>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              );
+            })}
           </CommandList>
         </Command>
       </PopoverContent>
