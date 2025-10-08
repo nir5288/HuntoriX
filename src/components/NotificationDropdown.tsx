@@ -108,7 +108,7 @@ export const NotificationDropdown = () => {
         </TooltipTrigger>
         <TooltipContent>Notifications</TooltipContent>
       </Tooltip>
-      <DropdownMenuContent align="end" className="w-80 bg-background z-[60]">
+      <DropdownMenuContent align="end" className="w-80 bg-background z-[210]">
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>Notifications</span>
           {unreadCount > 0 && (

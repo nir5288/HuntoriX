@@ -126,6 +126,13 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Prevent layout shift when UI libraries add body padding for scroll lock */
+  body[data-scroll-locked],
+  body[style*="padding-right"] {
+    padding-right: 0 !important;
+    --removed-body-scroll-bar-size: 0px !important;
+  }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
