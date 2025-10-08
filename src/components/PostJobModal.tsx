@@ -543,9 +543,9 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
             <Button 
               type="button" 
-              variant="ghost" 
+              variant="outline" 
               onClick={handleClear} 
-              className="h-8 text-xs"
+              className="h-8 text-xs border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950/20"
             >
               Clear Form
             </Button>
@@ -554,7 +554,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
         <form id="post-job-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6">
           {/* AI Quick Fill */}
-          <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+          <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800/30">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-1">
                 <Sparkles className="w-5 h-5 text-primary" />
@@ -820,7 +820,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     e.preventDefault();
                     setShowExclusiveInfo(!showExclusiveInfo);
                   }}
-                  className={`text-xs font-medium underline decoration-dotted underline-offset-2 transition-all duration-300 hover:decoration-solid ${
+                  className={`text-sm font-medium underline decoration-dotted underline-offset-2 transition-all duration-300 hover:decoration-solid ${
                     isExclusive 
                       ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
                       : 'text-muted-foreground hover:text-foreground'
@@ -828,11 +828,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 >
                   Exclusive on Huntorix
                 </button>
-                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[9px] px-1 py-0 h-3.5 border-0 leading-none">
+                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0 leading-none">
                   Premium
                 </Badge>
               </div>
-              <span className="text-[10px] text-muted-foreground/80">
+              <span className="text-xs text-muted-foreground/90">
                 14-day minimum commitment once published
               </span>
             </div>
@@ -1170,16 +1170,22 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         </div>
 
         {/* Sticky Footer */}
-        <div className="bg-background border-t px-6 py-4 flex items-center justify-between gap-4 flex-shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20">
-            <Info className="h-4 w-4 text-primary flex-shrink-0" />
-            <p className="text-sm font-medium text-foreground">
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/20 border-t border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+            <Info className="h-4 w-4 text-blue-700 dark:text-blue-300 flex-shrink-0" />
+            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
               Reviewed in under 1 hour
             </p>
           </div>
           
           <div className="flex gap-3">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} size="lg">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)} 
+              size="lg"
+              className="border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
               Cancel
             </Button>
             <Button 
@@ -1189,7 +1195,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               size="lg"
               className={cn(
                 "transition-all duration-300 font-bold min-w-[180px]",
-                isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
+                isFormValid && 'shadow-lg shadow-primary/30',
                 !isFormValid && 'opacity-40'
               )}
             >
