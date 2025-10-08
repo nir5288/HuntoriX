@@ -501,8 +501,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       });
       onOpenChange(false);
       
-      // Navigate to job detail page
-      navigate(`/jobs/${newJob.id}`);
+      // Reload to refresh the dashboard data
+      window.location.reload();
 
     } catch (error) {
       console.error('Error creating job - Full error:', error);
