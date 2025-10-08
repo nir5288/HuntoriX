@@ -127,8 +127,6 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
-    overflow-y: scroll; /* match html to prevent scroll lock jumps */
-    scrollbar-gutter: stable both-edges;
   }
 
   
