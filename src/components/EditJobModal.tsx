@@ -44,7 +44,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Job title is required'),
   custom_title: z.string().optional(),
   industry: z.string().min(1, 'Industry is required'),
-  seniority: z.enum(['junior', 'mid', 'senior', 'lead', 'exec'], {
+  seniority: z.enum(['junior', 'mid_level', 'senior', 'lead_principal', 'manager_director', 'vp_c_level'], {
     required_error: 'Seniority is required'
   }),
   employment_type: z.enum(['full_time', 'contract', 'temp'], {
@@ -99,7 +99,7 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
       title: '',
       custom_title: '',
       industry: '',
-      seniority: 'mid' as const,
+      seniority: 'mid_level' as const,
       employment_type: 'full_time' as const,
       location_type: 'remote',
       location: '',
@@ -125,7 +125,7 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
         title: titleValue,
         custom_title: isCustomTitle ? job.title : '',
         industry: job.industry || '',
-        seniority: job.seniority || 'mid',
+        seniority: job.seniority || 'mid_level',
         employment_type: job.employment_type || 'full_time',
         location_type: job.location ? 'onsite' : 'remote',
         location: job.location || '',
@@ -326,10 +326,11 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="junior">Junior</SelectItem>
-                    <SelectItem value="mid">Mid</SelectItem>
+                    <SelectItem value="mid_level">Mid-Level</SelectItem>
                     <SelectItem value="senior">Senior</SelectItem>
-                    <SelectItem value="lead">Lead</SelectItem>
-                    <SelectItem value="exec">Executive</SelectItem>
+                    <SelectItem value="lead_principal">Lead / Principal</SelectItem>
+                    <SelectItem value="manager_director">Manager / Director</SelectItem>
+                    <SelectItem value="vp_c_level">VP / C-Level</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.seniority && <p className="text-sm text-destructive">{errors.seniority.message}</p>}

@@ -10,6 +10,7 @@ import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, Check, X, MessageCircl
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ApplyModal } from '@/components/ApplyModal';
+import { formatSeniority } from '@/lib/seniorityUtils';
 const JobDetail = () => {
   const {
     id
@@ -335,7 +336,7 @@ const JobDetail = () => {
                   {job.employment_type && <div className="flex items-center gap-2">
                       <Briefcase className="h-4 w-4" />
                       <span className="capitalize">{job.employment_type === 'full_time' ? 'Full-time' : job.employment_type}</span>
-                      {job.seniority && <span> • {job.seniority.charAt(0).toUpperCase() + job.seniority.slice(1)}</span>}
+                      {job.seniority && <span> • {formatSeniority(job.seniority)}</span>}
                     </div>}
                   {(job.budget_min || job.budget_max) && <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4" />

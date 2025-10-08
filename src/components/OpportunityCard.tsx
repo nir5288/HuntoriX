@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { formatSeniority } from '@/lib/seniorityUtils';
 
 type Job = {
   id: string;
@@ -489,7 +490,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
               <span className="truncate">
                 {job.employment_type && (job.employment_type === 'full_time' ? 'Full-time' : job.employment_type)}
                 {job.employment_type && job.seniority && ' • '}
-                {job.seniority && job.seniority.charAt(0).toUpperCase() + job.seniority.slice(1)}
+                {job.seniority && formatSeniority(job.seniority)}
               </span>
             </div>
           )}

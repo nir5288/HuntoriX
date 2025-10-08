@@ -49,7 +49,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Job title is required'),
   custom_title: z.string().optional(),
   industry: z.string().min(1, 'Industry is required'),
-  seniority: z.enum(['junior', 'mid', 'senior', 'lead', 'exec'], {
+  seniority: z.enum(['junior', 'mid_level', 'senior', 'lead_principal', 'manager_director', 'vp_c_level'], {
     required_error: 'Seniority is required'
   }),
   employment_type: z.enum(['full_time', 'contract', 'temp'], {
@@ -199,13 +199,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       const combinedText = `${jobInfo.title ?? ''} ${jobInfo.description ?? ''} ${jobDescriptionText}`;
 
       // Helper: infer seniority from text
-      const detectSeniority = (text: string): 'junior' | 'mid' | 'senior' | 'lead' | 'exec' | undefined => {
+      const detectSeniority = (text: string): 'junior' | 'mid_level' | 'senior' | 'lead_principal' | 'manager_director' | 'vp_c_level' | undefined => {
         const t = text.toLowerCase();
-        if (/(lead|tech lead|team lead)/.test(t)) return 'lead';
-        if (/(executive director|vp|cto|chief|executive)/.test(t)) return 'exec';
+        if (/(vp|vice president|cto|cfo|ceo|chief|c-level)/.test(t)) return 'vp_c_level';
+        if (/(director|head of|manager|management)/.test(t)) return 'manager_director';
+        if (/(principal|lead|tech lead|team lead|staff)/.test(t)) return 'lead_principal';
         if (/(senior|sr\.?|5\+\s*years|6\+\s*years|7\+\s*years|8\+\s*years|9\+\s*years|10\+\s*years)/.test(t)) return 'senior';
-        if (/(junior|jr\.?|0-2\s*years|1-2\s*years)/.test(t)) return 'junior';
-        if (/(mid|3-5\s*years)/.test(t)) return 'mid';
+        if (/(junior|jr\.?|0-2\s*years|1-2\s*years|entry|entry-level)/.test(t)) return 'junior';
+        if (/(mid|mid-level|3-5\s*years|intermediate)/.test(t)) return 'mid_level';
         return undefined;
       };
 
@@ -280,10 +281,10 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           filledFields.add('seniority');
         }
       }
-      // If title says Senior or 5+ years but field is mid/junior, override to senior
+      // If title says Senior or 5+ years but field is mid_level/junior, override to senior
       {
         const current = watch('seniority') as any;
-        if ((jobInfo.title?.toLowerCase().includes('senior') || /5\+\s*years/i.test(combinedText)) && (current === 'mid' || current === 'junior')) {
+        if ((jobInfo.title?.toLowerCase().includes('senior') || /5\+\s*years/i.test(combinedText)) && (current === 'mid_level' || current === 'junior')) {
           setValue('seniority', 'senior' as any);
           filledFields.add('seniority');
         }
@@ -686,10 +687,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="junior">Junior</SelectItem>
-                      <SelectItem value="mid">Mid-Level</SelectItem>
+                      <SelectItem value="mid_level">Mid-Level</SelectItem>
                       <SelectItem value="senior">Senior</SelectItem>
-                      <SelectItem value="lead">Lead</SelectItem>
-                      <SelectItem value="exec">Executive</SelectItem>
+                      <SelectItem value="lead_principal">Lead / Principal</SelectItem>
+                      <SelectItem value="manager_director">Manager / Director</SelectItem>
+                      <SelectItem value="vp_c_level">VP / C-Level</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.seniority?.message && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}

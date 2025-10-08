@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatSeniority } from "@/lib/seniorityUtils";
 
 interface Job {
   id: string;
@@ -218,7 +219,7 @@ export default function AdminJobApprovals() {
       <TableCell className="text-xs text-muted-foreground">
         {job.location || 'Remote'}
       </TableCell>
-      <TableCell className="text-xs capitalize">{job.seniority}</TableCell>
+      <TableCell className="text-xs">{formatSeniority(job.seniority)}</TableCell>
       <TableCell className="text-xs">
         {job.budget_currency} {job.budget_min?.toLocaleString()}-{job.budget_max?.toLocaleString()}
       </TableCell>

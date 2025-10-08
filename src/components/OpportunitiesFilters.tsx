@@ -231,7 +231,13 @@ export const OpportunitiesFilters: React.FC<OpportunitiesFiltersProps> = ({
               <SelectContent>
                 <SelectItem value="all">All levels</SelectItem>
                 {seniorities.map(level => <SelectItem key={level} value={level}>
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                    {level === 'junior' ? 'Junior' : 
+                     level === 'mid_level' ? 'Mid-Level' :
+                     level === 'senior' ? 'Senior' :
+                     level === 'lead_principal' ? 'Lead / Principal' :
+                     level === 'manager_director' ? 'Manager / Director' :
+                     level === 'vp_c_level' ? 'VP / C-Level' :
+                     level.charAt(0).toUpperCase() + level.slice(1)}
                   </SelectItem>)}
               </SelectContent>
             </Select>
