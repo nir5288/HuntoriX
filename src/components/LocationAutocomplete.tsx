@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, Clock, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type LocationOption = {
-  type: 'city' | 'country';
+  type: 'city' | 'country' | 'recent';
   city?: string;
   country: string;
   displayValue: string;
@@ -245,10 +246,41 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLocations, setFilteredLocations] = useState<LocationOption[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [triggerWidth, setTriggerWidth] = useState<number>(0);
   const triggerRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [previewValue, setPreviewValue] = useState('');
+  const [originalQuery, setOriginalQuery] = useState('');
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('recentLocationSearches');
+    if (stored) {
+      try {
+        setRecentSearches(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to parse recent location searches');
+      }
+    }
+  }, []);
+
+  // Save to recent searches
+  const addToRecentSearches = useCallback((query: string) => {
+    if (!query.trim()) return;
+    
+    const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentLocationSearches', JSON.stringify(updated));
+  }, [recentSearches]);
+
+  // Delete a recent search
+  const deleteRecentSearch = useCallback((searchToDelete: string) => {
+    const updated = recentSearches.filter(s => s !== searchToDelete);
+    setRecentSearches(updated);
+    localStorage.setItem('recentLocationSearches', JSON.stringify(updated));
+  }, [recentSearches]);
 
   // Filter and sort locations based on search query with smart prioritization
   useEffect(() => {
@@ -328,12 +360,20 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
   const handleSelect = (location: LocationOption) => {
     onChange(location.displayValue);
     setSearchQuery(location.displayValue);
+    addToRecentSearches(location.displayValue);
     setOpen(false);
     setSelectedIndex(-1);
+    setPreviewValue('');
+    setOriginalQuery('');
   };
 
+  const showRecentSearches = searchQuery.length === 0;
+
   // Flatten all items for keyboard navigation
-  const allItems = filteredLocations;
+  const allItems = [
+    ...(showRecentSearches ? recentSearches.map(s => ({ type: 'recent' as const, displayValue: s, country: '' })) : []),
+    ...filteredLocations,
+  ];
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -341,18 +381,49 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => prev < allItems.length - 1 ? prev + 1 : prev);
+      // Store original query on first arrow down
+      if (selectedIndex === -1) {
+        setOriginalQuery(searchQuery);
+      }
+      setSelectedIndex(prev => {
+        const newIndex = prev < allItems.length - 1 ? prev + 1 : prev;
+        // Preview the selected item
+        if (newIndex >= 0 && newIndex < allItems.length) {
+          setPreviewValue(allItems[newIndex].displayValue);
+        }
+        return newIndex;
+      });
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => prev > -1 ? prev - 1 : -1);
+      setSelectedIndex(prev => {
+        const newIndex = prev > -1 ? prev - 1 : -1;
+        // Restore original query when going back to -1
+        if (newIndex === -1) {
+          setPreviewValue('');
+        } else if (newIndex >= 0 && newIndex < allItems.length) {
+          setPreviewValue(allItems[newIndex].displayValue);
+        }
+        return newIndex;
+      });
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < allItems.length) {
-        handleSelect(allItems[selectedIndex]);
+        const selectedItem = allItems[selectedIndex];
+        if (selectedItem.type === 'recent') {
+          onChange(selectedItem.displayValue);
+          setSearchQuery(selectedItem.displayValue);
+          setOpen(false);
+        } else {
+          handleSelect(selectedItem as LocationOption);
+        }
       }
+      setPreviewValue('');
+      setOriginalQuery('');
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);
+      setPreviewValue('');
+      setOriginalQuery('');
     }
   };
 
@@ -373,18 +444,50 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
           className={cn("relative", className)}
           role="combobox"
           aria-expanded={open}
+          onMouseDown={(e) => {
+            const target = e.target as HTMLElement;
+            const clickedInput = !!target.closest('input');
+            if (!open && !clickedInput) {
+              e.preventDefault();
+              setOpen(true);
+              setSelectedIndex(-1);
+              setPreviewValue('');
+              requestAnimationFrame(() => inputRef.current?.focus());
+            }
+          }}
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            const clickedInput = !!target.closest('input');
+            if (!open && !clickedInput) {
+              e.preventDefault();
+              setOpen(true);
+              inputRef.current?.focus();
+            }
+          }}
         >
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             ref={inputRef}
             type="text"
             placeholder={placeholder || "Search city or country..."}
-            value={searchQuery}
+            value={previewValue || searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
               onChange(e.target.value);
               setSelectedIndex(-1);
+              setPreviewValue('');
+              setOriginalQuery('');
               if (!open) setOpen(true);
+            }}
+            onMouseDown={(e) => {
+              if (open) {
+                e.stopPropagation();
+              }
+            }}
+            onClick={(e) => {
+              if (open) {
+                e.stopPropagation();
+              }
             }}
             onFocus={() => {
               setOpen(true);
@@ -402,13 +505,55 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[300px]">
-            {filteredLocations.length === 0 && (
+          <CommandList className="max-h-[400px] overflow-y-auto overscroll-contain pointer-events-auto">
+            {showRecentSearches && recentSearches.length > 0 && (
+              <CommandGroup heading={
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  Recent Searches
+                </div>
+              }>
+                {recentSearches.map((search, idx) => (
+                  <CommandItem
+                    key={`recent-${idx}`}
+                    value={search}
+                    onSelect={() => {
+                      onChange(search);
+                      setSearchQuery(search);
+                      setOpen(false);
+                    }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    onMouseLeave={() => setSelectedIndex(-1)}
+                    className={cn(
+                      "flex items-center justify-between group",
+                      selectedIndex === idx
+                        ? "bg-gray-100 dark:bg-gray-800 data-[selected=true]:bg-gray-100 dark:data-[selected=true]:bg-gray-800"
+                        : "data-[selected=true]:bg-transparent data-[selected=true]:text-foreground"
+                    )}
+                  >
+                    <span>{search}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteRecentSearch(search);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+
+            {!showRecentSearches && filteredLocations.length === 0 && (
               <CommandEmpty>No locations found.</CommandEmpty>
             )}
 
-            {Object.keys(groupedLocations).map((country, countryIdx) => {
-              const startIdx = filteredLocations.findIndex(loc => loc.country === country);
+            {!showRecentSearches && Object.keys(groupedLocations).map((country, countryIdx) => {
+              const startIdx = (showRecentSearches ? recentSearches.length : 0) + filteredLocations.findIndex(loc => loc.country === country);
               return (
                 <CommandGroup key={country} heading={country}>
                   {groupedLocations[country].map((location, idx) => {
