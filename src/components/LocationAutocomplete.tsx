@@ -30,6 +30,16 @@ const LOCATION_DATA: LocationOption[] = [
   { type: 'city', city: 'Netanya', country: 'Israel', displayValue: 'Netanya, Israel' },
   { type: 'city', city: 'Petah Tikva', country: 'Israel', displayValue: 'Petah Tikva, Israel' },
   { type: 'city', city: 'Rishon LeZion', country: 'Israel', displayValue: 'Rishon LeZion, Israel' },
+  { type: 'city', city: 'Ashdod', country: 'Israel', displayValue: 'Ashdod, Israel' },
+  { type: 'city', city: 'Holon', country: 'Israel', displayValue: 'Holon, Israel' },
+  { type: 'city', city: 'Bnei Brak', country: 'Israel', displayValue: 'Bnei Brak, Israel' },
+  { type: 'city', city: 'Bat Yam', country: 'Israel', displayValue: 'Bat Yam, Israel' },
+  { type: 'city', city: 'Rehovot', country: 'Israel', displayValue: 'Rehovot, Israel' },
+  { type: 'city', city: 'Ashkelon', country: 'Israel', displayValue: 'Ashkelon, Israel' },
+  { type: 'city', city: 'Kfar Saba', country: 'Israel', displayValue: 'Kfar Saba, Israel' },
+  { type: 'city', city: 'Ra\'anana', country: 'Israel', displayValue: 'Ra\'anana, Israel' },
+  { type: 'city', city: 'Hod HaSharon', country: 'Israel', displayValue: 'Hod HaSharon, Israel' },
+  { type: 'city', city: 'Modi\'in', country: 'Israel', displayValue: 'Modi\'in, Israel' },
   { type: 'country', country: 'Israel', displayValue: 'Israel' },
   
   // United States
@@ -41,6 +51,20 @@ const LOCATION_DATA: LocationOption[] = [
   { type: 'city', city: 'Boston', country: 'United States', displayValue: 'Boston, United States' },
   { type: 'city', city: 'Chicago', country: 'United States', displayValue: 'Chicago, United States' },
   { type: 'city', city: 'Miami', country: 'United States', displayValue: 'Miami, United States' },
+  { type: 'city', city: 'Denver', country: 'United States', displayValue: 'Denver, United States' },
+  { type: 'city', city: 'Atlanta', country: 'United States', displayValue: 'Atlanta, United States' },
+  { type: 'city', city: 'Washington DC', country: 'United States', displayValue: 'Washington DC, United States' },
+  { type: 'city', city: 'Philadelphia', country: 'United States', displayValue: 'Philadelphia, United States' },
+  { type: 'city', city: 'San Diego', country: 'United States', displayValue: 'San Diego, United States' },
+  { type: 'city', city: 'Dallas', country: 'United States', displayValue: 'Dallas, United States' },
+  { type: 'city', city: 'Houston', country: 'United States', displayValue: 'Houston, United States' },
+  { type: 'city', city: 'Phoenix', country: 'United States', displayValue: 'Phoenix, United States' },
+  { type: 'city', city: 'Portland', country: 'United States', displayValue: 'Portland, United States' },
+  { type: 'city', city: 'San Jose', country: 'United States', displayValue: 'San Jose, United States' },
+  { type: 'city', city: 'Nashville', country: 'United States', displayValue: 'Nashville, United States' },
+  { type: 'city', city: 'Boulder', country: 'United States', displayValue: 'Boulder, United States' },
+  { type: 'city', city: 'Raleigh', country: 'United States', displayValue: 'Raleigh, United States' },
+  { type: 'city', city: 'Las Vegas', country: 'United States', displayValue: 'Las Vegas, United States' },
   { type: 'country', country: 'United States', displayValue: 'United States' },
   
   // United Kingdom
@@ -49,6 +73,11 @@ const LOCATION_DATA: LocationOption[] = [
   { type: 'city', city: 'Edinburgh', country: 'United Kingdom', displayValue: 'Edinburgh, United Kingdom' },
   { type: 'city', city: 'Birmingham', country: 'United Kingdom', displayValue: 'Birmingham, United Kingdom' },
   { type: 'city', city: 'Cambridge', country: 'United Kingdom', displayValue: 'Cambridge, United Kingdom' },
+  { type: 'city', city: 'Oxford', country: 'United Kingdom', displayValue: 'Oxford, United Kingdom' },
+  { type: 'city', city: 'Bristol', country: 'United Kingdom', displayValue: 'Bristol, United Kingdom' },
+  { type: 'city', city: 'Leeds', country: 'United Kingdom', displayValue: 'Leeds, United Kingdom' },
+  { type: 'city', city: 'Glasgow', country: 'United Kingdom', displayValue: 'Glasgow, United Kingdom' },
+  { type: 'city', city: 'Liverpool', country: 'United Kingdom', displayValue: 'Liverpool, United Kingdom' },
   { type: 'country', country: 'United Kingdom', displayValue: 'United Kingdom' },
   
   // Germany
@@ -56,6 +85,10 @@ const LOCATION_DATA: LocationOption[] = [
   { type: 'city', city: 'Munich', country: 'Germany', displayValue: 'Munich, Germany' },
   { type: 'city', city: 'Frankfurt', country: 'Germany', displayValue: 'Frankfurt, Germany' },
   { type: 'city', city: 'Hamburg', country: 'Germany', displayValue: 'Hamburg, Germany' },
+  { type: 'city', city: 'Cologne', country: 'Germany', displayValue: 'Cologne, Germany' },
+  { type: 'city', city: 'Stuttgart', country: 'Germany', displayValue: 'Stuttgart, Germany' },
+  { type: 'city', city: 'Dusseldorf', country: 'Germany', displayValue: 'Dusseldorf, Germany' },
+  { type: 'city', city: 'Dortmund', country: 'Germany', displayValue: 'Dortmund, Germany' },
   { type: 'country', country: 'Germany', displayValue: 'Germany' },
   
   // India
@@ -64,23 +97,148 @@ const LOCATION_DATA: LocationOption[] = [
   { type: 'city', city: 'Delhi', country: 'India', displayValue: 'Delhi, India' },
   { type: 'city', city: 'Hyderabad', country: 'India', displayValue: 'Hyderabad, India' },
   { type: 'city', city: 'Pune', country: 'India', displayValue: 'Pune, India' },
+  { type: 'city', city: 'Chennai', country: 'India', displayValue: 'Chennai, India' },
+  { type: 'city', city: 'Kolkata', country: 'India', displayValue: 'Kolkata, India' },
+  { type: 'city', city: 'Ahmedabad', country: 'India', displayValue: 'Ahmedabad, India' },
+  { type: 'city', city: 'Gurgaon', country: 'India', displayValue: 'Gurgaon, India' },
+  { type: 'city', city: 'Noida', country: 'India', displayValue: 'Noida, India' },
   { type: 'country', country: 'India', displayValue: 'India' },
   
-  // Other countries
+  // France
   { type: 'city', city: 'Paris', country: 'France', displayValue: 'Paris, France' },
+  { type: 'city', city: 'Lyon', country: 'France', displayValue: 'Lyon, France' },
+  { type: 'city', city: 'Marseille', country: 'France', displayValue: 'Marseille, France' },
+  { type: 'city', city: 'Toulouse', country: 'France', displayValue: 'Toulouse, France' },
+  { type: 'city', city: 'Nice', country: 'France', displayValue: 'Nice, France' },
+  { type: 'city', city: 'Nantes', country: 'France', displayValue: 'Nantes, France' },
   { type: 'country', country: 'France', displayValue: 'France' },
+  
+  // Netherlands
   { type: 'city', city: 'Amsterdam', country: 'Netherlands', displayValue: 'Amsterdam, Netherlands' },
+  { type: 'city', city: 'Rotterdam', country: 'Netherlands', displayValue: 'Rotterdam, Netherlands' },
+  { type: 'city', city: 'The Hague', country: 'Netherlands', displayValue: 'The Hague, Netherlands' },
+  { type: 'city', city: 'Utrecht', country: 'Netherlands', displayValue: 'Utrecht, Netherlands' },
+  { type: 'city', city: 'Eindhoven', country: 'Netherlands', displayValue: 'Eindhoven, Netherlands' },
   { type: 'country', country: 'Netherlands', displayValue: 'Netherlands' },
+  
+  // Canada
   { type: 'city', city: 'Toronto', country: 'Canada', displayValue: 'Toronto, Canada' },
   { type: 'city', city: 'Vancouver', country: 'Canada', displayValue: 'Vancouver, Canada' },
+  { type: 'city', city: 'Montreal', country: 'Canada', displayValue: 'Montreal, Canada' },
+  { type: 'city', city: 'Calgary', country: 'Canada', displayValue: 'Calgary, Canada' },
+  { type: 'city', city: 'Ottawa', country: 'Canada', displayValue: 'Ottawa, Canada' },
+  { type: 'city', city: 'Edmonton', country: 'Canada', displayValue: 'Edmonton, Canada' },
+  { type: 'city', city: 'Waterloo', country: 'Canada', displayValue: 'Waterloo, Canada' },
   { type: 'country', country: 'Canada', displayValue: 'Canada' },
+  
+  // Australia
   { type: 'city', city: 'Sydney', country: 'Australia', displayValue: 'Sydney, Australia' },
   { type: 'city', city: 'Melbourne', country: 'Australia', displayValue: 'Melbourne, Australia' },
+  { type: 'city', city: 'Brisbane', country: 'Australia', displayValue: 'Brisbane, Australia' },
+  { type: 'city', city: 'Perth', country: 'Australia', displayValue: 'Perth, Australia' },
+  { type: 'city', city: 'Adelaide', country: 'Australia', displayValue: 'Adelaide, Australia' },
+  { type: 'city', city: 'Canberra', country: 'Australia', displayValue: 'Canberra, Australia' },
   { type: 'country', country: 'Australia', displayValue: 'Australia' },
+  
+  // Singapore
   { type: 'city', city: 'Singapore', country: 'Singapore', displayValue: 'Singapore, Singapore' },
   { type: 'country', country: 'Singapore', displayValue: 'Singapore' },
+  
+  // UAE
   { type: 'city', city: 'Dubai', country: 'United Arab Emirates', displayValue: 'Dubai, United Arab Emirates' },
+  { type: 'city', city: 'Abu Dhabi', country: 'United Arab Emirates', displayValue: 'Abu Dhabi, United Arab Emirates' },
   { type: 'country', country: 'United Arab Emirates', displayValue: 'United Arab Emirates' },
+  
+  // Spain
+  { type: 'city', city: 'Madrid', country: 'Spain', displayValue: 'Madrid, Spain' },
+  { type: 'city', city: 'Barcelona', country: 'Spain', displayValue: 'Barcelona, Spain' },
+  { type: 'city', city: 'Valencia', country: 'Spain', displayValue: 'Valencia, Spain' },
+  { type: 'city', city: 'Seville', country: 'Spain', displayValue: 'Seville, Spain' },
+  { type: 'country', country: 'Spain', displayValue: 'Spain' },
+  
+  // Italy
+  { type: 'city', city: 'Rome', country: 'Italy', displayValue: 'Rome, Italy' },
+  { type: 'city', city: 'Milan', country: 'Italy', displayValue: 'Milan, Italy' },
+  { type: 'city', city: 'Turin', country: 'Italy', displayValue: 'Turin, Italy' },
+  { type: 'city', city: 'Florence', country: 'Italy', displayValue: 'Florence, Italy' },
+  { type: 'country', country: 'Italy', displayValue: 'Italy' },
+  
+  // Switzerland
+  { type: 'city', city: 'Zurich', country: 'Switzerland', displayValue: 'Zurich, Switzerland' },
+  { type: 'city', city: 'Geneva', country: 'Switzerland', displayValue: 'Geneva, Switzerland' },
+  { type: 'city', city: 'Basel', country: 'Switzerland', displayValue: 'Basel, Switzerland' },
+  { type: 'city', city: 'Bern', country: 'Switzerland', displayValue: 'Bern, Switzerland' },
+  { type: 'country', country: 'Switzerland', displayValue: 'Switzerland' },
+  
+  // Sweden
+  { type: 'city', city: 'Stockholm', country: 'Sweden', displayValue: 'Stockholm, Sweden' },
+  { type: 'city', city: 'Gothenburg', country: 'Sweden', displayValue: 'Gothenburg, Sweden' },
+  { type: 'city', city: 'Malmo', country: 'Sweden', displayValue: 'Malmo, Sweden' },
+  { type: 'country', country: 'Sweden', displayValue: 'Sweden' },
+  
+  // Ireland
+  { type: 'city', city: 'Dublin', country: 'Ireland', displayValue: 'Dublin, Ireland' },
+  { type: 'city', city: 'Cork', country: 'Ireland', displayValue: 'Cork, Ireland' },
+  { type: 'city', city: 'Galway', country: 'Ireland', displayValue: 'Galway, Ireland' },
+  { type: 'country', country: 'Ireland', displayValue: 'Ireland' },
+  
+  // Belgium
+  { type: 'city', city: 'Brussels', country: 'Belgium', displayValue: 'Brussels, Belgium' },
+  { type: 'city', city: 'Antwerp', country: 'Belgium', displayValue: 'Antwerp, Belgium' },
+  { type: 'city', city: 'Ghent', country: 'Belgium', displayValue: 'Ghent, Belgium' },
+  { type: 'country', country: 'Belgium', displayValue: 'Belgium' },
+  
+  // Austria
+  { type: 'city', city: 'Vienna', country: 'Austria', displayValue: 'Vienna, Austria' },
+  { type: 'city', city: 'Salzburg', country: 'Austria', displayValue: 'Salzburg, Austria' },
+  { type: 'country', country: 'Austria', displayValue: 'Austria' },
+  
+  // Poland
+  { type: 'city', city: 'Warsaw', country: 'Poland', displayValue: 'Warsaw, Poland' },
+  { type: 'city', city: 'Krakow', country: 'Poland', displayValue: 'Krakow, Poland' },
+  { type: 'city', city: 'Wroclaw', country: 'Poland', displayValue: 'Wroclaw, Poland' },
+  { type: 'country', country: 'Poland', displayValue: 'Poland' },
+  
+  // Japan
+  { type: 'city', city: 'Tokyo', country: 'Japan', displayValue: 'Tokyo, Japan' },
+  { type: 'city', city: 'Osaka', country: 'Japan', displayValue: 'Osaka, Japan' },
+  { type: 'city', city: 'Kyoto', country: 'Japan', displayValue: 'Kyoto, Japan' },
+  { type: 'country', country: 'Japan', displayValue: 'Japan' },
+  
+  // South Korea
+  { type: 'city', city: 'Seoul', country: 'South Korea', displayValue: 'Seoul, South Korea' },
+  { type: 'city', city: 'Busan', country: 'South Korea', displayValue: 'Busan, South Korea' },
+  { type: 'country', country: 'South Korea', displayValue: 'South Korea' },
+  
+  // China
+  { type: 'city', city: 'Beijing', country: 'China', displayValue: 'Beijing, China' },
+  { type: 'city', city: 'Shanghai', country: 'China', displayValue: 'Shanghai, China' },
+  { type: 'city', city: 'Shenzhen', country: 'China', displayValue: 'Shenzhen, China' },
+  { type: 'city', city: 'Guangzhou', country: 'China', displayValue: 'Guangzhou, China' },
+  { type: 'city', city: 'Hong Kong', country: 'China', displayValue: 'Hong Kong, China' },
+  { type: 'country', country: 'China', displayValue: 'China' },
+  
+  // Brazil
+  { type: 'city', city: 'Sao Paulo', country: 'Brazil', displayValue: 'Sao Paulo, Brazil' },
+  { type: 'city', city: 'Rio de Janeiro', country: 'Brazil', displayValue: 'Rio de Janeiro, Brazil' },
+  { type: 'city', city: 'Brasilia', country: 'Brazil', displayValue: 'Brasilia, Brazil' },
+  { type: 'country', country: 'Brazil', displayValue: 'Brazil' },
+  
+  // Mexico
+  { type: 'city', city: 'Mexico City', country: 'Mexico', displayValue: 'Mexico City, Mexico' },
+  { type: 'city', city: 'Guadalajara', country: 'Mexico', displayValue: 'Guadalajara, Mexico' },
+  { type: 'city', city: 'Monterrey', country: 'Mexico', displayValue: 'Monterrey, Mexico' },
+  { type: 'country', country: 'Mexico', displayValue: 'Mexico' },
+  
+  // Argentina
+  { type: 'city', city: 'Buenos Aires', country: 'Argentina', displayValue: 'Buenos Aires, Argentina' },
+  { type: 'city', city: 'Cordoba', country: 'Argentina', displayValue: 'Cordoba, Argentina' },
+  { type: 'country', country: 'Argentina', displayValue: 'Argentina' },
+  
+  // New Zealand
+  { type: 'city', city: 'Auckland', country: 'New Zealand', displayValue: 'Auckland, New Zealand' },
+  { type: 'city', city: 'Wellington', country: 'New Zealand', displayValue: 'Wellington, New Zealand' },
+  { type: 'country', country: 'New Zealand', displayValue: 'New Zealand' },
 ];
 
 export function LocationAutocomplete({ value, onChange, placeholder, className }: LocationAutocompleteProps) {
@@ -91,18 +249,63 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
   const [triggerWidth, setTriggerWidth] = useState<number>(0);
   const triggerRef = useRef<HTMLDivElement>(null);
 
-  // Filter locations based on search query
+  // Filter and sort locations based on search query with smart prioritization
   useEffect(() => {
     if (searchQuery.length === 0) {
       setFilteredLocations(LOCATION_DATA.slice(0, 20)); // Show first 20 by default
     } else {
       const query = searchQuery.toLowerCase().trim();
+      
+      // Filter matching locations
       const filtered = LOCATION_DATA.filter(location =>
         location.displayValue.toLowerCase().includes(query) ||
         location.country.toLowerCase().includes(query) ||
         (location.city && location.city.toLowerCase().includes(query))
       );
-      setFilteredLocations(filtered);
+      
+      // Sort by relevance
+      const sorted = filtered.sort((a, b) => {
+        const aDisplay = a.displayValue.toLowerCase();
+        const bDisplay = b.displayValue.toLowerCase();
+        const aCountry = a.country.toLowerCase();
+        const bCountry = b.country.toLowerCase();
+        const aCity = a.city?.toLowerCase() || '';
+        const bCity = b.city?.toLowerCase() || '';
+        
+        // Exact match priority (country or city name exactly matches query)
+        const aExactCountry = aCountry === query;
+        const bExactCountry = bCountry === query;
+        const aExactCity = aCity === query;
+        const bExactCity = bCity === query;
+        
+        if (aExactCountry && !bExactCountry) return -1;
+        if (!aExactCountry && bExactCountry) return 1;
+        if (aExactCity && !bExactCity) return -1;
+        if (!aExactCity && bExactCity) return 1;
+        
+        // Starts with priority (city or country starts with query)
+        const aStartsCity = aCity.startsWith(query);
+        const bStartsCity = bCity.startsWith(query);
+        const aStartsCountry = aCountry.startsWith(query);
+        const bStartsCountry = bCountry.startsWith(query);
+        
+        if (aStartsCity && !bStartsCity) return -1;
+        if (!aStartsCity && bStartsCity) return 1;
+        if (aStartsCountry && !bStartsCountry) return -1;
+        if (!aStartsCountry && bStartsCountry) return 1;
+        
+        // Contains in display value
+        const aContains = aDisplay.includes(query);
+        const bContains = bDisplay.includes(query);
+        
+        if (aContains && !bContains) return -1;
+        if (!aContains && bContains) return 1;
+        
+        // Alphabetical fallback
+        return aDisplay.localeCompare(bDisplay);
+      });
+      
+      setFilteredLocations(sorted);
     }
   }, [searchQuery]);
 
