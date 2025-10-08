@@ -51,23 +51,33 @@ JOB TITLE EXTRACTION:
 - If no clear title found, return null
 - NEVER make up titles based on responsibilities
 
-SENIORITY:
-- Look for explicit mentions: Junior, Senior, Mid-level, Lead, Director, VP, C-level
-- Experience years: 0-2y=junior, 3-5y=mid, 5-8y=senior, 8+y=lead/exec
-- If title contains "Junior" → seniority is "junior"
-- If title contains "Senior" → seniority is "senior"
+SENIORITY (CRITICAL - FOLLOW THESE RULES EXACTLY):
+- EXPLICIT MENTIONS OVERRIDE YEARS:
+  * If title contains "Junior" → junior
+  * If title contains "Senior", "Lead", "Principal", or "Architect" → senior
+  * If title contains "Director", "VP", "C-level" → exec
+- YEARS OF EXPERIENCE (only when no explicit mention in title):
+  * 0-2 years → junior
+  * 3-4 years → mid
+  * 5-7 years → mid (NOT senior!)
+  * 8+ years → senior
 - If unclear, return null
+- REMEMBER: "5+ years" = mid level, NOT senior
 
-INDUSTRY:
-- Only use these: Software/Tech, Biotech/Healthcare, Finance/Fintech, Energy/Cleantech, Public/Non-profit
-- Base on company description or explicit industry mentions
-- If unclear, return null
+INDUSTRY (INFER FROM KEYWORDS):
+- Software/Tech: "AI", "ML", "cloud", "infrastructure", "software", "SaaS", "platform"
+- Finance/Fintech: "fintech", "payments", "finance", "banking", "trading", "crypto"
+- Biotech/Healthcare: "biotech", "healthcare", "medical", "pharma", "clinical"
+- Energy/Cleantech: "energy", "renewable", "cleantech", "solar", "sustainability"
+- Public/Non-profit: "government", "non-profit", "NGO", "public sector"
+- Cybersecurity: Treat as Software/Tech unless explicitly different
+- If multiple keywords match, prioritize the most specific
 
-LOCATION:
-- Look for: Remote, Hybrid, On-site, office location mentions
-- ALWAYS extract in format "City, Country" (e.g., "Rehovot, Israel", "New York, USA", "London, UK")
-- If only city is mentioned, infer the country from context (company location, currency mentions, etc.)
-- Map work type to: remote, hybrid, on_site
+LOCATION (SCAN ENTIRE DOCUMENT):
+- Look EVERYWHERE in the text: "offices in [CITY]", "based in [CITY]", "located in [CITY]", "from our [CITY] office"
+- ALWAYS extract in format "City, Country" (e.g., "Tel Aviv, Israel", "New York, USA", "London, UK")
+- If only city mentioned, infer country from context (company HQ, currency, phone codes)
+- Map work type: Remote, Hybrid, On-site → remote, hybrid, on_site
 - If unclear, return null
 
 EMPLOYMENT TYPE:
@@ -75,17 +85,18 @@ EMPLOYMENT TYPE:
 - Map to: full_time, contract, temp
 - If unclear, assume full_time
 
-DESCRIPTION:
-- Extract 1-3 sentences from "About the role" or "Key Responsibilities" sections
+DESCRIPTION (FORMAT AS BULLET POINTS):
+- Extract 3-5 key responsibilities from "Key Responsibilities" or "About the role"
+- Format as bullet points with "•" prefix
 - Remove legal/EEO text
-- Keep it factual and concise
+- Keep concise - one sentence per bullet
 
-SKILLS:
-- Must-Have: Extract from "Requirements" or "What You Need" sections
-- Nice-to-Have: Extract from "Preferred" or "Bonus" or "Advantage" sections
-- Remove filler words
-- Technical skills only
-- Max 6 must-have, max 4 nice-to-have
+SKILLS (EXTRACT ALL, NOT JUST FIRST FEW):
+- Must-Have: Extract ALL from "Requirements" or "What You Need" sections
+- Nice-to-Have: Extract ALL from "Preferred", "Bonus", "Nice-to-Have", or "Advantage" sections
+- Include both hard skills (Node.js, AWS, Python) AND soft skills (communication, teamwork) - put soft skills last
+- Remove filler words like "strong", "proven", "solid"
+- NO LIMITS - extract all mentioned skills
 
 REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS UP.`
           },
@@ -210,22 +221,33 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
       return words.length > max ? words.slice(0, max).join(' ') : s;
     }
 
-    function cleanList(arr?: string[], cap = 6) {
+    function cleanList(arr?: string[]) {
       const seen = new Set<string>();
       const cleaned: string[] = [];
+      // Separate hard skills and soft skills
+      const hardSkills: string[] = [];
+      const softSkills: string[] = [];
+      const softSkillKeywords = ['communication', 'collaboration', 'teamwork', 'leadership', 'problem-solving', 'proactive', 'self-motivated'];
+      
       for (const item of arr ?? []) {
         const x = limitWords(normalizeTech(stripFiller(String(item))), 10);
         const key = x.toLowerCase();
         if (x && !seen.has(key)) {
           seen.add(key);
-          cleaned.push(x);
+          // Check if it's a soft skill
+          const isSoftSkill = softSkillKeywords.some(kw => key.includes(kw));
+          if (isSoftSkill) {
+            softSkills.push(x);
+          } else {
+            hardSkills.push(x);
+          }
         }
-        if (cleaned.length === cap) break;
       }
-      return cleaned;
+      // Return hard skills first, then soft skills
+      return [...hardSkills, ...softSkills];
     }
 
-    // Description: remove EEO/legal common lines, compress to 3 sentences
+    // Description: remove EEO/legal, format as bullets
     function cleanDescription(desc?: string) {
       if (!desc) return '';
       let d = desc
@@ -234,15 +256,25 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
         .replace(/(disability|veteran)s?.*?(\.|\n)/gi, '')
         .replace(/\s+/g, ' ')
         .trim();
-      const parts = d.split(/(?<=\.)\s+/).slice(0, 3);
-      return parts.join(' ');
+      
+      // If already has bullet points, keep them
+      if (d.includes('•') || d.includes('-')) {
+        return d;
+      }
+      
+      // Split into sentences and format as bullets (max 5)
+      const sentences = d.split(/(?<=\.)\s+/).filter(s => s.length > 10).slice(0, 5);
+      if (sentences.length > 1) {
+        return sentences.map(s => `• ${s}`).join('\n');
+      }
+      return d;
     }
 
     const jobInfo: any = {
       ...raw,
       description: cleanDescription(raw.description),
-      skills_must: cleanList(raw.skills_must, 6),
-      skills_nice: cleanList(raw.skills_nice, 4),
+      skills_must: cleanList(raw.skills_must),
+      skills_nice: cleanList(raw.skills_nice),
     };
 
     // Fallback: if hybrid and location missing but city in text
