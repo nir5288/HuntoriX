@@ -452,76 +452,79 @@ const EmployerDashboard = () => {
                 job.is_exclusive ? 'exclusive-job-card' : ''
               }`} onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
                       <CardHeader className="px-4 py-3">
-                        {/* Mobile layout - stacked */}
-                        <div className="flex flex-col gap-3 sm:hidden">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              <CardTitle className="text-sm break-words">{job.title}</CardTitle>
+                        {/* Mobile layout - enhanced */}
+                        <div className="flex flex-col gap-2.5 sm:hidden">
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <CardTitle className="text-sm font-semibold leading-tight">{job.title}</CardTitle>
                               {job.job_id_number && (
-                                <Badge variant="outline" className="text-[10px] h-5 shrink-0">
+                                <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
                                   #{job.job_id_number}
                                 </Badge>
                               )}
                             </div>
-                            {job.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] h-5 px-2 mb-2">
-                                HuntoriX Exclusive
-                              </Badge>
-                            )}
-                            {pendingCount > 0 && (
-                              <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] h-5 mb-2">
-                                {pendingCount} Pending
-                              </Badge>
-                            )}
-                            <CardDescription className="text-xs">
+                            
+                            <CardDescription className="text-[11px] leading-tight">
                               {job.location} • {job.employment_type?.replace('_', ' ')}
                             </CardDescription>
-                          </div>
-                          <div className="flex items-center justify-between gap-2 pt-2 border-t">
-                            <Badge className={`text-[10px] h-5 ${getStatusColor(job.status)}`}>
-                              {job.status}
-                            </Badge>
-                            <div className="flex items-center gap-1.5">
-                              <div className="relative">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate('/headhunters');
-                                  }}
-                                  className="h-7 text-[10px] px-2 gap-1"
-                                  title="Invite headhunters to this job"
-                                >
-                                  <Users className="h-3 w-3" />
-                                </Button>
-                                <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] h-3.5 px-1">
-                                  New
+                            
+                            <div className="flex flex-wrap gap-1.5">
+                              {job.is_exclusive && (
+                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
+                                  HuntoriX Exclusive
                                 </Badge>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => handleEditJob(job, e)}
-                                className="h-7 w-7"
-                                title="Edit job"
-                              >
-                                <Pencil className="h-3 w-3 text-[hsl(var(--accent-pink))]" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                className="h-7 w-7"
-                                title={job.visibility === 'public' ? 'Make private' : 'Make public'}
-                              >
-                                {job.visibility === 'public' ? (
-                                  <Eye className="h-3 w-3 text-[hsl(var(--accent-mint))]" />
-                                ) : (
-                                  <EyeOff className="h-3 w-3 text-muted-foreground" />
-                                )}
-                              </Button>
+                              )}
+                              {pendingCount > 0 && (
+                                <Badge className="bg-[hsl(var(--warning))] text-white text-[9px] h-4 px-1.5">
+                                  {pendingCount} Pending
+                                </Badge>
+                              )}
+                              <Badge className={`text-[9px] h-4 px-1.5 ${getStatusColor(job.status)}`}>
+                                {job.status}
+                              </Badge>
                             </div>
+                          </div>
+                          
+                          <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
+                            <div className="relative">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate('/headhunters');
+                                }}
+                                className="h-8 w-8 p-0"
+                                title="Invite headhunters"
+                              >
+                                <Users className="h-3.5 w-3.5" />
+                              </Button>
+                              <Badge className="absolute -top-0.5 -right-0.5 bg-[hsl(var(--accent-pink))] text-white text-[7px] h-2.5 w-2.5 p-0 flex items-center justify-center rounded-full">
+                                
+                              </Badge>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => handleEditJob(job, e)}
+                              className="h-8 w-8"
+                              title="Edit job"
+                            >
+                              <Pencil className="h-3.5 w-3.5 text-[hsl(var(--accent-pink))]" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
+                              className="h-8 w-8"
+                              title={job.visibility === 'public' ? 'Make private' : 'Make public'}
+                            >
+                              {job.visibility === 'public' ? (
+                                <Eye className="h-3.5 w-3.5 text-[hsl(var(--accent-mint))]" />
+                              ) : (
+                                <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                              )}
+                            </Button>
                           </div>
                         </div>
 
