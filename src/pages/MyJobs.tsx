@@ -337,23 +337,19 @@ const MyJobs = () => {
                                     </Badge>
                                   </div>
                                   <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="icon"
                                     onClick={(e) => handleEditJob(job, e)}
-                                    className="h-8 w-8 border-[hsl(var(--accent-pink))] hover:bg-[hsl(var(--accent-pink))] hover:text-white"
+                                    className="h-8 w-8"
                                     title="Edit job"
                                   >
                                     <Pencil className="h-3.5 w-3.5 text-[hsl(var(--accent-pink))]" />
                                   </Button>
                                   <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="icon"
                                     onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                    className={`h-8 w-8 ${
-                                      job.visibility === 'public' 
-                                        ? 'border-[hsl(var(--accent-mint))] hover:bg-[hsl(var(--accent-mint))] hover:text-white' 
-                                        : 'border-muted-foreground hover:bg-muted'
-                                    }`}
+                                    className="h-8 w-8"
                                     title={job.visibility === 'public' ? 'Make private' : 'Make public'}
                                   >
                                     {job.visibility === 'public' ? (
@@ -397,23 +393,19 @@ const MyJobs = () => {
                                     {job.status}
                                   </Badge>
                                   <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="icon"
                                     onClick={(e) => handleEditJob(job, e)}
-                                    className="h-7 w-7 border-[hsl(var(--accent-pink))] hover:bg-[hsl(var(--accent-pink))] hover:text-white"
+                                    className="h-7 w-7"
                                     title="Edit job"
                                   >
                                     <Pencil className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-[hsl(var(--accent-pink))]" />
                                   </Button>
                                   <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="icon"
                                     onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                    className={`h-7 w-7 ${
-                                      job.visibility === 'public' 
-                                        ? 'border-[hsl(var(--accent-mint))] hover:bg-[hsl(var(--accent-mint))] hover:text-white' 
-                                        : 'border-muted-foreground hover:bg-muted'
-                                    }`}
+                                    className="h-7 w-7"
                                     title={job.visibility === 'public' ? 'Make private' : 'Make public'}
                                   >
                                     {job.visibility === 'public' ? (
