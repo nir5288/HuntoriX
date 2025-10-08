@@ -1170,7 +1170,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         </div>
 
         {/* Sticky Footer */}
-        <div className="sticky bottom-0 bg-background border-t px-6 py-4 flex items-center justify-between gap-4">
+        <div className="bg-background border-t px-6 py-4 flex items-center justify-between gap-4 flex-shrink-0">
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20">
             <Info className="h-4 w-4 text-primary flex-shrink-0" />
             <p className="text-sm font-medium text-foreground">
