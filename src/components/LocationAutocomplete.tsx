@@ -365,13 +365,13 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         </div>
       </PopoverTrigger>
       <PopoverContent 
-        className="p-0" 
+        className="p-0 bg-background z-50" 
         style={{ width: triggerWidth > 0 ? `${triggerWidth}px` : 'auto' }}
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[300px] overflow-y-auto overscroll-contain">
+          <CommandList className="max-h-[300px] overflow-y-auto overscroll-contain pointer-events-auto">
             {filteredLocations.length === 0 && (
               <CommandEmpty>No locations found.</CommandEmpty>
             )}
