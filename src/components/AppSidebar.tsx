@@ -4,6 +4,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -73,15 +74,18 @@ export function AppSidebar({ role }: AppSidebarProps) {
     return title;
   };
   return (
-    <Sidebar collapsible="icon" className="border-r bg-sidebar transition-all duration-200">
-      <SidebarHeader className="border-b p-3 flex flex-row items-center justify-between transition-all duration-200">
+    <Sidebar collapsible="icon" className="border-r border-emerald-500/30 bg-slate-900 transition-all duration-200">
+      <SidebarHeader className="border-b border-emerald-500/30 p-3 flex flex-row items-center justify-between transition-all duration-200">
         {open && (
           <div className="flex items-center gap-2 px-1">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center text-white font-bold text-sm">
-              {role === 'employer' ? 'E' : 'H'}
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-slate-900 font-bold text-sm font-mono shadow-lg shadow-emerald-500/50">
+              HX
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold">
+              <span className="text-sm font-bold text-emerald-400 font-mono tracking-wider">
+                HUNTORIX
+              </span>
+              <span className="text-[10px] text-cyan-400 font-mono uppercase">
                 {role === 'employer' ? 'Employer' : 'Headhunter'}
               </span>
             </div>
@@ -91,7 +95,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
           variant="ghost"
           size="icon"
           onClick={() => setOpen(!open)}
-          className="h-8 w-8 ml-auto"
+          className="h-8 w-8 ml-auto text-emerald-400 hover:text-emerald-300 hover:bg-slate-800/50"
           aria-label="Toggle sidebar"
           title={open ? "Collapse sidebar" : "Expand sidebar"}
         >
@@ -103,7 +107,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
         </Button>
       </SidebarHeader>
       
-      <SidebarContent className="py-2 transition-all duration-200">
+      <SidebarContent className="py-2 transition-all duration-200 bg-slate-900">
         <SidebarGroup>
           <SidebarGroupContent>
             <TooltipProvider delayDuration={200} skipDelayDuration={0}>
@@ -114,21 +118,25 @@ export function AppSidebar({ role }: AppSidebarProps) {
                       asChild={item.url !== '#'}
                       isActive={isActive(item.url)}
                       tooltip={getTooltip(item.title)}
-                      className="h-10 px-3"
+                      className={`h-10 px-3 transition-all duration-200 ${
+                        isActive(item.url)
+                          ? 'bg-slate-950 text-emerald-400 border-l-2 border-emerald-400 shadow-lg shadow-emerald-500/20'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+                      }`}
                     >
                       {item.url === '#' ? (
                         <div className="flex items-center gap-3 w-full cursor-not-allowed opacity-50">
                           <item.icon className="h-5 w-5 shrink-0" />
-                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                          {open && <span className="text-sm font-medium font-mono">{item.title}</span>}
                         </div>
                       ) : (
                         <NavLink to={item.url} className="flex items-center gap-3 w-full">
-                          <item.icon className="h-5 w-5 shrink-0" />
+                          <item.icon className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110" />
                           {open && (
                             <div className="flex items-center gap-2 flex-1">
-                              <span className="text-sm font-medium">{item.title}</span>
+                              <span className="text-sm font-medium font-mono">{item.title}</span>
                               {'badge' in item && item.badge && (
-                                <Badge variant="secondary" className="text-xs py-0 h-5">
+                                <Badge variant="secondary" className="text-xs py-0 h-5 bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
                                   {item.badge}
                                 </Badge>
                               )}
@@ -144,6 +152,23 @@ export function AppSidebar({ role }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="border-t border-emerald-500/30 p-3 bg-slate-900">
+        <div className="flex items-center justify-center">
+          {open ? (
+            <div className="flex items-center gap-2 text-emerald-400">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-slate-900 font-bold text-sm font-mono shadow-lg shadow-emerald-500/50">
+                HX
+              </div>
+              <span className="text-xs font-mono tracking-wider">HUNTORIX</span>
+            </div>
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-slate-900 font-bold text-sm font-mono shadow-lg shadow-emerald-500/50">
+              HX
+            </div>
+          )}
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
