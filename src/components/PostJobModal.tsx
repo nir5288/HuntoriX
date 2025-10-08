@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { X, Loader2, Info, Sparkles } from 'lucide-react';
+import { X, Loader2, Info, Sparkles, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -90,6 +91,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [isExclusive, setIsExclusive] = useState(false);
   const [showExclusiveInfo, setShowExclusiveInfo] = useState(false);
   const [salaryPeriod, setSalaryPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [compensationOpen, setCompensationOpen] = useState(false);
+  const [skillsOpen, setSkillsOpen] = useState(false);
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -532,7 +535,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
+        <div className="overflow-y-auto flex-1 px-6 pt-6">
         <DialogHeader>
           <DialogTitle className="text-2xl">Post a Job</DialogTitle>
           <div className="flex items-center justify-between">
@@ -548,7 +552,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form id="post-job-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6">
           {/* AI Quick Fill */}
           <Card className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
             <div className="flex items-start gap-3">
@@ -846,7 +850,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </div>
 
           {/* Basics */}
-          <Card className="p-6">
+          <Card className="p-6 bg-muted/20">
             <h3 className="font-semibold text-base mb-5">Job Basics</h3>
             
             <div className="space-y-4">
@@ -957,94 +961,104 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           {/* Compensation */}
-          <Card className="p-5">
-            <h3 className="font-semibold text-base mb-4">Compensation Range</h3>
-            
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="budget_currency" className="text-sm font-medium">Currency</Label>
-                  <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                    <SelectTrigger className={cn("h-10", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {currencies.map(curr => (
-                        <SelectItem key={curr} value={curr}>{curr}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="salary_period" className="text-sm font-medium">Period</Label>
-                  <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
-                    const budgetMin = watch('budget_min');
-                    const budgetMax = watch('budget_max');
-                    
-                    if (value === 'yearly' && salaryPeriod === 'monthly') {
-                      if (budgetMin) setValue('budget_min', (parseInt(budgetMin) * 12).toString());
-                      if (budgetMax) setValue('budget_max', (parseInt(budgetMax) * 12).toString());
-                    } else if (value === 'monthly' && salaryPeriod === 'yearly') {
-                      if (budgetMin) setValue('budget_min', Math.round(parseInt(budgetMin) / 12).toString());
-                      if (budgetMax) setValue('budget_max', Math.round(parseInt(budgetMax) / 12).toString());
-                    }
-                    
-                    setSalaryPeriod(value);
-                  }}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="yearly">Yearly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+          <Collapsible open={compensationOpen} onOpenChange={setCompensationOpen}>
+            <Card className="p-5 bg-accent/5">
+              <CollapsibleTrigger className="w-full flex items-center justify-between group">
+                <h3 className="font-semibold text-base">Compensation Range</h3>
+                <ChevronDown className={cn(
+                  "h-5 w-5 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
+                  compensationOpen && "transform rotate-180"
+                )} />
+              </CollapsibleTrigger>
               
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="font-semibold">
-                    {watch('budget_min') 
-                      ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                      : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
-                    }
-                  </span>
-                  <span className="font-semibold">
-                    {watch('budget_max') 
-                      ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
-                      : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
-                    }
-                  </span>
+              <CollapsibleContent className="pt-4">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="budget_currency" className="text-sm font-medium">Currency</Label>
+                      <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
+                        <SelectTrigger className={cn("h-10", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {currencies.map(curr => (
+                            <SelectItem key={curr} value={curr}>{curr}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="salary_period" className="text-sm font-medium">Period</Label>
+                      <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
+                        const budgetMin = watch('budget_min');
+                        const budgetMax = watch('budget_max');
+                        
+                        if (value === 'yearly' && salaryPeriod === 'monthly') {
+                          if (budgetMin) setValue('budget_min', (parseInt(budgetMin) * 12).toString());
+                          if (budgetMax) setValue('budget_max', (parseInt(budgetMax) * 12).toString());
+                        } else if (value === 'monthly' && salaryPeriod === 'yearly') {
+                          if (budgetMin) setValue('budget_min', Math.round(parseInt(budgetMin) / 12).toString());
+                          if (budgetMax) setValue('budget_max', Math.round(parseInt(budgetMax) / 12).toString());
+                        }
+                        
+                        setSalaryPeriod(value);
+                      }}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="yearly">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-semibold">
+                        {watch('budget_min') 
+                          ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                          : `${(salaryPeriod === 'monthly' ? 5000 : 60000).toLocaleString()} ${watch('budget_currency') || 'ILS'}`
+                        }
+                      </span>
+                      <span className="font-semibold">
+                        {watch('budget_max') 
+                          ? `${parseInt(watch('budget_max')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
+                          : `${(salaryPeriod === 'monthly' ? 150000 : 1800000).toLocaleString()}+ ${watch('budget_currency') || 'ILS'}`
+                        }
+                      </span>
+                    </div>
+                    <Slider 
+                      min={salaryPeriod === 'monthly' ? 5000 : 60000}
+                      max={salaryPeriod === 'monthly' ? 150000 : 1800000}
+                      step={salaryPeriod === 'monthly' ? 1000 : 10000}
+                      value={[
+                        watch('budget_min') 
+                          ? parseInt(watch('budget_min')) 
+                          : salaryPeriod === 'monthly' ? 5000 : 60000,
+                        watch('budget_max') 
+                          ? parseInt(watch('budget_max')) 
+                          : salaryPeriod === 'monthly' ? 150000 : 1800000
+                      ]}
+                      onValueChange={(values) => {
+                        const min = salaryPeriod === 'monthly' ? 5000 : 60000;
+                        const max = salaryPeriod === 'monthly' ? 150000 : 1800000;
+                        setValue('budget_min', values[0] > min ? values[0].toString() : '');
+                        setValue('budget_max', values[1] < max ? values[1].toString() : '');
+                      }}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                  {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
                 </div>
-                <Slider 
-                  min={salaryPeriod === 'monthly' ? 5000 : 60000}
-                  max={salaryPeriod === 'monthly' ? 150000 : 1800000}
-                  step={salaryPeriod === 'monthly' ? 1000 : 10000}
-                  value={[
-                    watch('budget_min') 
-                      ? parseInt(watch('budget_min')) 
-                      : salaryPeriod === 'monthly' ? 5000 : 60000,
-                    watch('budget_max') 
-                      ? parseInt(watch('budget_max')) 
-                      : salaryPeriod === 'monthly' ? 150000 : 1800000
-                  ]}
-                  onValueChange={(values) => {
-                    const min = salaryPeriod === 'monthly' ? 5000 : 60000;
-                    const max = salaryPeriod === 'monthly' ? 150000 : 1800000;
-                    setValue('budget_min', values[0] > min ? values[0].toString() : '');
-                    setValue('budget_max', values[1] < max ? values[1].toString() : '');
-                  }}
-                  className="cursor-pointer"
-                />
-              </div>
-              {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
-            </div>
-          </Card>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
 
           {/* Description */}
-          <Card className="p-6">
+          <Card className="p-6 bg-muted/20">
             <h3 className="font-semibold text-base mb-5">Job Description</h3>
             
             <div className="space-y-2.5">
@@ -1060,112 +1074,121 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           {/* Skills */}
-          <Card className="p-6" id="skills-must">
-            <h3 className="font-semibold text-base mb-5">Required Skills</h3>
-            
-            <div className="space-y-5">
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Must-Have Skills <span className="text-destructive">*</span></Label>
-                <div className="flex gap-2">
-                  <Input 
-                    value={skillMustInput}
-                    onChange={(e) => setSkillMustInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
-                    placeholder="Type a skill and press Enter"
-                    className="h-11"
-                  />
-                  <Button type="button" onClick={addSkillMust} variant="secondary" size="lg" className="h-11 px-6">
-                    Add
-                  </Button>
-                </div>
-                <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                  {skillsMust.map(skill => (
-                    <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
-                      {skill}
-                      <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillMust(skill)} />
-                    </Badge>
-                  ))}
-                  {skillsMust.length === 0 && (
-                    <span className="text-sm text-muted-foreground">Add at least one required skill</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Nice-to-Have Skills</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    value={skillNiceInput}
-                    onChange={(e) => setSkillNiceInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
-                    placeholder="Type a skill and press Enter"
-                    className="h-11"
-                  />
-                  <Button type="button" onClick={addSkillNice} variant="secondary" size="lg" className="h-11 px-6">
-                    Add
-                  </Button>
-                </div>
-                <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                  {skillsNice.map(skill => (
-                    <Badge key={skill} variant="outline" className="gap-1.5 text-sm h-8 px-3">
-                      {skill}
-                      <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillNice(skill)} />
-                    </Badge>
-                  ))}
-                  {skillsNice.length === 0 && (
-                    <span className="text-sm text-muted-foreground">Optional skills that would be beneficial</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Visibility & Review Notice */}
-          <Card className="p-5 bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-blue-50/50 dark:from-blue-950/20 dark:via-purple-950/10 dark:to-blue-950/20 border-blue-200/50 dark:border-blue-800/30">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Checkbox 
-                  id="visibility" 
-                  checked={isPublic}
-                  onCheckedChange={(checked) => setIsPublic(checked as boolean)}
-                  className="h-5 w-5"
-                />
-                <div>
-                  <Label 
-                    htmlFor="visibility"
-                    className="text-sm font-semibold cursor-pointer block"
-                  >
-                    Make Job Public
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {isPublic ? "Visible to all candidates" : "Only visible to invited candidates"}
-                  </p>
-                </div>
-              </div>
+          <Collapsible open={skillsOpen} onOpenChange={setSkillsOpen}>
+            <Card className="p-6 bg-accent/5" id="skills-must">
+              <CollapsibleTrigger className="w-full flex items-center justify-between group">
+                <h3 className="font-semibold text-base">Required Skills</h3>
+                <ChevronDown className={cn(
+                  "h-5 w-5 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
+                  skillsOpen && "transform rotate-180"
+                )} />
+              </CollapsibleTrigger>
               
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-100/80 dark:bg-blue-900/30 border border-blue-300/50 dark:border-blue-700/50">
-                <Info className="h-4 w-4 text-blue-700 dark:text-blue-300 flex-shrink-0" />
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                    Reviewed in ~1 hour
-                  </p>
-                  <p className="text-xs text-blue-700 dark:text-blue-300">
-                    Our team will review your posting
-                  </p>
+              <CollapsibleContent className="pt-5">
+                <div className="space-y-5">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Must-Have Skills <span className="text-destructive">*</span></Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={skillMustInput}
+                        onChange={(e) => setSkillMustInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
+                        placeholder="Type a skill and press Enter"
+                        className="h-11"
+                      />
+                      <Button type="button" onClick={addSkillMust} variant="secondary" size="lg" className="h-11 px-6">
+                        Add
+                      </Button>
+                    </div>
+                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      {skillsMust.map(skill => (
+                        <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
+                          {skill}
+                          <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillMust(skill)} />
+                        </Badge>
+                      ))}
+                      {skillsMust.length === 0 && (
+                        <span className="text-sm text-muted-foreground">Add at least one required skill</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Nice-to-Have Skills</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={skillNiceInput}
+                        onChange={(e) => setSkillNiceInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
+                        placeholder="Type a skill and press Enter"
+                        className="h-11"
+                      />
+                      <Button type="button" onClick={addSkillNice} variant="secondary" size="lg" className="h-11 px-6">
+                        Add
+                      </Button>
+                    </div>
+                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                      {skillsNice.map(skill => (
+                        <Badge key={skill} variant="outline" className="gap-1.5 text-sm h-8 px-3">
+                          {skill}
+                          <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillNice(skill)} />
+                        </Badge>
+                      ))}
+                      {skillsNice.length === 0 && (
+                        <span className="text-sm text-muted-foreground">Optional skills that would be beneficial</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+
+          {/* Visibility */}
+          <Card className="p-5 bg-muted/20">
+            <div className="flex items-center gap-3">
+              <Checkbox 
+                id="visibility" 
+                checked={isPublic}
+                onCheckedChange={(checked) => setIsPublic(checked as boolean)}
+                className="h-5 w-5"
+              />
+              <div>
+                <Label 
+                  htmlFor="visibility"
+                  className="text-sm font-semibold cursor-pointer block"
+                >
+                  Make Job Public
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {isPublic ? "Visible to all candidates" : "Only visible to invited candidates"}
+                </p>
               </div>
             </div>
           </Card>
+        </form>
+        </div>
 
-          <div className="flex gap-3 justify-end pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
+        {/* Sticky Footer */}
+        <div className="sticky bottom-0 bg-background border-t px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20">
+            <Info className="h-4 w-4 text-primary flex-shrink-0" />
+            <p className="text-sm font-medium text-foreground">
+              Reviewed in under 1 hour
+            </p>
+          </div>
+          
+          <div className="flex gap-3">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} size="lg">
               Cancel
             </Button>
             <Button 
-              type="submit" 
+              type="submit"
+              form="post-job-form"
               variant={isFormValid ? "hero" : "default"}
+              size="lg"
               className={cn(
-                "h-9 transition-all duration-300 font-bold",
+                "transition-all duration-300 font-bold min-w-[180px]",
                 isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
                 !isFormValid && 'opacity-40'
               )}
@@ -1173,7 +1196,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               {isSubmitting ? 'Submitting...' : 'Submit for Review'}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
