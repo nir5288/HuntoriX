@@ -578,14 +578,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     className="flex-1 text-xs"
                     disabled={isParsing}
                     onClick={() => {
-                      const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
-                      if (textarea) {
-                        const container = textarea.parentElement?.parentElement;
-                        if (container?.classList.contains('hidden')) {
-                          container.classList.remove('hidden');
-                          textarea.focus();
-                        } else {
-                          container?.classList.add('hidden');
+                      const container = document.getElementById('paste-jd-container');
+                      if (container) {
+                        container.classList.toggle('hidden');
+                        if (!container.classList.contains('hidden')) {
+                          const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
+                          textarea?.focus();
                         }
                       }
                     }}
