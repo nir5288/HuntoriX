@@ -592,7 +592,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     }}
                   />
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 opacity-0 group-active:opacity-60 group-active:scale-150 transition-all duration-200" />
-                  <div className="absolute inset-[2px] rounded-full bg-background" />
                 </>
               ) : (
                 <>
