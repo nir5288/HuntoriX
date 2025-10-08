@@ -19,6 +19,7 @@ import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
+import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -644,16 +645,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="space-y-4">
               <div className="space-y-2.5">
                 <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
-                <Select onValueChange={(value) => setValue('title', value)} value={selectedTitle}>
-                  <SelectTrigger className={cn("h-11", autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                    <SelectValue placeholder="Select job title" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jobTitles.map(title => (
-                      <SelectItem key={title} value={title}>{title}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <JobTitleAutocomplete
+                  value={selectedTitle}
+                  onChange={(value) => setValue('title', value)}
+                  placeholder="Search job title..."
+                  className={cn(autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                />
                 {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
 

@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { X, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -284,16 +285,11 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
             
             <div className="space-y-2">
               <Label htmlFor="title">Job Title <span className="text-destructive">• Required</span></Label>
-              <Select onValueChange={(value) => setValue('title', value)} value={selectedTitle}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select job title" />
-                </SelectTrigger>
-                <SelectContent>
-                  {jobTitles.map(title => (
-                    <SelectItem key={title} value={title}>{title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <JobTitleAutocomplete
+                value={selectedTitle}
+                onChange={(value) => setValue('title', value)}
+                placeholder="Search job title..."
+              />
               {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
             </div>
 
