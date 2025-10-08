@@ -425,6 +425,25 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
           className={cn("relative", className)}
           role="combobox"
           aria-expanded={open}
+          onMouseDown={(e) => {
+            const target = e.target as HTMLElement;
+            const clickedInput = !!target.closest('input');
+            if (!open && !clickedInput) {
+              e.preventDefault();
+              setOpen(true);
+              setSelectedIndex(-1);
+              requestAnimationFrame(() => inputRef.current?.focus());
+            }
+          }}
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            const clickedInput = !!target.closest('input');
+            if (!open && !clickedInput) {
+              e.preventDefault();
+              setOpen(true);
+              inputRef.current?.focus();
+            }
+          }}
         >
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -437,6 +456,16 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
               onChange(e.target.value);
               setSelectedIndex(-1);
               if (!open) setOpen(true);
+            }}
+            onMouseDown={(e) => {
+              if (open) {
+                e.stopPropagation();
+              }
+            }}
+            onClick={(e) => {
+              if (open) {
+                e.stopPropagation();
+              }
             }}
             onFocus={() => {
               setOpen(true);
@@ -454,7 +483,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[400px]">
+          <CommandList className="max-h-[400px] overflow-y-auto overscroll-contain pointer-events-auto">
             {searchQuery.length === 0 && recentSearches.length > 0 && (
               <CommandGroup heading={
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
