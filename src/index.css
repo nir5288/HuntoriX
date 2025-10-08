@@ -119,7 +119,7 @@
 
   html {
     overflow-x: hidden;
-    overflow-y: scroll; /* prevent layout shift when overlays open */
+    overflow-y: scroll; /* keep scrollbar visible to avoid layout shift */
     scrollbar-gutter: stable both-edges;
   }
 
@@ -127,8 +127,14 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
+    overflow-y: scroll; /* match html to prevent scroll lock jumps */
     scrollbar-gutter: stable both-edges;
   }
+
+  /* Prevent Radix scroll-lock from adding right padding that shifts layout */
+  :root { --removed-body-scroll-bar-size: 0 !important; }
+  body[style*="--removed-body-scroll-bar-size"] { padding-right: 0 !important; }
+  body[style*="padding-right"] { padding-right: 0 !important; }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
