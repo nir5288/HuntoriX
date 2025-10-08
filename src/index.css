@@ -131,10 +131,6 @@
     scrollbar-gutter: stable both-edges;
   }
 
-  /* Prevent Radix scroll-lock from adding right padding that shifts layout */
-  :root { --removed-body-scroll-bar-size: 0 !important; }
-  body[style*="--removed-body-scroll-bar-size"] { padding-right: 0 !important; }
-  body[style*="padding-right"] { padding-right: 0 !important; }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
