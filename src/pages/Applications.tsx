@@ -321,65 +321,73 @@ const Applications = () => {
                         </div>
                       </div>
 
-                      {/* Tablet & Desktop layout */}
-                      <div className="hidden sm:flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <CardTitle className="text-sm sm:text-base break-words">{app.job?.title}</CardTitle>
-                            {app.job?.job_id_number && (
-                              <Badge variant="outline" className="text-[10px] sm:text-xs h-5 shrink-0">
-                                #{app.job?.job_id_number}
-                              </Badge>
-                            )}
+                      {/* Tablet & Desktop layout - original */}
+                      <div className="hidden sm:flex items-start justify-between">
+                        <div 
+                          className="flex-1 cursor-pointer"
+                          onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <CardTitle className="text-base">{app.job?.title}</CardTitle>
+                            <Badge variant="outline" className="text-xs h-5">
+                              #{app.job?.job_id_number}
+                            </Badge>
                             {app.job?.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
                                 HuntoriX Exclusive
                               </Badge>
                             )}
                             {app.type === 'invitation' && (
-                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-[10px] sm:text-xs h-5 px-2">
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5">
                                 Invitation
                               </Badge>
                             )}
                           </div>
-                          <CardDescription className="text-[11px] sm:text-xs">
-                            {app.job?.employer?.company_name || app.job?.employer?.name} • {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
+                          <CardDescription className="text-xs">
+                            {app.job?.employer?.company_name || app.job?.employer?.name} • 
+                            {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(app.status)}`}>
+                        <div className="flex items-center gap-1.5">
+                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)}`}>
                             {app.status}
                           </Badge>
-                          {app.status === 'shortlisted' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleChat(app.job_id);
-                              }}
-                              className="h-7 text-xs"
-                            >
-                              <MessageCircle className="mr-1.5 h-3 w-3" />
-                              Chat
-                            </Button>
-                          )}
-                          {app.type === 'invitation' && app.status === 'pending' && (
-                            <Button
-                              variant="hero"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/job-review/${app.job_id}`);
-                              }}
-                              className="h-7 text-xs"
-                            >
-                              Review
-                            </Button>
-                          )}
                         </div>
                       </div>
                     </CardHeader>
+                    <CardContent className="px-4 pb-3 hidden sm:block">
+                      <div className="flex gap-2">
+                        {app.status === 'shortlisted' && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleChat(app.job_id)}
+                            className="h-7 text-xs"
+                          >
+                            <MessageCircle className="mr-1.5 h-3 w-3" />
+                            Chat
+                          </Button>
+                        )}
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
+                          className="h-7 text-xs"
+                        >
+                          View Details
+                        </Button>
+                        {app.type === 'invitation' && app.status === 'pending' && (
+                          <Button 
+                            size="sm" 
+                            variant="hero"
+                            onClick={() => navigate(`/job-review/${app.job_id}`)}
+                            className="h-7 text-xs"
+                          >
+                            Review
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
                   </Card>
                 ))}
               </div>
