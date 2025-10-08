@@ -147,6 +147,7 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [previewValue, setPreviewValue] = useState('');
   const [originalQuery, setOriginalQuery] = useState('');
+  const [showCustomMessage, setShowCustomMessage] = useState(false);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -285,6 +286,13 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
         } else {
           handleSelect(selectedItem as JobTitleOption);
         }
+      } else if (searchQuery.trim()) {
+        // Custom title entry - no selection from list
+        onChange(searchQuery.trim());
+        addToRecentSearches(searchQuery.trim());
+        setOpen(false);
+        setShowCustomMessage(true);
+        setTimeout(() => setShowCustomMessage(false), 3000);
       }
       setPreviewValue('');
       setOriginalQuery('');
@@ -308,13 +316,14 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
   });
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger asChild>
-        <div
-          ref={triggerRef}
-          className={cn("relative", className)}
-          role="combobox"
-          aria-expanded={open}
+    <div className="relative">
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
+          <div
+            ref={triggerRef}
+            className={cn("relative", className)}
+            role="combobox"
+            aria-expanded={open}
           onMouseDown={(e) => {
             const target = e.target as HTMLElement;
             const clickedInput = !!target.closest('input');
@@ -459,6 +468,12 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
           </CommandList>
         </Command>
       </PopoverContent>
-    </Popover>
+      </Popover>
+      {showCustomMessage && (
+        <p className="text-xs text-muted-foreground mt-1.5 animate-in fade-in slide-in-from-top-1">
+          Custom title saved
+        </p>
+      )}
+    </div>
   );
 }
