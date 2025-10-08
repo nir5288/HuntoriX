@@ -460,72 +460,133 @@ const HeadhunterDashboard = () => {
                 <p className="text-sm text-muted-foreground">No applications match your filters</p>
               </div> : <>
                 <div className="space-y-3">
-                {filteredApplications.slice(0, 5).map(app => <Card key={`${app.type}-${app.id}`} className={`hover:shadow-md transition-shadow ${
+                {filteredApplications.slice(0, 5).map(app => <Card key={`${app.type}-${app.id}`} className={`group hover:shadow-md transition-shadow cursor-pointer ${
                     app.job?.is_exclusive ? 'exclusive-job-card' : ''
-                  }`}>
+                  }`} onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'dashboard' } })}>
                     <CardHeader className="px-4 py-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 cursor-pointer" onClick={() => navigate(`/jobs/${app.job_id}`, {
-                  state: {
-                    from: 'dashboard'
-                  }
-                })}>
-                          <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-base">{app.job?.title}</CardTitle>
-                            <Badge variant="outline" className="text-xs h-5">
-                              #{app.job?.job_id_number}
-                            </Badge>
+                      {/* Mobile layout */}
+                      <div className="flex flex-col gap-2.5 sm:hidden">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <CardTitle className="text-sm font-semibold leading-tight">{app.job?.title}</CardTitle>
+                            {app.job?.job_id_number && (
+                              <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
+                                #{app.job?.job_id_number}
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <CardDescription className="text-[11px] leading-tight">
+                            {app.job?.employer?.company_name || app.job?.employer?.name} • {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
+                          </CardDescription>
+                          
+                          <div className="flex flex-wrap gap-1.5">
                             {app.job?.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
                                 HuntoriX Exclusive
                               </Badge>
                             )}
-                            {app.type === 'invitation' && <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5 bg-fuchsia-500">
+                            {app.type === 'invitation' && (
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-[9px] h-4 px-1.5">
                                 Invitation
-                              </Badge>}
+                              </Badge>
+                            )}
+                            <Badge className={`text-[9px] h-4 px-1.5 ${getStatusColor(app.status)}`}>
+                              {app.status}
+                            </Badge>
                           </div>
-                          <CardDescription className="text-xs">
-                            {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
+                        </div>
+                        
+                        <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
+                          {app.status === 'shortlisted' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleChat(app.job_id);
+                              }}
+                              className="h-8 text-[10px]"
+                            >
+                              <MessageCircle className="mr-1 h-3 w-3" />
+                              Chat
+                            </Button>
+                          )}
+                          {app.type === 'invitation' && app.status === 'pending' && (
+                            <Button
+                              variant="hero"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/job-review/${app.job_id}`, { state: { from: 'dashboard' } });
+                              }}
+                              className="h-8 text-[10px]"
+                            >
+                              Review
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Tablet & Desktop layout */}
+                      <div className="hidden sm:flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <CardTitle className="text-sm sm:text-base break-words">{app.job?.title}</CardTitle>
+                            {app.job?.job_id_number && (
+                              <Badge variant="outline" className="text-[10px] sm:text-xs h-5 shrink-0">
+                                #{app.job?.job_id_number}
+                              </Badge>
+                            )}
+                            {app.job?.is_exclusive && (
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                                HuntoriX Exclusive
+                              </Badge>
+                            )}
+                            {app.type === 'invitation' && (
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-[10px] sm:text-xs h-5 px-2">
+                                Invitation
+                              </Badge>
+                            )}
+                          </div>
+                          <CardDescription className="text-[11px] sm:text-xs">
+                            {app.job?.employer?.company_name || app.job?.employer?.name} • {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)}`}>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(app.status)}`}>
                             {app.status}
                           </Badge>
+                          {app.status === 'shortlisted' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleChat(app.job_id);
+                              }}
+                              className="h-7 text-xs"
+                            >
+                              <MessageCircle className="mr-1.5 h-3 w-3" />
+                              Chat
+                            </Button>
+                          )}
+                          {app.type === 'invitation' && app.status === 'pending' && (
+                            <Button
+                              variant="hero"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/job-review/${app.job_id}`, { state: { from: 'dashboard' } });
+                              }}
+                              className="h-7 text-xs"
+                            >
+                              Review
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="px-4 pb-3">
-                      <div className="flex gap-2">
-                        {app.status === 'shortlisted' && <Button size="sm" variant="outline" onClick={e => {
-                  e.stopPropagation();
-                  handleChat(app.job_id);
-                }} className="h-7 text-xs">
-                            <MessageCircle className="mr-1.5 h-3 w-3" />
-                            Chat
-                          </Button>}
-                        <Button size="sm" variant="outline" onClick={e => {
-                  e.stopPropagation();
-                  navigate(`/jobs/${app.job_id}`, {
-                    state: {
-                      from: 'dashboard'
-                    }
-                  });
-                }} className="h-7 text-xs">
-                          View Details
-                        </Button>
-                        {app.type === 'invitation' && app.status === 'pending' && <Button size="sm" variant="hero" onClick={e => {
-                  e.stopPropagation();
-                  navigate(`/job-review/${app.job_id}`, {
-                    state: {
-                      from: 'dashboard'
-                    }
-                  });
-                }} className="h-7 text-xs">
-                            Review
-                          </Button>}
-                      </div>
-                    </CardContent>
                   </Card>)}
               </div>
               {applications.length > 5 && (
