@@ -118,7 +118,6 @@
   }
 
   html {
-    overflow-y: scroll; /* keep scrollbar visible to avoid layout shift */
     scrollbar-gutter: stable both-edges;
   }
 
