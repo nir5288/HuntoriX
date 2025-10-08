@@ -586,24 +586,24 @@ const EmployerDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="px-4 pb-3">
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                          <span>{jobApplications.length} applications</span>
-                          <span>•</span>
-                          <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
-                          {jobEditCounts[job.id] > 0 && (
-                            <>
-                              <span>•</span>
-                              <span 
-                                className="underline cursor-pointer hover:text-[hsl(var(--accent-pink))] transition-colors"
-                                onClick={(e) => handleViewEditHistory(job, e)}
-                              >
-                                Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
-                              </span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex justify-end">
-                          <div className="relative">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span>{jobApplications.length} applications</span>
+                            <span>•</span>
+                            <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
+                            {jobEditCounts[job.id] > 0 && (
+                              <>
+                                <span>•</span>
+                                <span 
+                                  className="underline cursor-pointer hover:text-[hsl(var(--accent-pink))] transition-colors"
+                                  onClick={(e) => handleViewEditHistory(job, e)}
+                                >
+                                  Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <div className="relative shrink-0">
                             <Button
                               variant="outline"
                               size="sm"
