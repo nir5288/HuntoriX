@@ -38,21 +38,6 @@ const EmployerDashboard = () => {
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
   const [visibleJobCount, setVisibleJobCount] = useState(3);
   
-  // Show loading screen while auth is loading
-  if (loading || !user || !profile) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
-        <Header />
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <div className="text-center space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="text-muted-foreground">Loading your dashboard...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
   useEffect(() => {
     if (user && !loading) {
       fetchDashboardData();
@@ -266,7 +251,23 @@ const EmployerDashboard = () => {
       toast.error('Failed to load edit history');
     }
   };
-  if (loading || loadingData) {
+
+  // Show loading screen while auth is loading
+  if (loading || !user || !profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingData) {
     return (
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
