@@ -91,7 +91,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [showExclusiveInfo, setShowExclusiveInfo] = useState(false);
   const [salaryPeriod, setSalaryPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
-  const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
@@ -401,6 +401,19 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         element.classList.remove('ring-2', 'ring-destructive', 'ring-offset-2');
       }, 2000);
     }
+  };
+
+  const handleClear = () => {
+    reset();
+    setSkillsMust([]);
+    setSkillsNice([]);
+    setSkillMustInput('');
+    setSkillNiceInput('');
+    setIsPublic(true);
+    setAutoFilledFields(new Set());
+    setIsExclusive(false);
+    setSalaryPeriod('monthly');
+    toast.success('Form cleared');
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -1134,21 +1147,31 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </div>
           </Card>
 
-          <div className="flex gap-3 justify-end pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
-              Cancel
-            </Button>
+          <div className="flex gap-3 justify-between pt-2">
             <Button 
-              type="submit" 
-              variant={isFormValid ? "hero" : "default"}
-              className={cn(
-                "h-9 transition-all duration-300 font-bold",
-                isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
-                !isFormValid && 'opacity-40'
-              )}
+              type="button" 
+              variant="ghost" 
+              onClick={handleClear} 
+              className="h-9"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit for Review'}
+              Clear Form
             </Button>
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-9">
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                variant={isFormValid ? "hero" : "default"}
+                className={cn(
+                  "h-9 transition-all duration-300 font-bold",
+                  isFormValid && 'shadow-2xl shadow-[hsl(var(--accent-pink))]/50 ring-2 ring-[hsl(var(--accent-pink))]/30',
+                  !isFormValid && 'opacity-40'
+                )}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit for Review'}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
