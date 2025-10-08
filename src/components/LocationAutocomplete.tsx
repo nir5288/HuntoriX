@@ -272,14 +272,17 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         const aCity = a.city?.toLowerCase() || '';
         const bCity = b.city?.toLowerCase() || '';
         
-        // Exact match priority (country or city name exactly matches query)
-        const aExactCountry = aCountry === query;
-        const bExactCountry = bCountry === query;
-        const aExactCity = aCity === query;
-        const bExactCity = bCity === query;
+        // Exact country match - prioritize country-only entries
+        const aExactCountry = aCountry === query && a.type === 'country';
+        const bExactCountry = bCountry === query && b.type === 'country';
         
         if (aExactCountry && !bExactCountry) return -1;
         if (!aExactCountry && bExactCountry) return 1;
+        
+        // Exact city match
+        const aExactCity = aCity === query;
+        const bExactCity = bCity === query;
+        
         if (aExactCity && !bExactCity) return -1;
         if (!aExactCity && bExactCity) return 1;
         
