@@ -371,7 +371,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command className="rounded-lg border-none shadow-lg">
-          <CommandList className="max-h-[300px]">
+          <CommandList className="max-h-[300px] overflow-y-auto overscroll-contain">
             {filteredLocations.length === 0 && (
               <CommandEmpty>No locations found.</CommandEmpty>
             )}
