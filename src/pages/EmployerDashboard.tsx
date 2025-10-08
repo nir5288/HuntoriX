@@ -560,24 +560,6 @@ const EmployerDashboard = () => {
                             <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
                               {job.status}
                             </Badge>
-                            <div className="relative">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate('/headhunters');
-                                }}
-                                className="h-7 text-[10px] sm:text-xs px-2 gap-1"
-                                title="Invite headhunters to this job"
-                              >
-                                <Users className="h-3 w-3" />
-                                <span className="hidden sm:inline">Invite</span>
-                              </Button>
-                              <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
-                                New
-                              </Badge>
-                            </div>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -604,7 +586,7 @@ const EmployerDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="px-4 pb-3">
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                           <span>{jobApplications.length} applications</span>
                           <span>•</span>
                           <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
@@ -619,6 +601,26 @@ const EmployerDashboard = () => {
                               </span>
                             </>
                           )}
+                        </div>
+                        <div className="flex justify-end">
+                          <div className="relative">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/headhunters');
+                              }}
+                              className="h-7 text-[10px] sm:text-xs px-2 gap-1"
+                              title="Invite headhunters to this job"
+                            >
+                              <Users className="h-3 w-3" />
+                              <span>Invite to Job</span>
+                            </Button>
+                            <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
+                              New
+                            </Badge>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
