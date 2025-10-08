@@ -244,7 +244,7 @@ const LOCATION_DATA: LocationOption[] = [
 export function LocationAutocomplete({ value, onChange, placeholder, className }: LocationAutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredLocations, setFilteredLocations] = useState<LocationOption[]>([]);
+  const [filteredLocations, setFilteredLocations] = useState<LocationOption[]>(LOCATION_DATA.slice(0, 20));
   const inputRef = useRef<HTMLInputElement>(null);
   const [triggerWidth, setTriggerWidth] = useState<number>(0);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -362,11 +362,27 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
             placeholder={placeholder || "Search city or country..."}
             value={searchQuery}
             onChange={(e) => {
-              setSearchQuery(e.target.value);
-              onChange(e.target.value);
+              const newValue = e.target.value;
+              setSearchQuery(newValue);
+              onChange(newValue);
               if (!open) setOpen(true);
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              setOpen(true);
+              // Show default locations if empty
+              if (!searchQuery) {
+                setFilteredLocations(LOCATION_DATA.slice(0, 20));
+              }
+            }}
+            onClick={() => {
+              if (!open) {
+                setOpen(true);
+                // Show default locations if empty
+                if (!searchQuery) {
+                  setFilteredLocations(LOCATION_DATA.slice(0, 20));
+                }
+              }
+            }}
             className="flex h-11 w-full rounded-md border border-input bg-background pl-10 pr-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
