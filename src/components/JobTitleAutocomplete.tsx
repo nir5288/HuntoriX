@@ -280,6 +280,7 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
         if (selectedItem.type === 'recent') {
           onChange(selectedItem.value);
           setSearchQuery(selectedItem.value);
+          addToRecentSearches(selectedItem.value);
           setOpen(false);
         } else {
           handleSelect(selectedItem as JobTitleOption);
@@ -287,6 +288,7 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
       }
       setPreviewValue('');
       setOriginalQuery('');
+      setSelectedIndex(-1);
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);
@@ -389,6 +391,7 @@ export function JobTitleAutocomplete({ value, onChange, placeholder, className }
                     onSelect={() => {
                       onChange(search);
                       setSearchQuery(search);
+                      addToRecentSearches(search);
                       setOpen(false);
                     }}
                     onMouseEnter={() => setSelectedIndex(idx)}

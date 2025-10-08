@@ -240,6 +240,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
         const selectedItem = allItems[selectedIndex];
         if (selectedItem.type === 'recent') {
           onChange(selectedItem.value);
+          addToRecentSearches(selectedItem.value);
           setOpen(false);
         } else {
           handleSelect(selectedItem);
@@ -249,6 +250,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       }
       setPreviewValue('');
       setOriginalQuery('');
+      setSelectedIndex(-1);
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);
@@ -351,6 +353,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
                     value={search}
                     onSelect={() => {
                       onChange(search);
+                      addToRecentSearches(search);
                       setOpen(false);
                     }}
                     onMouseEnter={() => setSelectedIndex(idx)}

@@ -503,6 +503,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         if (selectedItem.type === 'recent') {
           onChange(selectedItem.displayValue);
           setSearchQuery(selectedItem.displayValue);
+          addToRecentSearches(selectedItem.displayValue);
           setOpen(false);
         } else {
           handleSelect(selectedItem as LocationOption);
@@ -510,6 +511,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
       }
       setPreviewValue('');
       setOriginalQuery('');
+      setSelectedIndex(-1);
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);
@@ -611,6 +613,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
                     onSelect={() => {
                       onChange(search);
                       setSearchQuery(search);
+                      addToRecentSearches(search);
                       setOpen(false);
                     }}
                     onMouseEnter={() => setSelectedIndex(idx)}
