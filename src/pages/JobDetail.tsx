@@ -281,8 +281,8 @@ const JobDetail = () => {
           Back
         </Button>
 
-        <div className="grid lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
             <Card className="rounded-2xl">
               <CardHeader>
                 <div className="flex items-start justify-between gap-4 mb-4">
