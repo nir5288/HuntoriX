@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
+import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -52,19 +53,11 @@ const formSchema = z.object({
     required_error: 'Employment type is required'
   }),
   location_type: z.string().default('remote'),
-  location: z.string().optional(),
+  location: z.string().min(1, 'Work location is required'),
   budget_currency: z.string().default('ILS'),
   budget_min: z.string().optional(),
   budget_max: z.string().optional(),
   description: z.string().min(10, 'Description is required (min 10 characters)'),
-}).refine((data) => {
-  if (data.location_type !== 'remote' && !data.location) {
-    return false;
-  }
-  return true;
-}, {
-  message: 'Location is required for on-site or hybrid positions',
-  path: ['location']
 }).refine((data) => {
   if (data.budget_min && data.budget_max) {
     return Number(data.budget_max) >= Number(data.budget_min);
@@ -440,9 +433,9 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       return;
     }
 
-    if (data.location_type !== 'remote' && !data.location) {
-      toast.error('Location is required', { 
-        description: 'Please select a location for on-site or hybrid positions'
+    if (!data.location || data.location.trim().length === 0) {
+      toast.error('Work location is required', { 
+        description: 'Please select a work location (city or country)'
       });
       scrollToField('location');
       return;
@@ -476,7 +469,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           industry: data.industry,
           seniority: data.seniority,
           employment_type: data.employment_type,
-          location: data.location_type === 'remote' ? '' : data.location,
+          location: data.location,
           budget_currency: data.budget_currency,
           budget_min: data.budget_min ? Number(data.budget_min) : null,
           budget_max: data.budget_max ? Number(data.budget_max) : null,
@@ -742,22 +735,19 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </RadioGroup>
               </div>
 
-              {locationType !== 'remote' && (
-                <div className="space-y-2.5">
-                  <Label htmlFor="location" className="text-sm font-medium">City <span className="text-destructive">*</span></Label>
-                  <Select onValueChange={(value) => setValue('location', value)}>
-                    <SelectTrigger className={cn("h-11", autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
-                      <SelectValue placeholder="Select city" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations.map(loc => (
-                        <SelectItem key={loc} value={loc}>{loc}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
-                </div>
-              )}
+              <div className="space-y-2.5">
+                <Label htmlFor="location" className="text-sm font-medium">Work Location <span className="text-destructive">*</span></Label>
+                <LocationAutocomplete
+                  value={watch('location') || ''}
+                  onChange={(value) => setValue('location', value)}
+                  placeholder="Search city or country..."
+                  className={cn(autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5')}
+                />
+                {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
+                <p className="text-xs text-muted-foreground">
+                  Select a city (e.g., "Tel Aviv, Israel") or country (e.g., "Israel")
+                </p>
+              </div>
             </div>
           </Card>
 
