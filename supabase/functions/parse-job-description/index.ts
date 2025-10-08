@@ -85,26 +85,17 @@ EMPLOYMENT TYPE:
 - Map to: full_time, contract, temp
 - If unclear, assume full_time
 
-DESCRIPTION (FORMAT WITH CLEAR SECTIONS):
-- Organize into sections: "About the Job", "Key Responsibilities", "Requirements", "Nice-to-Have"
-- Use section headers like "## About the Job" or "## Key Responsibilities"
-- Format each section with bullet points using "•" prefix
-- Keep each bullet concise - one sentence max
+DESCRIPTION (FORMAT AS BULLET POINTS):
+- Extract 3-5 key responsibilities from "Key Responsibilities" or "About the role"
+- Format as bullet points with "•" prefix
 - Remove legal/EEO text
-- Extract 3-5 bullets per section where applicable
+- Keep concise - one sentence per bullet
 
-SKILLS (EXTRACT ALL AND SHORTEN TO 1-3 WORDS):
+SKILLS (EXTRACT ALL, NOT JUST FIRST FEW):
 - Must-Have: Extract ALL from "Requirements" or "What You Need" sections
 - Nice-to-Have: Extract ALL from "Preferred", "Bonus", "Nice-to-Have", or "Advantage" sections
-- SHORTEN each skill to 1-3 words maximum
-- Remove ALL filler words: "experience with", "knowledge of", "proficiency in", "strong", "proven", "solid", "familiarity with", "expertise in"
-- Examples:
-  * "Strong debugging skills" → "Debugging"
-  * "Experience with cloud-based systems" → "Cloud Systems"
-  * "Proficiency in Node.js" → "Node.js"
-  * "Knowledge of CI/CD pipelines" → "CI/CD"
-- Keep ONLY technology names, frameworks, tools, and key technical terms
-- Include both hard skills and soft skills - put soft skills last
+- Include both hard skills (Node.js, AWS, Python) AND soft skills (communication, teamwork) - put soft skills last
+- Remove filler words like "strong", "proven", "solid"
 - NO LIMITS - extract all mentioned skills
 
 REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS UP.`
@@ -207,42 +198,7 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
     const originalText: string = String(jobDescription || '');
 
     function stripFiller(s: string) {
-      // Remove common filler phrases at the start
-      let cleaned = s.replace(/^(strong|proven|solid|hands?-on|experience with|proficiency in|expertise in|knowledge of|ability to|familiarity with|understanding of|background in|skills in|working with)\s+/i, '').trim();
-      
-      // Remove "experience" or "skills" at the end
-      cleaned = cleaned.replace(/\s+(experience|skills|skill)$/i, '').trim();
-      
-      // Shorten common long phrases to 1-3 words
-      const shortenings: Record<string, string> = {
-        'cloud-based systems': 'Cloud Systems',
-        'continuous integration and continuous delivery': 'CI/CD',
-        'continuous integration and deployment': 'CI/CD',
-        'relational and nosql databases': 'Databases',
-        'relational databases': 'SQL Databases',
-        'nosql databases': 'NoSQL Databases',
-        'infrastructure as code': 'IaC',
-        'restful apis': 'REST APIs',
-        'microservices architectures': 'Microservices',
-        'containerization and orchestration': 'Containers',
-        'debugging and troubleshooting': 'Debugging',
-        'performance optimization': 'Optimization',
-        'system design': 'System Design',
-        'data structures': 'Data Structures',
-        'software engineering principles': 'Software Engineering',
-        'security best practices': 'Security',
-        'cross-functional teams': 'Team Collaboration',
-        'communication and collaboration': 'Communication',
-      };
-      
-      const lowerCleaned = cleaned.toLowerCase();
-      for (const [long, short] of Object.entries(shortenings)) {
-        if (lowerCleaned.includes(long)) {
-          return short;
-        }
-      }
-      
-      return cleaned;
+      return s.replace(/^(strong|proven|solid|hands?-on|experience with|proficiency in|expertise in|knowledge of|ability to)\s+/i, '').trim();
     }
 
     function normalizeTech(s: string) {
@@ -291,7 +247,7 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
       return [...hardSkills, ...softSkills];
     }
 
-    // Description: remove EEO/legal, format with sections
+    // Description: remove EEO/legal, format as bullets
     function cleanDescription(desc?: string) {
       if (!desc) return '';
       let d = desc
@@ -301,8 +257,8 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
         .replace(/\s+/g, ' ')
         .trim();
       
-      // If already has section headers, keep them
-      if (d.includes('##') || (d.includes('•') && d.length > 200)) {
+      // If already has bullet points, keep them
+      if (d.includes('•') || d.includes('-')) {
         return d;
       }
       
