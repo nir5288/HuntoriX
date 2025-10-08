@@ -128,12 +128,8 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + '...';
   };
-  const handleApply = () => {
-    if (!user) {
-      navigate(`/auth?role=headhunter`);
-      return;
-    }
-    navigate(`/job/${currentBanner.job_id}`);
+  const handleViewDetails = () => {
+    navigate(`/jobs/${currentBanner.job_id}`);
   };
   const renderBannerContent = () => {
     // If it's a job banner and we have job details, show the job card
@@ -177,7 +173,7 @@ export function PromotionalBanner({ location = 'home_top' }: PromotionalBannerPr
             {/* Action buttons - responsive positioning */}
             <div className="absolute bottom-2 right-2 left-2 md:left-auto flex gap-1.5">
               <Button 
-                onClick={handleApply}
+                onClick={handleViewDetails}
                 size="sm"
                 variant="hero"
                 className="flex-1 md:flex-initial h-7 text-xs"
