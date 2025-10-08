@@ -65,8 +65,9 @@ INDUSTRY:
 
 LOCATION:
 - Look for: Remote, Hybrid, On-site, office location mentions
-- Extract city/country if mentioned
-- Map to: remote, hybrid, on_site
+- ALWAYS extract in format "City, Country" (e.g., "Rehovot, Israel", "New York, USA", "London, UK")
+- If only city is mentioned, infer the country from context (company location, currency mentions, etc.)
+- Map work type to: remote, hybrid, on_site
 - If unclear, return null
 
 EMPLOYMENT TYPE:
@@ -128,7 +129,7 @@ REMEMBER: Accuracy over completeness. Return null if unsure. DO NOT MAKE THINGS 
                   },
                   location: {
                     type: 'string',
-                    description: 'The specific location if on-site or hybrid (e.g., Tel Aviv, New York)'
+                    description: 'The specific location ALWAYS in "City, Country" format if on-site or hybrid (e.g., "Tel Aviv, Israel", "New York, USA", "London, UK"). Always include the country name.'
                   },
                   budget_currency: {
                     type: 'string',
