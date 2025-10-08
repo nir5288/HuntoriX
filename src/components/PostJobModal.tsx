@@ -532,41 +532,225 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               <div className="flex-shrink-0 mt-1">
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-foreground mb-1">AI Quick Fill</h3>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Upload your job description and let AI automatically fill in the form fields. 
-                  Accepts PDF, DOCX, or TXT files.
-                </p>
-                <Input
-                  id="ai-upload"
-                  type="file"
-                  accept=".pdf,.docx,.txt"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  disabled={isParsing}
-                />
-                <Label 
-                  htmlFor="ai-upload"
-                  className={cn(
-                    "inline-flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer transition-all",
-                    "bg-primary text-primary-foreground hover:bg-primary/90",
-                    "text-xs font-medium",
-                    isParsing && "opacity-50 pointer-events-none"
-                  )}
-                >
-                  {isParsing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Parsing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      Upload Job Description
-                    </>
-                  )}
-                </Label>
+              <div className="flex-1 min-w-0 space-y-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-1">AI Quick Fill</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Upload a file or paste your job description and let AI automatically fill in the form fields.
+                  </p>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input
+                    id="ai-upload"
+                    type="file"
+                    accept=".pdf,.docx,.txt"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={isParsing}
+                  />
+                  <Label 
+                    htmlFor="ai-upload"
+                    className={cn(
+                      "inline-flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer transition-all flex-1 justify-center",
+                      "bg-primary text-primary-foreground hover:bg-primary/90",
+                      "text-xs font-medium",
+                      isParsing && "opacity-50 pointer-events-none"
+                    )}
+                  >
+                    {isParsing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        Upload File
+                      </>
+                    )}
+                  </Label>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-xs"
+                    disabled={isParsing}
+                    onClick={() => {
+                      const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
+                      if (textarea) {
+                        const container = textarea.parentElement?.parentElement;
+                        if (container?.classList.contains('hidden')) {
+                          container.classList.remove('hidden');
+                          textarea.focus();
+                        } else {
+                          container?.classList.add('hidden');
+                        }
+                      }
+                    }}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Paste Text
+                  </Button>
+                </div>
+                
+                <div className="hidden" id="paste-jd-container">
+                  <Textarea
+                    id="paste-jd-textarea"
+                    placeholder="Paste your job description here..."
+                    rows={6}
+                    className="text-xs resize-none"
+                    disabled={isParsing}
+                  />
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="text-xs"
+                      disabled={isParsing}
+                      onClick={async () => {
+                        const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
+                        const text = textarea?.value?.trim();
+                        
+                        if (!text) {
+                          toast.error('Please paste some text first');
+                          return;
+                        }
+                        
+                        setIsParsing(true);
+                        const filledFields = new Set<string>();
+                        
+                        try {
+                          const { data, error } = await supabase.functions.invoke('parse-job-description', {
+                            body: { jobDescription: text }
+                          });
+
+                          if (error) throw error;
+                          if (!data.success) throw new Error(data.error);
+
+                          const jobInfo = data.jobInfo;
+                          const combinedText = `${jobInfo.title ?? ''} ${jobInfo.description ?? ''} ${text}`;
+
+                          // Helper: infer seniority from text
+                          const detectSeniority = (text: string): 'junior' | 'mid_level' | 'senior' | 'lead_principal' | 'manager_director' | 'vp_c_level' | undefined => {
+                            const t = text.toLowerCase();
+                            if (/(vp|vice president|cto|cfo|ceo|chief|c-level)/.test(t)) return 'vp_c_level';
+                            if (/(director|head of|manager|management)/.test(t)) return 'manager_director';
+                            if (/(principal|lead|tech lead|team lead|staff)/.test(t)) return 'lead_principal';
+                            if (/(senior|sr\.?|5\+\s*years|6\+\s*years|7\+\s*years|8\+\s*years|9\+\s*years|10\+\s*years)/.test(t)) return 'senior';
+                            if (/(junior|jr\.?|0-2\s*years|1-2\s*years|entry|entry-level)/.test(t)) return 'junior';
+                            if (/(mid|mid-level|3-5\s*years|intermediate)/.test(t)) return 'mid_level';
+                            return undefined;
+                          };
+
+                          // Auto-fill logic (reusing from handleFileUpload)
+                          if (jobInfo.title) {
+                            const normalized = jobInfo.title.trim();
+                            if (jobTitles.includes(normalized)) {
+                              setValue('title', normalized);
+                              filledFields.add('title');
+                            } else {
+                              setValue('title', 'Other');
+                              setValue('custom_title', normalized);
+                              filledFields.add('title');
+                              filledFields.add('custom_title');
+                            }
+                          }
+                          if (jobInfo.industry) {
+                            setValue('industry', jobInfo.industry);
+                            filledFields.add('industry');
+                          }
+                          if (jobInfo.seniority) {
+                            setValue('seniority', jobInfo.seniority as any);
+                            filledFields.add('seniority');
+                          } else {
+                            const inferred = detectSeniority(combinedText);
+                            if (inferred) {
+                              setValue('seniority', inferred as any);
+                              filledFields.add('seniority');
+                            }
+                          }
+                          if (jobInfo.employment_type) {
+                            setValue('employment_type', jobInfo.employment_type);
+                            filledFields.add('employment_type');
+                          }
+                          if (jobInfo.location_type) {
+                            setValue('location_type', jobInfo.location_type);
+                            filledFields.add('location_type');
+                          }
+                          if (jobInfo.location) {
+                            setValue('location', jobInfo.location);
+                            filledFields.add('location');
+                          }
+                          if (jobInfo.budget_currency) {
+                            setValue('budget_currency', jobInfo.budget_currency);
+                            filledFields.add('budget_currency');
+                          }
+                          if (jobInfo.budget_min) {
+                            setValue('budget_min', jobInfo.budget_min.toString());
+                            filledFields.add('budget_min');
+                          }
+                          if (jobInfo.budget_max) {
+                            setValue('budget_max', jobInfo.budget_max.toString());
+                            filledFields.add('budget_max');
+                          }
+                          if (jobInfo.description) {
+                            setValue('description', jobInfo.description);
+                            filledFields.add('description');
+                          }
+                          if (jobInfo.skills_must?.length > 0) {
+                            setSkillsMust(jobInfo.skills_must);
+                            filledFields.add('skills_must');
+                          }
+                          if (jobInfo.skills_nice?.length > 0) {
+                            setSkillsNice(jobInfo.skills_nice);
+                            filledFields.add('skills_nice');
+                          }
+
+                          setAutoFilledFields(filledFields);
+                          toast.success('Parsed and auto-filled key fields. Please review before posting.');
+                          
+                          // Hide the textarea after successful parse
+                          const container = document.getElementById('paste-jd-container');
+                          container?.classList.add('hidden');
+                          textarea.value = '';
+                        } catch (error) {
+                          console.error('Error parsing job description:', error);
+                          toast.error('Failed to parse job description. Please try again or fill in manually.');
+                        } finally {
+                          setIsParsing(false);
+                        }
+                      }}
+                    >
+                      {isParsing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Parse & Fill
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => {
+                        const container = document.getElementById('paste-jd-container');
+                        const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
+                        container?.classList.add('hidden');
+                        if (textarea) textarea.value = '';
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
