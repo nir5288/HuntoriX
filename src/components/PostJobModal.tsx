@@ -533,17 +533,19 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="relative">
-          <Button 
-            type="button" 
-            variant="ghost" 
-            onClick={handleClear} 
-            className="absolute right-0 top-0 h-8 text-xs"
-          >
-            Clear Form
-          </Button>
-          <DialogTitle className="text-2xl pr-24">Post a Job</DialogTitle>
-          <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
+        <DialogHeader>
+          <DialogTitle className="text-2xl">Post a Job</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={handleClear} 
+              className="h-8 text-xs"
+            >
+              Clear Form
+            </Button>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
