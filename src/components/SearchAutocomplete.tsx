@@ -251,6 +251,7 @@ export function SearchAutocomplete({ value, onChange, onFilterAdd, placeholder }
       setPreviewValue('');
       setOriginalQuery('');
       setSelectedIndex(-1);
+      inputRef.current?.blur();
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);

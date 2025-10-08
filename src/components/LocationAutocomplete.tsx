@@ -512,6 +512,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
       setPreviewValue('');
       setOriginalQuery('');
       setSelectedIndex(-1);
+      inputRef.current?.blur();
     } else if (e.key === 'Escape') {
       setOpen(false);
       setSelectedIndex(-1);
