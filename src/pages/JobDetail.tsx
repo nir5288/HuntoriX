@@ -275,14 +275,14 @@ const JobDetail = () => {
   return <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Button variant="ghost" onClick={handleBack} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid lg:grid-cols-[1fr,380px] gap-8">
+          <div className="space-y-6 min-w-0">
             <Card className="rounded-2xl">
               <CardHeader>
                 <div className="flex items-start justify-between gap-4 mb-4">
