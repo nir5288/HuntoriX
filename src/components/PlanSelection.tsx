@@ -243,7 +243,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
           {PLANS.map((plan) => {
             const price = getPrice(plan);
             const isSelected = selectedPlan === plan.id;
@@ -253,7 +253,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
               <Card
                 key={plan.id}
                 className={cn(
-                  "relative cursor-pointer transition-all duration-200 rounded-2xl border-2 flex flex-col h-full",
+                  "relative cursor-pointer transition-all duration-200 rounded-2xl border-2 flex flex-col h-full pt-6",
                   isSelected && !plan.locked && "ring-2 ring-primary shadow-lg border-primary",
                   isRecommended && "border-primary/50",
                   plan.locked && "opacity-60",
