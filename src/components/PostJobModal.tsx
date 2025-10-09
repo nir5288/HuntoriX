@@ -93,6 +93,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [salaryPeriod, setSalaryPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [compensationOpen, setCompensationOpen] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -152,6 +153,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     if (skillMustInput.trim() && !skillsMust.includes(skillMustInput.trim())) {
       setSkillsMust([...skillsMust, skillMustInput.trim()]);
       setSkillMustInput('');
+      clearFieldError('skills_must');
     }
   };
 
@@ -420,16 +422,23 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   };
 
   const scrollToField = (fieldName: string) => {
-    const element = document.querySelector(`[name="${fieldName}"]`) || 
-                    document.getElementById(fieldName);
+    const element = document.querySelector(`[data-field="${fieldName}"]`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Flash the field with red border
-      element.classList.add('ring-2', 'ring-destructive');
+      // Focus the element
+      const focusableElement = element.querySelector('input, textarea, button, select') as HTMLElement;
       setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-destructive');
-      }, 3000);
+        focusableElement?.focus({ preventScroll: true });
+      }, 300);
     }
+  };
+
+  const clearFieldError = (fieldName: string) => {
+    setFieldErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldName];
+      return newErrors;
+    });
   };
 
   const handleClear = () => {
@@ -442,99 +451,107 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     setAutoFilledFields(new Set());
     setIsExclusive(false);
     setSalaryPeriod('monthly');
+    setFieldErrors({});
     toast.success('Form cleared');
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    // Clear previous errors
+    setFieldErrors({});
+    
     // Validate all required fields and collect errors
-    const validationErrors: { field: string; message: string; description: string }[] = [];
+    const validationErrors: Record<string, string> = {};
+    
+    // Define field order for scrolling to first error
+    const fieldOrder = [
+      'title', 
+      'industry', 
+      'seniority', 
+      'employment_type', 
+      'location_type',
+      'location', 
+      'budget_currency',
+      'budget_min',
+      'budget_max',
+      'description', 
+      'skills_must'
+    ];
 
-    if (!data.title) {
-      validationErrors.push({
-        field: 'title',
-        message: 'Job title is required',
-        description: 'Please select or enter a job title'
-      });
+    if (!data.title || data.title.trim().length === 0) {
+      validationErrors.title = 'Job title is required';
+    }
+    
+    if (data.title === 'Other' && (!data.custom_title || data.custom_title.trim().length === 0)) {
+      validationErrors.custom_title = 'Custom title is required when selecting "Other"';
     }
 
-    if (!data.industry) {
-      validationErrors.push({
-        field: 'industry',
-        message: 'Industry is required',
-        description: 'Please select an industry'
-      });
+    if (!data.industry || data.industry.trim().length === 0) {
+      validationErrors.industry = 'Industry is required';
     }
 
     if (!data.seniority) {
-      validationErrors.push({
-        field: 'seniority',
-        message: 'Seniority level is required',
-        description: 'Please select the seniority level'
-      });
+      validationErrors.seniority = 'Seniority level is required';
     }
 
     if (!data.employment_type) {
-      validationErrors.push({
-        field: 'employment_type',
-        message: 'Employment type is required',
-        description: 'Please select full-time, contract, or temp'
-      });
+      validationErrors.employment_type = 'Employment type is required';
     }
 
-    if (!data.location || data.location.trim().length === 0) {
-      validationErrors.push({
-        field: 'location',
-        message: 'Work location is required',
-        description: 'Please select a location from the dropdown'
-      });
+    // Location validation based on location_type
+    const locType = data.location_type || 'remote';
+    if ((locType === 'on_site' || locType === 'hybrid') && (!data.location || data.location.trim().length === 0)) {
+      validationErrors.location = 'Work location is required for On-site and Hybrid positions';
     }
 
-    if (!data.description || data.description.length < 10) {
-      validationErrors.push({
-        field: 'description',
-        message: 'Job description is required',
-        description: 'Please provide a description (minimum 10 characters)'
-      });
+    // Salary range validation
+    const budgetMin = data.budget_min ? Number(data.budget_min) : null;
+    const budgetMax = data.budget_max ? Number(data.budget_max) : null;
+    
+    if (budgetMin !== null && budgetMax !== null && budgetMax < budgetMin) {
+      validationErrors.budget_max = 'Maximum salary must be greater than or equal to minimum';
+    }
+
+    if (!data.description || data.description.trim().length < 10) {
+      validationErrors.description = 'Job description is required (minimum 10 characters)';
     }
 
     if (skillsMust.length === 0) {
-      validationErrors.push({
-        field: 'skills-must-container',
-        message: 'Must-have skills are required',
-        description: 'Please add at least one required skill for this position'
-      });
+      validationErrors.skills_must = 'At least one must-have skill is required';
     }
 
     // If there are validation errors, show them and scroll to the first one
-    if (validationErrors.length > 0) {
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      
       // Expand skills section if skills are missing
-      if (validationErrors.some(e => e.field === 'skills-must-container')) {
+      if (validationErrors.skills_must) {
         setSkillsOpen(true);
       }
+      
+      // Expand compensation section if budget errors exist
+      if (validationErrors.budget_min || validationErrors.budget_max) {
+        setCompensationOpen(true);
+      }
 
-      // Highlight all invalid fields
-      validationErrors.forEach(error => {
-        const element = document.querySelector(`[name="${error.field}"]`) || 
-                       document.getElementById(error.field);
-        if (element) {
-          element.classList.add('ring-2', 'ring-destructive');
-          setTimeout(() => {
-            element.classList.remove('ring-2', 'ring-destructive');
-          }, 3000);
-        }
-      });
-
-      // Scroll to the first invalid field
-      scrollToField(validationErrors[0].field);
+      // Find the first error in DOM order
+      const firstErrorField = fieldOrder.find(field => validationErrors[field]);
+      
+      if (firstErrorField) {
+        // Small delay to allow collapsibles to expand
+        setTimeout(() => {
+          scrollToField(firstErrorField);
+        }, 100);
+      }
 
       // Show toast with error summary
-      const errorCount = validationErrors.length;
-      toast.error(
-        errorCount === 1 ? validationErrors[0].message : `${errorCount} required fields are missing`,
-        { 
-          description: errorCount === 1 ? validationErrors[0].description : 'Please fill in all required fields'
-        }
-      );
+      const errorCount = Object.keys(validationErrors).length;
+      if (errorCount === 1) {
+        const errorField = Object.keys(validationErrors)[0];
+        const errorMessage = validationErrors[errorField];
+        toast.error(errorMessage);
+      } else {
+        toast.error(`Please complete the required fields (${errorCount} missing). Jumped to the first.`);
+      }
       
       return;
     }
@@ -919,30 +936,72 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <h3 className="font-semibold text-base mb-5">Job Basics</h3>
             
             <div className="space-y-4">
-              <div className="space-y-2.5">
+              <div className="space-y-2.5" data-field="title">
                 <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
-                <div id="title" className="transition-all rounded-md">
+                <div className="transition-all rounded-md">
                   <JobTitleAutocomplete
                     value={selectedTitle}
-                    onChange={(value) => setValue('title', value)}
+                    onChange={(value) => {
+                      setValue('title', value);
+                      clearFieldError('title');
+                    }}
                     placeholder="Search job title..."
-                    className={cn(autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                    className={cn(
+                      autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                      fieldErrors.title && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                    )}
+                    aria-invalid={!!fieldErrors.title}
+                    aria-describedby={fieldErrors.title ? 'title-error' : undefined}
                   />
                 </div>
-                {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+                {fieldErrors.title && (
+                  <p id="title-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.title}</p>
+                )}
+                {errors.title && !fieldErrors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
 
               {selectedTitle === 'Other' && (
-                <div className="space-y-2.5">
-                  <Label className="text-sm font-medium">Custom Title</Label>
-                  <Input {...register('custom_title')} placeholder="Enter custom job title" className="h-11" />
+                <div className="space-y-2.5" data-field="custom_title">
+                  <Label className="text-sm font-medium">Custom Title <span className="text-destructive">*</span></Label>
+                  <Input 
+                    {...register('custom_title')} 
+                    onChange={(e) => {
+                      register('custom_title').onChange(e);
+                      clearFieldError('custom_title');
+                    }}
+                    placeholder="Enter custom job title" 
+                    className={cn(
+                      "h-11",
+                      fieldErrors.custom_title && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                    )}
+                    aria-invalid={!!fieldErrors.custom_title}
+                    aria-describedby={fieldErrors.custom_title ? 'custom-title-error' : undefined}
+                  />
+                  {fieldErrors.custom_title && (
+                    <p id="custom-title-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.custom_title}</p>
+                  )}
                 </div>
               )}
 
-              <div className="space-y-2.5">
+              <div className="space-y-2.5" data-field="industry">
                 <Label htmlFor="industry" className="text-sm font-medium">Industry <span className="text-destructive">*</span></Label>
-                <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
-                  <SelectTrigger id="industry" className={cn("h-11 transition-all", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                <Select 
+                  onValueChange={(value) => {
+                    setValue('industry', value);
+                    clearFieldError('industry');
+                  }} 
+                  value={industry}
+                >
+                  <SelectTrigger 
+                    id="industry" 
+                    className={cn(
+                      "h-11 transition-all", 
+                      autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                      fieldErrors.industry && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                    )}
+                    aria-invalid={!!fieldErrors.industry}
+                    aria-describedby={fieldErrors.industry ? 'industry-error' : undefined}
+                  >
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -951,14 +1010,32 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
+                {fieldErrors.industry && (
+                  <p id="industry-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.industry}</p>
+                )}
+                {errors.industry && !fieldErrors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2.5">
+                <div className="space-y-2.5" data-field="seniority">
                   <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
-                  <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
-                    <SelectTrigger id="seniority" className={cn("h-11 transition-all", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  <Select 
+                    onValueChange={(value) => {
+                      setValue('seniority', value as any);
+                      clearFieldError('seniority');
+                    }} 
+                    value={seniorityVal || undefined}
+                  >
+                    <SelectTrigger 
+                      id="seniority" 
+                      className={cn(
+                        "h-11 transition-all", 
+                        autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                        fieldErrors.seniority && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                      )}
+                      aria-invalid={!!fieldErrors.seniority}
+                      aria-describedby={fieldErrors.seniority ? 'seniority-error' : undefined}
+                    >
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -970,13 +1047,31 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       <SelectItem value="vp_c_level">VP / C-Level</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.seniority?.message && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
+                  {fieldErrors.seniority && (
+                    <p id="seniority-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.seniority}</p>
+                  )}
+                  {errors.seniority?.message && !fieldErrors.seniority && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-2.5" data-field="employment_type">
                   <Label htmlFor="employment_type" className="text-sm font-medium">Employment Type <span className="text-destructive">*</span></Label>
-                  <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
-                    <SelectTrigger id="employment_type" className={cn("h-11 transition-all", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  <Select 
+                    onValueChange={(value) => {
+                      setValue('employment_type', value as any);
+                      clearFieldError('employment_type');
+                    }} 
+                    value={employmentTypeVal || undefined}
+                  >
+                    <SelectTrigger 
+                      id="employment_type" 
+                      className={cn(
+                        "h-11 transition-all", 
+                        autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                        fieldErrors.employment_type && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                      )}
+                      aria-invalid={!!fieldErrors.employment_type}
+                      aria-describedby={fieldErrors.employment_type ? 'employment-type-error' : undefined}
+                    >
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -985,15 +1080,25 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       <SelectItem value="temp">Temporary</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.employment_type?.message && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
+                  {fieldErrors.employment_type && (
+                    <p id="employment-type-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.employment_type}</p>
+                  )}
+                  {errors.employment_type?.message && !fieldErrors.employment_type && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
                 </div>
               </div>
 
-              <div className="space-y-2.5">
-                <Label className="text-sm font-medium">Work Location</Label>
+              <div className="space-y-2.5" data-field="location_type">
+                <Label className="text-sm font-medium">Work Location Type</Label>
                 <RadioGroup
                   value={locationType || 'remote'}
-                  onValueChange={(value) => setValue('location_type', value)}
+                  onValueChange={(value) => {
+                    setValue('location_type', value);
+                    clearFieldError('location_type');
+                    // Clear location error if switching to remote
+                    if (value === 'remote') {
+                      clearFieldError('location');
+                    }
+                  }}
                   className={cn("grid grid-cols-3 gap-3", autoFilledFields.has('location_type') && 'bg-yellow-50 dark:bg-yellow-950/20 p-3 rounded-lg')}
                 >
                   <div className="flex items-center space-x-2">
@@ -1011,19 +1116,33 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </RadioGroup>
               </div>
 
-              <div className="space-y-2.5">
-                <Label htmlFor="location" className="text-sm font-medium">Work Location <span className="text-destructive">*</span></Label>
-                <div id="location" className="transition-all rounded-md">
+              <div className="space-y-2.5" data-field="location">
+                <Label htmlFor="location" className="text-sm font-medium">
+                  Work Location {(locationType === 'on_site' || locationType === 'hybrid') && <span className="text-destructive">*</span>}
+                </Label>
+                <div className="transition-all rounded-md">
                   <LocationAutocomplete
                     value={watch('location') || ''}
-                    onChange={(value) => setValue('location', value)}
+                    onChange={(value) => {
+                      setValue('location', value);
+                      clearFieldError('location');
+                    }}
                     placeholder="Search city or country..."
-                    className={cn(autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5')}
+                    className={cn(
+                      autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5',
+                      fieldErrors.location && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                    )}
+                    aria-invalid={!!fieldErrors.location}
+                    aria-describedby={fieldErrors.location ? 'location-error' : undefined}
                   />
                 </div>
-                {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
+                {fieldErrors.location && (
+                  <p id="location-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.location}</p>
+                )}
+                {errors.location && !fieldErrors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
                 <p className="text-xs text-muted-foreground">
                   Select a location from the dropdown - custom locations are not allowed
+                  {locationType === 'remote' && ' (optional for remote positions)'}
                 </p>
               </div>
             </div>
@@ -1043,7 +1162,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               <CollapsibleContent className="pt-4">
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
+                    <div className="space-y-2" data-field="budget_currency">
                       <Label htmlFor="budget_currency" className="text-sm font-medium">Currency</Label>
                       <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
                         <SelectTrigger className={cn("h-10", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
@@ -1084,7 +1203,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-field="budget_min">
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-semibold">
                         {watch('budget_min') 
@@ -1116,11 +1235,16 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                         const max = salaryPeriod === 'monthly' ? 150000 : 1800000;
                         setValue('budget_min', values[0] > min ? values[0].toString() : '');
                         setValue('budget_max', values[1] < max ? values[1].toString() : '');
+                        clearFieldError('budget_min');
+                        clearFieldError('budget_max');
                       }}
                       className="cursor-pointer"
                     />
                   </div>
-                  {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
+                  {fieldErrors.budget_max && (
+                    <p id="budget-max-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.budget_max}</p>
+                  )}
+                  {errors.budget_max && !fieldErrors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
                 </div>
               </CollapsibleContent>
             </Card>
@@ -1130,16 +1254,29 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           <Card className="p-6 bg-muted/20">
             <h3 className="font-semibold text-base mb-5">Job Description</h3>
             
-            <div className="space-y-2.5">
+            <div className="space-y-2.5" data-field="description">
               <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
               <Textarea 
                 id="description"
                 {...register('description')} 
+                onChange={(e) => {
+                  register('description').onChange(e);
+                  clearFieldError('description');
+                }}
                 rows={6} 
                 placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
-                className={cn("text-sm resize-none transition-all", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                className={cn(
+                  "text-sm resize-none transition-all", 
+                  autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                  fieldErrors.description && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                )}
+                aria-invalid={!!fieldErrors.description}
+                aria-describedby={fieldErrors.description ? 'description-error' : undefined}
               />
-              {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+              {fieldErrors.description && (
+                <p id="description-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.description}</p>
+              )}
+              {errors.description && !fieldErrors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
           </Card>
 
@@ -1156,7 +1293,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               
               <CollapsibleContent className="pt-5">
                 <div className="space-y-5">
-                  <div className="space-y-3">
+                  <div className="space-y-3" data-field="skills_must">
                     <Label className="text-sm font-medium">Must-Have Skills <span className="text-destructive">*</span></Label>
                     <div className="flex gap-2">
                       <Input 
@@ -1170,17 +1307,37 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                         Add
                       </Button>
                     </div>
-                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2 transition-all", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')} id="skills-must-container">
+                    <div 
+                      className={cn(
+                        "flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2 transition-all", 
+                        autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                        fieldErrors.skills_must && 'ring-2 ring-red-500/70 border-red-300 bg-red-50/50 dark:bg-red-950/20'
+                      )}
+                      id="skills-must-container"
+                      aria-invalid={!!fieldErrors.skills_must}
+                      aria-describedby={fieldErrors.skills_must ? 'skills-must-error' : undefined}
+                    >
                       {skillsMust.map(skill => (
                         <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
                           {skill}
-                          <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillMust(skill)} />
+                          <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => {
+                            removeSkillMust(skill);
+                            if (skillsMust.length === 1) {
+                              // Will be empty after removal
+                              setFieldErrors(prev => ({ ...prev, skills_must: 'At least one must-have skill is required' }));
+                            } else {
+                              clearFieldError('skills_must');
+                            }
+                          }} />
                         </Badge>
                       ))}
                       {skillsMust.length === 0 && (
                         <span className="text-sm text-muted-foreground">Add at least one required skill</span>
                       )}
                     </div>
+                    {fieldErrors.skills_must && (
+                      <p id="skills-must-error" className="text-sm text-red-600 dark:text-red-400">{fieldErrors.skills_must}</p>
+                    )}
                   </div>
 
                   <div className="space-y-3">
