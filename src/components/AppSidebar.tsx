@@ -155,7 +155,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                           isSoon 
                             ? 'cursor-not-allowed opacity-40' 
                             : isActiveItem
-                              ? 'bg-black/60 shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] border border-slate-700/50'
+                              ? 'bg-black shadow-[inset_0_4px_12px_rgba(0,0,0,0.9),inset_0_-2px_8px_rgba(0,0,0,0.7),0_1px_0_rgba(255,255,255,0.03)] border border-black'
                               : 'hover:bg-slate-700/40'
                         }`}
                       >
