@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Brain, Sparkles, Zap, Users, Briefcase, Target, TrendingUp, Network, Bot, CheckCircle, Award, Cpu } from 'lucide-react';
+import { Sparkles, Zap, Users, Briefcase, Target, TrendingUp, Network, Bot, CheckCircle, Award, Cpu } from 'lucide-react';
 
 const HeroFloatingElements = () => {
   return (
@@ -161,35 +161,6 @@ const HeroFloatingElements = () => {
           delay: 1,
         }}
       />
-
-      {/* Interactive AI Assist Chip */}
-      <motion.div
-        className="absolute bottom-[15%] right-[10%] pointer-events-auto"
-        whileHover={{ scale: 1.1 }}
-        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-      >
-        <motion.div
-          className="px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] cursor-pointer shadow-lg"
-          animate={{
-            boxShadow: [
-              '0 0 20px hsl(var(--accent-lilac) / 0.3)',
-              '0 0 30px hsl(var(--accent-pink) / 0.5)',
-              '0 0 20px hsl(var(--accent-lilac) / 0.3)',
-            ],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          title="Powered by Huntorix AI"
-        >
-          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Brain className="w-4 h-4" />
-            <span>AI Assist</span>
-          </div>
-        </motion.div>
-      </motion.div>
 
       {/* Floating Icon Particles */}
       <motion.div
