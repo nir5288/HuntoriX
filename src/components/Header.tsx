@@ -152,40 +152,58 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-[100] px-4 sm:px-6 md:px-8">
+    <header className="fixed top-4 left-0 right-0 z-[100] px-4 sm:px-6">
       <div 
-        className={`max-w-[1440px] mx-auto rounded-3xl backdrop-blur-xl bg-background/60 border-2 shadow-lg transition-all duration-300 ${
+        className={`relative max-w-[1400px] mx-auto rounded-full backdrop-blur-md bg-background/70 shadow-lg transition-all duration-300 ${
           isScrolled 
-            ? 'h-14 sm:h-[60px] md:h-[72px] bg-background/80' 
-            : 'h-16 sm:h-[72px] md:h-24 bg-background/60'
+            ? 'h-[56px] sm:h-[60px] bg-background/80' 
+            : 'h-[64px] sm:h-[72px] bg-background/70'
         }`}
         style={{
-          borderImage: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink))) 1',
+          border: '2px solid transparent',
+          backgroundImage: `
+            linear-gradient(hsl(var(--background)), hsl(var(--background))),
+            linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))
+          `,
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box',
         }}
       >
-        <div className="h-full px-4 sm:px-6 md:px-8 flex items-center justify-between gap-4">
+        <div className="h-full px-6 sm:px-8 flex items-center justify-between gap-4">
           {/* Left side - Logo */}
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition shrink-0">
-            <Briefcase className={`transition-all duration-300 ${isScrolled ? 'h-5 w-5 sm:h-6 sm:w-6' : 'h-6 w-6 sm:h-7 sm:w-7'}`} />
-            <span className={`font-bold whitespace-nowrap transition-all duration-300 ${isScrolled ? 'text-base sm:text-lg md:text-xl' : 'text-lg sm:text-xl md:text-2xl'}`}>HUNTORIX</span>
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition shrink-0 z-10">
+            <Briefcase className={`transition-all duration-300 ${isScrolled ? 'h-5 w-5' : 'h-6 w-6'}`} />
+            <span className={`font-bold whitespace-nowrap transition-all duration-300 ${isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'}`}>HUNTORIX</span>
           </Link>
 
           {/* Center - Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2 lg:gap-6 absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden lg:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
-              className={`${getNavLinkClass('/dashboard')} text-xs lg:text-sm transition-all duration-300`}
+              className={`text-sm font-medium transition-colors hover:text-foreground ${
+                isActive('/dashboard') ? 'text-foreground' : 'text-muted-foreground'
+              }`}
             >
               Dashboard
             </Link>
-            <Link to="/opportunities" className={`${getNavLinkClass('/opportunities')} text-xs lg:text-sm transition-all duration-300`}>
+            <Link 
+              to="/opportunities" 
+              className={`text-sm font-medium transition-colors hover:text-foreground ${
+                isActive('/opportunities') ? 'text-foreground' : 'text-muted-foreground'
+              }`}
+            >
               Opportunities
             </Link>
-            <Link to="/headhunters" className={`${getNavLinkClass('/headhunters')} text-xs lg:text-sm transition-all duration-300`}>
+            <Link 
+              to="/headhunters" 
+              className={`text-sm font-medium transition-colors hover:text-foreground ${
+                isActive('/headhunters') ? 'text-foreground' : 'text-muted-foreground'
+              }`}
+            >
               Headhunters
             </Link>
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-xs lg:text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 More <ChevronDown className="h-3 w-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center">
@@ -204,105 +222,85 @@ export function Header() {
           </nav>
 
           {/* Right side - Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            {/* Mobile Menu for < md */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[280px] sm:w-[340px]">
-                <nav className="flex flex-col gap-1 mt-8">
-                  <div className="mb-2">
-                    <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">MAIN MENU</p>
-                    <Link 
-                      to={user ? getDashboardPath() : '/auth'} 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
-                      Dashboard
-                    </Link>
-                    <Link 
-                      to="/opportunities" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Star className="h-5 w-5 text-muted-foreground" />
-                      Opportunities
-                    </Link>
-                    <Link 
-                      to="/headhunters" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <User className="h-5 w-5 text-muted-foreground" />
-                      Find a Headhunter
-                    </Link>
-                    {user && (
-                      <Link 
-                        to="/messages" 
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <MessagesSquare className="h-5 w-5 text-muted-foreground" />
-                        Messages
-                      </Link>
-                    )}
-                  </div>
-                  <div className="border-t pt-2">
-                    <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
-                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
-                      <BarChart3 className="h-5 w-5 text-muted-foreground" />
-                      HuntRank
-                      <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
-                    </div>
-                  </div>
-                </nav>
-              </SheetContent>
-            </Sheet>
-
+          <div className="flex items-center gap-2 shrink-0 z-10">
             {user && profile ? (
               <TooltipProvider delayDuration={0}>
-                <div className="hidden sm:flex items-center gap-1">
-                  <NotificationDropdown />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate('/messages')}
-                        className={`transition-all duration-300 ${isScrolled ? 'h-8 w-8' : 'h-9 w-9'}`}
-                      >
-                        <MessagesSquare className={`transition-all duration-300 ${isScrolled ? 'h-4 w-4' : 'h-5 w-5'}`} />
+                <div className="flex items-center gap-1">
+                  {/* Mobile Menu */}
+                  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9" aria-label="Open menu">
+                        <Menu className="h-5 w-5" />
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Messages</TooltipContent>
-                  </Tooltip>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-2 hover:opacity-80 transition">
-                      <div className="relative">
-                        <Avatar className={`transition-all duration-300 ${isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9 sm:h-10 sm:w-10'}`}>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-[280px] sm:w-[340px]">
+                      <nav className="flex flex-col gap-1 mt-8">
+                        <div className="mb-2">
+                          <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">MAIN MENU</p>
+                          <Link 
+                            to={user ? getDashboardPath() : '/auth'} 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+                            Dashboard
+                          </Link>
+                          <Link 
+                            to="/opportunities" 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <Star className="h-5 w-5 text-muted-foreground" />
+                            Opportunities
+                          </Link>
+                          <Link 
+                            to="/headhunters" 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <User className="h-5 w-5 text-muted-foreground" />
+                            Headhunters
+                          </Link>
+                          <Link 
+                            to="/messages" 
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <MessagesSquare className="h-5 w-5 text-muted-foreground" />
+                            Messages
+                          </Link>
+                        </div>
+                      </nav>
+                    </SheetContent>
+                  </Sheet>
+
+                  <div className="hidden lg:flex items-center gap-1">
+                    <NotificationDropdown />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => navigate('/messages')}
+                          className="h-9 w-9"
+                        >
+                          <MessagesSquare className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Messages</TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-2 hover:opacity-80 transition">
+                        <Avatar className="h-9 w-9">
                           <AvatarImage src={profile.avatar_url} />
                           <AvatarFallback className="text-sm">
                             {profile.name?.[0]?.toUpperCase() || 'U'}
                           </AvatarFallback>
                         </Avatar>
-                        <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background ${
-                          status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
-                        }`} />
-                      </div>
-                      <div className="hidden lg:flex flex-col items-start">
-                        <span className={`font-medium truncate max-w-[120px] transition-all duration-300 ${isScrolled ? 'text-xs' : 'text-sm'}`}>{profile.name || profile.email}</span>
-                        <Badge variant="outline" className={`capitalize transition-all duration-300 ${isScrolled ? 'text-[10px]' : 'text-xs'}`}>
-                          {profile.role}
-                        </Badge>
-                      </div>
-                    </button>
-                  </DropdownMenuTrigger>
+                      </button>
+                    </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -436,28 +434,59 @@ export function Header() {
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                </div>
               </TooltipProvider>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate('/auth?mode=signin')}
-                  className={`transition-all duration-300 ${isScrolled ? 'text-xs px-2 h-8' : 'text-sm px-3 h-9'}`}
-                >
-                  Login
-                </Button>
-                <Button 
-                  variant="hero" 
-                  size="sm"
-                  onClick={() => navigate('/auth?mode=signup')}
-                  className={`transition-all duration-300 ${isScrolled ? 'text-xs px-3 h-8' : 'text-sm px-4 h-9'}`}
-                >
-                  Sign up
-                </Button>
-              </div>
+              <>
+                {/* Mobile Menu for non-logged in users */}
+                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9" aria-label="Open menu">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[280px] sm:w-[340px]">
+                    <nav className="flex flex-col gap-1 mt-8">
+                      <Link 
+                        to="/opportunities" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Star className="h-5 w-5 text-muted-foreground" />
+                        Opportunities
+                      </Link>
+                      <Link 
+                        to="/headhunters" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5 text-muted-foreground" />
+                        Headhunters
+                      </Link>
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+                
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => navigate('/auth?mode=signin')}
+                    className="text-sm px-4 h-9 hidden sm:flex"
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate('/auth?mode=signup')}
+                    className="text-sm px-4 h-9 bg-foreground text-background hover:bg-foreground/90 rounded-full font-medium"
+                  >
+                    Sign up →
+                  </Button>
+                </div>
+              </>
             )}
           </div>
         </div>
