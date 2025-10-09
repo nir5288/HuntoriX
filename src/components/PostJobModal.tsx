@@ -1273,13 +1273,13 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => onOpenChange(false)} 
-              size="lg"
-              className="border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+              size="default"
+              className="h-10 px-6 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               Cancel
             </Button>
@@ -1287,11 +1287,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               type="submit"
               form="post-job-form"
               variant={isFormValid ? "hero" : "default"}
-              size="lg"
+              size="default"
               disabled={isSubmitting}
               className={cn(
-                "transition-all duration-300 font-bold min-w-[180px]",
-                isFormValid && 'shadow-lg shadow-primary/30',
+                "h-10 px-6 transition-all duration-300 font-semibold",
+                isFormValid && 'shadow-md shadow-primary/20',
                 !isFormValid && 'opacity-50'
               )}
             >
