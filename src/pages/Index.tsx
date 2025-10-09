@@ -41,38 +41,49 @@ const Index = () => {
       
       {/* Hero Section */}
       <section 
-        className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center"
+        className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center overflow-hidden"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
-        <div className="max-w-[1600px] mx-auto px-4 py-20">
+        {/* Large Background Text */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+          <h2 className="text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[24rem] xl:text-[28rem] font-black text-foreground/[0.02] whitespace-nowrap select-none tracking-tighter leading-none">
+            HUNTORIX
+          </h2>
+        </div>
+
+        <div className="max-w-[1600px] mx-auto px-4 py-20 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px]">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
-              <div>
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
+              <div className="animate-fade-in">
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
                   <Award className="h-4 w-4" />
-                  Trusted by leading companies
+                  Trusted by Leading Companies
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-                Post a Job.
-                <br />
-                Let the <span className="whitespace-nowrap">Best Headhunters</span>
-                <br />
-                Compete for You.
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter leading-[1.1] animate-fade-in">
+                <span className="block text-foreground">Post a Job.</span>
+                <span className="block mt-2">
+                  <span className="text-[hsl(var(--accent-pink))]">Let the Best</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-[hsl(var(--accent-mint))] via-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] bg-clip-text text-transparent">
+                    Headhunters
+                  </span>
+                </span>
+                <span className="block text-foreground mt-2">Compete for You.</span>
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+              <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed animate-fade-in">
                 Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-8 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 pt-8 justify-center lg:justify-start animate-fade-in">
                 <Button 
                   size="lg" 
                   variant="hero" 
                   onClick={handleEmployerCTA}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
                 >
                   <Briefcase className="mr-2 h-5 w-5" />
                   I'm an Employer
@@ -81,7 +92,7 @@ const Index = () => {
                   size="lg" 
                   variant="mint" 
                   onClick={handleHeadhunterCTA}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
                 >
                   <Users className="mr-2 h-5 w-5" />
                   I'm a Headhunter
@@ -90,12 +101,12 @@ const Index = () => {
             </div>
 
             {/* Right side - Image (50%) */}
-            <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative">
+            <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative animate-fade-in">
               <HeroFloatingElements />
               <img
                 src={heroImage} 
                 alt="Headhunter network connecting employers with talent" 
-                className="w-full h-auto object-contain relative z-10"
+                className="w-full h-auto object-contain relative z-10 drop-shadow-2xl"
               />
             </div>
           </div>
