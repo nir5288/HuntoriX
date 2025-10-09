@@ -58,15 +58,12 @@ const Index = () => {
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         {/* Large Background Text */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none overflow-visible flex justify-center items-end">
           <h2 
-            className="font-black text-foreground/[0.08] select-none leading-none"
+            className="font-black text-foreground/[0.08] select-none leading-none whitespace-nowrap"
             style={{
-              fontSize: 'clamp(8rem, 15vw, 22rem)',
-              width: '100%',
-              letterSpacing: '0.2em',
-              transform: 'scaleX(1.8)',
-              transformOrigin: 'center',
+              fontSize: 'clamp(10rem, 20vw, 28rem)',
+              letterSpacing: '0.05em',
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 20%, rgba(0,0,0,1) 60%)',
               maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 20%, rgba(0,0,0,1) 60%)',
             }}
