@@ -707,7 +707,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   
                   <Button
                     type="button"
-                    className="flex-1 text-xs h-10 px-4 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+                    variant="outline"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md transition-all flex-1 justify-center h-10 text-xs font-medium"
                     disabled={isParsing}
                     onClick={() => {
                       const container = document.getElementById('paste-jd-container');
