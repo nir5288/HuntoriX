@@ -93,7 +93,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
       className="border-r border-slate-800/50 transition-all duration-300"
       style={{ 
         backgroundColor: 'rgb(18, 18, 20)',
-        width: open ? '24rem' : '4.5rem'
+        width: open ? '16rem' : '5.25rem'
       }}
     >
       <SidebarHeader 
@@ -159,7 +159,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                       >
                         {item.url === '#' ? (
                           <div className={`flex items-center gap-4 w-full ${!open ? 'justify-center' : ''}`}>
-                            <item.icon className="h-7 w-7 shrink-0 text-slate-600" strokeWidth={2.5} />
+                            <item.icon className="h-7 w-7 shrink-0 text-slate-600" strokeWidth={3} />
                             {open && (
                               <div className="flex items-center gap-2 flex-1 justify-between">
                                 <span className="text-sm font-medium text-slate-500">{item.title}</span>
@@ -175,7 +175,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                           <NavLink to={item.url} className={`flex items-center gap-4 w-full ${!open ? 'justify-center' : ''}`}>
                             <item.icon 
                               className="h-7 w-7 shrink-0 transition-all duration-200"
-                              strokeWidth={2.5}
+                              strokeWidth={3}
                               style={{
                                 color: isActiveItem 
                                   ? 'hsl(var(--accent-mint))' 
