@@ -54,8 +54,12 @@ const Index = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight break-words">
-                Post a Job. Let the Best Headhunters Compete for You.
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+                Post a Job.
+                <br />
+                Let the Best Hunters
+                <br />
+                Compete for You.
               </h1>
               
               <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
@@ -79,7 +83,7 @@ const Index = () => {
               <img 
                 src={heroImage} 
                 alt="Headhunter network connecting employers with talent" 
-                className="w-full max-w-[800px] h-auto object-contain"
+                className="w-full max-w-[1040px] h-auto object-contain"
               />
             </div>
           </div>
