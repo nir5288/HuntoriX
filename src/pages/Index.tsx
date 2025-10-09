@@ -59,7 +59,7 @@ const Index = () => {
       >
         {/* Large Background Text */}
         <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden pb-2">
-          <h2 className="text-[10rem] sm:text-[14rem] md:text-[18rem] lg:text-[22rem] xl:text-[28rem] font-black text-foreground/[0.05] whitespace-nowrap select-none tracking-tighter leading-none">
+          <h2 className="text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[14rem] xl:text-[18rem] 2xl:text-[22rem] font-black text-foreground/[0.05] whitespace-nowrap select-none tracking-tighter leading-none">
             HUNTORIX
           </h2>
         </div>
