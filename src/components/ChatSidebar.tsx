@@ -477,7 +477,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0 pr-24">
+                          <div className="flex-1 min-w-0 pr-16">
                             <div className="flex items-center gap-2 mb-0.5">
                               <p className={cn(
                                 "text-sm truncate flex-1",
@@ -509,7 +509,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
 
                       {/* 3-dot menu - appears on hover or when open in top right */}
                       <div className={cn(
-                        "absolute top-2 right-2 transition-opacity z-20 pointer-events-auto",
+                        "absolute top-2 right-2 transition-opacity",
                         openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                       )}>
                         <DropdownMenu
@@ -528,7 +528,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="z-50 bg-popover">
+                          <DropdownMenuContent align="end" className="z-50">
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
