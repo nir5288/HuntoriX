@@ -642,17 +642,17 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0" hideCloseButton>
         <div className="overflow-y-auto flex-1 px-6 pt-6">
         <DialogHeader>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start items-stretch justify-between gap-3 sm:gap-4">
             <div className="flex-1">
-              <DialogTitle className="text-2xl">Post a Job</DialogTitle>
-              <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
+              <DialogTitle className="text-xl sm:text-2xl">Post a Job</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">Fill in the details to post a new job opening</DialogDescription>
             </div>
             <Button 
               type="button" 
               variant="outline" 
               onClick={handleClear} 
               size="sm"
-              className="h-9 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 dark:border-destructive/50 dark:text-destructive dark:hover:bg-destructive/20 flex-shrink-0"
+              className="h-9 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 dark:border-destructive/50 dark:text-destructive dark:hover:bg-destructive/20 w-full sm:w-auto sm:flex-shrink-0"
             >
               Clear Form
             </Button>
@@ -1341,10 +1341,10 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         </div>
 
         {/* Sticky Footer */}
-        <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/20 border-t border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between gap-4 flex-shrink-0">
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/20 border-t border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center items-stretch justify-between gap-3 sm:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
             <Info className="h-4 w-4 text-blue-700 dark:text-blue-300 flex-shrink-0" />
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+            <p className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100">
               Jobs will be reviewed in under 1 hour
             </p>
           </div>
@@ -1355,7 +1355,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               variant="outline" 
               onClick={() => onOpenChange(false)} 
               size="default"
-              className="h-10 px-6 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="h-10 px-4 sm:px-6 flex-1 sm:flex-initial border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               Cancel
             </Button>
@@ -1366,7 +1366,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               size="default"
               disabled={isSubmitting}
               className={cn(
-                "h-10 px-6 transition-all duration-300 font-semibold",
+                "h-10 px-4 sm:px-6 flex-1 sm:flex-initial transition-all duration-300 font-semibold",
                 isFormValid && 'shadow-md shadow-primary/20',
                 !isFormValid && 'opacity-50'
               )}
