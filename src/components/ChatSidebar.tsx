@@ -463,7 +463,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                     <>
                       <button
                         onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
-                        className="relative z-0 w-full p-3 pr-12 text-left hover:bg-accent transition-colors"
+                        className="w-full p-3 text-left hover:bg-accent transition-colors"
                       >
                         <div className="flex items-start gap-2">
                           <div className="relative">
@@ -501,7 +501,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                       
                       {/* Timestamp - always visible, moves left on hover or when menu open */}
                       <span className={cn(
-                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200 z-10",
+                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200",
                         (openMenuKey === `${conv.jobId}-${conv.otherUserId}`) ? "right-12" : "group-hover:right-12 right-3"
                       )}>
                         {formatRelativeTime(conv.lastMessageTime)}
@@ -509,8 +509,8 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
 
                       {/* 3-dot menu - appears on hover or when open in top right */}
                       <div className={cn(
-                        "absolute top-2 right-2 transition-opacity z-20 pointer-events-none group-hover:pointer-events-auto",
-                        openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100 pointer-events-auto" : "opacity-0 group-hover:opacity-100"
+                        "absolute top-2 right-2 transition-opacity",
+                        openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                       )}>
                         <DropdownMenu
                           open={openMenuKey === `${conv.jobId}-${conv.otherUserId}`}
