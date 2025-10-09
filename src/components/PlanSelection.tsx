@@ -312,18 +312,6 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                 {isRecommended && (
                   <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--vibrant-lilac)/0.08)] to-transparent pointer-events-none" />
                 )}
-                {plan.locked && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Lock className="h-5 w-5 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Available soon</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                )}
 
                 <CardHeader className="pb-6 relative z-10">
                   <div className="flex items-center gap-3 mb-2">
@@ -368,7 +356,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-8 flex-1 flex flex-col relative z-10">
+                <CardContent className="space-y-6 flex-1 flex flex-col relative z-10">
                   <ul className="space-y-4 flex-1">
                     {plan.features.map((feature, featureIndex) => (
                       <li 
