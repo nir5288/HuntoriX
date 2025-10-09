@@ -118,9 +118,22 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const industry = watch('industry');
   const seniorityVal = watch('seniority');
   const employmentTypeVal = watch('employment_type');
+  const location = watch('location');
+  const budgetMin = watch('budget_min');
+  const budgetMax = watch('budget_max');
 
-  // Check if all required fields are filled
-  const isFormValid = isValid && skillsMust.length > 0;
+  // Check if all required fields are filled - calculate manually for better reactivity
+  const isFormValid = Boolean(
+    (selectedTitle === 'Other' ? watch('custom_title')?.trim() : selectedTitle) &&
+    industry &&
+    seniorityVal &&
+    employmentTypeVal &&
+    location?.trim() &&
+    description?.trim() &&
+    description?.length >= 10 &&
+    skillsMust.length > 0 &&
+    (!budgetMin || !budgetMax || Number(budgetMax) >= Number(budgetMin))
+  );
 
   // Auto-expand skills section when AI fills skills
   useEffect(() => {
@@ -543,21 +556,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0" hideCloseButton>
         <div className="overflow-y-auto flex-1 px-6 pt-6">
         <DialogHeader>
           <DialogTitle className="text-2xl">Post a Job</DialogTitle>
-          <div className="flex items-center justify-between">
-            <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={handleClear} 
-              className="h-8 text-xs border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950/20"
-            >
-              Clear Form
-            </Button>
-          </div>
+          <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
         </DialogHeader>
 
         <form id="post-job-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6">
@@ -1186,7 +1189,16 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             </p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={handleClear} 
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Clear Form
+            </Button>
             <Button 
               type="button" 
               variant="outline" 
@@ -1201,10 +1213,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               form="post-job-form"
               variant={isFormValid ? "hero" : "default"}
               size="lg"
+              disabled={!isFormValid || isSubmitting}
               className={cn(
                 "transition-all duration-300 font-bold min-w-[180px]",
                 isFormValid && 'shadow-lg shadow-primary/30',
-                !isFormValid && 'opacity-40'
+                !isFormValid && 'opacity-50 cursor-not-allowed'
               )}
             >
               {isSubmitting ? 'Submitting...' : 'Submit for Review'}
