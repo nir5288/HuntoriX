@@ -489,23 +489,6 @@ const EmployerDashboard = () => {
                           </div>
                           
                           <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
-                            <div className="relative">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate('/headhunters');
-                                }}
-                                className="h-8 w-8 p-0"
-                                title="Invite headhunters"
-                              >
-                                <Users className="h-3.5 w-3.5" />
-                              </Button>
-                              <Badge className="absolute -top-0.5 -right-0.5 bg-[hsl(var(--accent-pink))] text-white text-[7px] h-2.5 w-2.5 p-0 flex items-center justify-center rounded-full">
-                                
-                              </Badge>
-                            </div>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -604,24 +587,6 @@ const EmployerDashboard = () => {
                                 </span>
                               </>
                             )}
-                          </div>
-                          <div className="relative shrink-0">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate('/headhunters');
-                              }}
-                              className="h-7 text-[10px] sm:text-xs px-2 gap-1"
-                              title="Invite headhunters to this job"
-                            >
-                              <Users className="h-3 w-3" />
-                              <span>Invite to Job</span>
-                            </Button>
-                            <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
-                              New
-                            </Badge>
                           </div>
                         </div>
                       </CardContent>
