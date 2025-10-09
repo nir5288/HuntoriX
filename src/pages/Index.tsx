@@ -58,7 +58,7 @@ const Index = () => {
               <h1 className="text-[clamp(2rem,4.5vw,4.5rem)] font-bold tracking-tight leading-tight">
                 Post a Job.
                 <br />
-                Let the Best Hunters
+                Let the <span className="whitespace-nowrap">Best Headhunters</span>
                 <br />
                 Compete for You.
               </h1>
