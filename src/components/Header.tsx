@@ -152,16 +152,9 @@ export function Header() {
       {/* Floating pill-shaped header with gradient border */}
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
         <div 
-          className={`
-            relative rounded-full transition-all duration-300
-            ${isScrolled 
-              ? 'h-14 sm:h-16 bg-background/80' 
-              : 'h-16 sm:h-[72px] bg-background/60'
-            }
-            backdrop-blur-xl shadow-lg
-          `}
+          className="relative rounded-full h-16 sm:h-[72px] backdrop-blur-xl shadow-lg transition-all duration-300"
           style={{
-            background: `linear-gradient(${isScrolled ? 'hsl(var(--background) / 0.8)' : 'hsl(var(--background) / 0.6)'}, ${isScrolled ? 'hsl(var(--background) / 0.8)' : 'hsl(var(--background) / 0.6)'}) padding-box, linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink))) border-box`,
+            background: `linear-gradient(hsl(var(--background) / ${isScrolled ? '0.8' : '0.6'}), hsl(var(--background) / ${isScrolled ? '0.8' : '0.6'})) padding-box, linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink))) border-box`,
             border: '2px solid transparent',
           }}
         >
@@ -169,14 +162,10 @@ export function Header() {
             {/* Logo - Left */}
             <Link 
               to="/" 
-              className={`flex items-center gap-2 hover:opacity-80 transition-all duration-300 ${
-                isScrolled ? 'scale-95' : 'scale-100'
-              }`}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-300"
             >
-              <Briefcase className={`transition-all duration-300 ${isScrolled ? 'h-5 w-5' : 'h-6 w-6'}`} />
-              <span className={`font-bold whitespace-nowrap transition-all duration-300 ${
-                isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
-              }`}>
+              <Briefcase className="h-6 w-6" />
+              <span className="font-bold whitespace-nowrap text-lg sm:text-xl">
                 HUNTORIX
               </span>
             </Link>
@@ -295,13 +284,9 @@ export function Header() {
                           variant="ghost"
                           size="icon"
                           onClick={() => navigate('/messages')}
-                          className={`transition-all duration-300 ${
-                            isScrolled ? 'h-8 w-8' : 'h-9 w-9'
-                          }`}
+                          className="h-9 w-9"
                         >
-                          <MessagesSquare className={`transition-all duration-300 ${
-                            isScrolled ? 'h-4 w-4' : 'h-5 w-5'
-                          }`} />
+                          <MessagesSquare className="h-5 w-5" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Messages</TooltipContent>
@@ -311,10 +296,8 @@ export function Header() {
                   {/* User dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 hover:opacity-80 transition-all duration-300">
-                        <Avatar className={`transition-all duration-300 ${
-                          isScrolled ? 'h-8 w-8' : 'h-9 w-9'
-                        }`}>
+                      <button className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-300">
+                        <Avatar className="h-9 w-9">
                           <AvatarImage src={profile.avatar_url} />
                           <AvatarFallback className="text-sm">
                             {profile.name?.[0]?.toUpperCase() || 'U'}
@@ -460,27 +443,17 @@ export function Header() {
                     variant="ghost" 
                     size="sm"
                     onClick={() => navigate('/auth?mode=signin')}
-                    className={`transition-all duration-300 ${
-                      isScrolled 
-                        ? 'text-xs px-3 h-8' 
-                        : 'text-sm px-4 h-9'
-                    }`}
+                    className="text-sm px-4 h-9"
                   >
                     Login
                   </Button>
                   <Button 
                     size="sm"
                     onClick={() => navigate('/auth?mode=signup')}
-                    className={`bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 ${
-                      isScrolled 
-                        ? 'text-xs px-3 h-8' 
-                        : 'text-sm px-4 h-9'
-                    }`}
+                    className="bg-foreground text-background hover:bg-foreground/90 text-sm px-4 h-9"
                   >
                     Sign up
-                    <ArrowRight className={`ml-1 transition-all duration-300 ${
-                      isScrolled ? 'h-3 w-3' : 'h-4 w-4'
-                    }`} />
+                    <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </>
               )}
