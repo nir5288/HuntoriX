@@ -375,7 +375,7 @@ const Messages = () => {
         onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
       />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 max-w-[65%]">
         <div className="h-full flex flex-col">
             {otherUserId ? <>
                 {/* Fixed Header */}
