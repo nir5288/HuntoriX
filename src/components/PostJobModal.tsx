@@ -639,44 +639,42 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         onDontShowAgain={handleDontShowAgain}
       />
       <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 bg-muted/30" hideCloseButton>
-        <div className="overflow-y-auto flex-1 px-6 pt-4">
-        {/* Content Wrapper with Focus Background */}
-        <div className="max-w-2xl mx-auto bg-background rounded-lg shadow-lg p-4">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0" hideCloseButton>
+        <div className="overflow-y-auto flex-1 px-6 pt-6">
         <DialogHeader>
-          <div className="flex flex-col sm:flex-row sm:items-start items-stretch justify-between gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-start items-stretch justify-between gap-3 sm:gap-4">
             <div className="flex-1">
-              <DialogTitle className="text-base sm:text-lg">Post a Job</DialogTitle>
-              <DialogDescription className="text-[10px] sm:text-xs">Fill in the details to post a new job opening</DialogDescription>
+              <DialogTitle className="text-xl sm:text-2xl">Post a Job</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">Fill in the details to post a new job opening</DialogDescription>
             </div>
             <Button 
               type="button" 
               variant="outline" 
               onClick={handleClear} 
               size="sm"
-              className="h-7 text-[10px] px-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 dark:border-destructive/50 dark:text-destructive dark:hover:bg-destructive/20 w-full sm:w-auto sm:flex-shrink-0"
+              className="h-9 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 dark:border-destructive/50 dark:text-destructive dark:hover:bg-destructive/20 w-full sm:w-auto sm:flex-shrink-0"
             >
               Clear Form
             </Button>
           </div>
         </DialogHeader>
 
-        <form id="post-job-form" onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-3 pb-3 mt-3">
+        <form id="post-job-form" onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-5 pb-6 mt-6">
           {/* AI Quick Fill */}
-          <Card className="p-2.5 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800/30 shadow-sm">
-            <div className="flex items-start gap-2">
-              <div className="flex-shrink-0 mt-0.5">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800/30 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-1">
+                <Sparkles className="w-5 h-5 text-primary" />
               </div>
-              <div className="flex-1 min-w-0 space-y-2">
+              <div className="flex-1 min-w-0 space-y-3">
                 <div>
-                  <h3 className="text-xs font-semibold text-foreground mb-0.5">AI Quick Fill</h3>
-                  <p className="text-[10px] text-muted-foreground">
+                  <h3 className="text-sm font-semibold text-foreground mb-1">AI Quick Fill</h3>
+                  <p className="text-xs text-muted-foreground">
                     Upload a file or paste your job description and let AI automatically fill in the form fields.
                   </p>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-1.5">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="ai-upload"
                     type="file"
@@ -688,20 +686,20 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   <Label 
                     htmlFor="ai-upload"
                     className={cn(
-                      "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md cursor-pointer transition-all flex-1 justify-center h-7",
+                      "inline-flex items-center gap-2 px-4 py-2.5 rounded-md cursor-pointer transition-all flex-1 justify-center h-10",
                       "bg-primary text-primary-foreground hover:bg-primary/90",
-                      "text-[10px] font-medium",
+                      "text-xs font-medium",
                       isParsing && "opacity-50 pointer-events-none"
                     )}
                   >
                     {isParsing ? (
                       <>
-                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         Processing...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-3 h-3" />
+                        <Sparkles className="w-4 h-4" />
                         Upload File
                       </>
                     )}
@@ -710,7 +708,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   <Button
                     type="button"
                     variant="outline"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-all flex-1 justify-center h-7 text-[10px] font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md transition-all flex-1 justify-center h-10 text-xs font-medium"
                     disabled={isParsing}
                     onClick={() => {
                       const container = document.getElementById('paste-jd-container');
@@ -723,7 +721,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       }
                     }}
                   >
-                    <Sparkles className="w-3 h-3" />
+                    <Sparkles className="w-4 h-4" />
                     Paste Text
                   </Button>
                 </div>
@@ -732,15 +730,15 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   <Textarea
                     id="paste-jd-textarea"
                     placeholder="Paste your job description here..."
-                    rows={4}
-                    className="text-[10px] resize-none"
+                    rows={6}
+                    className="text-xs resize-none"
                     disabled={isParsing}
                   />
-                  <div className="flex gap-1.5 mt-1.5">
+                  <div className="flex gap-2 mt-2">
                     <Button
                       type="button"
                       size="sm"
-                      className="text-[10px] h-6 px-2"
+                      className="text-xs"
                       disabled={isParsing}
                       onClick={async () => {
                         const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
@@ -858,12 +856,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     >
                       {isParsing ? (
                         <>
-                          <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                           Processing...
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-3 h-3 mr-1" />
+                          <Sparkles className="w-4 h-4 mr-2" />
                           Parse & Fill
                         </>
                       )}
@@ -872,7 +870,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="text-[10px] h-6 px-2"
+                      className="text-xs"
                       onClick={() => {
                         const container = document.getElementById('paste-jd-container');
                         const textarea = document.getElementById('paste-jd-textarea') as HTMLTextAreaElement;
@@ -889,7 +887,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           {/* Exclusive Toggle */}
-          <div className="relative flex items-center gap-1.5 p-1.5 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20 shadow-sm">
+          <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20 shadow-sm">
             <button
               type="button"
               onClick={() => {
@@ -900,7 +898,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 }
                 setIsExclusive(!isExclusive);
               }}
-              className="relative w-4 h-4 rounded-full flex items-center justify-center transition-all duration-200 group flex-shrink-0"
+              className="relative w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 group flex-shrink-0"
             >
               {isExclusive ? (
                 <>
@@ -921,14 +919,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               )}
             </button>
             <div className="flex flex-col gap-0.5 min-w-0">
-              <div className="flex items-center gap-1 flex-wrap">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setShowExclusiveInfo(!showExclusiveInfo);
                   }}
-                  className={`text-xs font-medium underline decoration-dotted underline-offset-2 transition-all duration-300 hover:decoration-solid ${
+                  className={`text-sm font-medium underline decoration-dotted underline-offset-2 transition-all duration-300 hover:decoration-solid ${
                     isExclusive 
                       ? 'bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent font-semibold' 
                       : 'text-muted-foreground hover:text-foreground'
@@ -936,20 +934,20 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 >
                   Exclusive on Huntorix
                 </button>
-                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[9px] px-1 py-0 h-3.5 border-0 leading-none">
+                <Badge className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 text-white text-[10px] px-1.5 py-0 h-4 border-0 leading-none">
                   Premium
                 </Badge>
               </div>
-              <span className="text-[10px] text-muted-foreground/90">
+              <span className="text-xs text-muted-foreground/90">
                 14-day minimum commitment once published
               </span>
             </div>
             {showExclusiveInfo && (
-              <div className="absolute left-0 top-full mt-1.5 p-2 bg-popover border rounded-lg shadow-lg text-[10px] text-popover-foreground z-[100] max-w-xs">
+              <div className="absolute left-0 top-full mt-2 p-2.5 bg-popover border rounded-lg shadow-lg text-xs text-popover-foreground z-[100] max-w-xs">
                 <p>Mark this job as exclusive to HuntoriX. Exclusive jobs get priority placement and are only available through our platform.</p>
                 <button 
                   onClick={() => setShowExclusiveInfo(false)}
-                  className="mt-1 text-[9px] text-muted-foreground hover:text-foreground"
+                  className="mt-1.5 text-[10px] text-muted-foreground hover:text-foreground"
                 >
                   Close
                 </button>
@@ -958,12 +956,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </div>
 
           {/* Basics */}
-          <Card className="p-3 bg-gradient-to-br from-muted/40 to-muted/20 border shadow-sm">
-            <h3 className="font-semibold text-xs mb-2.5">Job Basics</h3>
+          <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
+            <h3 className="font-semibold text-base mb-5">Job Basics</h3>
             
-            <div className="space-y-2.5">
-              <div className="space-y-1.5" data-field="title">
-                <Label htmlFor="title" className="text-[10px] font-medium">Job Title <span className="text-destructive">*</span></Label>
+            <div className="space-y-4">
+              <div className="space-y-2.5" data-field="title">
+                <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
                 <JobTitleAutocomplete
                   value={selectedTitle}
                   onChange={(value) => {
@@ -976,18 +974,18 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     fieldErrors.title && 'border-destructive ring-2 ring-destructive/20'
                   )}
                 />
-                {fieldErrors.title && <p className="text-[10px] text-destructive">{fieldErrors.title}</p>}
+                {fieldErrors.title && <p className="text-sm text-destructive">{fieldErrors.title}</p>}
               </div>
 
               {selectedTitle === 'Other' && (
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-medium">Custom Title</Label>
-                  <Input {...register('custom_title')} placeholder="Enter custom job title" className="h-7 text-xs" />
+                <div className="space-y-2.5">
+                  <Label className="text-sm font-medium">Custom Title</Label>
+                  <Input {...register('custom_title')} placeholder="Enter custom job title" className="h-11" />
                 </div>
               )}
 
-              <div className="space-y-1.5" data-field="industry">
-                <Label htmlFor="industry" className="text-[10px] font-medium">Industry <span className="text-destructive">*</span></Label>
+              <div className="space-y-2.5" data-field="industry">
+                <Label htmlFor="industry" className="text-sm font-medium">Industry <span className="text-destructive">*</span></Label>
                 <Select 
                   onValueChange={(value) => {
                     setValue('industry', value);
@@ -996,7 +994,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   value={industry || ''}
                 >
                   <SelectTrigger className={cn(
-                    "h-7 text-xs",
+                    "h-11",
                     autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20',
                     fieldErrors.industry && 'border-destructive ring-2 ring-destructive/20'
                   )}>
@@ -1004,16 +1002,16 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   </SelectTrigger>
                   <SelectContent>
                     {industries.map(ind => (
-                      <SelectItem key={ind} value={ind} className="text-xs">{ind}</SelectItem>
+                      <SelectItem key={ind} value={ind}>{ind}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {fieldErrors.industry && <p className="text-[10px] text-destructive">{fieldErrors.industry}</p>}
+                {fieldErrors.industry && <p className="text-sm text-destructive">{fieldErrors.industry}</p>}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div className="space-y-1.5" data-field="seniority">
-                  <Label htmlFor="seniority" className="text-[10px] font-medium">Seniority Level <span className="text-destructive">*</span></Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2.5" data-field="seniority">
+                  <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
                   <Select 
                     onValueChange={(value) => {
                       setValue('seniority', value as any);
@@ -1022,26 +1020,26 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     value={seniorityVal || ''}
                   >
                     <SelectTrigger className={cn(
-                      "h-7 text-xs",
+                      "h-11",
                       autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20',
                       fieldErrors.seniority && 'border-destructive ring-2 ring-destructive/20'
                     )}>
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="junior" className="text-xs">Junior</SelectItem>
-                      <SelectItem value="mid_level" className="text-xs">Mid-Level</SelectItem>
-                      <SelectItem value="senior" className="text-xs">Senior</SelectItem>
-                      <SelectItem value="lead_principal" className="text-xs">Lead / Principal</SelectItem>
-                      <SelectItem value="manager_director" className="text-xs">Manager / Director</SelectItem>
-                      <SelectItem value="vp_c_level" className="text-xs">VP / C-Level</SelectItem>
+                      <SelectItem value="junior">Junior</SelectItem>
+                      <SelectItem value="mid_level">Mid-Level</SelectItem>
+                      <SelectItem value="senior">Senior</SelectItem>
+                      <SelectItem value="lead_principal">Lead / Principal</SelectItem>
+                      <SelectItem value="manager_director">Manager / Director</SelectItem>
+                      <SelectItem value="vp_c_level">VP / C-Level</SelectItem>
                     </SelectContent>
                   </Select>
-                  {fieldErrors.seniority && <p className="text-[10px] text-destructive">{fieldErrors.seniority}</p>}
+                  {fieldErrors.seniority && <p className="text-sm text-destructive">{fieldErrors.seniority}</p>}
                 </div>
 
-                <div className="space-y-1.5" data-field="employment_type">
-                  <Label htmlFor="employment_type" className="text-[10px] font-medium">Employment Type <span className="text-destructive">*</span></Label>
+                <div className="space-y-2.5" data-field="employment_type">
+                  <Label htmlFor="employment_type" className="text-sm font-medium">Employment Type <span className="text-destructive">*</span></Label>
                   <Select 
                     onValueChange={(value) => {
                       setValue('employment_type', value as any);
@@ -1050,46 +1048,46 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     value={employmentTypeVal || ''}
                   >
                     <SelectTrigger className={cn(
-                      "h-7 text-xs",
+                      "h-11",
                       autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20',
                       fieldErrors.employment_type && 'border-destructive ring-2 ring-destructive/20'
                     )}>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="full_time" className="text-xs">Full-Time</SelectItem>
-                      <SelectItem value="contract" className="text-xs">Contract</SelectItem>
-                      <SelectItem value="temp" className="text-xs">Temporary</SelectItem>
+                      <SelectItem value="full_time">Full-Time</SelectItem>
+                      <SelectItem value="contract">Contract</SelectItem>
+                      <SelectItem value="temp">Temporary</SelectItem>
                     </SelectContent>
                   </Select>
-                  {fieldErrors.employment_type && <p className="text-[10px] text-destructive">{fieldErrors.employment_type}</p>}
+                  {fieldErrors.employment_type && <p className="text-sm text-destructive">{fieldErrors.employment_type}</p>}
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-[10px] font-medium">Work Location</Label>
+              <div className="space-y-2.5">
+                <Label className="text-sm font-medium">Work Location</Label>
                 <RadioGroup
                   value={locationType || 'remote'}
                   onValueChange={(value) => setValue('location_type', value)}
-                  className={cn("grid grid-cols-3 gap-2", autoFilledFields.has('location_type') && 'bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded-lg')}
+                  className={cn("grid grid-cols-3 gap-3", autoFilledFields.has('location_type') && 'bg-yellow-50 dark:bg-yellow-950/20 p-3 rounded-lg')}
                 >
-                  <div className="flex items-center space-x-1.5">
-                    <RadioGroupItem value="on_site" id="on_site" className="h-3 w-3" />
-                    <Label htmlFor="on_site" className="text-[10px] cursor-pointer font-normal">On-site</Label>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="on_site" id="on_site" />
+                    <Label htmlFor="on_site" className="text-sm cursor-pointer font-normal">On-site</Label>
                   </div>
-                  <div className="flex items-center space-x-1.5">
-                    <RadioGroupItem value="hybrid" id="hybrid" className="h-3 w-3" />
-                    <Label htmlFor="hybrid" className="text-[10px] cursor-pointer font-normal">Hybrid</Label>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="hybrid" id="hybrid" />
+                    <Label htmlFor="hybrid" className="text-sm cursor-pointer font-normal">Hybrid</Label>
                   </div>
-                  <div className="flex items-center space-x-1.5">
-                    <RadioGroupItem value="remote" id="remote" className="h-3 w-3" />
-                    <Label htmlFor="remote" className="text-[10px] cursor-pointer font-normal">Remote</Label>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="remote" id="remote" />
+                    <Label htmlFor="remote" className="text-sm cursor-pointer font-normal">Remote</Label>
                   </div>
                 </RadioGroup>
               </div>
 
-              <div className="space-y-1.5" data-field="location">
-                <Label htmlFor="location" className="text-[10px] font-medium">Work Location <span className="text-destructive">*</span></Label>
+              <div className="space-y-2.5" data-field="location">
+                <Label htmlFor="location" className="text-sm font-medium">Work Location <span className="text-destructive">*</span></Label>
                 <LocationAutocomplete
                   value={watch('location') || ''}
                   onChange={(value) => {
@@ -1102,8 +1100,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     fieldErrors.location && 'border-destructive ring-2 ring-destructive/20'
                   )}
                 />
-                {fieldErrors.location && <p className="text-[10px] text-destructive">{fieldErrors.location}</p>}
-                <p className="text-[10px] text-muted-foreground">
+                {fieldErrors.location && <p className="text-sm text-destructive">{fieldErrors.location}</p>}
+                <p className="text-xs text-muted-foreground">
                   Select a city (e.g., "Tel Aviv, Israel") or country (e.g., "Israel")
                 </p>
               </div>
@@ -1112,34 +1110,34 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
           {/* Compensation */}
           <Collapsible open={compensationOpen} onOpenChange={setCompensationOpen}>
-            <Card className="p-2.5 bg-gradient-to-br from-muted/40 to-muted/20 border shadow-sm">
+            <Card className="p-5 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
-                <h3 className="font-semibold text-xs">Compensation Range</h3>
+                <h3 className="font-semibold text-base">Compensation Range</h3>
                 <ChevronDown className={cn(
-                  "h-4 w-4 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
+                  "h-5 w-5 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
                   compensationOpen && "transform rotate-180"
                 )} />
               </CollapsibleTrigger>
               
-              <CollapsibleContent className="pt-2.5">
-                <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="budget_currency" className="text-[10px] font-medium">Currency</Label>
+              <CollapsibleContent className="pt-4">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="budget_currency" className="text-sm font-medium">Currency</Label>
                       <Select onValueChange={(value) => setValue('budget_currency', value)} defaultValue="ILS">
-                        <SelectTrigger className={cn("h-7 text-xs", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                        <SelectTrigger className={cn("h-10", autoFilledFields.has('budget_currency') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {currencies.map(curr => (
-                            <SelectItem key={curr} value={curr} className="text-xs">{curr}</SelectItem>
+                            <SelectItem key={curr} value={curr}>{curr}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                     
-                    <div className="space-y-1.5">
-                      <Label htmlFor="salary_period" className="text-[10px] font-medium">Period</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="salary_period" className="text-sm font-medium">Period</Label>
                       <Select value={salaryPeriod} onValueChange={(value: 'monthly' | 'yearly') => {
                         const budgetMin = watch('budget_min');
                         const budgetMax = watch('budget_max');
@@ -1154,19 +1152,19 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                         
                         setSalaryPeriod(value);
                       }}>
-                        <SelectTrigger className="h-7 text-xs">
+                        <SelectTrigger className="h-10">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="monthly" className="text-xs">Monthly</SelectItem>
-                          <SelectItem value="yearly" className="text-xs">Yearly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="yearly">Yearly</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between items-center text-[10px]">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
                       <span className="font-semibold">
                         {watch('budget_min') 
                           ? `${parseInt(watch('budget_min')).toLocaleString()} ${watch('budget_currency') || 'ILS'}` 
@@ -1201,24 +1199,24 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       className="cursor-pointer"
                     />
                   </div>
-                  {errors.budget_max && <p className="text-[10px] text-destructive">{errors.budget_max.message}</p>}
+                  {errors.budget_max && <p className="text-sm text-destructive">{errors.budget_max.message}</p>}
                 </div>
               </CollapsibleContent>
             </Card>
           </Collapsible>
 
           {/* Description */}
-          <Card className="p-3 bg-gradient-to-br from-muted/40 to-muted/20 border shadow-sm">
-            <h3 className="font-semibold text-xs mb-2.5">Job Description</h3>
+          <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
+            <h3 className="font-semibold text-base mb-5">Job Description</h3>
             
-            <div className="space-y-1.5" data-field="description">
-              <Label htmlFor="description" className="text-[10px] font-medium">Role Overview <span className="text-destructive">*</span></Label>
+            <div className="space-y-2.5" data-field="description">
+              <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
               <Textarea 
                 {...register('description')} 
-                rows={4} 
+                rows={6} 
                 placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
                 className={cn(
-                  "text-xs resize-none",
+                  "text-sm resize-none",
                   autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20',
                   fieldErrors.description && 'border-destructive ring-2 ring-destructive/20'
                 )}
@@ -1227,32 +1225,32 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   clearFieldError('description');
                 }}
               />
-              {fieldErrors.description && <p className="text-[10px] text-destructive">{fieldErrors.description}</p>}
+              {fieldErrors.description && <p className="text-sm text-destructive">{fieldErrors.description}</p>}
             </div>
           </Card>
 
           {/* Skills */}
           <Collapsible open={skillsOpen} onOpenChange={setSkillsOpen}>
-            <Card className="p-3 bg-gradient-to-br from-muted/40 to-muted/20 border shadow-sm" id="skills-must" data-field="skills_must">
+            <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm" id="skills-must" data-field="skills_must">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
-                <h3 className="font-semibold text-xs">Required Skills</h3>
+                <h3 className="font-semibold text-base">Required Skills</h3>
                 <ChevronDown className={cn(
-                  "h-4 w-4 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
+                  "h-5 w-5 transition-transform duration-200 text-muted-foreground group-hover:text-foreground",
                   skillsOpen && "transform rotate-180"
                 )} />
               </CollapsibleTrigger>
               
-              <CollapsibleContent className="pt-2.5">
-                <div className="space-y-2.5">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-medium">Must-Have Skills <span className="text-destructive">*</span></Label>
-                    <div className="flex gap-1.5">
+              <CollapsibleContent className="pt-5">
+                <div className="space-y-5">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Must-Have Skills <span className="text-destructive">*</span></Label>
+                    <div className="flex gap-2">
                       <Input 
                         value={skillMustInput}
                         onChange={(e) => setSkillMustInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
                         placeholder="Type a skill and press Enter"
-                        className="h-7 text-xs"
+                        className="h-11"
                       />
                       <Button 
                         type="button" 
@@ -1261,53 +1259,53 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                           clearFieldError('skills_must');
                         }} 
                         variant="secondary" 
-                        size="sm"
-                        className="h-7 px-3 text-[10px]"
+                        size="lg" 
+                        className="h-11 px-6"
                       >
                         Add
                       </Button>
                     </div>
                     <div className={cn(
-                      "flex flex-wrap gap-1.5 min-h-[40px] p-2 rounded-lg border",
+                      "flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2",
                       autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20',
                       fieldErrors.skills_must && 'border-destructive ring-2 ring-destructive/20'
                     )}>
                       {skillsMust.map(skill => (
-                        <Badge key={skill} variant="secondary" className="gap-1 text-[10px] h-5 px-2">
+                        <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
                           {skill}
-                          <X className="h-2.5 w-2.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillMust(skill)} />
+                          <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillMust(skill)} />
                         </Badge>
                       ))}
                       {skillsMust.length === 0 && (
-                        <span className="text-[10px] text-muted-foreground">Add at least one required skill</span>
+                        <span className="text-sm text-muted-foreground">Add at least one required skill</span>
                       )}
                     </div>
-                    {fieldErrors.skills_must && <p className="text-[10px] text-destructive">{fieldErrors.skills_must}</p>}
+                    {fieldErrors.skills_must && <p className="text-sm text-destructive">{fieldErrors.skills_must}</p>}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-medium">Nice-to-Have Skills</Label>
-                    <div className="flex gap-1.5">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Nice-to-Have Skills</Label>
+                    <div className="flex gap-2">
                       <Input 
                         value={skillNiceInput}
                         onChange={(e) => setSkillNiceInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
                         placeholder="Type a skill and press Enter"
-                        className="h-7 text-xs"
+                        className="h-11"
                       />
-                      <Button type="button" onClick={addSkillNice} variant="secondary" size="sm" className="h-7 px-3 text-[10px]">
+                      <Button type="button" onClick={addSkillNice} variant="secondary" size="lg" className="h-11 px-6">
                         Add
                       </Button>
                     </div>
-                    <div className={cn("flex flex-wrap gap-1.5 min-h-[40px] p-2 rounded-lg border", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_nice') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                       {skillsNice.map(skill => (
-                        <Badge key={skill} variant="outline" className="gap-1 text-[10px] h-5 px-2">
+                        <Badge key={skill} variant="outline" className="gap-1.5 text-sm h-8 px-3">
                           {skill}
-                          <X className="h-2.5 w-2.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillNice(skill)} />
+                          <X className="h-3.5 w-3.5 cursor-pointer hover:text-destructive" onClick={() => removeSkillNice(skill)} />
                         </Badge>
                       ))}
                       {skillsNice.length === 0 && (
-                        <span className="text-[10px] text-muted-foreground">Optional skills that would be beneficial</span>
+                        <span className="text-sm text-muted-foreground">Optional skills that would be beneficial</span>
                       )}
                     </div>
                   </div>
@@ -1317,22 +1315,22 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Collapsible>
 
           {/* Visibility */}
-          <Card className="p-2.5 bg-gradient-to-br from-muted/50 to-muted/30 border shadow-sm">
-            <div className="flex items-center gap-2">
+          <Card className="p-5 bg-gradient-to-br from-muted/50 to-muted/30 border-2 shadow-sm">
+            <div className="flex items-center gap-3">
               <Checkbox 
                 id="visibility" 
                 checked={isPublic}
                 onCheckedChange={(checked) => setIsPublic(checked as boolean)}
-                className="h-4 w-4"
+                className="h-5 w-5"
               />
               <div>
                 <Label 
                   htmlFor="visibility"
-                  className="text-xs font-semibold cursor-pointer block"
+                  className="text-sm font-semibold cursor-pointer block"
                 >
                   Make Job Public
                 </Label>
-                <p className="text-[10px] text-muted-foreground mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {isPublic ? "Visible to all candidates" : "Only visible to invited candidates"}
                 </p>
               </div>
@@ -1340,24 +1338,23 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
         </form>
         </div>
-        </div>
 
         {/* Sticky Footer */}
-        <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/20 border-t border-slate-200 dark:border-slate-700 px-3 sm:px-4 py-2.5 flex flex-col sm:flex-row sm:items-center items-stretch justify-between gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
-            <Info className="h-3.5 w-3.5 text-blue-700 dark:text-blue-300 flex-shrink-0" />
-            <p className="text-[10px] sm:text-xs font-semibold text-blue-900 dark:text-blue-100">
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-slate-900 dark:to-blue-950/20 border-t border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center items-stretch justify-between gap-3 sm:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+            <Info className="h-4 w-4 text-blue-700 dark:text-blue-300 flex-shrink-0" />
+            <p className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100">
               Jobs will be reviewed in under 1 hour
             </p>
           </div>
           
-          <div className="flex gap-1.5">
+          <div className="flex gap-2">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => onOpenChange(false)} 
-              size="sm"
-              className="h-8 px-3 sm:px-4 flex-1 sm:flex-initial border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs"
+              size="default"
+              className="h-10 px-4 sm:px-6 flex-1 sm:flex-initial border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               Cancel
             </Button>
@@ -1365,10 +1362,10 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               type="submit"
               form="post-job-form"
               variant={isFormValid ? "hero" : "default"}
-              size="sm"
+              size="default"
               disabled={isSubmitting}
               className={cn(
-                "h-8 px-3 sm:px-4 flex-1 sm:flex-initial transition-all duration-300 font-semibold text-xs",
+                "h-10 px-4 sm:px-6 flex-1 sm:flex-initial transition-all duration-300 font-semibold",
                 isFormValid && 'shadow-md shadow-primary/20',
                 !isFormValid && 'opacity-50'
               )}
