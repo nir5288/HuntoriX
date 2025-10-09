@@ -446,61 +446,96 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    // Validate all required fields
+    // Validate all required fields and collect errors
+    const validationErrors: { field: string; message: string; description: string }[] = [];
+
     if (!data.title) {
-      toast.error('Job title is required', { 
+      validationErrors.push({
+        field: 'title',
+        message: 'Job title is required',
         description: 'Please select or enter a job title'
       });
-      scrollToField('title');
-      return;
     }
 
     if (!data.industry) {
-      toast.error('Industry is required', { 
+      validationErrors.push({
+        field: 'industry',
+        message: 'Industry is required',
         description: 'Please select an industry'
       });
-      scrollToField('industry');
-      return;
     }
 
     if (!data.seniority) {
-      toast.error('Seniority level is required', { 
+      validationErrors.push({
+        field: 'seniority',
+        message: 'Seniority level is required',
         description: 'Please select the seniority level'
       });
-      scrollToField('seniority');
-      return;
     }
 
     if (!data.employment_type) {
-      toast.error('Employment type is required', { 
+      validationErrors.push({
+        field: 'employment_type',
+        message: 'Employment type is required',
         description: 'Please select full-time, contract, or temp'
       });
-      scrollToField('employment_type');
-      return;
     }
 
     if (!data.location || data.location.trim().length === 0) {
-      toast.error('Work location is required', { 
+      validationErrors.push({
+        field: 'location',
+        message: 'Work location is required',
         description: 'Please select a location from the dropdown'
       });
-      scrollToField('location');
-      return;
     }
 
     if (!data.description || data.description.length < 10) {
-      toast.error('Job description is required', { 
+      validationErrors.push({
+        field: 'description',
+        message: 'Job description is required',
         description: 'Please provide a description (minimum 10 characters)'
       });
-      scrollToField('description');
-      return;
     }
 
     if (skillsMust.length === 0) {
-      setSkillsOpen(true);
-      toast.error('Must-have skills are required', { 
+      validationErrors.push({
+        field: 'skills-must-container',
+        message: 'Must-have skills are required',
         description: 'Please add at least one required skill for this position'
       });
-      scrollToField('skills-must-container');
+    }
+
+    // If there are validation errors, show them and scroll to the first one
+    if (validationErrors.length > 0) {
+      // Expand skills section if skills are missing
+      if (validationErrors.some(e => e.field === 'skills-must-container')) {
+        setSkillsOpen(true);
+      }
+
+      // Highlight all invalid fields
+      validationErrors.forEach(error => {
+        const element = document.querySelector(`[name="${error.field}"]`) || 
+                       document.getElementById(error.field);
+        if (element) {
+          element.classList.add('ring-2', 'ring-destructive');
+          setTimeout(() => {
+            element.classList.remove('ring-2', 'ring-destructive');
+          }, 3000);
+        }
+      });
+
+      // Scroll to the first invalid field
+      scrollToField(validationErrors[0].field);
+
+      // Show toast with error summary
+      const errorCount = validationErrors.length;
+      toast.error(
+        errorCount === 1 ? validationErrors[0].message : `${errorCount} required fields are missing`,
+        { 
+          description: errorCount === 1 ? validationErrors[0].description : 'Please fill in all required fields'
+        }
+      );
+      
       return;
     }
 
