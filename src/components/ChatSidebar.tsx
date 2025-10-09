@@ -362,22 +362,19 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
   return (
     <div
       className={cn(
-        "bg-background border-r transition-all duration-300 ease-in-out shrink-0 h-full",
-        isOpen ? "" : "w-0 border-0 overflow-hidden",
-        isCollapsed && isOpen ? "w-16" : isOpen ? "w-56" : "w-0"
+        "bg-background border-r shrink-0 h-full w-72"
       )}
     >
-      <div className="h-[72px] px-3 flex items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
-        {!isCollapsed && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 hover:opacity-80 transition">
-                <span className="text-sm font-medium capitalize">
-                  {filter === "all" ? "All messages" : filter}
-                </span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
+      <div className="h-[72px] px-3 flex items-center border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1.5 hover:opacity-80 transition">
+              <span className="text-sm font-medium capitalize">
+                {filter === "all" ? "All messages" : filter}
+              </span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="z-[500] bg-popover">
               <DropdownMenuItem onClick={() => setFilter("all")}>
                 All messages
@@ -388,198 +385,154 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
               <DropdownMenuItem onClick={() => setFilter("starred")}>
                 Starred
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onToggleCollapse}
-          className="ml-auto"
-          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <ChevronLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
-        </Button>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <ScrollArea className="h-[calc(100vh-72px)]">
         <TooltipProvider delayDuration={200}>
           {loading ? (
             <div className="p-4 text-center text-muted-foreground">
-              {!isCollapsed && "Loading conversations..."}
+              Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
-              {!isCollapsed && "No conversations yet"}
+              No conversations yet
             </div>
           ) : filteredConversations.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
-              {!isCollapsed && `No ${filter !== "all" && filter} conversations`}
+              {`No ${filter !== "all" && filter} conversations`}
             </div>
           ) : (
-            <div className={cn(isCollapsed ? "space-y-2 p-2" : "divide-y")}>
+            <div className="divide-y">
               {filteredConversations.map((conv) => (
                 <div
                   key={`${conv.jobId}-${conv.otherUserId}`}
                   className={cn(
                     "relative group",
-                    !isCollapsed && activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
+                    activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
                   )}
                 >
-                  {isCollapsed ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
-                          className={cn(
-                            "w-full p-2 rounded-lg hover:bg-accent transition-colors flex items-center justify-center",
-                            activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
-                          )}
-                        >
-                          <div className="relative">
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage src={conv.otherUserAvatar || undefined} />
-                              <AvatarFallback>
-                                {conv.otherUserName.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            {conv.unreadCount > 0 && (
-                              <div className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full border-2 border-background flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-white">{conv.unreadCount > 9 ? '9+' : conv.unreadCount}</span>
-                              </div>
-                            )}
-                          </div>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <p className="font-semibold">{conv.otherUserName}</p>
-                        <p className="text-xs text-muted-foreground">{conv.jobTitle}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
-                        className="w-full p-3 text-left hover:bg-accent transition-colors"
-                      >
-                        <div className="flex items-start gap-2">
-                          <div className="relative">
-                            <Avatar className="h-9 w-9">
-                              <AvatarImage src={conv.otherUserAvatar || undefined} />
-                              <AvatarFallback>
-                                {conv.otherUserName.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            {conv.unreadCount > 0 && (
-                              <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0 pr-24">
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <p className={cn(
-                                "text-sm truncate flex-1",
-                                conv.unreadCount > 0 ? "font-semibold" : "font-medium"
-                              )}>
-                                {conv.otherUserName}
-                              </p>
-                            </div>
-                            <p className="text-xs text-muted-foreground mb-0.5 truncate">
-                              1
-                            </p>
-                            <p className={cn(
-                              "text-xs truncate",
-                              conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
-                            )}>
-                              {conv.lastMessage}
-                            </p>
-                          </div>
+                  <button
+                    onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
+                    className="w-full p-3 text-left hover:bg-accent transition-colors"
+                  >
+                    <div className="flex items-start gap-2">
+                      <div className="relative">
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={conv.otherUserAvatar || undefined} />
+                          <AvatarFallback>
+                            {conv.otherUserName.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        {conv.unreadCount > 0 && (
+                          <div className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-destructive rounded-full border-2 border-background" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0 pr-24">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className={cn(
+                            "text-sm truncate flex-1",
+                            conv.unreadCount > 0 ? "font-semibold" : "font-medium"
+                          )}>
+                            {conv.otherUserName}
+                          </p>
                         </div>
-                      </button>
-                      
-                      {/* Timestamp - always visible, moves left on hover or when menu open */}
-                      <span className={cn(
-                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200",
-                        (openMenuKey === `${conv.jobId}-${conv.otherUserId}`) ? "right-12" : "group-hover:right-12 right-3"
-                      )}>
-                        {formatRelativeTime(conv.lastMessageTime)}
-                      </span>
+                        <p className="text-xs text-muted-foreground mb-0.5 truncate">
+                          {conv.jobTitle}
+                        </p>
+                        <p className={cn(
+                          "text-xs truncate",
+                          conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                        )}>
+                          {conv.lastMessage}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                  
+                  {/* Timestamp - always visible, moves left on hover or when menu open */}
+                  <span className={cn(
+                    "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200",
+                    (openMenuKey === `${conv.jobId}-${conv.otherUserId}`) ? "right-12" : "group-hover:right-12 right-3"
+                  )}>
+                    {formatRelativeTime(conv.lastMessageTime)}
+                  </span>
 
-                      {/* 3-dot menu - appears on hover or when open in top right */}
-                      <div className={cn(
-                        "absolute top-2 right-2 transition-opacity z-20 pointer-events-auto",
-                        openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                      )}>
-                        <DropdownMenu
-                          open={openMenuKey === `${conv.jobId}-${conv.otherUserId}`}
-                          onOpenChange={(open) => {
-                            setOpenMenuKey(open ? `${conv.jobId}-${conv.otherUserId}` : null);
+                  {/* 3-dot menu - appears on hover or when open in top right */}
+                  <div className={cn(
+                    "absolute top-2 right-2 transition-opacity z-20 pointer-events-auto",
+                    openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  )}>
+                    <DropdownMenu
+                      open={openMenuKey === `${conv.jobId}-${conv.otherUserId}`}
+                      onOpenChange={(open) => {
+                        setOpenMenuKey(open ? `${conv.jobId}-${conv.otherUserId}` : null);
+                      }}
+                    >
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 bg-background/90 backdrop-blur-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="z-[500] bg-popover">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (conv.unreadCount > 0) {
+                              handleMarkAsRead(conv.jobId, conv.otherUserId);
+                            } else {
+                              handleMarkAsUnread(conv.jobId, conv.otherUserId);
+                            }
+                            setOpenMenuKey(null);
                           }}
                         >
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 bg-background/90 backdrop-blur-sm"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="z-[500] bg-popover">
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (conv.unreadCount > 0) {
-                                  handleMarkAsRead(conv.jobId, conv.otherUserId);
-                                } else {
-                                  handleMarkAsUnread(conv.jobId, conv.otherUserId);
-                                }
-                                setOpenMenuKey(null);
-                              }}
-                            >
-                              {conv.unreadCount > 0 ? (
-                                <>
-                                  <MailOpen className="h-4 w-4 mr-2" />
-                                  Mark as read
-                                </>
-                              ) : (
-                                <>
-                                  <Mail className="h-4 w-4 mr-2" />
-                                  Mark as unread
-                                </>
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
-                                setDeleteDialogOpen(true);
-                                setOpenMenuKey(null);
-                              }}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete conversation
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                          {conv.unreadCount > 0 ? (
+                            <>
+                              <MailOpen className="h-4 w-4 mr-2" />
+                              Mark as read
+                            </>
+                          ) : (
+                            <>
+                              <Mail className="h-4 w-4 mr-2" />
+                              Mark as unread
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConversationToDelete({ jobId: conv.jobId, userId: conv.otherUserId });
+                            setDeleteDialogOpen(true);
+                            setOpenMenuKey(null);
+                          }}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete conversation
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
 
-                      {/* Star button - always visible at bottom right */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute bottom-2 right-2 h-6 w-6"
-                        onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
-                        title={conv.isStarred ? "Unstar" : "Star"}
-                      >
-                        <Star className={cn(
-                          "h-3.5 w-3.5",
-                          conv.isStarred && "fill-yellow-500 text-yellow-500"
-                        )} />
-                      </Button>
-                    </>
-                  )}
+                  {/* Star button - always visible at bottom right */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute bottom-2 right-2 h-6 w-6"
+                    onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
+                    title={conv.isStarred ? "Unstar" : "Star"}
+                  >
+                    <Star className={cn(
+                      "h-3.5 w-3.5",
+                      conv.isStarred && "fill-yellow-500 text-yellow-500"
+                    )} />
+                  </Button>
                 </div>
               ))}
             </div>

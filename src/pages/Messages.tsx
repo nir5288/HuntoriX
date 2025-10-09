@@ -369,10 +369,10 @@ const Messages = () => {
   };
   return <div className="h-screen flex ml-0">
       <ChatSidebar
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)}
-        isCollapsed={chatSidebarCollapsed}
-        onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
+        isOpen={true} 
+        onClose={() => {}}
+        isCollapsed={false}
+        onToggleCollapse={() => {}}
       />
 
       <div className="flex-1 flex flex-col min-w-0 max-w-[65%]">
