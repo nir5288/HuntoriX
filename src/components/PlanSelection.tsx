@@ -243,7 +243,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {PLANS.map((plan) => {
             const price = getPrice(plan);
             const isSelected = selectedPlan === plan.id;
@@ -253,29 +253,15 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
               <Card
                 key={plan.id}
                 className={cn(
-                  "relative cursor-pointer transition-all duration-200 rounded-2xl border-2 flex flex-col h-full pt-6",
+                  "relative cursor-pointer transition-all duration-200 rounded-2xl flex flex-col h-full",
                   isSelected && !plan.locked && "ring-2 ring-primary shadow-lg border-primary",
-                  isRecommended && "border-primary/50",
+                  isRecommended && "border-2 border-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] bg-gradient-to-b from-primary/5 to-transparent",
+                  !isRecommended && "border-2",
                   plan.locked && "opacity-60",
-                  !isSelected && !plan.locked && "hover:border-primary/30"
+                  !isSelected && !plan.locked && !isRecommended && "hover:border-primary/30"
                 )}
                 onClick={() => !plan.locked && setSelectedPlan(plan.id)}
               >
-                {isRecommended && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                    <Badge 
-                      className="px-4 py-1.5 text-sm font-semibold shadow-lg"
-                      style={{
-                        backgroundColor: 'hsl(var(--primary))',
-                        color: 'hsl(var(--primary-foreground))',
-                        border: 'none',
-                      }}
-                    >
-                      Recommended
-                    </Badge>
-                  </div>
-                )}
-
                 {plan.locked && (
                   <div className="absolute top-4 right-4 z-10">
                     <Tooltip>
@@ -290,7 +276,21 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                 )}
 
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                    {isRecommended && (
+                      <Badge 
+                        variant="secondary"
+                        className="text-xs font-semibold"
+                        style={{
+                          backgroundColor: 'hsl(var(--primary))',
+                          color: 'hsl(var(--primary-foreground))',
+                        }}
+                      >
+                        Popular
+                      </Badge>
+                    )}
+                  </div>
                   <CardDescription className="flex items-center gap-2 text-base">
                     {plan.description}
                     <Tooltip>
