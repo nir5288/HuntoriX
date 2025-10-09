@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
+import { OnHoldReasonModal } from '@/components/OnHoldReasonModal';
 const EmployerDashboard = () => {
   const {
     user,
@@ -38,6 +39,8 @@ const EmployerDashboard = () => {
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
   const [visibleJobCount, setVisibleJobCount] = useState(3);
   const [uiVariant, setUiVariant] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8>(1);
+  const [onHoldModalOpen, setOnHoldModalOpen] = useState(false);
+  const [jobToHold, setJobToHold] = useState<any>(null);
   
   useEffect(() => {
     if (user && !loading) {
@@ -118,6 +121,32 @@ const EmployerDashboard = () => {
       success: 'bg-[hsl(var(--success))]'
     };
     return colors[status] || 'bg-gray-400';
+  };
+
+  const handleStatusClick = (job: any, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setJobToHold(job);
+    setOnHoldModalOpen(true);
+  };
+
+  const handleOnHoldConfirm = async (reason: string) => {
+    if (!jobToHold) return;
+
+    const { error } = await supabase
+      .from('jobs')
+      .update({ status: 'on_hold' })
+      .eq('id', jobToHold.id);
+
+    if (error) {
+      toast.error('Failed to update job status');
+      return;
+    }
+
+    toast.success(`Job put on hold: ${reason}`);
+    setOnHoldModalOpen(false);
+    setJobToHold(null);
+    fetchDashboardData();
   };
   const getApplicationStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -557,8 +586,12 @@ const EmployerDashboard = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-start gap-1.5">
-                            <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
-                              {job.status}
+                            <Badge 
+                              className={`text-[10px] sm:text-xs h-5 cursor-pointer hover:opacity-80 transition-opacity ${getStatusColor(job.status)}`}
+                              onClick={(e) => handleStatusClick(job, e)}
+                              title="Click to put on hold"
+                            >
+                              {job.status.replace('_', ' ')}
                             </Badge>
                             <Button
                               variant="ghost"
@@ -1991,6 +2024,12 @@ const EmployerDashboard = () => {
           />
         </>
       )}
+
+      <OnHoldReasonModal
+        open={onHoldModalOpen}
+        onOpenChange={setOnHoldModalOpen}
+        onConfirm={handleOnHoldConfirm}
+      />
     </>
   );
 };
