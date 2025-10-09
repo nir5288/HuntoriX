@@ -30,7 +30,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {!isMessagesPage && <Header />}
           <main className={`flex-1 w-full overflow-x-hidden ${isMessagesPage ? '' : 'pt-14 sm:pt-16'}`}>
-            <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
+            <div className={isMessagesPage ? "w-full px-0" : "w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8"}>
               {children}
             </div>
           </main>
