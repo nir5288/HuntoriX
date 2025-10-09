@@ -400,13 +400,12 @@ const Messages = () => {
                 
                 <Button
                   variant="default"
-                  size="icon"
                   onClick={() => setIsVideoCallOpen(true)}
-                  className="relative h-10 w-10 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg"
+                  className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
                   title="Video Call - Pro Plan Required"
                 >
-                  <Video className="h-5 w-5" />
-                  <Badge className="absolute -top-2 -right-2 text-[8px] px-1 py-0 h-4 bg-purple-500 text-white border-purple-600 font-bold">PRO</Badge>
+                  <Video className="h-4 w-4" />
+                  <span className="text-sm font-semibold">PRO</span>
                 </Button>
               </div>
 
