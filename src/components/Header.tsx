@@ -204,28 +204,6 @@ export function Header() {
               >
                 Find a Headhunter
               </Link>
-              <Link 
-                to="/huntrank" 
-                className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                  isActive('/huntrank') 
-                    ? 'text-foreground' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                HuntRank
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-              </Link>
-              <Link 
-                to="/huntbase" 
-                className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                  isActive('/huntbase') 
-                    ? 'text-foreground' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                HuntBase
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-              </Link>
             </nav>
 
             {/* Right side - Auth & Actions */}
@@ -301,21 +279,6 @@ export function Header() {
                         <User className="h-5 w-5 text-muted-foreground" />
                         Find a Headhunter
                       </Link>
-                    </div>
-
-                    {/* Coming Soon */}
-                    <div className="border-t pt-2">
-                      <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
-                      <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
-                        <BarChart3 className="h-5 w-5 text-muted-foreground" />
-                        HuntRank
-                        <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
-                      </div>
-                      <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
-                        <Globe className="h-5 w-5 text-muted-foreground" />
-                        HuntBase
-                        <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
-                      </div>
                     </div>
                   </nav>
                 </SheetContent>

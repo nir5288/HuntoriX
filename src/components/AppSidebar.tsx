@@ -1,4 +1,4 @@
-import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, PlusCircle } from "lucide-react";
+import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, PlusCircle, TrendingUp, Database } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -55,11 +55,25 @@ export function AppSidebar({ role }: AppSidebarProps) {
       title: 'Tools',
       url: '#',
       icon: Wrench,
+      badge: 'Soon',
     },
     {
       title: 'Analytics',
       url: '#',
       icon: BarChart3,
+      badge: 'Soon',
+    },
+    {
+      title: 'HuntRank',
+      url: '#',
+      icon: TrendingUp,
+      badge: 'Soon',
+    },
+    {
+      title: 'HuntBase',
+      url: '#',
+      icon: Database,
+      badge: 'Soon',
     },
     {
       title: 'Help',
@@ -78,11 +92,26 @@ export function AppSidebar({ role }: AppSidebarProps) {
     return title;
   };
   return (
-    <Sidebar collapsible="icon" className="border-r bg-sidebar transition-all duration-200">
-      <SidebarHeader className="border-b p-3 flex flex-row items-center justify-between transition-all duration-200">
+    <Sidebar 
+      collapsible="icon" 
+      className="border-r transition-all duration-200"
+      style={{
+        background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 100%)',
+      }}
+    >
+      <SidebarHeader className="p-3 flex flex-row items-center justify-between transition-all duration-200 border-b"
+        style={{
+          borderColor: 'hsl(var(--border) / 0.5)',
+        }}
+      >
         {open && (
           <div className="flex items-center gap-2 px-1">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center text-white font-bold text-sm">
+            <div 
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
+              }}
+            >
               {role === 'employer' ? 'E' : 'H'}
             </div>
             <div className="flex flex-col">
@@ -96,7 +125,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
           variant="ghost"
           size="icon"
           onClick={() => setOpen(!open)}
-          className="h-8 w-8 ml-auto"
+          className="h-8 w-8 ml-auto hover:bg-accent/50"
           aria-label="Toggle sidebar"
           title={open ? "Collapse sidebar" : "Expand sidebar"}
         >
@@ -119,12 +148,21 @@ export function AppSidebar({ role }: AppSidebarProps) {
                       asChild={item.url !== '#'}
                       isActive={isActive(item.url)}
                       tooltip={getTooltip(item.title)}
-                      className="h-10 px-3"
+                      className="h-10 px-3 hover:bg-accent/50 data-[active=true]:bg-gradient-to-r data-[active=true]:from-accent-mint/20 data-[active=true]:to-accent-lilac/20"
                     >
                       {item.url === '#' ? (
-                        <div className="flex items-center gap-3 w-full cursor-not-allowed opacity-50">
+                        <div className="flex items-center gap-3 w-full cursor-not-allowed opacity-60">
                           <item.icon className="h-5 w-5 shrink-0" />
-                          {open && <span className="text-sm font-medium">{item.title}</span>}
+                          {open && (
+                            <div className="flex items-center gap-2 flex-1">
+                              <span className="text-sm font-medium">{item.title}</span>
+                              {'badge' in item && item.badge && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5">
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <NavLink to={item.url} className="flex items-center gap-3 w-full">
@@ -133,7 +171,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             <div className="flex items-center gap-2 flex-1">
                               <span className="text-sm font-medium">{item.title}</span>
                               {'badge' in item && item.badge && (
-                                <Badge variant="secondary" className="text-xs py-0 h-5">
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5">
                                   {item.badge}
                                 </Badge>
                               )}
@@ -149,6 +187,37 @@ export function AppSidebar({ role }: AppSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Footer with logo */}
+      <div 
+        className="border-t p-4 mt-auto"
+        style={{
+          borderColor: 'hsl(var(--border) / 0.5)',
+        }}
+      >
+        {open ? (
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md"
+              style={{
+                background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
+              }}
+            >
+              <Briefcase className="h-4 w-4" />
+            </div>
+            <span className="font-bold text-base">HUNTORIX</span>
+          </div>
+        ) : (
+          <div 
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md mx-auto"
+            style={{
+              background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
+            }}
+          >
+            <Briefcase className="h-4 w-4" />
+          </div>
+        )}
+      </div>
     </Sidebar>
   );
 }
