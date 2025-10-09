@@ -22,7 +22,6 @@ import {
 import { FeaturedHeadhunters } from "@/components/FeaturedHeadhunters";
 import { HotOpportunities } from "@/components/HotOpportunities";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
-import HeroFloatingElements from "@/components/HeroFloatingElements";
 import dashboardPreview from "@/assets/dashboard-preview.jpg";
 import heroBackground from "@/assets/hero-background-new.png";
 import heroImage from "@/assets/hero-image.png";
@@ -132,7 +131,6 @@ const Index = () => {
 
             {/* Right side - Image (50%) */}
             <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative animate-fade-in">
-              <HeroFloatingElements />
               <img
                 src={heroImage}
                 alt="Headhunter network connecting employers with talent"
