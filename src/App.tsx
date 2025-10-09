@@ -33,6 +33,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Accessibility from "./pages/Accessibility";
 import GlobalHiring from "./pages/GlobalHiring";
+import PostJob from "./pages/PostJob";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -60,6 +61,7 @@ const AppContent = () => {
           <Route element={<DashboardLayoutWrapper />}>
             <Route path="/dashboard/employer" element={<EmployerDashboard />} />
             <Route path="/my-jobs" element={<MyJobs />} />
+            <Route path="/post-job" element={<PostJob />} />
             <Route path="/dashboard/headhunter" element={<HeadhunterDashboard />} />
             <Route path="/applications" element={<Applications />} />
             <Route path="/saved-jobs" element={<SavedJobs />} />

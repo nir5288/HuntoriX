@@ -1,4 +1,4 @@
-import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe } from "lucide-react";
+import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, PlusCircle } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -30,6 +30,11 @@ export function AppSidebar({ role }: AppSidebarProps) {
       url: role === 'employer' ? '/dashboard/employer' : '/dashboard/headhunter',
       icon: Home,
     },
+    ...(role === 'employer' ? [{
+      title: 'Post Job',
+      url: '/post-job',
+      icon: PlusCircle,
+    }] : []),
     {
       title: role === 'employer' ? 'My Jobs' : 'Applications',
       url: role === 'employer' ? '/my-jobs' : '/applications',
