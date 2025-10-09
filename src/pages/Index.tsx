@@ -76,14 +76,10 @@ const Index = () => {
           <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px] -mt-12">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
-              <div className="animate-fade-in flex flex-wrap gap-3 justify-center lg:justify-start">
+              <div className="animate-fade-in flex justify-center lg:justify-start">
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  AI-Powered Platform
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
-                  <Shield className="h-3.5 w-3.5" />
-                  Verified Professionals
+                  <Award className="h-3.5 w-3.5" />
+                  Top Rated Platform
                 </span>
               </div>
 
@@ -104,25 +100,38 @@ const Index = () => {
                 effortlessly.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-8 justify-center lg:justify-start animate-fade-in">
-                <Button
-                  size="lg"
-                  variant="hero"
-                  onClick={handleEmployerCTA}
-                  className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
-                >
-                  <Briefcase className="mr-2 h-5 w-5" />
-                  I'm an Employer
-                </Button>
-                <Button
-                  size="lg"
-                  variant="mint"
-                  onClick={handleHeadhunterCTA}
-                  className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
-                >
-                  <Users className="mr-2 h-5 w-5" />
-                  I'm a Headhunter
-                </Button>
+              <div className="flex flex-col gap-6 pt-8 animate-fade-in">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Button
+                    size="lg"
+                    variant="hero"
+                    onClick={handleEmployerCTA}
+                    className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+                  >
+                    <Briefcase className="mr-2 h-5 w-5" />
+                    I'm an Employer
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="secondary"
+                    onClick={handleHeadhunterCTA}
+                    className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                  >
+                    <Users className="mr-2 h-5 w-5" />
+                    I'm a Headhunter
+                  </Button>
+                </div>
+                
+                <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    AI-Powered Platform
+                  </span>
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
+                    <Shield className="h-3.5 w-3.5" />
+                    Verified Professionals
+                  </span>
+                </div>
               </div>
             </div>
 
