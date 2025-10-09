@@ -406,7 +406,7 @@ const Messages = () => {
                   title="Video Call - Pro Plan Required"
                 >
                   <Video className="h-5 w-5" />
-                  <Badge variant="locked" className="absolute -top-2 -right-2 text-[8px] px-1 py-0 h-4">PRO</Badge>
+                  <Badge className="absolute -top-2 -right-2 text-[8px] px-1 py-0 h-4 bg-purple-500 text-white border-purple-600 font-bold">PRO</Badge>
                 </Button>
               </div>
 
