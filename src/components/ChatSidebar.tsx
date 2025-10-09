@@ -362,13 +362,10 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
   return (
     <div
       className={cn(
-        "fixed top-0 bottom-0 bg-background border-r transition-all duration-300 ease-in-out",
-        isOpen ? "translate-x-0 z-[300]" : "-translate-x-full -z-10 pointer-events-none",
-        isCollapsed ? "w-16" : "w-56"
+        "bg-background border-r transition-all duration-300 ease-in-out shrink-0 h-full",
+        isOpen ? "" : "w-0 border-0 overflow-hidden",
+        isCollapsed && isOpen ? "w-16" : isOpen ? "w-56" : "w-0"
       )}
-      style={{
-        left: sidebarOpen ? 'var(--sidebar-width, 16rem)' : 'var(--sidebar-width-icon, 3.5rem)'
-      }}
     >
       <div className="h-[72px] px-3 flex items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
         {!isCollapsed && (

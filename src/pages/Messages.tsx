@@ -368,18 +368,19 @@ const Messages = () => {
     loadMessages(true);
   };
   return <>
-      <ChatSidebar
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)}
-        isCollapsed={chatSidebarCollapsed}
-        onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
-      />
+      <div className="h-screen flex">
+        <ChatSidebar
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)}
+          isCollapsed={chatSidebarCollapsed}
+          onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
+        />
 
-          <div className="h-screen flex flex-col">
-            <div className="h-full flex flex-col transition-all duration-300 border-l ml-0">
-              {otherUserId ? <>
-                  {/* Fixed Header */}
-                  <div className="h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4">
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="h-full flex flex-col">
+            {otherUserId ? <>
+                {/* Fixed Header */}
+                <div className="h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4">
                 {!sidebarOpen && <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
                     <Menu className="h-5 w-5" />
                   </Button>}
@@ -501,20 +502,21 @@ const Messages = () => {
                 </Button>}
               <p className="mx-0 my-[35px]">Select a conversation to start messaging</p>
             </div>}
+          </div>
         </div>
+        
+        {otherUserId && (
+          <VideoCall
+            isOpen={isVideoCallOpen}
+            onClose={() => setIsVideoCallOpen(false)}
+            otherUserId={otherUserId}
+            otherUserName={otherUserName}
+            otherUserAvatar={otherUserAvatar}
+            currentUserId={user?.id || ""}
+            roomId={`${validJobId || 'direct'}-${[user?.id, otherUserId].sort().join('-')}`}
+          />
+        )}
       </div>
-      
-      {otherUserId && (
-        <VideoCall
-          isOpen={isVideoCallOpen}
-          onClose={() => setIsVideoCallOpen(false)}
-          otherUserId={otherUserId}
-          otherUserName={otherUserName}
-          otherUserAvatar={otherUserAvatar}
-          currentUserId={user?.id || ""}
-          roomId={`${validJobId || 'direct'}-${[user?.id, otherUserId].sort().join('-')}`}
-        />
-      )}
     </>;
 };
 export default Messages;
