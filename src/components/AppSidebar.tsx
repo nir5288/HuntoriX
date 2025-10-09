@@ -91,7 +91,10 @@ export function AppSidebar({ role }: AppSidebarProps) {
     <Sidebar 
       collapsible="icon" 
       className="border-r border-slate-800/50 transition-all duration-300"
-      style={{ backgroundColor: 'rgb(18, 18, 20)' }}
+      style={{ 
+        backgroundColor: 'rgb(18, 18, 20)',
+        width: open ? '24rem' : '4.5rem'
+      }}
     >
       <SidebarHeader 
         className="p-4 flex flex-row items-center justify-between transition-all duration-300 border-b border-slate-700/40"
@@ -146,17 +149,17 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         asChild={item.url !== '#'}
                         isActive={isActiveItem}
                         tooltip={getTooltip(item.title)}
-                        className={`h-12 px-4 group transition-all duration-200 rounded-xl ${
+                        className={`h-14 px-4 group transition-all duration-200 rounded-xl ${
                           isSoon 
                             ? 'cursor-not-allowed opacity-40' 
                             : isActiveItem
-                              ? 'bg-gradient-to-r from-accent-mint/25 to-accent-lilac/25 shadow-lg shadow-accent-mint/10'
+                              ? 'bg-black/60 shadow-[0_4px_20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] border border-slate-700/50'
                               : 'hover:bg-slate-700/40'
                         }`}
                       >
                         {item.url === '#' ? (
-                          <div className="flex items-center gap-3 w-full">
-                            <item.icon className="h-6 w-6 shrink-0 text-slate-600" />
+                          <div className={`flex items-center gap-4 w-full ${!open ? 'justify-center' : ''}`}>
+                            <item.icon className="h-7 w-7 shrink-0 text-slate-600" strokeWidth={2.5} />
                             {open && (
                               <div className="flex items-center gap-2 flex-1 justify-between">
                                 <span className="text-sm font-medium text-slate-500">{item.title}</span>
@@ -169,21 +172,22 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             )}
                           </div>
                         ) : (
-                          <NavLink to={item.url} className="flex items-center gap-3 w-full">
+                          <NavLink to={item.url} className={`flex items-center gap-4 w-full ${!open ? 'justify-center' : ''}`}>
                             <item.icon 
-                              className="h-6 w-6 shrink-0 transition-all duration-200"
+                              className="h-7 w-7 shrink-0 transition-all duration-200"
+                              strokeWidth={2.5}
                               style={{
                                 color: isActiveItem 
                                   ? 'hsl(var(--accent-mint))' 
                                   : 'hsl(var(--accent-pink))',
                                 filter: isActiveItem 
-                                  ? 'drop-shadow(0 0 10px hsl(var(--accent-mint) / 0.5))' 
+                                  ? 'drop-shadow(0 0 12px hsl(var(--accent-mint) / 0.6))' 
                                   : 'drop-shadow(0 0 6px hsl(var(--accent-pink) / 0.3))'
                               }}
                             />
                             {open && (
                               <div className="flex items-center gap-2 flex-1 justify-between">
-                                <span className={`text-sm font-semibold transition-colors ${
+                                <span className={`text-base font-semibold transition-colors ${
                                   isActiveItem ? 'text-white' : 'text-slate-300'
                                 }`}>
                                   {item.title}
