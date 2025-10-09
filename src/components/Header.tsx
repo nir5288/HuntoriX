@@ -141,7 +141,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 z-[100] w-full border-b bg-background">
-      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <div className="w-full max-w-[1400px] mx-auto px-2 h-14 sm:h-16 flex items-center justify-between gap-2">
         {/* Left side - Hamburger (mobile) + Logo & Nav (desktop) */}
         <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
           {/* Logo - centered on mobile only, left on tablet+ */}
