@@ -21,7 +21,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ role }: AppSidebarProps) {
-  const { open, setOpen, toggleSidebar } = useSidebar();
+  const { open, setOpen } = useSidebar();
   const location = useLocation();
   
   const items = [
@@ -91,28 +91,21 @@ export function AppSidebar({ role }: AppSidebarProps) {
     if (open) return undefined;
     return title;
   };
-  const getIconColor = (item: any, isActiveItem: boolean) => {
-    if (item.url === '#') {
-      return 'text-muted-foreground/40'; // grayed out for "soon" items
-    }
-    if (isActiveItem) {
-      return ''; // will use gradient
-    }
-    return ''; // will use gradient for inactive clickable items too
-  };
 
   return (
     <Sidebar 
       collapsible="icon" 
-      className="border-r border-slate-900/50 transition-all duration-200 bg-[#0a0a0a]"
+      className="border-r border-slate-800/50 transition-all duration-300"
+      style={{ backgroundColor: 'rgb(18, 18, 20)' }}
     >
       <SidebarHeader 
-        className="p-3 flex flex-row items-center justify-between transition-all duration-200 border-b border-slate-800/30 bg-black/40"
+        className="p-4 flex flex-row items-center justify-between transition-all duration-300 border-b border-slate-700/40"
+        style={{ backgroundColor: 'rgb(22, 22, 24)' }}
       >
         {open && (
-          <div className="flex items-center gap-2 px-1">
+          <div className="flex items-center gap-3 px-1">
             <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-base shadow-xl"
               style={{
                 background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
               }}
@@ -120,9 +113,10 @@ export function AppSidebar({ role }: AppSidebarProps) {
               {role === 'employer' ? 'E' : 'H'}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-white">
+              <span className="text-base font-bold text-white tracking-tight">
                 {role === 'employer' ? 'Employer' : 'Headhunter'}
               </span>
+              <span className="text-xs text-slate-400">Portal</span>
             </div>
           </div>
         )}
@@ -130,23 +124,23 @@ export function AppSidebar({ role }: AppSidebarProps) {
           variant="ghost"
           size="icon"
           onClick={() => setOpen(!open)}
-          className="h-8 w-8 ml-auto hover:bg-slate-800/50 text-slate-300 hover:text-white"
+          className="h-9 w-9 ml-auto hover:bg-slate-700/50 text-slate-400 hover:text-white transition-all duration-200"
           aria-label="Toggle sidebar"
           title={open ? "Collapse sidebar" : "Expand sidebar"}
         >
           {open ? (
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" />
           ) : (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
           )}
         </Button>
       </SidebarHeader>
       
-      <SidebarContent className="py-2 transition-all duration-200" style={{ backgroundColor: 'rgb(26, 28, 31)' }}>
+      <SidebarContent className="py-3 transition-all duration-300" style={{ backgroundColor: 'rgb(26, 28, 31)' }}>
         <SidebarGroup>
           <SidebarGroupContent>
             <TooltipProvider delayDuration={200} skipDelayDuration={0}>
-              <SidebarMenu className="gap-1">
+              <SidebarMenu className="gap-1.5 px-3">
                 {items.map((item) => {
                   const isActiveItem = isActive(item.url);
                   const isSoon = item.url === '#';
@@ -157,22 +151,22 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         asChild={item.url !== '#'}
                         isActive={isActiveItem}
                         tooltip={getTooltip(item.title)}
-                        className={`h-10 px-3 group transition-all duration-200 ${
+                        className={`h-12 px-4 group transition-all duration-200 rounded-xl ${
                           isSoon 
-                            ? 'cursor-not-allowed opacity-50' 
+                            ? 'cursor-not-allowed opacity-40' 
                             : isActiveItem
-                              ? 'bg-gradient-to-r from-accent-mint/20 to-accent-lilac/20'
-                              : 'hover:bg-slate-800/50'
+                              ? 'bg-gradient-to-r from-accent-mint/25 to-accent-lilac/25 shadow-lg shadow-accent-mint/10'
+                              : 'hover:bg-slate-700/40'
                         }`}
                       >
                         {item.url === '#' ? (
                           <div className="flex items-center gap-3 w-full">
-                            <item.icon className={`h-5 w-5 shrink-0 ${getIconColor(item, isActiveItem)}`} />
+                            <item.icon className="h-6 w-6 shrink-0 text-slate-600" />
                             {open && (
-                              <div className="flex items-center gap-2 flex-1">
-                                <span className="text-sm font-medium text-slate-400">{item.title}</span>
+                              <div className="flex items-center gap-2 flex-1 justify-between">
+                                <span className="text-sm font-medium text-slate-500">{item.title}</span>
                                 {'badge' in item && item.badge && (
-                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 bg-slate-800 text-slate-400 border-slate-700">
+                                  <Badge variant="secondary" className="text-[9px] px-2 py-0.5 h-5 bg-slate-800/80 text-slate-500 border-slate-700/50 font-medium">
                                     {item.badge}
                                   </Badge>
                                 )}
@@ -182,22 +176,34 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         ) : (
                           <NavLink to={item.url} className="flex items-center gap-3 w-full">
                             <item.icon 
-                              className="h-5 w-5 shrink-0 transition-all duration-200 drop-shadow-[0_0_8px_currentColor]"
+                              className="h-6 w-6 shrink-0 transition-all duration-200"
                               style={{
                                 color: isActiveItem 
                                   ? 'hsl(var(--accent-mint))' 
-                                  : 'hsl(var(--accent-pink))'
+                                  : 'hsl(var(--accent-pink))',
+                                filter: isActiveItem 
+                                  ? 'drop-shadow(0 0 10px hsl(var(--accent-mint) / 0.5))' 
+                                  : 'drop-shadow(0 0 6px hsl(var(--accent-pink) / 0.3))'
                               }}
                             />
                             {open && (
-                              <div className="flex items-center gap-2 flex-1">
-                                <span className={`text-sm font-medium transition-colors ${
+                              <div className="flex items-center gap-2 flex-1 justify-between">
+                                <span className={`text-sm font-semibold transition-colors ${
                                   isActiveItem ? 'text-white' : 'text-slate-300'
                                 }`}>
                                   {item.title}
                                 </span>
                                 {'badge' in item && item.badge && (
-                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 bg-accent-lilac/20 text-accent-lilac border-accent-lilac/30">
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="text-[9px] px-2 py-0.5 h-5 font-semibold"
+                                    style={{
+                                      backgroundColor: 'hsl(var(--accent-lilac) / 0.2)',
+                                      color: 'hsl(var(--accent-lilac))',
+                                      borderColor: 'hsl(var(--accent-lilac) / 0.3)',
+                                      borderWidth: '1px',
+                                    }}
+                                  >
                                     {item.badge}
                                   </Badge>
                                 )}
@@ -217,28 +223,29 @@ export function AppSidebar({ role }: AppSidebarProps) {
 
       {/* Footer with logo */}
       <div 
-        className="border-t border-slate-800/30 p-4 mt-auto bg-black/40"
+        className="border-t border-slate-700/40 p-4 mt-auto"
+        style={{ backgroundColor: 'rgb(22, 22, 24)' }}
       >
         {open ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg"
               style={{
                 background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
               }}
             >
-              <Briefcase className="h-4 w-4" />
+              <Briefcase className="h-5 w-5" />
             </div>
-            <span className="font-bold text-base text-white">HUNTORIX</span>
+            <span className="font-bold text-lg text-white tracking-tight">HUNTORIX</span>
           </div>
         ) : (
           <div 
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md mx-auto"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg mx-auto"
             style={{
               background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
             }}
           >
-            <Briefcase className="h-4 w-4" />
+            <Briefcase className="h-5 w-5" />
           </div>
         )}
       </div>

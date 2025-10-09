@@ -25,12 +25,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
-      <div className="relative min-h-screen flex w-full">
+      <div className="relative min-h-screen flex w-full bg-slate-50 dark:bg-slate-950">
         <AppSidebar role={role} />
         <div className="flex-1 flex flex-col min-w-0">
           {!isMessagesPage && <Header />}
           <main className={`flex-1 w-full overflow-x-hidden ${isMessagesPage ? '' : 'pt-14 sm:pt-16'}`}>
-            <div className={isMessagesPage ? "w-full px-0" : "w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8"}>
+            <div className={isMessagesPage ? "w-full px-0" : "w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6"}>
               {children}
             </div>
           </main>
