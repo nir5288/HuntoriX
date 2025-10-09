@@ -216,35 +216,51 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
 
   return (
     <TooltipProvider>
-      <div className="space-y-12 pb-12">
+      <div className="space-y-16 pb-16 animate-fade-in">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold">Choose Your Plan</h2>
-          <p className="text-muted-foreground">
+        <div className="text-center space-y-4 max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+            Choose Your Plan
+          </h2>
+          <p className="text-lg text-muted-foreground">
             Select the plan that best fits your needs. You can change plans later.
           </p>
         </div>
 
         {/* Monthly/Yearly Toggle */}
-        <div className="flex items-center justify-center gap-3">
-          <span className={cn("text-sm font-medium", billingCycle === 'monthly' && "text-foreground")}>
+        <div className="flex items-center justify-center gap-4 p-2 rounded-full bg-muted/50 w-fit mx-auto backdrop-blur-sm border border-border/50">
+          <span className={cn(
+            "text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200",
+            billingCycle === 'monthly' && "bg-primary text-primary-foreground shadow-lg"
+          )}>
             Monthly
           </span>
           <Switch
             checked={billingCycle === 'yearly'}
             onCheckedChange={(checked) => setBillingCycle(checked ? 'yearly' : 'monthly')}
+            className="data-[state=checked]:bg-[hsl(var(--vibrant-mint))]"
           />
-          <span className={cn("text-sm font-medium", billingCycle === 'yearly' && "text-foreground")}>
+          <span className={cn(
+            "text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2",
+            billingCycle === 'yearly' && "bg-primary text-primary-foreground shadow-lg"
+          )}>
             Yearly
-            <Badge variant="secondary" className="ml-2 text-xs">
+            <Badge 
+              variant="secondary" 
+              className="text-xs font-bold"
+              style={{
+                backgroundColor: 'hsl(var(--vibrant-mint))',
+                color: 'hsl(var(--primary))',
+              }}
+            >
               save 2 months
             </Badge>
           </span>
         </div>
 
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PLANS.map((plan) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {PLANS.map((plan, index) => {
             const price = getPrice(plan);
             const isSelected = selectedPlan === plan.id;
             const isRecommended = plan.id === 'core';
@@ -252,16 +268,24 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
             return (
               <Card
                 key={plan.id}
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                }}
                 className={cn(
-                  "relative cursor-pointer transition-all duration-200 rounded-2xl flex flex-col h-full",
-                  isSelected && !plan.locked && "ring-2 ring-primary shadow-lg border-primary",
-                  isRecommended && "border-2 border-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)] bg-gradient-to-b from-primary/5 to-transparent",
-                  !isRecommended && "border-2",
-                  plan.locked && "opacity-60",
-                  !isSelected && !plan.locked && !isRecommended && "hover:border-primary/30"
+                  "group relative cursor-pointer transition-all duration-300 rounded-3xl flex flex-col h-full animate-fade-in overflow-hidden",
+                  "hover:shadow-2xl hover:-translate-y-2",
+                  isSelected && !plan.locked && "ring-2 ring-[hsl(var(--vibrant-mint))] shadow-2xl scale-[1.02]",
+                  isRecommended && "border-2 border-[hsl(var(--vibrant-lilac))] shadow-[0_8px_40px_rgba(167,139,250,0.25)] bg-gradient-to-br from-[hsl(var(--accent-lilac))] via-background to-background",
+                  !isRecommended && "border-2 border-border",
+                  plan.locked && "opacity-70 cursor-not-allowed hover:shadow-lg hover:translate-y-0",
+                  !isSelected && !plan.locked && !isRecommended && "hover:border-[hsl(var(--accent-mint))]"
                 )}
                 onClick={() => !plan.locked && setSelectedPlan(plan.id)}
               >
+                {/* Gradient overlay for recommended */}
+                {isRecommended && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--vibrant-lilac)/0.08)] to-transparent pointer-events-none" />
+                )}
                 {plan.locked && (
                   <div className="absolute top-4 right-4 z-10">
                     <Tooltip>
@@ -275,77 +299,110 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                   </div>
                 )}
 
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
+                <CardHeader className="pb-6 relative z-10">
+                  <div className="flex items-center gap-3 mb-2">
                     <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                     {isRecommended && (
                       <Badge 
-                        variant="secondary"
-                        className="text-xs font-semibold"
+                        className="text-xs font-bold px-3 py-1 animate-scale-in"
                         style={{
-                          backgroundColor: 'hsl(var(--primary))',
-                          color: 'hsl(var(--primary-foreground))',
+                          backgroundColor: 'hsl(var(--vibrant-lilac))',
+                          color: 'white',
                         }}
                       >
-                        Popular
+                        ⭐ Popular
                       </Badge>
                     )}
                   </div>
-                  <CardDescription className="flex items-center gap-2 text-base">
+                  <CardDescription className="flex items-center gap-2 text-base font-medium">
                     {plan.description}
                     <Tooltip>
                       <TooltipTrigger>
-                        <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Info className="h-4 w-4 text-muted-foreground hover:text-[hsl(var(--vibrant-mint))] transition-colors" />
                       </TooltipTrigger>
-                      <TooltipContent>
+                      <TooltipContent className="max-w-xs">
                         <p>Each application uses 1 credit.</p>
                       </TooltipContent>
                     </Tooltip>
                   </CardDescription>
-                  <div className="mt-6">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold">${price}</span>
-                      <span className="text-muted-foreground text-base">
-                        / {billingCycle === 'yearly' ? 'year' : 'month'}
+                  <div className="mt-8">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-6xl font-extrabold bg-gradient-to-br from-primary to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+                        ${price}
+                      </span>
+                      <span className="text-muted-foreground text-lg font-medium">
+                        / {billingCycle === 'yearly' ? 'year' : 'mo'}
                       </span>
                     </div>
                     {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        billed yearly, save 2 months
+                      <p className="text-sm font-medium mt-3 px-3 py-1.5 rounded-full bg-[hsl(var(--accent-mint))] text-primary w-fit">
+                        💰 Save 2 months
                       </p>
                     )}
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-6 flex-1 flex flex-col">
-                  <ul className="space-y-3 flex-1">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3 text-sm">
-                        <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" strokeWidth={2.5} />
-                        <span className="leading-relaxed">{feature}</span>
+                <CardContent className="space-y-8 flex-1 flex flex-col relative z-10">
+                  <ul className="space-y-4 flex-1">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li 
+                        key={featureIndex} 
+                        className="flex items-start gap-3 text-sm group/feature"
+                        style={{
+                          animationDelay: `${(index * 100) + (featureIndex * 50)}ms`,
+                        }}
+                      >
+                        <div className={cn(
+                          "rounded-full p-1 shrink-0 transition-all duration-200",
+                          isRecommended ? "bg-[hsl(var(--vibrant-lilac)/0.2)]" : "bg-[hsl(var(--accent-mint))]"
+                        )}>
+                          <Check 
+                            className={cn(
+                              "h-4 w-4 shrink-0 transition-transform duration-200 group-hover/feature:scale-110",
+                              isRecommended ? "text-[hsl(var(--vibrant-lilac))]" : "text-primary"
+                            )} 
+                            strokeWidth={3} 
+                          />
+                        </div>
+                        <span className="leading-relaxed font-medium">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Button
-                    className="w-full h-11 text-base font-semibold"
+                    className={cn(
+                      "w-full h-12 text-base font-bold rounded-xl transition-all duration-200 relative overflow-hidden group/btn",
+                      isSelected && "shadow-lg scale-105"
+                    )}
                     variant={isSelected ? 'default' : 'outline'}
+                    style={isRecommended && !isSelected ? {
+                      borderColor: 'hsl(var(--vibrant-lilac))',
+                      color: 'hsl(var(--vibrant-lilac))',
+                    } : {}}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!plan.locked) setSelectedPlan(plan.id);
                     }}
                     disabled={plan.locked || submitting}
                   >
-                    {plan.locked ? (
-                      <>
-                        <Lock className="mr-2 h-4 w-4" />
-                        Coming soon
-                      </>
-                    ) : isSelected ? (
-                      'Selected'
-                    ) : (
-                      'Select Plan'
+                    {!plan.locked && !isSelected && (
+                      <span className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--vibrant-pink)/0.1)] via-[hsl(var(--vibrant-lilac)/0.1)] to-[hsl(var(--vibrant-mint)/0.1)] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                     )}
+                    <span className="relative z-10">
+                      {plan.locked ? (
+                        <>
+                          <Lock className="mr-2 h-4 w-4" />
+                          Coming soon
+                        </>
+                      ) : isSelected ? (
+                        <>
+                          <Check className="mr-2 h-5 w-5" strokeWidth={3} />
+                          Selected
+                        </>
+                      ) : (
+                        'Select Plan'
+                      )}
+                    </span>
                   </Button>
                 </CardContent>
               </Card>
@@ -354,30 +411,33 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Plans at a glance strip */}
-        <div className="flex items-center justify-center gap-4 flex-wrap">
+        <div className="flex items-center justify-center gap-3 flex-wrap p-6 rounded-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-mint))] animate-fade-in">
           {PLANS.map((plan) => {
             const price = getPrice(plan);
             return (
               <Badge
                 key={plan.id}
-                variant="outline"
+                variant="secondary"
                 className={cn(
-                  "px-4 py-2 text-sm font-medium",
+                  "px-5 py-2.5 text-sm font-bold bg-background/95 backdrop-blur-sm hover:scale-105 transition-transform duration-200 border-2",
+                  plan.id === 'core' && "border-[hsl(var(--vibrant-lilac))]",
                   plan.locked && "opacity-60"
                 )}
               >
-                {plan.name} — ${price}{billingCycle === 'yearly' && '/yr'}
-                {plan.locked && ' (Locked)'}
+                {plan.name} — ${price}{billingCycle === 'yearly' ? '/yr' : '/mo'}
+                {plan.locked && ' 🔒'}
               </Badge>
             );
           })}
         </div>
 
         {/* Feature Comparison Table - Desktop */}
-        <div className="hidden md:block space-y-4">
-          <h3 className="text-2xl font-bold text-center">Plans at a Glance</h3>
+        <div className="hidden md:block space-y-6 animate-fade-in">
+          <h3 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+            Plans at a Glance
+          </h3>
           
-          <div className="overflow-x-auto rounded-2xl border">
+          <div className="overflow-x-auto rounded-3xl border-2 border-border shadow-2xl bg-card">
             <Table>
               <TableHeader>
                 <TableRow className="border-b-2">
@@ -457,23 +517,34 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Feature Comparison - Mobile Cards */}
-        <div className="md:hidden space-y-6">
-          <h3 className="text-2xl font-bold text-center">Plans at a Glance</h3>
+        <div className="md:hidden space-y-6 animate-fade-in">
+          <h3 className="text-3xl font-bold text-center bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+            Plans at a Glance
+          </h3>
           
-          {PLANS.map((plan) => (
-            <Card key={plan.id} className="rounded-2xl">
+          {PLANS.map((plan, index) => (
+            <Card 
+              key={plan.id} 
+              className={cn(
+                "rounded-3xl border-2 hover:shadow-xl transition-all duration-300 animate-fade-in",
+                plan.id === 'core' && "border-[hsl(var(--vibrant-lilac))] bg-gradient-to-br from-[hsl(var(--accent-lilac))] to-background"
+              )}
+              style={{
+                animationDelay: `${index * 100}ms`,
+              }}
+            >
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
+                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                   {plan.id === 'core' && (
                     <Badge 
-                      className="font-semibold"
+                      className="font-bold text-xs"
                       style={{
-                        backgroundColor: 'hsl(var(--primary))',
-                        color: 'hsl(var(--primary-foreground))',
+                        backgroundColor: 'hsl(var(--vibrant-lilac))',
+                        color: 'white',
                       }}
                     >
-                      Recommended
+                      ⭐ Popular
                     </Badge>
                   )}
                 </div>
@@ -484,13 +555,13 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                   if (value === false) return null;
                   
                   return (
-                    <div key={index} className="flex items-start justify-between gap-3 text-sm py-2">
+                    <div key={index} className="flex items-start justify-between gap-3 text-sm py-2.5 border-b border-border/50 last:border-0">
                       <div className="flex items-center gap-2 flex-1">
                         <span className="font-semibold">{row.feature}</span>
                         {row.tooltip && (
                           <Tooltip>
                             <TooltipTrigger>
-                              <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <Info className="h-4 w-4 text-muted-foreground shrink-0 hover:text-[hsl(var(--vibrant-mint))] transition-colors" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="max-w-xs">{row.tooltip}</p>
@@ -500,9 +571,11 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                       </div>
                       <div className="shrink-0">
                         {typeof value === 'boolean' && value ? (
-                          <Check className="h-5 w-5 text-primary" strokeWidth={2.5} />
+                          <div className="rounded-full p-1 bg-[hsl(var(--accent-mint))]">
+                            <Check className="h-4 w-4 text-primary" strokeWidth={3} />
+                          </div>
                         ) : typeof value === 'string' ? (
-                          <span className="font-medium">{value}</span>
+                          <span className="font-bold text-primary">{value}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
@@ -511,7 +584,10 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                   );
                 })}
                 <Button
-                  className="w-full mt-4"
+                  className={cn(
+                    "w-full mt-6 h-12 font-bold rounded-xl transition-all duration-200",
+                    plan.id === 'core' && "bg-[hsl(var(--vibrant-lilac))] hover:bg-[hsl(var(--vibrant-lilac))] text-white"
+                  )}
                   variant={plan.locked ? 'outline' : 'default'}
                   disabled={plan.locked}
                   onClick={() => !plan.locked && setSelectedPlan(plan.id)}
@@ -531,28 +607,51 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Helper Notes */}
-        <div className="space-y-2 text-sm text-muted-foreground text-center max-w-3xl mx-auto">
-          <p>• Applications credits = credits to send applications (1 application = 1 credit).</p>
-          <p>• Candidate process visibility = see each candidate's stage per job (timeline/progress).</p>
-          <p>• Statistics & application insights = analytics on views, response time, success rates, etc.</p>
+        <div className="space-y-3 text-sm max-w-4xl mx-auto p-6 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-fade-in">
+          <p className="font-semibold text-primary flex items-center gap-2">
+            <span className="text-lg">💡</span>
+            Applications credits = credits to send applications (1 application = 1 credit).
+          </p>
+          <p className="font-semibold text-primary flex items-center gap-2">
+            <span className="text-lg">📊</span>
+            Candidate process visibility = see each candidate's stage per job (timeline/progress).
+          </p>
+          <p className="font-semibold text-primary flex items-center gap-2">
+            <span className="text-lg">📈</span>
+            Statistics & application insights = analytics on views, response time, success rates, etc.
+          </p>
         </div>
 
         {/* Continue Button */}
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-center pt-8 animate-fade-in">
           <Button
             size="lg"
             disabled={!selectedPlan || submitting}
             onClick={() => selectedPlan && handleSelectPlan(selectedPlan)}
-            className="min-w-[200px]"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              'Continue'
+            className={cn(
+              "min-w-[280px] h-14 text-lg font-bold rounded-2xl transition-all duration-300 relative overflow-hidden group shadow-2xl",
+              selectedPlan && "hover:scale-105 animate-scale-in"
             )}
+            style={selectedPlan ? {
+              background: 'linear-gradient(135deg, hsl(var(--vibrant-mint)), hsl(var(--vibrant-lilac)))',
+            } : {}}
+          >
+            {!submitting && selectedPlan && (
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            )}
+            <span className="relative z-10">
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <span className="ml-2">→</span>
+                </>
+              )}
+            </span>
           </Button>
         </div>
       </div>
