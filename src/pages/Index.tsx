@@ -9,6 +9,7 @@ import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
 import heroBackground from '@/assets/hero-background.jpg';
+import heroImage from '@/assets/hero-image.png';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -73,9 +74,13 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right side - Space reserved for image (40%) */}
-            <div className="hidden lg:block lg:w-[40%]">
-              {/* Image will go here */}
+            {/* Right side - Image (40%) */}
+            <div className="hidden lg:flex lg:w-[40%] items-center justify-center">
+              <img 
+                src={heroImage} 
+                alt="Headhunter network connecting employers with talent" 
+                className="w-full max-w-[800px] h-auto object-contain"
+              />
             </div>
           </div>
         </div>
