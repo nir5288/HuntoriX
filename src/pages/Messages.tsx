@@ -405,7 +405,7 @@ const Messages = () => {
                   title="Video Call - Pro Plan Required"
                 >
                   <Video className="h-4 w-4" />
-                  <span className="text-sm font-semibold">PRO</span>
+                  <span className="text-sm font-semibold">Schedule a video call</span>
                 </Button>
               </div>
 
