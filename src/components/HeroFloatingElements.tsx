@@ -197,7 +197,7 @@ const HeroFloatingElements = () => {
         animate={{
           y: [0, -15, 0],
           x: [0, 5, 0],
-          opacity: [0.4, 0.8, 0.4],
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{
           duration: 4,
@@ -206,7 +206,7 @@ const HeroFloatingElements = () => {
           delay: 1.5,
         }}
       >
-        <Sparkles className="w-5 h-5 text-[hsl(var(--accent-mint))]" />
+        <Sparkles className="w-8 h-8 text-[hsl(var(--accent-mint))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div
@@ -214,7 +214,7 @@ const HeroFloatingElements = () => {
         animate={{
           y: [0, 10, 0],
           x: [0, -5, 0],
-          opacity: [0.3, 0.7, 0.3],
+          opacity: [0.6, 1, 0.6],
           rotate: [0, 180, 360],
         }}
         transition={{
@@ -224,7 +224,7 @@ const HeroFloatingElements = () => {
           delay: 0.8,
         }}
       >
-        <Zap className="w-4 h-4 text-[hsl(var(--accent-pink))]" />
+        <Zap className="w-7 h-7 text-[hsl(var(--accent-pink))]" strokeWidth={2.5} />
       </motion.div>
 
       {/* Particle Trails */}
@@ -254,7 +254,7 @@ const HeroFloatingElements = () => {
         className="absolute top-[25%] right-[30%]"
         animate={{
           y: [0, -12, 0],
-          opacity: [0.5, 0.9, 0.5],
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{
           duration: 4.5,
@@ -263,7 +263,7 @@ const HeroFloatingElements = () => {
           delay: 0.3,
         }}
       >
-        <Users className="w-6 h-6 text-[hsl(var(--accent-lilac))]" />
+        <Users className="w-9 h-9 text-[hsl(var(--accent-lilac))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div
@@ -271,7 +271,7 @@ const HeroFloatingElements = () => {
         animate={{
           y: [0, 8, 0],
           rotate: [0, 5, 0],
-          opacity: [0.4, 0.8, 0.4],
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{
           duration: 5,
@@ -280,7 +280,7 @@ const HeroFloatingElements = () => {
           delay: 1.2,
         }}
       >
-        <Briefcase className="w-5 h-5 text-[hsl(var(--accent-pink))]" />
+        <Briefcase className="w-8 h-8 text-[hsl(var(--accent-pink))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div
@@ -288,7 +288,7 @@ const HeroFloatingElements = () => {
         animate={{
           y: [0, -10, 0],
           scale: [1, 1.15, 1],
-          opacity: [0.5, 0.85, 0.5],
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{
           duration: 4,
@@ -297,14 +297,14 @@ const HeroFloatingElements = () => {
           delay: 2,
         }}
       >
-        <Target className="w-5 h-5 text-[hsl(var(--accent-mint))]" />
+        <Target className="w-8 h-8 text-[hsl(var(--accent-mint))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div
         className="absolute top-[65%] right-[15%]"
         animate={{
           y: [0, 12, 0],
-          opacity: [0.3, 0.7, 0.3],
+          opacity: [0.6, 1, 0.6],
         }}
         transition={{
           duration: 5.5,
@@ -313,7 +313,7 @@ const HeroFloatingElements = () => {
           delay: 0.8,
         }}
       >
-        <Network className="w-6 h-6 text-[hsl(var(--accent-lilac))]" />
+        <Network className="w-9 h-9 text-[hsl(var(--accent-lilac))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div
@@ -321,7 +321,7 @@ const HeroFloatingElements = () => {
         animate={{
           y: [0, -8, 0],
           rotate: [0, -10, 0],
-          opacity: [0.5, 0.9, 0.5],
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{
           duration: 4.2,
@@ -330,14 +330,14 @@ const HeroFloatingElements = () => {
           delay: 1.5,
         }}
       >
-        <Bot className="w-5 h-5 text-[hsl(var(--accent-pink))]" />
+        <Bot className="w-8 h-8 text-[hsl(var(--accent-pink))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div
         className="absolute bottom-[20%] right-[32%]"
         animate={{
           y: [0, -15, 0],
-          opacity: [0.4, 0.8, 0.4],
+          opacity: [0.7, 1, 0.7],
         }}
         transition={{
           duration: 4.8,
@@ -346,7 +346,7 @@ const HeroFloatingElements = () => {
           delay: 0.5,
         }}
       >
-        <TrendingUp className="w-5 h-5 text-[hsl(var(--accent-mint))]" />
+        <TrendingUp className="w-8 h-8 text-[hsl(var(--accent-mint))]" strokeWidth={2.5} />
       </motion.div>
 
       <motion.div

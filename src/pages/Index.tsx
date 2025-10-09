@@ -45,8 +45,8 @@ const Index = () => {
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         {/* Large Background Text */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-          <h2 className="text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[24rem] xl:text-[28rem] font-black text-foreground/[0.02] whitespace-nowrap select-none tracking-tighter leading-none">
+        <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden pb-20">
+          <h2 className="text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[24rem] xl:text-[32rem] font-black text-foreground/[0.08] whitespace-nowrap select-none tracking-tighter leading-none">
             HUNTORIX
           </h2>
         </div>
@@ -55,10 +55,18 @@ const Index = () => {
           <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px]">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
-              <div className="animate-fade-in">
+              <div className="animate-fade-in flex flex-wrap gap-3 justify-center lg:justify-start">
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
                   <Award className="h-4 w-4" />
-                  Trusted by Leading Companies
+                  Top Rated Platform
+                </span>
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
+                  <Bot className="h-4 w-4" />
+                  AI-Powered Matching
+                </span>
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-sm font-bold shadow-lg">
+                  <Shield className="h-4 w-4" />
+                  Verified Professionals
                 </span>
               </div>
               
