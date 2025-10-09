@@ -149,7 +149,9 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         asChild={item.url !== '#'}
                         isActive={isActiveItem}
                         tooltip={getTooltip(item.title)}
-                        className={`h-14 px-4 group transition-all duration-200 rounded-xl ${
+                        className={`h-14 group transition-all duration-200 rounded-xl ${
+                          open ? 'px-4' : 'px-0 justify-center'
+                        } ${
                           isSoon 
                             ? 'cursor-not-allowed opacity-40' 
                             : isActiveItem
@@ -158,7 +160,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         }`}
                       >
                         {item.url === '#' ? (
-                          <div className={`flex items-center gap-4 w-full ${!open ? 'justify-center' : ''}`}>
+                          <div className={`flex items-center w-full ${open ? 'gap-4' : 'justify-center'}`}>
                             <item.icon className="h-7 w-7 shrink-0 text-slate-600" strokeWidth={3} />
                             {open && (
                               <div className="flex items-center gap-2 flex-1 justify-between">
@@ -172,7 +174,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             )}
                           </div>
                         ) : (
-                          <NavLink to={item.url} className={`flex items-center gap-4 w-full ${!open ? 'justify-center' : ''}`}>
+                          <NavLink to={item.url} className={`flex items-center w-full ${open ? 'gap-4' : 'justify-center'}`}>
                             <item.icon 
                               className="h-7 w-7 shrink-0 transition-all duration-200"
                               strokeWidth={3}
