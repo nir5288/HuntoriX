@@ -2,11 +2,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown, Menu } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Circle, Star, Shield, BarChart3, FileText, Crown, Menu, ChevronDown } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,6 @@ import { SwitchRoleModal } from './SwitchRoleModal';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useState, useEffect } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ManageBannersModal } from './ManageBannersModal';
 import EditLegalDocumentModal from './EditLegalDocumentModal';
@@ -43,6 +41,7 @@ export function Header() {
   const [showEditLegal, setShowEditLegal] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<{ name: string; price_usd: number } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
     open: boolean;
     currentRole: 'employer' | 'headhunter';
@@ -52,6 +51,19 @@ export function Header() {
     currentRole: 'headhunter',
     targetRole: 'employer',
   });
+
+  // Scroll detection for header size change
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 40);
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Fetch subscription plan for headhunters
   useEffect(() => {
@@ -140,202 +152,157 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 z-[100] w-full border-b bg-background">
-      <div className="site-container h-14 sm:h-16 flex items-center justify-between gap-2">
-        {/* Left side - Hamburger (mobile) + Logo & Nav (desktop) */}
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
-          {/* Logo - centered on mobile only, left on tablet+ */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0 absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0">
-            <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
-            <span className="font-bold text-sm sm:text-base md:text-xl whitespace-nowrap">HUNTORIX</span>
+    <header className="fixed top-4 left-0 right-0 z-[100] px-4 sm:px-6 md:px-8">
+      <div 
+        className={`max-w-[1440px] mx-auto rounded-3xl backdrop-blur-xl bg-background/60 border-2 shadow-lg transition-all duration-300 ${
+          isScrolled 
+            ? 'h-14 sm:h-[60px] md:h-[72px] bg-background/80' 
+            : 'h-16 sm:h-[72px] md:h-24 bg-background/60'
+        }`}
+        style={{
+          borderImage: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink))) 1',
+        }}
+      >
+        <div className="h-full px-4 sm:px-6 md:px-8 flex items-center justify-between gap-4">
+          {/* Left side - Logo */}
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition shrink-0">
+            <Briefcase className={`transition-all duration-300 ${isScrolled ? 'h-5 w-5 sm:h-6 sm:w-6' : 'h-6 w-6 sm:h-7 sm:w-7'}`} />
+            <span className={`font-bold whitespace-nowrap transition-all duration-300 ${isScrolled ? 'text-base sm:text-lg md:text-xl' : 'text-lg sm:text-xl md:text-2xl'}`}>HUNTORIX</span>
           </Link>
 
-          {/* Mobile/Tablet Hamburger - next to logo on tablet */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10 sm:h-10 sm:w-10" aria-label="Open menu">
-                <Menu className="h-6 w-6 sm:h-6 sm:w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[340px]">
-              <nav className="flex flex-col gap-1 mt-8">
-                {/* Main Navigation */}
-                <div className="mb-2">
-                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">MAIN MENU</p>
-                  <Link 
-                    to={user ? getDashboardPath() : '/auth'} 
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
-                    Dashboard
-                  </Link>
-                  {user && profile?.role === 'employer' && (
-                    <Link 
-                      to="/my-jobs" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Briefcase className="h-5 w-5 text-muted-foreground" />
-                      My Jobs
-                    </Link>
-                  )}
-                  {user && profile?.role === 'headhunter' && (
-                    <Link 
-                      to="/applications" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Briefcase className="h-5 w-5 text-muted-foreground" />
-                      Applications
-                    </Link>
-                  )}
-                  {user && (
-                    <Link 
-                      to="/messages" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <MessagesSquare className="h-5 w-5 text-muted-foreground" />
-                      Messages
-                    </Link>
-                  )}
-                </div>
-
-                {/* Discover Section */}
-                <div className="border-t pt-2 mb-2">
-                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">DISCOVER</p>
-                  <Link 
-                    to="/opportunities" 
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Star className="h-5 w-5 text-muted-foreground" />
-                    Opportunities
-                  </Link>
-                  <Link 
-                    to="/headhunters" 
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <User className="h-5 w-5 text-muted-foreground" />
-                    Find a Headhunter
-                  </Link>
-                </div>
-
-                {/* Coming Soon */}
-                <div className="border-t pt-2">
-                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
-                    <BarChart3 className="h-5 w-5 text-muted-foreground" />
-                    HuntRank
-                    <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
-                  </div>
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
-                    <Globe className="h-5 w-5 text-muted-foreground" />
-                    HuntBase
-                    <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
-                  </div>
-                </div>
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
+          {/* Center - Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-2 lg:gap-6 absolute left-1/2 -translate-x-1/2">
             <Link 
               to={user ? getDashboardPath() : '/auth'} 
-              className={getNavLinkClass('/dashboard')}
+              className={`${getNavLinkClass('/dashboard')} text-xs lg:text-sm transition-all duration-300`}
             >
               Dashboard
             </Link>
-            <Link to="/opportunities" className={getNavLinkClass('/opportunities')}>
+            <Link to="/opportunities" className={`${getNavLinkClass('/opportunities')} text-xs lg:text-sm transition-all duration-300`}>
               Opportunities
             </Link>
-            <Link to="/headhunters" className={getNavLinkClass('/headhunters')}>
-              Find a Headhunter
+            <Link to="/headhunters" className={`${getNavLinkClass('/headhunters')} text-xs lg:text-sm transition-all duration-300`}>
+              Headhunters
             </Link>
-            <Link to="/huntrank" className={`${getNavLinkClass('/huntrank')} flex items-center gap-1.5`}>
-              HuntRank
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-            </Link>
-            <Link to="/huntbase" className={`${getNavLinkClass('/huntbase')} flex items-center gap-1.5`}>
-              HuntBase
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-xs lg:text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                More <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                <DropdownMenuItem onClick={() => navigate('/huntrank')}>
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  HuntRank
+                  <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">Soon</Badge>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/huntbase')}>
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  HuntBase
+                  <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">Soon</Badge>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
-        </div>
 
-        {/* Right side - Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
-          {user && profile ? (
-            <TooltipProvider delayDuration={0}>
-              <div className="hidden sm:flex items-center gap-1">
-                <NotificationDropdown />
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate('/saved-jobs')}
-                      className="relative h-8 w-8 sm:h-9 sm:w-9"
+          {/* Right side - Actions */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Mobile Menu for < md */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px] sm:w-[340px]">
+                <nav className="flex flex-col gap-1 mt-8">
+                  <div className="mb-2">
+                    <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">MAIN MENU</p>
+                    <Link 
+                      to={user ? getDashboardPath() : '/auth'} 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>My Saved Jobs</TooltipContent>
-                </Tooltip>
-                {profile.role === 'employer' && (
+                      <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+                      Dashboard
+                    </Link>
+                    <Link 
+                      to="/opportunities" 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Star className="h-5 w-5 text-muted-foreground" />
+                      Opportunities
+                    </Link>
+                    <Link 
+                      to="/headhunters" 
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User className="h-5 w-5 text-muted-foreground" />
+                      Find a Headhunter
+                    </Link>
+                    {user && (
+                      <Link 
+                        to="/messages" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <MessagesSquare className="h-5 w-5 text-muted-foreground" />
+                        Messages
+                      </Link>
+                    )}
+                  </div>
+                  <div className="border-t pt-2">
+                    <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
+                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
+                      <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                      HuntRank
+                      <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
+                    </div>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            {user && profile ? (
+              <TooltipProvider delayDuration={0}>
+                <div className="hidden sm:flex items-center gap-1">
+                  <NotificationDropdown />
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => navigate('/saved-headhunters')}
-                        className="relative h-8 w-8 sm:h-9 sm:w-9"
+                        onClick={() => navigate('/messages')}
+                        className={`transition-all duration-300 ${isScrolled ? 'h-8 w-8' : 'h-9 w-9'}`}
                       >
-                        <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <MessagesSquare className={`transition-all duration-300 ${isScrolled ? 'h-4 w-4' : 'h-5 w-5'}`} />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>My Saved Headhunters</TooltipContent>
+                    <TooltipContent>Messages</TooltipContent>
                   </Tooltip>
-                )}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => navigate('/messages')}
-                      className="relative h-8 w-8 sm:h-9 sm:w-9"
-                    >
-                      <MessagesSquare className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Messages</TooltipContent>
-                </Tooltip>
-              </div>
-              <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition">
-                  <div className="relative">
-                    <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
-                      <AvatarImage src={profile.avatar_url} />
-                      <AvatarFallback className="text-sm">
-                        {profile.name?.[0]?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full border-2 border-background ${
-                      status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
-                    }`} />
-                  </div>
-                  <div className="hidden md:flex flex-col items-start">
-                    <span className="text-xs sm:text-sm font-medium truncate max-w-[120px]">{profile.name || profile.email}</span>
-                    <Badge variant="outline" className="text-[10px] sm:text-xs capitalize">
-                      {profile.role}
-                    </Badge>
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 hover:opacity-80 transition">
+                      <div className="relative">
+                        <Avatar className={`transition-all duration-300 ${isScrolled ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9 sm:h-10 sm:w-10'}`}>
+                          <AvatarImage src={profile.avatar_url} />
+                          <AvatarFallback className="text-sm">
+                            {profile.name?.[0]?.toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background ${
+                          status === 'online' ? 'bg-green-500' : 'bg-yellow-500'
+                        }`} />
+                      </div>
+                      <div className="hidden lg:flex flex-col items-start">
+                        <span className={`font-medium truncate max-w-[120px] transition-all duration-300 ${isScrolled ? 'text-xs' : 'text-sm'}`}>{profile.name || profile.email}</span>
+                        <Badge variant="outline" className={`capitalize transition-all duration-300 ${isScrolled ? 'text-[10px]' : 'text-xs'}`}>
+                          {profile.role}
+                        </Badge>
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -469,29 +436,30 @@ export function Header() {
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            </TooltipProvider>
-          ) : (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate('/auth?mode=signin')}
-                className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
-              >
-                Log in
-              </Button>
-              <Button 
-                variant="hero" 
-                size="sm"
-                onClick={() => navigate('/auth?mode=signup')}
-                className="text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
-              >
-                Sign up
-              </Button>
-            </div>
-          )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              </TooltipProvider>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => navigate('/auth?mode=signin')}
+                  className={`transition-all duration-300 ${isScrolled ? 'text-xs px-2 h-8' : 'text-sm px-3 h-9'}`}
+                >
+                  Login
+                </Button>
+                <Button 
+                  variant="hero" 
+                  size="sm"
+                  onClick={() => navigate('/auth?mode=signup')}
+                  className={`transition-all duration-300 ${isScrolled ? 'text-xs px-3 h-8' : 'text-sm px-4 h-9'}`}
+                >
+                  Sign up
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

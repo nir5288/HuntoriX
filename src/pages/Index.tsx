@@ -49,7 +49,7 @@ const Index = () => {
     }
   };
   return (
-    <div className="relative min-h-screen overflow-x-hidden pt-14 sm:pt-16">
+    <div className="relative min-h-screen overflow-x-hidden pt-24 sm:pt-28 md:pt-32">
       <Header />
 
       {/* Hero Section */}
