@@ -487,7 +487,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               </p>
                             </div>
                             <p className="text-xs text-muted-foreground mb-0.5 truncate">
-                              {conv.jobTitle}
+                              1
                             </p>
                             <p className={cn(
                               "text-xs truncate",
