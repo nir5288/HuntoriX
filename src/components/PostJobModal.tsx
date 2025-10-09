@@ -481,7 +481,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
     if (!data.location || data.location.trim().length === 0) {
       toast.error('Work location is required', { 
-        description: 'Please select a work location (city or country)'
+        description: 'Please select a location from the dropdown'
       });
       scrollToField('location');
       return;
@@ -988,7 +988,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </div>
                 {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
                 <p className="text-xs text-muted-foreground">
-                  Select a city (e.g., "Tel Aviv, Israel") or country (e.g., "Israel")
+                  Select a location from the dropdown - custom locations are not allowed
                 </p>
               </div>
             </div>
