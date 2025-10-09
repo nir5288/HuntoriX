@@ -44,7 +44,7 @@ const Index = () => {
         className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-[200px]">
+        <div className="container mx-auto px-4 py-20">
           <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px]">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
