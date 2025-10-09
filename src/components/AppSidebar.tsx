@@ -104,10 +104,10 @@ export function AppSidebar({ role }: AppSidebarProps) {
   return (
     <Sidebar 
       collapsible="icon" 
-      className="border-r transition-all duration-200 bg-slate-950/95 dark:bg-slate-950"
+      className="border-r border-slate-900/50 transition-all duration-200 bg-[#0a0a0a]"
     >
       <SidebarHeader 
-        className="p-3 flex flex-row items-center justify-between transition-all duration-200 border-b border-slate-800/50 bg-slate-900/50"
+        className="p-3 flex flex-row items-center justify-between transition-all duration-200 border-b border-slate-800/30 bg-black/40"
       >
         {open && (
           <div className="flex items-center gap-2 px-1">
@@ -182,11 +182,11 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         ) : (
                           <NavLink to={item.url} className="flex items-center gap-3 w-full">
                             <item.icon 
-                              className="h-5 w-5 shrink-0 transition-all duration-200"
+                              className="h-5 w-5 shrink-0 transition-all duration-200 drop-shadow-[0_0_8px_currentColor]"
                               style={{
                                 color: isActiveItem 
                                   ? 'hsl(var(--accent-mint))' 
-                                  : 'hsl(var(--accent-lilac))'
+                                  : 'hsl(var(--accent-pink))'
                               }}
                             />
                             {open && (
@@ -217,7 +217,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
 
       {/* Footer with logo */}
       <div 
-        className="border-t border-slate-800/50 p-4 mt-auto bg-slate-900/50"
+        className="border-t border-slate-800/30 p-4 mt-auto bg-black/40"
       >
         {open ? (
           <div className="flex items-center gap-2">
