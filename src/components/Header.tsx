@@ -143,7 +143,7 @@ export function Header() {
     <header className="fixed top-0 z-[100] w-full border-b bg-background">
       <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
         {/* Left side - Hamburger (mobile) + Logo & Nav (desktop) */}
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0 lg:pl-12">
           {/* Logo - centered on mobile only, left on tablet+ */}
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition shrink-0 absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0">
             <Briefcase className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -283,7 +283,7 @@ export function Header() {
         </div>
 
         {/* Right side - Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 lg:pr-12">
           <Link to="/executives" className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-bold hover:opacity-80 transition whitespace-nowrap text-sm">
             Executives
             <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>

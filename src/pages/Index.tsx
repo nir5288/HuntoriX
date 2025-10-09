@@ -46,7 +46,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-8 md:py-12 w-full">
           <div className="flex items-center min-h-[600px]">
             {/* Left side - Text content (60%) */}
-            <div className="w-full lg:w-[60%] space-y-8">
+            <div className="w-full lg:w-[60%] lg:pl-12 space-y-8">
               <div>
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
                   <Award className="h-4 w-4" />
