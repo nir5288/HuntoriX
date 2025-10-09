@@ -894,7 +894,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   )}
                 />
                 {fieldErrors.title && <p className="text-sm text-destructive">{fieldErrors.title}</p>}
-                {errors.title && !fieldErrors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
 
               {selectedTitle === 'Other' && (
@@ -927,7 +926,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   </SelectContent>
                 </Select>
                 {fieldErrors.industry && <p className="text-sm text-destructive">{fieldErrors.industry}</p>}
-                {errors.industry && !fieldErrors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -957,7 +955,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     </SelectContent>
                   </Select>
                   {fieldErrors.seniority && <p className="text-sm text-destructive">{fieldErrors.seniority}</p>}
-                  {errors.seniority?.message && !fieldErrors.seniority && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
                 </div>
 
                 <div className="space-y-2.5">
@@ -983,7 +980,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     </SelectContent>
                   </Select>
                   {fieldErrors.employment_type && <p className="text-sm text-destructive">{fieldErrors.employment_type}</p>}
-                  {errors.employment_type?.message && !fieldErrors.employment_type && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
                 </div>
               </div>
 
@@ -1024,7 +1020,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   )}
                 />
                 {fieldErrors.location && <p className="text-sm text-destructive">{fieldErrors.location}</p>}
-                {errors.location && !fieldErrors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
                 <p className="text-xs text-muted-foreground">
                   Select a city (e.g., "Tel Aviv, Israel") or country (e.g., "Israel")
                 </p>
@@ -1150,7 +1145,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 }}
               />
               {fieldErrors.description && <p className="text-sm text-destructive">{fieldErrors.description}</p>}
-              {errors.description && !fieldErrors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
           </Card>
 
