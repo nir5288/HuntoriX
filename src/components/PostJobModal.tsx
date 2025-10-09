@@ -415,11 +415,15 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   };
 
   const scrollToField = (fieldName: string) => {
-    const element = document.querySelector(`[name="${fieldName}"]`) || 
-                    document.getElementById(fieldName);
+    const wrapper = document.querySelector(`[data-field="${fieldName}"]`) as HTMLElement | null;
+    const element = wrapper || (document.querySelector(`[name="${fieldName}"]`) as HTMLElement | null) ||
+                    (document.getElementById(fieldName) as HTMLElement | null);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Flash the field
+      const focusTarget = (wrapper || element).querySelector<HTMLElement>(
+        'input, textarea, [role="combobox"], [contenteditable="true"], button, select'
+      );
+      focusTarget?.focus({ preventScroll: true });
       element.classList.add('ring-2', 'ring-destructive', 'ring-offset-2');
       setTimeout(() => {
         element.classList.remove('ring-2', 'ring-destructive', 'ring-offset-2');
@@ -448,6 +452,34 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         delete newErrors[fieldName];
         return newErrors;
       });
+    }
+  };
+
+  const onInvalid = (formErrors: any) => {
+    const newErrors: Record<string, string> = {};
+    if (formErrors?.title) newErrors.title = String(formErrors.title.message || 'Job title is required');
+    if (formErrors?.industry) newErrors.industry = String(formErrors.industry.message || 'Industry is required');
+    if (formErrors?.seniority) newErrors.seniority = String(formErrors.seniority.message || 'Seniority level is required');
+    if (formErrors?.employment_type) newErrors.employment_type = String(formErrors.employment_type.message || 'Employment type is required');
+    if (formErrors?.location) newErrors.location = String(formErrors.location.message || 'Work location is required');
+    if (formErrors?.description) newErrors.description = String(formErrors.description.message || 'Job description is required (minimum 10 characters)');
+
+    if (skillsMust.length === 0) {
+      newErrors.skills_must = 'At least one required skill must be added';
+      setSkillsOpen(true);
+    }
+
+    setFieldErrors(newErrors);
+
+    const order = ['title','industry','seniority','employment_type','location','description','skills_must'];
+    const firstKey = order.find(k => newErrors[k]);
+    if (firstKey) {
+      scrollToField(firstKey);
+    }
+
+    const count = Object.keys(newErrors).length;
+    if (count > 0) {
+      toast.error(count === 1 ? `Please complete ${firstKey?.replace('_',' ')}` : `Please complete the required fields (${count} missing). Jumped to the first.`);
     }
   };
 
@@ -577,7 +609,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </div>
         </DialogHeader>
 
-        <form id="post-job-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6 mt-6">
+        <form id="post-job-form" onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-5 pb-6 mt-6">
           {/* AI Quick Fill */}
           <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800/30 shadow-sm">
             <div className="flex items-start gap-3">
@@ -879,9 +911,22 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <h3 className="font-semibold text-base mb-5">Job Basics</h3>
             
             <div className="space-y-4">
-              <div className="space-y-2.5">
+              <div className="space-y-2.5" data-field="title">
                 <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
                 <JobTitleAutocomplete
+                  value={selectedTitle}
+                  onChange={(value) => {
+                    setValue('title', value);
+                    clearFieldError('title');
+                  }}
+                  placeholder="Search job title..."
+                  className={cn(
+                    autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                    fieldErrors.title && 'border-destructive ring-2 ring-destructive/20'
+                  )}
+                />
+                {fieldErrors.title && <p className="text-sm text-destructive">{fieldErrors.title}</p>}
+              </div>
                   value={selectedTitle}
                   onChange={(value) => {
                     setValue('title', value);
@@ -903,7 +948,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </div>
               )}
 
-              <div className="space-y-2.5">
+              <div className="space-y-2.5" data-field="industry">
                 <Label htmlFor="industry" className="text-sm font-medium">Industry <span className="text-destructive">*</span></Label>
                 <Select 
                   onValueChange={(value) => {
@@ -929,7 +974,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2.5">
+                <div className="space-y-2.5" data-field="seniority">
                   <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
                   <Select 
                     onValueChange={(value) => {
@@ -957,7 +1002,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   {fieldErrors.seniority && <p className="text-sm text-destructive">{fieldErrors.seniority}</p>}
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-2.5" data-field="employment_type">
                   <Label htmlFor="employment_type" className="text-sm font-medium">Employment Type <span className="text-destructive">*</span></Label>
                   <Select 
                     onValueChange={(value) => {
@@ -1005,7 +1050,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 </RadioGroup>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-2.5" data-field="location">
                 <Label htmlFor="location" className="text-sm font-medium">Work Location <span className="text-destructive">*</span></Label>
                 <LocationAutocomplete
                   value={watch('location') || ''}
@@ -1128,7 +1173,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
             <h3 className="font-semibold text-base mb-5">Job Description</h3>
             
-            <div className="space-y-2.5">
+            <div className="space-y-2.5" data-field="description">
               <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
               <Textarea 
                 {...register('description')} 
@@ -1150,7 +1195,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
           {/* Skills */}
           <Collapsible open={skillsOpen} onOpenChange={setSkillsOpen}>
-            <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm" id="skills-must">
+            <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm" id="skills-must" data-field="skills_must">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
                 <h3 className="font-semibold text-base">Required Skills</h3>
                 <ChevronDown className={cn(
