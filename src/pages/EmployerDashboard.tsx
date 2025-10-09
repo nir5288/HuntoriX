@@ -4,13 +4,15 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star, Pencil } from 'lucide-react';
+import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star, Pencil, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PostJobModal } from '@/components/PostJobModal';
 import { EditJobModal } from '@/components/EditJobModal';
 import { JobEditHistory } from '@/components/JobEditHistory';
+import { OnHoldReasonModal } from '@/components/OnHoldReasonModal';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -38,6 +40,8 @@ const EmployerDashboard = () => {
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
   const [visibleJobCount, setVisibleJobCount] = useState(3);
   const [uiVariant, setUiVariant] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8>(1);
+  const [onHoldModalOpen, setOnHoldModalOpen] = useState(false);
+  const [jobToUpdateStatus, setJobToUpdateStatus] = useState<any>(null);
   
   useEffect(() => {
     if (user && !loading) {
@@ -248,6 +252,51 @@ const EmployerDashboard = () => {
     } catch (error) {
       console.error('Error fetching edit history:', error);
       toast.error('Failed to load edit history');
+    }
+  };
+
+  const handleStatusChange = async (job: any, newStatus: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (newStatus === 'on_hold') {
+      setJobToUpdateStatus(job);
+      setOnHoldModalOpen(true);
+    } else {
+      // Direct update for "open" status
+      try {
+        const { error } = await supabase
+          .from('jobs')
+          .update({ status: newStatus })
+          .eq('id', job.id);
+        
+        if (error) throw error;
+        
+        toast.success(`Job status updated to ${newStatus}`);
+        fetchDashboardData();
+      } catch (error) {
+        console.error('Error updating job status:', error);
+        toast.error('Failed to update job status');
+      }
+    }
+  };
+
+  const handleOnHoldConfirm = async (reason: string) => {
+    if (!jobToUpdateStatus) return;
+    
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({ status: 'on_hold' })
+        .eq('id', jobToUpdateStatus.id);
+      
+      if (error) throw error;
+      
+      toast.success(`Job put on hold: ${reason}`);
+      fetchDashboardData();
+      setJobToUpdateStatus(null);
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      toast.error('Failed to put job on hold');
     }
   };
 
@@ -557,9 +606,39 @@ const EmployerDashboard = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-start gap-1.5">
-                            <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
-                              {job.status}
-                            </Badge>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className={`h-6 text-[10px] sm:text-xs px-2 gap-1 ${getStatusColor(job.status)} border-0 hover:opacity-80`}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {job.status.replace('_', ' ')}
+                                  <ChevronDown className="h-3 w-3" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-36 p-1" align="start">
+                                <div className="flex flex-col gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="justify-start h-8 text-xs"
+                                    onClick={(e) => handleStatusChange(job, 'open', e)}
+                                  >
+                                    Open
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="justify-start h-8 text-xs"
+                                    onClick={(e) => handleStatusChange(job, 'on_hold', e)}
+                                  >
+                                    On Hold
+                                  </Button>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -1991,6 +2070,11 @@ const EmployerDashboard = () => {
           />
         </>
       )}
+      <OnHoldReasonModal
+        open={onHoldModalOpen}
+        onOpenChange={setOnHoldModalOpen}
+        onConfirm={handleOnHoldConfirm}
+      />
     </>
   );
 };
