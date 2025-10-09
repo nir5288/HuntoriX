@@ -381,7 +381,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                 <ChevronDown className="h-3 w-3 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent align="start" className="z-[500] bg-popover">
               <DropdownMenuItem onClick={() => setFilter("all")}>
                 All messages
               </DropdownMenuItem>
