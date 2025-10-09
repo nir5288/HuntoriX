@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ExclusiveJobPromotionModal } from '@/components/ExclusiveJobPromotionModal';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -94,6 +95,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [compensationOpen, setCompensationOpen] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [showExclusivePromotion, setShowExclusivePromotion] = useState(false);
+  const [pendingSubmitData, setPendingSubmitData] = useState<z.infer<typeof formSchema> | null>(null);
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -531,6 +534,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       return;
     }
 
+    // Check if we should show the exclusive promotion modal
+    const dontShowAgain = localStorage.getItem('hideExclusivePromotion') === 'true';
+    if (!isExclusive && !dontShowAgain) {
+      setPendingSubmitData(data);
+      setShowExclusivePromotion(true);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -587,8 +598,47 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     }
   };
 
+  const handleActivateExclusive = () => {
+    setIsExclusive(true);
+    setShowExclusivePromotion(false);
+    // Automatically submit after activating
+    if (pendingSubmitData) {
+      setTimeout(() => {
+        handleSubmit(onSubmit, onInvalid)();
+      }, 100);
+    }
+  };
+
+  const handleNotNow = () => {
+    setShowExclusivePromotion(false);
+    // Continue with submission
+    if (pendingSubmitData) {
+      setTimeout(() => {
+        handleSubmit(onSubmit, onInvalid)();
+      }, 100);
+    }
+  };
+
+  const handleDontShowAgain = () => {
+    localStorage.setItem('hideExclusivePromotion', 'true');
+    setShowExclusivePromotion(false);
+    // Continue with submission
+    if (pendingSubmitData) {
+      setTimeout(() => {
+        handleSubmit(onSubmit, onInvalid)();
+      }, 100);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <ExclusiveJobPromotionModal
+        open={showExclusivePromotion}
+        onActivate={handleActivateExclusive}
+        onNotNow={handleNotNow}
+        onDontShowAgain={handleDontShowAgain}
+      />
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0" hideCloseButton>
         <div className="overflow-y-auto flex-1 px-6 pt-6">
         <DialogHeader>
@@ -1327,5 +1377,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
