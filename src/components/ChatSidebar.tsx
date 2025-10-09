@@ -438,15 +438,29 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                             {conv.otherUserName}
                           </p>
                         </div>
-                        <p className="text-xs text-muted-foreground mb-0.5 truncate">
-                          {conv.jobTitle}
-                        </p>
-                        <p className={cn(
-                          "text-xs truncate",
-                          conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
-                        )}>
-                          {conv.lastMessage}
-                        </p>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className="text-xs text-muted-foreground mb-0.5 truncate max-w-[100px]">
+                              {conv.jobTitle}
+                            </p>
+                          </TooltipTrigger>
+                          <TooltipContent side="right">
+                            <p className="max-w-xs">{conv.jobTitle}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className={cn(
+                              "text-xs truncate max-w-[100px]",
+                              conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                            )}>
+                              {conv.lastMessage}
+                            </p>
+                          </TooltipTrigger>
+                          <TooltipContent side="right">
+                            <p className="max-w-xs">{conv.lastMessage}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                   </button>
