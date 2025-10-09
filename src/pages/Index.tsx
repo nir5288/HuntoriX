@@ -45,8 +45,8 @@ const Index = () => {
       >
         <div className="w-full mx-auto px-[150px] pb-8 md:pb-12">
           <div className="flex items-center min-h-[600px]">
-            {/* Left side - Text content (60%) */}
-            <div className="w-full lg:w-[60%] space-y-8">
+            {/* Left side - Text content (50%) */}
+            <div className="w-full lg:w-[50%] space-y-8">
               <div>
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
                   <Award className="h-4 w-4" />
@@ -78,12 +78,12 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right side - Image (40%) */}
-            <div className="hidden lg:flex lg:w-[40%] items-center justify-center">
+            {/* Right side - Image (50%) */}
+            <div className="hidden lg:flex lg:w-[50%] items-center justify-center">
               <img 
                 src={heroImage} 
                 alt="Headhunter network connecting employers with talent" 
-                className="w-full max-w-[1040px] h-auto object-contain"
+                className="w-full h-auto object-contain"
               />
             </div>
           </div>
