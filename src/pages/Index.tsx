@@ -1,46 +1,59 @@
-import { Header } from '@/components/Header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/auth';
-import { Briefcase, Users, TrendingUp, Shield, Clock, Award, Bot, Sparkles, Target, BarChart3, Search, FileText, DollarSign, MessageSquare } from 'lucide-react';
-import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
-import { HotOpportunities } from '@/components/HotOpportunities';
-import { TestimonialsSection } from '@/components/TestimonialsSection';
-import HeroFloatingElements from '@/components/HeroFloatingElements';
-import dashboardPreview from '@/assets/dashboard-preview.jpg';
-import heroBackground from '@/assets/hero-background-new.png';
-import heroImage from '@/assets/hero-image.png';
+import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
+import {
+  Briefcase,
+  Users,
+  TrendingUp,
+  Shield,
+  Clock,
+  Award,
+  Bot,
+  Sparkles,
+  Target,
+  BarChart3,
+  Search,
+  FileText,
+  DollarSign,
+  MessageSquare,
+} from "lucide-react";
+import { FeaturedHeadhunters } from "@/components/FeaturedHeadhunters";
+import { HotOpportunities } from "@/components/HotOpportunities";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
+import HeroFloatingElements from "@/components/HeroFloatingElements";
+import dashboardPreview from "@/assets/dashboard-preview.jpg";
+import heroBackground from "@/assets/hero-background-new.png";
+import heroImage from "@/assets/hero-image.png";
 
 const Index = () => {
   const navigate = useNavigate();
-  const {
-    user,
-    profile
-  } = useAuth();
+  const { user, profile } = useAuth();
   const handleEmployerCTA = () => {
     if (!user) {
-      navigate('/auth?role=employer');
-    } else if (profile?.role === 'employer') {
-      navigate('/dashboard/employer');
+      navigate("/auth?role=employer");
+    } else if (profile?.role === "employer") {
+      navigate("/dashboard/employer");
     } else {
       alert("You're signed in as a Headhunter. Please log out to switch roles.");
     }
   };
   const handleHeadhunterCTA = () => {
     if (!user) {
-      navigate('/auth?role=headhunter');
-    } else if (profile?.role === 'headhunter') {
-      navigate('/dashboard/headhunter');
+      navigate("/auth?role=headhunter");
+    } else if (profile?.role === "headhunter") {
+      navigate("/dashboard/headhunter");
     } else {
       alert("You're signed in as an Employer. Please log out to switch roles.");
     }
   };
-  return <div className="relative min-h-screen overflow-x-hidden pt-14 sm:pt-16">
+  return (
+    <div className="relative min-h-screen overflow-x-hidden pt-14 sm:pt-16">
       <Header />
-      
+
       {/* Hero Section */}
-      <section 
+      <section
         className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center overflow-hidden"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
@@ -62,14 +75,14 @@ const Index = () => {
                 </span>
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
                   <Bot className="h-4 w-4" />
-                  AI-Powered Matching
+                  AI-Powered Tools
                 </span>
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-sm font-bold shadow-lg">
                   <Shield className="h-4 w-4" />
                   Verified Professionals
                 </span>
               </div>
-              
+
               <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-[1.1] animate-fade-in">
                 <span className="block text-foreground">Post a Job.</span>
                 <span className="block mt-2">
@@ -81,24 +94,25 @@ const Index = () => {
                 </span>
                 <span className="block text-foreground mt-2">Compete for You.</span>
               </h1>
-              
+
               <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed animate-fade-in">
-                Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
+                Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring
+                effortlessly.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 pt-8 justify-center lg:justify-start animate-fade-in">
-                <Button 
-                  size="lg" 
-                  variant="hero" 
+                <Button
+                  size="lg"
+                  variant="hero"
                   onClick={handleEmployerCTA}
                   className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
                 >
                   <Briefcase className="mr-2 h-5 w-5" />
                   I'm an Employer
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="mint" 
+                <Button
+                  size="lg"
+                  variant="mint"
                   onClick={handleHeadhunterCTA}
                   className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover:scale-105"
                 >
@@ -112,8 +126,8 @@ const Index = () => {
             <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative animate-fade-in">
               <HeroFloatingElements />
               <img
-                src={heroImage} 
-                alt="Headhunter network connecting employers with talent" 
+                src={heroImage}
+                alt="Headhunter network connecting employers with talent"
                 className="w-full h-auto object-contain relative z-10 drop-shadow-2xl"
               />
             </div>
@@ -122,7 +136,6 @@ const Index = () => {
       </section>
 
       {/* Dashboard Showcase */}
-      
 
       {/* Featured Headhunters */}
       <FeaturedHeadhunters />
@@ -170,7 +183,9 @@ const Index = () => {
                   <Target className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold text-sm">Smart Headhunter Matching</h4>
-                    <p className="text-xs text-muted-foreground">Suggests the best headhunters by field & success rate</p>
+                    <p className="text-xs text-muted-foreground">
+                      Suggests the best headhunters by field & success rate
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -184,7 +199,9 @@ const Index = () => {
                   <BarChart3 className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold text-sm">Hiring Insights Dashboard</h4>
-                    <p className="text-xs text-muted-foreground">Shows time-to-hire, market salary ranges, and trends</p>
+                    <p className="text-xs text-muted-foreground">
+                      Shows time-to-hire, market salary ranges, and trends
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -243,14 +260,18 @@ const Index = () => {
                   <DollarSign className="h-5 w-5 text-[hsl(var(--accent-lilac))] mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold text-sm">Dynamic Fee Optimization</h4>
-                    <p className="text-xs text-muted-foreground">Adjusts suggested success fees by demand & role type</p>
+                    <p className="text-xs text-muted-foreground">
+                      Adjusts suggested success fees by demand & role type
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <MessageSquare className="h-5 w-5 text-[hsl(var(--accent-lilac))] mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold text-sm">Chat Assistant</h4>
-                    <p className="text-xs text-muted-foreground">Writes follow-ups, summaries, and coordination messages</p>
+                    <p className="text-xs text-muted-foreground">
+                      Writes follow-ups, summaries, and coordination messages
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -283,7 +304,9 @@ const Index = () => {
                 <TrendingUp className="h-5 w-5 text-[hsl(var(--accent-pink))] mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold">Quality Matches</h4>
-                  <p className="text-sm text-muted-foreground">Get 3-5 pre-vetted candidates per role from specialized recruiters</p>
+                  <p className="text-sm text-muted-foreground">
+                    Get 3-5 pre-vetted candidates per role from specialized recruiters
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -347,9 +370,7 @@ const Index = () => {
       <section className="container mx-auto px-4 py-20">
         <Card className="bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] border-0">
           <CardContent className="p-12 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Ready to get started?
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">Ready to get started?</h2>
             <p className="text-lg text-foreground/80 mb-8 max-w-2xl mx-auto">
               Join thousands of employers and headhunters who are transforming their hiring process
             </p>
@@ -364,6 +385,7 @@ const Index = () => {
           </CardContent>
         </Card>
       </section>
-    </div>;
+    </div>
+  );
 };
 export default Index;
