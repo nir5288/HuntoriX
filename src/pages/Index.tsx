@@ -23,7 +23,6 @@ import { FeaturedHeadhunters } from "@/components/FeaturedHeadhunters";
 import { HotOpportunities } from "@/components/HotOpportunities";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import HeroFloatingElements from "@/components/HeroFloatingElements";
-import { HeroNetworkAnimation } from "@/components/HeroNetworkAnimation";
 import dashboardPreview from "@/assets/dashboard-preview.jpg";
 import heroBackground from "@/assets/hero-background-new.png";
 import heroImage from "@/assets/hero-image.png";
@@ -58,9 +57,6 @@ const Index = () => {
         className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center overflow-hidden"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
-        {/* Network Animation Layer */}
-        <HeroNetworkAnimation />
-        
         {/* Large Background Text */}
         <div className="absolute bottom-0 left-0 right-0 flex justify-center pointer-events-none overflow-hidden">
           <h2 
