@@ -35,7 +35,7 @@ const Index = () => {
       alert("You're signed in as an Employer. Please log out to switch roles.");
     }
   };
-  return <div className="relative min-h-screen overflow-x-hidden">
+  return <div className="relative min-h-screen overflow-x-hidden pt-14 sm:pt-16">
       <Header />
       
       {/* Hero Section */}
