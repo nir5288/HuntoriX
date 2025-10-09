@@ -93,6 +93,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const [salaryPeriod, setSalaryPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [compensationOpen, setCompensationOpen] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
@@ -436,65 +437,65 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     setAutoFilledFields(new Set());
     setIsExclusive(false);
     setSalaryPeriod('monthly');
+    setFieldErrors({});
     toast.success('Form cleared');
   };
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    // Validate all required fields
-    if (!data.title) {
-      toast.error('Job title is required', { 
-        description: 'Please select or enter a job title'
+  const clearFieldError = (fieldName: string) => {
+    if (fieldErrors[fieldName]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
       });
-      scrollToField('title');
-      return;
+    }
+  };
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const errors: Record<string, string> = {};
+
+    // Validate all required fields and collect errors
+    if (!data.title) {
+      errors.title = 'Job title is required';
     }
 
     if (!data.industry) {
-      toast.error('Industry is required', { 
-        description: 'Please select an industry'
-      });
-      scrollToField('industry');
-      return;
+      errors.industry = 'Industry is required';
     }
 
     if (!data.seniority) {
-      toast.error('Seniority level is required', { 
-        description: 'Please select the seniority level'
-      });
-      scrollToField('seniority');
-      return;
+      errors.seniority = 'Seniority level is required';
     }
 
     if (!data.employment_type) {
-      toast.error('Employment type is required', { 
-        description: 'Please select full-time, contract, or temp'
-      });
-      scrollToField('employment_type');
-      return;
+      errors.employment_type = 'Employment type is required';
     }
 
     if (!data.location || data.location.trim().length === 0) {
-      toast.error('Work location is required', { 
-        description: 'Please select a work location (city or country)'
-      });
-      scrollToField('location');
-      return;
+      errors.location = 'Work location is required';
     }
 
     if (!data.description || data.description.length < 10) {
-      toast.error('Job description is required', { 
-        description: 'Please provide a description (minimum 10 characters)'
-      });
-      scrollToField('description');
-      return;
+      errors.description = 'Job description is required (minimum 10 characters)';
     }
 
     if (skillsMust.length === 0) {
+      errors.skills_must = 'At least one required skill must be added';
       setSkillsOpen(true);
-      toast.error('Must-have skills are required', { 
-        description: 'Please add at least one required skill for this position'
+    }
+
+    // If there are errors, show them and stop
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      
+      // Scroll to first error
+      const firstErrorField = Object.keys(errors)[0];
+      scrollToField(firstErrorField);
+      
+      // Show toast with error count
+      toast.error(`Please complete the required fields (${Object.keys(errors).length} missing)`, {
+        description: 'Check the highlighted fields below'
       });
-      scrollToField('skills-must');
       return;
     }
 
@@ -882,11 +883,18 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
                 <JobTitleAutocomplete
                   value={selectedTitle}
-                  onChange={(value) => setValue('title', value)}
+                  onChange={(value) => {
+                    setValue('title', value);
+                    clearFieldError('title');
+                  }}
                   placeholder="Search job title..."
-                  className={cn(autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                  className={cn(
+                    autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                    fieldErrors.title && 'border-destructive ring-2 ring-destructive/20'
+                  )}
                 />
-                {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+                {fieldErrors.title && <p className="text-sm text-destructive">{fieldErrors.title}</p>}
+                {errors.title && !fieldErrors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
 
               {selectedTitle === 'Other' && (
@@ -898,8 +906,18 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
               <div className="space-y-2.5">
                 <Label htmlFor="industry" className="text-sm font-medium">Industry <span className="text-destructive">*</span></Label>
-                <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
-                  <SelectTrigger className={cn("h-11", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                <Select 
+                  onValueChange={(value) => {
+                    setValue('industry', value);
+                    clearFieldError('industry');
+                  }} 
+                  value={industry}
+                >
+                  <SelectTrigger className={cn(
+                    "h-11",
+                    autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                    fieldErrors.industry && 'border-destructive ring-2 ring-destructive/20'
+                  )}>
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -908,14 +926,25 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
+                {fieldErrors.industry && <p className="text-sm text-destructive">{fieldErrors.industry}</p>}
+                {errors.industry && !fieldErrors.industry && <p className="text-sm text-destructive">{errors.industry.message}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2.5">
                   <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
-                  <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
-                    <SelectTrigger className={cn("h-11", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  <Select 
+                    onValueChange={(value) => {
+                      setValue('seniority', value as any);
+                      clearFieldError('seniority');
+                    }} 
+                    value={seniorityVal || undefined}
+                  >
+                    <SelectTrigger className={cn(
+                      "h-11",
+                      autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                      fieldErrors.seniority && 'border-destructive ring-2 ring-destructive/20'
+                    )}>
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -927,13 +956,24 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       <SelectItem value="vp_c_level">VP / C-Level</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.seniority?.message && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
+                  {fieldErrors.seniority && <p className="text-sm text-destructive">{fieldErrors.seniority}</p>}
+                  {errors.seniority?.message && !fieldErrors.seniority && <p className="text-sm text-destructive">{String(errors.seniority.message)}</p>}
                 </div>
 
                 <div className="space-y-2.5">
                   <Label htmlFor="employment_type" className="text-sm font-medium">Employment Type <span className="text-destructive">*</span></Label>
-                  <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
-                    <SelectTrigger className={cn("h-11", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  <Select 
+                    onValueChange={(value) => {
+                      setValue('employment_type', value as any);
+                      clearFieldError('employment_type');
+                    }} 
+                    value={employmentTypeVal || undefined}
+                  >
+                    <SelectTrigger className={cn(
+                      "h-11",
+                      autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                      fieldErrors.employment_type && 'border-destructive ring-2 ring-destructive/20'
+                    )}>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -942,7 +982,8 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       <SelectItem value="temp">Temporary</SelectItem>
                     </SelectContent>
                   </Select>
-                  {errors.employment_type?.message && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
+                  {fieldErrors.employment_type && <p className="text-sm text-destructive">{fieldErrors.employment_type}</p>}
+                  {errors.employment_type?.message && !fieldErrors.employment_type && <p className="text-sm text-destructive">{String(errors.employment_type.message)}</p>}
                 </div>
               </div>
 
@@ -972,11 +1013,18 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 <Label htmlFor="location" className="text-sm font-medium">Work Location <span className="text-destructive">*</span></Label>
                 <LocationAutocomplete
                   value={watch('location') || ''}
-                  onChange={(value) => setValue('location', value)}
+                  onChange={(value) => {
+                    setValue('location', value);
+                    clearFieldError('location');
+                  }}
                   placeholder="Search city or country..."
-                  className={cn(autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5')}
+                  className={cn(
+                    autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5',
+                    fieldErrors.location && 'border-destructive ring-2 ring-destructive/20'
+                  )}
                 />
-                {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
+                {fieldErrors.location && <p className="text-sm text-destructive">{fieldErrors.location}</p>}
+                {errors.location && !fieldErrors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
                 <p className="text-xs text-muted-foreground">
                   Select a city (e.g., "Tel Aviv, Israel") or country (e.g., "Israel")
                 </p>
@@ -1091,9 +1139,18 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 {...register('description')} 
                 rows={6} 
                 placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
-                className={cn("text-sm resize-none", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                className={cn(
+                  "text-sm resize-none",
+                  autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                  fieldErrors.description && 'border-destructive ring-2 ring-destructive/20'
+                )}
+                onChange={(e) => {
+                  register('description').onChange(e);
+                  clearFieldError('description');
+                }}
               />
-              {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+              {fieldErrors.description && <p className="text-sm text-destructive">{fieldErrors.description}</p>}
+              {errors.description && !fieldErrors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
           </Card>
 
@@ -1120,11 +1177,24 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                         placeholder="Type a skill and press Enter"
                         className="h-11"
                       />
-                      <Button type="button" onClick={addSkillMust} variant="secondary" size="lg" className="h-11 px-6">
+                      <Button 
+                        type="button" 
+                        onClick={() => {
+                          addSkillMust();
+                          clearFieldError('skills_must');
+                        }} 
+                        variant="secondary" 
+                        size="lg" 
+                        className="h-11 px-6"
+                      >
                         Add
                       </Button>
                     </div>
-                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <div className={cn(
+                      "flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2",
+                      autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20',
+                      fieldErrors.skills_must && 'border-destructive ring-2 ring-destructive/20'
+                    )}>
                       {skillsMust.map(skill => (
                         <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
                           {skill}
@@ -1135,6 +1205,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                         <span className="text-sm text-muted-foreground">Add at least one required skill</span>
                       )}
                     </div>
+                    {fieldErrors.skills_must && <p className="text-sm text-destructive">{fieldErrors.skills_must}</p>}
                   </div>
 
                   <div className="space-y-3">
@@ -1217,11 +1288,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               form="post-job-form"
               variant={isFormValid ? "hero" : "default"}
               size="lg"
-              disabled={!isFormValid || isSubmitting}
+              disabled={isSubmitting}
               className={cn(
                 "transition-all duration-300 font-bold min-w-[180px]",
                 isFormValid && 'shadow-lg shadow-primary/30',
-                !isFormValid && 'opacity-50 cursor-not-allowed'
+                !isFormValid && 'opacity-50'
               )}
             >
               {isSubmitting ? 'Submitting...' : 'Submit for Review'}
