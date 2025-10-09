@@ -58,17 +58,8 @@ const Index = () => {
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         {/* Large Background Text */}
-        <div className="absolute bottom-0 left-0 w-full pointer-events-none overflow-visible">
-          <h2 
-            className="font-black text-foreground/[0.05] whitespace-nowrap select-none tracking-tighter leading-none text-center"
-            style={{ 
-              fontSize: 'clamp(8rem, 15vw, 22rem)',
-              width: '100vw',
-              marginLeft: 'calc(-50vw + 50%)',
-              maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 20%, rgba(0,0,0,1) 60%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 20%, rgba(0,0,0,1) 60%)'
-            }}
-          >
+        <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden pb-20">
+          <h2 className="text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[24rem] xl:text-[32rem] font-black text-foreground/[0.08] whitespace-nowrap select-none tracking-tighter leading-none">
             HUNTORIX
           </h2>
         </div>
@@ -81,6 +72,14 @@ const Index = () => {
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
                   <Award className="h-4 w-4" />
                   Top Rated Platform
+                </span>
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
+                  <Bot className="h-4 w-4" />
+                  AI-Powered Tools
+                </span>
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-sm font-bold shadow-lg">
+                  <Shield className="h-4 w-4" />
+                  Verified Professionals
                 </span>
               </div>
 
@@ -125,16 +124,6 @@ const Index = () => {
 
             {/* Right side - Image (50%) */}
             <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative animate-fade-in">
-              <div className="absolute top-8 right-8 flex flex-col gap-3 z-20 animate-fade-in">
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
-                  <Bot className="h-4 w-4" />
-                  AI-Powered Tools
-                </span>
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-sm font-bold shadow-lg">
-                  <Shield className="h-4 w-4" />
-                  Verified Professionals
-                </span>
-              </div>
               <HeroFloatingElements />
               <img
                 src={heroImage}
