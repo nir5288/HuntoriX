@@ -83,6 +83,8 @@ const PLANS: Plan[] = [
     description: 'Unlimited credits',
     features: [
       'Everything in Pro',
+      'AI matchmaking & candidate search',
+      'Work worldwide',
       'Dedicated account manager',
       'White-label solution',
       'Custom integrations',
@@ -134,6 +136,30 @@ const FEATURE_COMPARISON = [
   },
   { feature: 'AI/Video badges on job cards', free: false, core: false, pro: true, huntorix: true },
   { 
+    feature: 'AI matchmaking', 
+    free: false, 
+    core: false, 
+    pro: false, 
+    huntorix: true,
+    tooltip: 'Intelligent AI-powered matching between jobs and headhunters based on expertise, history, and success rates.'
+  },
+  { 
+    feature: 'AI candidate search', 
+    free: false, 
+    core: false, 
+    pro: false, 
+    huntorix: true,
+    tooltip: 'Advanced AI-driven candidate search and screening capabilities.'
+  },
+  { 
+    feature: 'Work worldwide', 
+    free: false, 
+    core: false, 
+    pro: false, 
+    huntorix: true,
+    tooltip: 'Access to global job opportunities and international placements.'
+  },
+  { 
     feature: 'Job notifications (by role & industry)', 
     free: false, 
     core: false, 
@@ -141,7 +167,7 @@ const FEATURE_COMPARISON = [
     huntorix: true,
     tooltip: 'Early heads-up based on your target roles & industries (HuntoriX only).'
   },
-  { feature: 'Support', free: 'Standard', core: 'Standard', pro: 'Priority', huntorix: 'Priority' },
+  { feature: 'Support', free: 'Standard', core: 'Standard', pro: 'Priority', huntorix: 'Dedicated' },
 ];
 
 export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
@@ -619,6 +645,14 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
           <p className="font-semibold text-primary flex items-center gap-2">
             <span className="text-lg">📈</span>
             Statistics & application insights = analytics on views, response time, success rates, etc.
+          </p>
+          <p className="font-semibold text-primary flex items-center gap-2">
+            <span className="text-lg">🤖</span>
+            AI matchmaking & candidate search = exclusive to HuntoriX for intelligent matching and screening.
+          </p>
+          <p className="font-semibold text-primary flex items-center gap-2">
+            <span className="text-lg">🌍</span>
+            Work worldwide = HuntoriX members can access global opportunities and international placements.
           </p>
         </div>
 
