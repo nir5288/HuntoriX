@@ -11,13 +11,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Loader2, Sparkles, Upload, FileText, X } from 'lucide-react';
+import { Loader2, Sparkles, Upload, FileText, X, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
 import { ExclusiveJobPromotionModal } from '@/components/ExclusiveJobPromotionModal';
+import { cn } from '@/lib/utils';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -66,6 +67,7 @@ const formSchema = z.object({
 
 export default function PostJob() {
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
   const [skillsMust, setSkillsMust] = useState<string[]>([]);
   const [skillsNice, setSkillsNice] = useState<string[]>([]);
   const [skillMustInput, setSkillMustInput] = useState('');
@@ -86,7 +88,7 @@ export default function PostJob() {
     getUser();
   }, []);
 
-  const { register, handleSubmit, watch, setValue, reset } = useForm({
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
@@ -179,7 +181,6 @@ export default function PostJob() {
 
       const jobInfo = data.jobInfo;
 
-      // Auto-fill fields
       if (jobInfo.title) {
         const normalized = jobInfo.title.trim();
         if (jobTitles.includes(normalized)) {
@@ -212,9 +213,12 @@ export default function PostJob() {
     }
   };
 
+  const canProceedToStep2 = watch('title') && watch('industry') && watch('seniority') && watch('employment_type') && watch('location');
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (skillsMust.length === 0) {
       toast.error('Please add at least one required skill');
+      setStep(2);
       return;
     }
 
@@ -254,9 +258,6 @@ export default function PostJob() {
       if (error) throw error;
 
       toast.success('Job posted successfully! Pending admin approval.');
-      reset();
-      setSkillsMust([]);
-      setSkillsNice([]);
       navigate('/my-jobs');
     } catch (error) {
       console.error('Error posting job:', error);
@@ -267,262 +268,289 @@ export default function PostJob() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] overflow-hidden p-6">
-      <div className="h-full">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold">Post a New Job</h1>
-          <p className="text-sm text-muted-foreground">Fill out the form below to create a job posting</p>
+    <div className="h-full flex flex-col">
+      {/* Header with Progress */}
+      <div className="border-b bg-card px-6 py-4">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-xl font-semibold mb-3">Post a New Job</h1>
+          <div className="flex items-center gap-2">
+            <div className={cn("flex items-center gap-2 flex-1")}>
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors",
+                step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+              )}>
+                {step > 1 ? <Check className="h-4 w-4" /> : "1"}
+              </div>
+              <span className="text-sm font-medium">Job Details</span>
+            </div>
+            <div className="flex-1 h-px bg-border" />
+            <div className={cn("flex items-center gap-2 flex-1")}>
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors",
+                step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+              )}>
+                2
+              </div>
+              <span className="text-sm font-medium">Description & Skills</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="h-[calc(100%-5rem)] overflow-y-auto pr-2">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* AI Quick Fill */}
-            <Card className="p-4 lg:col-span-2 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <h3 className="font-semibold text-sm">AI Quick Fill</h3>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Label htmlFor="file-upload" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md transition-all flex-1 justify-center h-10 bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer text-xs font-medium">
-                  <Upload className="h-4 w-4" />
-                  Upload File
-                  <Input
-                    id="file-upload"
-                    type="file"
-                    accept=".pdf,.docx,.txt"
-                    onChange={handleFileUpload}
-                    disabled={isParsing}
-                    className="hidden"
-                  />
-                </Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md transition-all flex-1 justify-center h-10 text-xs font-medium"
+      {/* Form Content */}
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-6">
+          {/* AI Quick Fill */}
+          <Card className="p-3 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h3 className="font-medium text-sm">AI Quick Fill</h3>
+            </div>
+            <div className="flex gap-2">
+              <Label htmlFor="file-upload" className="inline-flex items-center gap-2 px-3 py-2 rounded-md transition-all flex-1 justify-center h-9 bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer text-xs font-medium">
+                <Upload className="h-3 w-3" />
+                Upload File
+                <Input
+                  id="file-upload"
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  onChange={handleFileUpload}
                   disabled={isParsing}
-                >
-                  <FileText className="h-4 w-4" />
-                  Paste Text
-                </Button>
-              </div>
-              {isParsing && (
-                <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  Parsing job description...
-                </div>
-              )}
-            </Card>
-
-            {/* Left Column */}
-            <div className="space-y-4">
-              {/* Job Title */}
-              <div>
-                <Label htmlFor="title">Job Title *</Label>
-                <JobTitleAutocomplete
-                  value={selectedTitle || ''}
-                  onChange={(value) => setValue('title', value)}
+                  className="hidden"
                 />
-                {selectedTitle === 'Other' && (
-                  <Input
-                    {...register('custom_title')}
-                    placeholder="Enter custom job title"
-                    className="mt-2"
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="inline-flex items-center gap-2 flex-1 h-9 text-xs"
+                disabled={isParsing}
+              >
+                <FileText className="h-3 w-3" />
+                Paste Text
+              </Button>
+            </div>
+            {isParsing && (
+              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Parsing job description...
+              </div>
+            )}
+          </Card>
+
+          {/* Step 1: Job Details */}
+          {step === 1 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label className="text-xs font-medium">Job Title *</Label>
+                  <JobTitleAutocomplete
+                    value={selectedTitle || ''}
+                    onChange={(value) => setValue('title', value)}
                   />
-                )}
-              </div>
+                  {selectedTitle === 'Other' && (
+                    <Input
+                      {...register('custom_title')}
+                      placeholder="Enter custom job title"
+                      className="mt-2 h-9 text-sm"
+                    />
+                  )}
+                  {errors.title && <p className="text-xs text-destructive mt-1">{String(errors.title.message)}</p>}
+                </div>
 
-              {/* Industry */}
-              <div>
-                <Label htmlFor="industry">Industry *</Label>
-                <Select onValueChange={(value) => setValue('industry', value)} value={watch('industry')}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {industries.map((ind) => (
-                      <SelectItem key={ind} value={ind}>{ind}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                <div>
+                  <Label className="text-xs font-medium">Industry *</Label>
+                  <Select onValueChange={(value) => setValue('industry', value)} value={watch('industry')}>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {industries.map((ind) => (
+                        <SelectItem key={ind} value={ind} className="text-sm">{ind}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.industry && <p className="text-xs text-destructive mt-1">{String(errors.industry.message)}</p>}
+                </div>
 
-              {/* Seniority */}
-              <div>
-                <Label>Seniority *</Label>
-                <RadioGroup onValueChange={(value) => setValue('seniority', value as any)} value={watch('seniority')}>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="junior" id="junior" />
-                      <Label htmlFor="junior" className="cursor-pointer">Junior</Label>
+                <div>
+                  <Label className="text-xs font-medium">Location Type *</Label>
+                  <RadioGroup onValueChange={(value) => setValue('location_type', value)} value={locationType} className="flex gap-3 mt-2">
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="remote" id="remote" className="h-4 w-4" />
+                      <Label htmlFor="remote" className="cursor-pointer text-sm">Remote</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="mid_level" id="mid_level" />
-                      <Label htmlFor="mid_level" className="cursor-pointer">Mid-Level</Label>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="hybrid" id="hybrid" className="h-4 w-4" />
+                      <Label htmlFor="hybrid" className="cursor-pointer text-sm">Hybrid</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="senior" id="senior" />
-                      <Label htmlFor="senior" className="cursor-pointer">Senior</Label>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="on_site" id="on_site" className="h-4 w-4" />
+                      <Label htmlFor="on_site" className="cursor-pointer text-sm">On-Site</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="lead_principal" id="lead_principal" />
-                      <Label htmlFor="lead_principal" className="cursor-pointer">Lead/Principal</Label>
+                  </RadioGroup>
+                </div>
+
+                <div className="col-span-2">
+                  <Label className="text-xs font-medium">Work Location *</Label>
+                  <LocationAutocomplete
+                    value={watch('location') || ''}
+                    onChange={(value) => setValue('location', value)}
+                  />
+                  {errors.location && <p className="text-xs text-destructive mt-1">{String(errors.location.message)}</p>}
+                </div>
+
+                <div className="col-span-2">
+                  <Label className="text-xs font-medium mb-2 block">Seniority *</Label>
+                  <RadioGroup onValueChange={(value) => setValue('seniority', value as any)} value={watch('seniority')} className="grid grid-cols-3 gap-2">
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="junior" id="junior" className="h-4 w-4" />
+                      <Label htmlFor="junior" className="cursor-pointer text-sm">Junior</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="manager_director" id="manager_director" />
-                      <Label htmlFor="manager_director" className="cursor-pointer">Manager/Director</Label>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="mid_level" id="mid_level" className="h-4 w-4" />
+                      <Label htmlFor="mid_level" className="cursor-pointer text-sm">Mid-Level</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="vp_c_level" id="vp_c_level" />
-                      <Label htmlFor="vp_c_level" className="cursor-pointer">VP/C-Level</Label>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="senior" id="senior" className="h-4 w-4" />
+                      <Label htmlFor="senior" className="cursor-pointer text-sm">Senior</Label>
                     </div>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="lead_principal" id="lead_principal" className="h-4 w-4" />
+                      <Label htmlFor="lead_principal" className="cursor-pointer text-sm">Lead/Principal</Label>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="manager_director" id="manager_director" className="h-4 w-4" />
+                      <Label htmlFor="manager_director" className="cursor-pointer text-sm">Manager/Director</Label>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="vp_c_level" id="vp_c_level" className="h-4 w-4" />
+                      <Label htmlFor="vp_c_level" className="cursor-pointer text-sm">VP/C-Level</Label>
+                    </div>
+                  </RadioGroup>
+                  {errors.seniority && <p className="text-xs text-destructive mt-1">{String(errors.seniority.message)}</p>}
+                </div>
+
+                <div className="col-span-2">
+                  <Label className="text-xs font-medium mb-2 block">Employment Type *</Label>
+                  <RadioGroup onValueChange={(value) => setValue('employment_type', value as any)} value={watch('employment_type')} className="flex gap-4">
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="full_time" id="full_time" className="h-4 w-4" />
+                      <Label htmlFor="full_time" className="cursor-pointer text-sm">Full-Time</Label>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="contract" id="contract" className="h-4 w-4" />
+                      <Label htmlFor="contract" className="cursor-pointer text-sm">Contract</Label>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <RadioGroupItem value="temp" id="temp" className="h-4 w-4" />
+                      <Label htmlFor="temp" className="cursor-pointer text-sm">Temporary</Label>
+                    </div>
+                  </RadioGroup>
+                  {errors.employment_type && <p className="text-xs text-destructive mt-1">{String(errors.employment_type.message)}</p>}
+                </div>
+
+                <div className="col-span-2">
+                  <Label className="text-xs font-medium">Salary Range (Optional)</Label>
+                  <div className="grid grid-cols-7 gap-2 mt-2">
+                    <div className="col-span-2">
+                      <Select onValueChange={(value) => setValue('budget_currency', value)} value={watch('budget_currency')}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {currencies.map((curr) => (
+                            <SelectItem key={curr} value={curr} className="text-sm">{curr}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Input
+                      {...register('budget_min')}
+                      type="number"
+                      placeholder="Min"
+                      className="h-9 text-sm col-span-2"
+                    />
+                    <span className="flex items-center justify-center text-sm text-muted-foreground">to</span>
+                    <Input
+                      {...register('budget_max')}
+                      type="number"
+                      placeholder="Max"
+                      className="h-9 text-sm col-span-2"
+                    />
                   </div>
-                </RadioGroup>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Description & Skills */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs font-medium">Job Description *</Label>
+                <Textarea
+                  {...register('description')}
+                  placeholder="Describe the role, responsibilities, and requirements..."
+                  className="min-h-[120px] text-sm mt-2"
+                />
+                {errors.description && <p className="text-xs text-destructive mt-1">{String(errors.description.message)}</p>}
               </div>
 
-              {/* Employment Type */}
               <div>
-                <Label>Employment Type *</Label>
-                <RadioGroup onValueChange={(value) => setValue('employment_type', value as any)} value={watch('employment_type')}>
-                  <div className="flex gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="full_time" id="full_time" />
-                      <Label htmlFor="full_time" className="cursor-pointer">Full-Time</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="contract" id="contract" />
-                      <Label htmlFor="contract" className="cursor-pointer">Contract</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="temp" id="temp" />
-                      <Label htmlFor="temp" className="cursor-pointer">Temporary</Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {/* Required Skills */}
-              <div>
-                <Label>Required Skills *</Label>
+                <Label className="text-xs font-medium">Required Skills *</Label>
                 <div className="flex gap-2 mt-2">
                   <Input
                     value={skillMustInput}
                     onChange={(e) => setSkillMustInput(e.target.value)}
                     placeholder="e.g., React, Python"
+                    className="h-9 text-sm"
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillMust())}
                   />
-                  <Button type="button" onClick={addSkillMust} size="sm">Add</Button>
+                  <Button type="button" onClick={addSkillMust} size="sm" className="h-9">Add</Button>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {skillsMust.map((skill) => (
-                    <Badge key={skill} variant="secondary" className="gap-1">
+                    <Badge key={skill} variant="secondary" className="gap-1 text-xs px-2 py-0.5">
                       {skill}
                       <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillMust(skill)} />
                     </Badge>
                   ))}
                 </div>
+                {skillsMust.length === 0 && <p className="text-xs text-muted-foreground mt-1">At least one skill required</p>}
               </div>
 
-              {/* Nice-to-Have Skills */}
               <div>
-                <Label>Nice-to-Have Skills</Label>
+                <Label className="text-xs font-medium">Nice-to-Have Skills</Label>
                 <div className="flex gap-2 mt-2">
                   <Input
                     value={skillNiceInput}
                     onChange={(e) => setSkillNiceInput(e.target.value)}
                     placeholder="e.g., Docker, AWS"
+                    className="h-9 text-sm"
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkillNice())}
                   />
-                  <Button type="button" onClick={addSkillNice} size="sm">Add</Button>
+                  <Button type="button" onClick={addSkillNice} size="sm" className="h-9">Add</Button>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {skillsNice.map((skill) => (
-                    <Badge key={skill} variant="outline" className="gap-1">
+                    <Badge key={skill} variant="outline" className="gap-1 text-xs px-2 py-0.5">
                       {skill}
                       <X className="h-3 w-3 cursor-pointer" onClick={() => removeSkillNice(skill)} />
                     </Badge>
                   ))}
                 </div>
               </div>
-            </div>
 
-            {/* Right Column */}
-            <div className="space-y-4">
-              {/* Location Type */}
-              <div>
-                <Label>Location Type *</Label>
-                <RadioGroup onValueChange={(value) => setValue('location_type', value)} value={locationType}>
-                  <div className="flex gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="remote" id="remote" />
-                      <Label htmlFor="remote" className="cursor-pointer">Remote</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="hybrid" id="hybrid" />
-                      <Label htmlFor="hybrid" className="cursor-pointer">Hybrid</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="on_site" id="on_site" />
-                      <Label htmlFor="on_site" className="cursor-pointer">On-Site</Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {/* Location */}
-              <div>
-                <Label htmlFor="location">Work Location *</Label>
-                <LocationAutocomplete
-                  value={watch('location') || ''}
-                  onChange={(value) => setValue('location', value)}
-                />
-              </div>
-
-              {/* Salary Range */}
-              <div>
-                <Label>Salary Range (Optional)</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  <Select onValueChange={(value) => setValue('budget_currency', value)} value={watch('budget_currency')}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {currencies.map((curr) => (
-                        <SelectItem key={curr} value={curr}>{curr}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    {...register('budget_min')}
-                    type="number"
-                    placeholder="Min"
-                  />
-                  <Input
-                    {...register('budget_max')}
-                    type="number"
-                    placeholder="Max"
-                  />
-                </div>
-              </div>
-
-              {/* Job Description */}
-              <div>
-                <Label htmlFor="description">Job Description *</Label>
-                <Textarea
-                  {...register('description')}
-                  placeholder="Describe the role, responsibilities, and requirements..."
-                  className="min-h-[200px]"
-                />
-              </div>
-
-              {/* Visibility Options */}
-              <div className="space-y-3">
+              <div className="space-y-2 pt-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="is_public"
                     checked={isPublic}
                     onCheckedChange={(checked) => setIsPublic(!!checked)}
+                    className="h-4 w-4"
                   />
-                  <Label htmlFor="is_public" className="cursor-pointer">
+                  <Label htmlFor="is_public" className="cursor-pointer text-sm">
                     Make this job public
                   </Label>
                 </div>
@@ -531,34 +559,64 @@ export default function PostJob() {
                     id="is_exclusive"
                     checked={isExclusive}
                     onCheckedChange={(checked) => setIsExclusive(!!checked)}
+                    className="h-4 w-4"
                   />
-                  <Label htmlFor="is_exclusive" className="cursor-pointer">
+                  <Label htmlFor="is_exclusive" className="cursor-pointer text-sm">
                     Exclusive job (premium feature)
                   </Label>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex gap-3 mt-6 pt-4 border-t">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Post Job
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/my-jobs')}
-            >
-              Cancel
-            </Button>
-          </div>
+          )}
         </form>
+      </div>
+
+      {/* Footer Actions */}
+      <div className="border-t bg-card px-6 py-3">
+        <div className="max-w-4xl mx-auto flex justify-between gap-3">
+          {step === 1 ? (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/my-jobs')}
+                className="h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setStep(2)}
+                disabled={!canProceedToStep2}
+                className="h-9"
+              >
+                Next Step
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStep(1)}
+                className="h-9"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                onClick={handleSubmit(onSubmit)}
+                className="h-9"
+              >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Post Job
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <ExclusiveJobPromotionModal
