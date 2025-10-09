@@ -81,10 +81,6 @@ const Index = () => {
                   <Award className="h-4 w-4" />
                   Top Rated Platform
                 </span>
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
-                  <Bot className="h-4 w-4" />
-                  AI-Powered Tools
-                </span>
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-sm font-bold shadow-lg">
                   <Shield className="h-4 w-4" />
                   Verified Professionals
