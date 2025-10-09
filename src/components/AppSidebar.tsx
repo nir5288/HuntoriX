@@ -149,11 +149,11 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         asChild={item.url !== '#'}
                         isActive={isActiveItem}
                         tooltip={getTooltip(item.title)}
-                        className={`h-14 group transition-all duration-200 rounded-xl ${
-                          open ? 'px-4' : 'px-0 justify-center'
+                        className={`group rounded-xl leading-none transition-all duration-200 ${
+                          open ? 'h-14 px-4' : 'h-12 w-12 p-0 grid place-items-center'
                         } ${
                           isSoon 
-                            ? 'cursor-not-allowed opacity-40' 
+                            ? 'cursor-not-allowed' 
                             : isActiveItem
                               ? 'bg-black shadow-[inset_0_4px_12px_rgba(0,0,0,0.9),inset_0_-2px_8px_rgba(0,0,0,0.7),0_1px_0_rgba(255,255,255,0.03)] border border-black data-[active=true]:bg-black'
                               : 'hover:bg-slate-700/40'
@@ -161,12 +161,14 @@ export function AppSidebar({ role }: AppSidebarProps) {
                       >
                         {item.url === '#' ? (
                           <div className={`flex items-center w-full ${open ? 'gap-4' : 'justify-center'}`}>
-                            <item.icon className="h-7 w-7 shrink-0 text-slate-600" strokeWidth={3} />
+                            <div className="grid place-items-center h-8 w-8 rounded-full">
+                              <item.icon className="h-6 w-6 text-slate-500/70" />
+                            </div>
                             {open && (
                               <div className="flex items-center gap-2 flex-1 justify-between">
-                                <span className="text-sm font-medium text-slate-500">{item.title}</span>
+                                <span className="text-sm font-medium text-slate-500/80">{item.title}</span>
                                 {'badge' in item && item.badge && (
-                                  <Badge variant="secondary" className="text-[9px] px-2 py-0.5 h-5 bg-slate-800/80 text-slate-500 border-slate-700/50 font-medium">
+                                  <Badge variant="secondary" className="text-[9px] px-2 py-0.5 h-5 bg-slate-800/80 text-slate-400 border-slate-700/50 font-medium">
                                     {item.badge}
                                   </Badge>
                                 )}
@@ -175,18 +177,19 @@ export function AppSidebar({ role }: AppSidebarProps) {
                           </div>
                         ) : (
                           <NavLink to={item.url} className={`flex items-center w-full ${open ? 'gap-4' : 'justify-center'}`}>
-                            <item.icon 
-                              className="h-7 w-7 shrink-0 transition-all duration-200"
-                              strokeWidth={3}
-                              style={{
-                                color: isActiveItem 
-                                  ? 'hsl(var(--accent-mint))' 
-                                  : 'hsl(var(--accent-pink))',
-                                filter: isActiveItem 
-                                  ? 'drop-shadow(0 0 12px hsl(var(--accent-mint) / 0.6))' 
-                                  : 'drop-shadow(0 0 6px hsl(var(--accent-pink) / 0.3))'
-                              }}
-                            />
+                            <div className={`grid place-items-center rounded-full ${open ? 'h-8 w-8' : 'h-8 w-8'}`}>
+                              <item.icon 
+                                className="h-6 w-6 flex-shrink-0 transition-all duration-200"
+                                style={{
+                                  color: isActiveItem 
+                                    ? 'hsl(var(--accent-mint))' 
+                                    : 'hsl(var(--accent-pink))',
+                                  filter: isActiveItem 
+                                    ? 'drop-shadow(0 0 12px hsl(var(--accent-mint) / 0.6))' 
+                                    : 'drop-shadow(0 0 6px hsl(var(--accent-pink) / 0.3))'
+                                }}
+                              />
+                            </div>
                             {open && (
                               <div className="flex items-center gap-2 flex-1 justify-between">
                                 <span className={`text-base font-semibold transition-colors ${
