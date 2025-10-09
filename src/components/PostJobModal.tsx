@@ -674,7 +674,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   </p>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="ai-upload"
                     type="file"
@@ -1010,7 +1010,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 {fieldErrors.industry && <p className="text-sm text-destructive">{fieldErrors.industry}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2.5" data-field="seniority">
                   <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
                   <Select 
