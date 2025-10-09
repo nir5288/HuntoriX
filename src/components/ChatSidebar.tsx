@@ -501,7 +501,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                       
                       {/* Timestamp - always visible, moves left on hover or when menu open */}
                       <span className={cn(
-                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200",
+                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200 z-10",
                         (openMenuKey === `${conv.jobId}-${conv.otherUserId}`) ? "right-12" : "group-hover:right-12 right-3"
                       )}>
                         {formatRelativeTime(conv.lastMessageTime)}
@@ -509,7 +509,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
 
                       {/* 3-dot menu - appears on hover or when open in top right */}
                       <div className={cn(
-                        "absolute top-2 right-2 transition-opacity",
+                        "absolute top-2 right-2 transition-opacity z-20",
                         openMenuKey === `${conv.jobId}-${conv.otherUserId}` ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                       )}>
                         <DropdownMenu
@@ -568,19 +568,21 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                         </DropdownMenu>
                       </div>
 
-                      {/* Star button - always visible at bottom right */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute bottom-2 right-2 h-6 w-6"
-                        onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
-                        title={conv.isStarred ? "Unstar" : "Star"}
-                      >
-                        <Star className={cn(
-                          "h-3.5 w-3.5",
-                          conv.isStarred && "fill-yellow-500 text-yellow-500"
-                        )} />
-                      </Button>
+                      {/* Star button - appears on hover at bottom right */}
+                      <div className="absolute bottom-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={(e) => handleToggleStar(e, conv.jobId, conv.otherUserId)}
+                          title={conv.isStarred ? "Unstar" : "Star"}
+                        >
+                          <Star className={cn(
+                            "h-3.5 w-3.5",
+                            conv.isStarred && "fill-yellow-500 text-yellow-500"
+                          )} />
+                        </Button>
+                      </div>
                     </>
                   )}
                 </div>
