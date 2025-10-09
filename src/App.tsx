@@ -28,7 +28,6 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import HuntRank from "./pages/HuntRank";
 import HuntBase from "./pages/HuntBase";
-import Executives from "./pages/Executives";
 import AIAnalytics from "./pages/AIAnalytics";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -84,7 +83,6 @@ const AppContent = () => {
           <Route path="/headhunters" element={<HeadhunterDirectory />} />
           <Route path="/huntrank" element={<HuntRank />} />
           <Route path="/huntbase" element={<HuntBase />} />
-          <Route path="/executives" element={<Executives />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/accessibility" element={<Accessibility />} />
