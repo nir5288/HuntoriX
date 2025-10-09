@@ -73,13 +73,17 @@ const Index = () => {
         </div>
 
         <div className="max-w-[1600px] mx-auto px-4 py-20 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px]">
+          <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px] -mt-12">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
               <div className="animate-fade-in flex flex-wrap gap-3 justify-center lg:justify-start">
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
                   <Award className="h-4 w-4" />
                   Top Rated Platform
+                </span>
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] text-sm font-bold shadow-lg">
+                  <Bot className="h-4 w-4" />
+                  AI-Powered Tools
                 </span>
                 <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-sm font-bold shadow-lg">
                   <Shield className="h-4 w-4" />
