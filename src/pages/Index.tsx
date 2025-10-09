@@ -8,6 +8,8 @@ import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
 import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
+import heroBackground from '@/assets/hero-background.jpg';
+
 const Index = () => {
   const navigate = useNavigate();
   const {
@@ -32,11 +34,14 @@ const Index = () => {
       alert("You're signed in as an Employer. Please log out to switch roles.");
     }
   };
-  return <div className="relative min-h-screen bg-gradient-to-b from-background via-[hsl(var(--surface))] to-background overflow-x-hidden">
+  return <div className="relative min-h-screen overflow-x-hidden">
       <Header />
       
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-8 md:py-12">
+      <section 
+        className="relative container mx-auto px-4 py-8 md:py-12 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${heroBackground})` }}
+      >
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="inline-block">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
