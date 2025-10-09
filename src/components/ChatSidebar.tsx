@@ -363,7 +363,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
     <div
       className={cn(
         "fixed top-16 bottom-0 bg-background border-r transition-all duration-300 ease-in-out",
-        isOpen ? "translate-x-0 z-30" : "-translate-x-full -z-10 pointer-events-none",
+        isOpen ? "translate-x-0 z-[300]" : "-translate-x-full -z-10 pointer-events-none",
         isCollapsed ? "w-16" : "w-56"
       )}
       style={{
@@ -528,7 +528,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="z-50 bg-popover">
+                          <DropdownMenuContent align="end" className="z-[500] bg-popover">
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
