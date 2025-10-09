@@ -9,7 +9,7 @@ import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
 import heroBackground from '@/assets/hero-background.jpg';
-import heroImage from '@/assets/hero-image-new.png';
+import heroImage from '@/assets/hero-image.png';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const Index = () => {
       
       {/* Hero Section */}
       <section 
-        className="relative w-full h-[calc(100vh-100px)] bg-cover bg-center bg-no-repeat flex items-center"
+        className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         <div className="w-full mx-auto px-[150px] pb-8 md:pb-12">
