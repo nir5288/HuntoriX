@@ -9,7 +9,7 @@ import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
 import heroBackground from '@/assets/hero-background.jpg';
-import heroImage from '@/assets/hero-image.png';
+import heroImage from '@/assets/hero-image-new.png';
 
 const Index = () => {
   const navigate = useNavigate();
