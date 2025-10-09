@@ -559,13 +559,26 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0" hideCloseButton>
         <div className="overflow-y-auto flex-1 px-6 pt-6">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Post a Job</DialogTitle>
-          <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <DialogTitle className="text-2xl">Post a Job</DialogTitle>
+              <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
+            </div>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={handleClear} 
+              size="sm"
+              className="h-9 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 dark:border-destructive/50 dark:text-destructive dark:hover:bg-destructive/20 flex-shrink-0"
+            >
+              Clear Form
+            </Button>
+          </div>
         </DialogHeader>
 
-        <form id="post-job-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6">
+        <form id="post-job-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 pb-6 mt-6">
           {/* AI Quick Fill */}
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800/30">
+          <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800/30 shadow-sm">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-1">
                 <Sparkles className="w-5 h-5 text-primary" />
@@ -792,7 +805,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Card>
 
           {/* Exclusive Toggle */}
-          <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20">
+          <div className="relative flex items-center gap-2 p-2 rounded-lg border bg-gradient-to-r from-purple-50/50 via-blue-50/50 to-cyan-50/50 dark:from-purple-950/20 dark:via-blue-950/20 dark:to-cyan-950/20 shadow-sm">
             <button
               type="button"
               onClick={() => {
@@ -861,7 +874,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </div>
 
           {/* Basics */}
-          <Card className="p-6 bg-muted/20">
+          <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
             <h3 className="font-semibold text-base mb-5">Job Basics</h3>
             
             <div className="space-y-4">
@@ -973,7 +986,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
           {/* Compensation */}
           <Collapsible open={compensationOpen} onOpenChange={setCompensationOpen}>
-            <Card className="p-5 bg-accent/5">
+            <Card className="p-5 bg-gradient-to-br from-accent/20 to-accent/10 border-2 shadow-sm">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
                 <h3 className="font-semibold text-base">Compensation Range</h3>
                 <ChevronDown className={cn(
@@ -1069,7 +1082,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Collapsible>
 
           {/* Description */}
-          <Card className="p-6 bg-muted/20">
+          <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
             <h3 className="font-semibold text-base mb-5">Job Description</h3>
             
             <div className="space-y-2.5">
@@ -1086,7 +1099,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
           {/* Skills */}
           <Collapsible open={skillsOpen} onOpenChange={setSkillsOpen}>
-            <Card className="p-6 bg-accent/5" id="skills-must">
+            <Card className="p-6 bg-gradient-to-br from-accent/20 to-accent/10 border-2 shadow-sm" id="skills-must">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
                 <h3 className="font-semibold text-base">Required Skills</h3>
                 <ChevronDown className={cn(
@@ -1156,7 +1169,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           </Collapsible>
 
           {/* Visibility */}
-          <Card className="p-5 bg-muted/20">
+          <Card className="p-5 bg-gradient-to-br from-muted/50 to-muted/30 border-2 shadow-sm">
             <div className="flex items-center gap-3">
               <Checkbox 
                 id="visibility" 
@@ -1185,20 +1198,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
             <Info className="h-4 w-4 text-blue-700 dark:text-blue-300 flex-shrink-0" />
             <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-              Reviewed in under 1 hour
+              Jobs will be reviewed in under 1 hour
             </p>
           </div>
           
-          <div className="flex gap-2">
-            <Button 
-              type="button" 
-              variant="ghost" 
-              onClick={handleClear} 
-              size="sm"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Clear Form
-            </Button>
+          <div className="flex gap-3">
             <Button 
               type="button" 
               variant="outline" 
