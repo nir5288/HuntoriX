@@ -42,7 +42,7 @@ const PLANS: Plan[] = [
       'Max 3 CVs per job',
     ],
     locked: false,
-    icon: '🟢',
+    icon: '',
   },
   {
     id: 'core',
@@ -58,7 +58,7 @@ const PLANS: Plan[] = [
       'Max 5 CVs per job',
     ],
     locked: false,
-    icon: '🔵',
+    icon: '',
   },
   {
     id: 'pro',
@@ -74,7 +74,7 @@ const PLANS: Plan[] = [
       'AI/Video badges on job cards',
     ],
     locked: true,
-    icon: '⭐',
+    icon: '',
   },
   {
     id: 'huntorix',
@@ -89,7 +89,7 @@ const PLANS: Plan[] = [
       'Job notifications (by role & industry)',
     ],
     locked: true,
-    icon: '💎',
+    icon: '',
   },
 ];
 
@@ -197,9 +197,21 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
   };
 
   const renderFeatureValue = (value: any) => {
-    if (value === true) return <Check className="h-4 w-4 text-[hsl(var(--accent-mint))]" />;
-    if (value === false) return <span className="text-muted-foreground">—</span>;
-    return <span className="text-sm">{value}</span>;
+    if (value === true) return (
+      <div className="flex justify-center">
+        <Check className="h-5 w-5 text-primary font-bold" strokeWidth={3} />
+      </div>
+    );
+    if (value === false) return (
+      <div className="flex justify-center">
+        <span className="text-muted-foreground">—</span>
+      </div>
+    );
+    return (
+      <div className="flex justify-center">
+        <span className="text-sm font-medium">{value}</span>
+      </div>
+    );
   };
 
   return (
@@ -241,21 +253,22 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
               <Card
                 key={plan.id}
                 className={cn(
-                  "relative cursor-pointer transition-all duration-200 rounded-2xl",
-                  isSelected && !plan.locked && "ring-2 ring-[hsl(var(--accent-mint))] shadow-lg",
-                  isRecommended && "border-[hsl(var(--accent-lilac))]",
-                  plan.locked && "opacity-60"
+                  "relative cursor-pointer transition-all duration-200 rounded-2xl border-2 flex flex-col h-full",
+                  isSelected && !plan.locked && "ring-2 ring-primary shadow-lg border-primary",
+                  isRecommended && "border-primary/50",
+                  plan.locked && "opacity-60",
+                  !isSelected && !plan.locked && "hover:border-primary/30"
                 )}
                 onClick={() => !plan.locked && setSelectedPlan(plan.id)}
               >
                 {isRecommended && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                     <Badge 
+                      className="px-4 py-1.5 text-sm font-semibold shadow-lg"
                       style={{
-                        backgroundColor: 'hsl(var(--accent-lilac) / 0.2)',
-                        color: 'hsl(var(--accent-lilac))',
-                        borderColor: 'hsl(var(--accent-lilac))',
-                        borderWidth: 1,
+                        backgroundColor: 'hsl(var(--primary))',
+                        color: 'hsl(var(--primary-foreground))',
+                        border: 'none',
                       }}
                     >
                       Recommended
@@ -277,48 +290,45 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                 )}
 
                 <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{plan.icon}</span>
-                    <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  </div>
-                  <CardDescription className="flex items-center gap-2">
+                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                  <CardDescription className="flex items-center gap-2 text-base">
                     {plan.description}
                     <Tooltip>
                       <TooltipTrigger>
-                        <Info className="h-3 w-3 text-muted-foreground" />
+                        <Info className="h-3.5 w-3.5 text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Each application uses 1 credit.</p>
                       </TooltipContent>
                     </Tooltip>
                   </CardDescription>
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">${price}</span>
-                      <span className="text-muted-foreground">
+                      <span className="text-5xl font-bold">${price}</span>
+                      <span className="text-muted-foreground text-base">
                         / {billingCycle === 'yearly' ? 'year' : 'month'}
                       </span>
                     </div>
                     {billingCycle === 'yearly' && plan.monthlyPrice > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground mt-2">
                         billed yearly, save 2 months
                       </p>
                     )}
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2">
+                <CardContent className="space-y-6 flex-1 flex flex-col">
+                  <ul className="space-y-3 flex-1">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <Check className="h-4 w-4 text-[hsl(var(--accent-mint))] shrink-0 mt-0.5" />
-                        <span>{feature}</span>
+                      <li key={index} className="flex items-start gap-3 text-sm">
+                        <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" strokeWidth={2.5} />
+                        <span className="leading-relaxed">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Button
-                    className="w-full"
+                    className="w-full h-11 text-base font-semibold"
                     variant={isSelected ? 'default' : 'outline'}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -352,11 +362,11 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                 key={plan.id}
                 variant="outline"
                 className={cn(
-                  "px-3 py-1 text-sm",
+                  "px-4 py-2 text-sm font-medium",
                   plan.locked && "opacity-60"
                 )}
               >
-                {plan.icon} {plan.name} — ${price}{billingCycle === 'yearly' && '/yr'}
+                {plan.name} — ${price}{billingCycle === 'yearly' && '/yr'}
                 {plan.locked && ' (Locked)'}
               </Badge>
             );
@@ -370,21 +380,18 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
           <div className="overflow-x-auto rounded-2xl border">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="sticky left-0 bg-background z-10 w-[250px]">Feature</TableHead>
+                <TableRow className="border-b-2">
+                  <TableHead className="sticky left-0 bg-background z-10 w-[280px] font-bold text-base">Feature</TableHead>
                   {PLANS.map((plan) => (
-                    <TableHead key={plan.id} className="text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{plan.icon}</span>
-                          <span>{plan.name}</span>
-                        </div>
+                    <TableHead key={plan.id} className="text-center min-w-[180px]">
+                      <div className="flex flex-col items-center gap-3 py-4">
+                        <span className="text-xl font-bold">{plan.name}</span>
                         {plan.id === 'core' && (
                           <Badge 
-                            variant="secondary"
+                            className="font-semibold"
                             style={{
-                              backgroundColor: 'hsl(var(--accent-lilac) / 0.2)',
-                              color: 'hsl(var(--accent-lilac))',
+                              backgroundColor: 'hsl(var(--primary))',
+                              color: 'hsl(var(--primary-foreground))',
                             }}
                           >
                             Recommended
@@ -395,7 +402,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                           variant={plan.locked ? 'outline' : 'default'}
                           disabled={plan.locked}
                           onClick={() => !plan.locked && setSelectedPlan(plan.id)}
-                          className="mt-2"
+                          className="mt-2 w-full font-semibold"
                         >
                           {plan.locked ? (
                             <>
@@ -413,14 +420,17 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
               </TableHeader>
               <TableBody>
                 {FEATURE_COMPARISON.map((row, index) => (
-                  <TableRow key={index} className={index % 2 === 0 ? 'bg-muted/30' : ''}>
-                    <TableCell className="sticky left-0 bg-background z-10 font-medium">
+                  <TableRow key={index} className={cn(
+                    "border-b",
+                    index % 2 === 0 ? 'bg-muted/20' : ''
+                  )}>
+                    <TableCell className="sticky left-0 bg-background z-10 font-semibold py-4">
                       <div className="flex items-center gap-2">
                         {row.feature}
                         {row.tooltip && (
                           <Tooltip>
                             <TooltipTrigger>
-                              <Info className="h-3 w-3 text-muted-foreground" />
+                              <Info className="h-4 w-4 text-muted-foreground" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="max-w-xs">{row.tooltip}</p>
@@ -429,10 +439,10 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">{renderFeatureValue(row.free)}</TableCell>
-                    <TableCell className="text-center">{renderFeatureValue(row.core)}</TableCell>
-                    <TableCell className="text-center">{renderFeatureValue(row.pro)}</TableCell>
-                    <TableCell className="text-center">{renderFeatureValue(row.huntorix)}</TableCell>
+                    <TableCell className="py-4">{renderFeatureValue(row.free)}</TableCell>
+                    <TableCell className="py-4">{renderFeatureValue(row.core)}</TableCell>
+                    <TableCell className="py-4">{renderFeatureValue(row.pro)}</TableCell>
+                    <TableCell className="py-4">{renderFeatureValue(row.huntorix)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -454,12 +464,17 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
             <Card key={plan.id} className="rounded-2xl">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{plan.icon}</span>
-                    <CardTitle>{plan.name}</CardTitle>
-                  </div>
+                  <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
                   {plan.id === 'core' && (
-                    <Badge variant="secondary">Recommended</Badge>
+                    <Badge 
+                      className="font-semibold"
+                      style={{
+                        backgroundColor: 'hsl(var(--primary))',
+                        color: 'hsl(var(--primary-foreground))',
+                      }}
+                    >
+                      Recommended
+                    </Badge>
                   )}
                 </div>
               </CardHeader>
@@ -469,13 +484,13 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                   if (value === false) return null;
                   
                   return (
-                    <div key={index} className="flex items-start justify-between gap-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{row.feature}</span>
+                    <div key={index} className="flex items-start justify-between gap-3 text-sm py-2">
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="font-semibold">{row.feature}</span>
                         {row.tooltip && (
                           <Tooltip>
                             <TooltipTrigger>
-                              <Info className="h-3 w-3 text-muted-foreground shrink-0" />
+                              <Info className="h-4 w-4 text-muted-foreground shrink-0" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="max-w-xs">{row.tooltip}</p>
@@ -483,8 +498,14 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                           </Tooltip>
                         )}
                       </div>
-                      <div className="text-muted-foreground shrink-0">
-                        {renderFeatureValue(value)}
+                      <div className="shrink-0">
+                        {typeof value === 'boolean' && value ? (
+                          <Check className="h-5 w-5 text-primary" strokeWidth={2.5} />
+                        ) : typeof value === 'string' ? (
+                          <span className="font-medium">{value}</span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </div>
                     </div>
                   );
