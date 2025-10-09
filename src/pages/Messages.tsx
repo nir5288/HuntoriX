@@ -402,7 +402,7 @@ const Messages = () => {
                   variant="default"
                   size="icon"
                   onClick={() => setIsVideoCallOpen(true)}
-                  className="relative h-10 w-10 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] hover:opacity-90 shadow-lg"
+                  className="relative h-10 w-10 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg"
                   title="Video Call - Pro Plan Required"
                 >
                   <Video className="h-5 w-5" />
