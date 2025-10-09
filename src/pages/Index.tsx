@@ -43,34 +43,39 @@ const Index = () => {
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         <div className="container mx-auto px-4 py-8 md:py-12 w-full">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-block">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
-                <Award className="h-4 w-4" />
-                Trusted by leading companies
-              </span>
+          <div className="flex items-center min-h-[600px]">
+            {/* Left side - Text content (60%) */}
+            <div className="w-full lg:w-[60%] space-y-8">
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
+                  <Award className="h-4 w-4" />
+                  Trusted by leading companies
+                </span>
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight break-words">
+                Post a Job. Let the Best Headhunters Compete for You.
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
+                Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-8">
+                <Button size="lg" variant="hero" onClick={handleEmployerCTA} className="w-full sm:w-auto">
+                  <Briefcase className="mr-2 h-5 w-5" />
+                  I'm an Employer
+                </Button>
+                <Button size="lg" variant="mint" onClick={handleHeadhunterCTA} className="w-full sm:w-auto">
+                  <Users className="mr-2 h-5 w-5" />
+                  I'm a Headhunter
+                </Button>
+              </div>
             </div>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight break-words">
-              Find the perfect
-              <span className="block bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-                headhunter match
-              </span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-              <Button size="lg" variant="hero" onClick={handleEmployerCTA} className="w-full sm:w-auto">
-                <Briefcase className="mr-2 h-5 w-5" />
-                I'm an Employer
-              </Button>
-              <Button size="lg" variant="mint" onClick={handleHeadhunterCTA} className="w-full sm:w-auto">
-                <Users className="mr-2 h-5 w-5" />
-                I'm a Headhunter
-              </Button>
+
+            {/* Right side - Space reserved for image (40%) */}
+            <div className="hidden lg:block lg:w-[40%]">
+              {/* Image will go here */}
             </div>
           </div>
         </div>
