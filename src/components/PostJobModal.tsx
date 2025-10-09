@@ -1034,7 +1034,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
           {/* Compensation */}
           <Collapsible open={compensationOpen} onOpenChange={setCompensationOpen}>
-            <Card className="p-5 bg-gradient-to-br from-accent/20 to-accent/10 border-2 shadow-sm">
+            <Card className="p-5 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
                 <h3 className="font-semibold text-base">Compensation Range</h3>
                 <ChevronDown className={cn(
@@ -1156,7 +1156,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
           {/* Skills */}
           <Collapsible open={skillsOpen} onOpenChange={setSkillsOpen}>
-            <Card className="p-6 bg-gradient-to-br from-accent/20 to-accent/10 border-2 shadow-sm" id="skills-must">
+            <Card className="p-6 bg-gradient-to-br from-muted/40 to-muted/20 border-2 shadow-sm" id="skills-must">
               <CollapsibleTrigger className="w-full flex items-center justify-between group">
                 <h3 className="font-semibold text-base">Required Skills</h3>
                 <ChevronDown className={cn(
