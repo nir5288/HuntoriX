@@ -545,8 +545,8 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
                       <SelectItem value="on_hold">On Hold</SelectItem>
+                      <SelectItem value="success">Success</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

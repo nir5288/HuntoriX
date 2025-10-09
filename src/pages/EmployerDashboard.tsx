@@ -113,11 +113,9 @@ const EmployerDashboard = () => {
   };
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      open: 'bg-[hsl(var(--accent-mint))]',
-      shortlisted: 'bg-[hsl(var(--accent-lilac))]',
-      awarded: 'bg-[hsl(var(--success))]',
-      closed: 'bg-gray-400',
-      on_hold: 'bg-[hsl(var(--warning))]'
+      open: 'bg-[hsl(var(--success))]',
+      on_hold: 'bg-[hsl(var(--warning))]',
+      success: 'bg-[hsl(var(--success))]'
     };
     return colors[status] || 'bg-gray-400';
   };
