@@ -367,17 +367,16 @@ const Messages = () => {
     }
     loadMessages(true);
   };
-  return <>
-      <div className="h-screen flex">
-        <ChatSidebar
-          isOpen={sidebarOpen} 
-          onClose={() => setSidebarOpen(false)}
-          isCollapsed={chatSidebarCollapsed}
-          onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
-        />
+  return <div className="h-screen flex ml-0">
+      <ChatSidebar
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)}
+        isCollapsed={chatSidebarCollapsed}
+        onToggleCollapse={() => setChatSidebarCollapsed(!chatSidebarCollapsed)}
+      />
 
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="h-full flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="h-full flex flex-col">
             {otherUserId ? <>
                 {/* Fixed Header */}
                 <div className="h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4">
@@ -516,7 +515,6 @@ const Messages = () => {
             roomId={`${validJobId || 'direct'}-${[user?.id, otherUserId].sort().join('-')}`}
           />
         )}
-      </div>
-    </>;
+      </div>;
 };
 export default Messages;
