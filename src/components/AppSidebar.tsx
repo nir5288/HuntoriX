@@ -160,7 +160,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         }`}
                       >
                         {item.url === '#' ? (
-                          <div className={`flex items-center w-full ${open ? 'gap-4' : 'justify-center'}`}>
+                          <div className={`${open ? 'flex items-center gap-4 w-full' : 'grid place-items-center'}`}>
                             <div className="grid place-items-center h-8 w-8 rounded-full">
                               <item.icon className="h-6 w-6 text-slate-500/70" />
                             </div>
@@ -176,7 +176,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             )}
                           </div>
                         ) : (
-                          <NavLink to={item.url} className={`flex items-center w-full ${open ? 'gap-4' : 'justify-center'}`}>
+                          <NavLink to={item.url} className={`${open ? 'flex items-center gap-4 w-full' : 'grid place-items-center'}`}>
                             <div className={`grid place-items-center rounded-full ${open ? 'h-8 w-8' : 'h-8 w-8'}`}>
                               <item.icon 
                                 className="h-6 w-6 flex-shrink-0 transition-all duration-200"
