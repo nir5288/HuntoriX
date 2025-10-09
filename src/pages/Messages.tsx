@@ -10,10 +10,16 @@ import { MessageThread } from "@/components/MessageThread";
 import { MessageInput } from "@/components/MessageInput";
 import { VideoCall } from "@/components/VideoCall";
 import { useToast } from "@/hooks/use-toast";
-import { Menu, ArrowLeft, User, Circle, Video } from "lucide-react";
+import { Menu, ArrowLeft, User, Circle, Video, CalendarIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 interface Message {
   id: string;
   from_user: string;
@@ -68,6 +74,9 @@ const Messages = () => {
     senderName: string;
   } | null>(null);
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<Date>();
+  const [scheduleTime, setScheduleTime] = useState<string>("10:00");
+  const [schedulePopoverOpen, setSchedulePopoverOpen] = useState(false);
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
 
@@ -398,15 +407,69 @@ const Messages = () => {
                   </div>
                 </Link>
                 
-                <Button
-                  variant="default"
-                  onClick={() => setIsVideoCallOpen(true)}
-                  className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
-                  title="Video Call - Pro Plan Required"
-                >
-                  <Video className="h-4 w-4" />
-                  <span className="text-sm font-semibold">Schedule a video call</span>
-                </Button>
+                <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="default"
+                      className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
+                      title="Schedule a video call"
+                    >
+                      <Video className="h-4 w-4" />
+                      <span className="text-sm font-semibold">Schedule a video call</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <div className="p-4 space-y-4">
+                      <div className="space-y-2">
+                        <Label>Select Date</Label>
+                        <Calendar
+                          mode="single"
+                          selected={scheduleDate}
+                          onSelect={setScheduleDate}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className={cn("pointer-events-auto")}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Select Time</Label>
+                        <Select value={scheduleTime} onValueChange={setScheduleTime}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 24 }, (_, i) => {
+                              const hour = i.toString().padStart(2, '0');
+                              return [
+                                <SelectItem key={`${hour}:00`} value={`${hour}:00`}>{`${hour}:00`}</SelectItem>,
+                                <SelectItem key={`${hour}:30`} value={`${hour}:30`}>{`${hour}:30`}</SelectItem>
+                              ];
+                            }).flat()}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        className="w-full"
+                        onClick={() => {
+                          if (scheduleDate) {
+                            toast({
+                              title: "Video call scheduled",
+                              description: `Scheduled for ${format(scheduleDate, "PPP")} at ${scheduleTime}`,
+                            });
+                            setSchedulePopoverOpen(false);
+                          } else {
+                            toast({
+                              title: "Please select a date",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        Confirm Schedule
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Scrolling Message Thread */}
