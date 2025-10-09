@@ -402,9 +402,11 @@ const Messages = () => {
                   variant="default"
                   size="icon"
                   onClick={() => setIsVideoCallOpen(true)}
-                  className="h-10 w-10 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+                  className="relative h-10 w-10 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] hover:opacity-90 shadow-lg"
+                  title="Video Call - Pro Plan Required"
                 >
                   <Video className="h-5 w-5" />
+                  <Badge variant="locked" className="absolute -top-2 -right-2 text-[8px] px-1 py-0 h-4">PRO</Badge>
                 </Button>
               </div>
 
