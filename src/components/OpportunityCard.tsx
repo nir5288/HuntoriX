@@ -279,7 +279,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         variant={getCTAVariant() as any}
         disabled={isButtonDisabled()}
         size="sm"
-        className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+        className="w-full sm:w-auto sm:ml-auto text-xs sm:text-sm h-8 sm:h-9"
       >
         {getCTAText()}
       </Button>
