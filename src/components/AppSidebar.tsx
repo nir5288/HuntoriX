@@ -142,7 +142,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
         </Button>
       </SidebarHeader>
       
-      <SidebarContent className="py-2 transition-all duration-200">
+      <SidebarContent className="py-2 transition-all duration-200" style={{ backgroundColor: 'rgb(26, 28, 31)' }}>
         <SidebarGroup>
           <SidebarGroupContent>
             <TooltipProvider delayDuration={200} skipDelayDuration={0}>
