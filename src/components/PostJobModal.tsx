@@ -910,7 +910,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     setValue('industry', value);
                     clearFieldError('industry');
                   }} 
-                  value={industry}
+                  value={industry || ''}
                 >
                   <SelectTrigger className={cn(
                     "h-11",
@@ -936,7 +936,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       setValue('seniority', value as any);
                       clearFieldError('seniority');
                     }} 
-                    value={seniorityVal || undefined}
+                    value={seniorityVal || ''}
                   >
                     <SelectTrigger className={cn(
                       "h-11",
@@ -964,7 +964,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                       setValue('employment_type', value as any);
                       clearFieldError('employment_type');
                     }} 
-                    value={employmentTypeVal || undefined}
+                    value={employmentTypeVal || ''}
                   >
                     <SelectTrigger className={cn(
                       "h-11",
