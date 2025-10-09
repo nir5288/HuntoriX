@@ -262,14 +262,27 @@ const EmployerDashboard = () => {
       setJobToUpdateStatus(job);
       setOnHoldModalOpen(true);
     } else {
-      // Direct update for "open" status
+      // Direct update for other statuses
       try {
-        const { error } = await supabase
+        const { error: jobError } = await supabase
           .from('jobs')
           .update({ status: newStatus })
           .eq('id', job.id);
         
-        if (error) throw error;
+        if (jobError) throw jobError;
+
+        // If changing FROM on_hold to another status, mark history as resolved
+        if (job.status === 'on_hold') {
+          const { error: historyError } = await supabase
+            .from('job_hold_history')
+            .update({ resolved_at: new Date().toISOString() })
+            .eq('job_id', job.id)
+            .is('resolved_at', null);
+
+          if (historyError) {
+            console.error('Error updating hold history:', historyError);
+          }
+        }
         
         toast.success(`Job status updated to ${newStatus}`);
         fetchDashboardData();
