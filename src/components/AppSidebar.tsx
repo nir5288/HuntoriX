@@ -93,7 +93,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
       className="border-r border-slate-800/50 transition-all duration-300"
       style={{ 
         backgroundColor: 'rgb(18, 18, 20)',
-        width: open ? '16rem' : '5.25rem'
+        width: open ? '16rem' : '3.4rem'
       }}
     >
       <SidebarHeader 
