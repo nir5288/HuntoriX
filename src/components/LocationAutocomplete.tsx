@@ -508,9 +508,6 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
         } else {
           handleSelect(selectedItem as LocationOption);
         }
-      } else {
-        // Don't allow custom entries - just close without selecting
-        setOpen(false);
       }
       setPreviewValue('');
       setOriginalQuery('');
@@ -570,19 +567,11 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
             value={previewValue || searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
-              // Don't call onChange to parent - only update on valid selection
+              onChange(e.target.value);
               setSelectedIndex(-1);
               setPreviewValue('');
               setOriginalQuery('');
               if (!open) setOpen(true);
-            }}
-            onBlur={() => {
-              // Reset to last valid value on blur if no selection made
-              setTimeout(() => {
-                if (!LOCATION_DATA.some(loc => loc.displayValue === searchQuery)) {
-                  setSearchQuery(value);
-                }
-              }, 200);
             }}
             onMouseDown={(e) => {
               if (open) {

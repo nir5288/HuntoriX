@@ -118,28 +118,9 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
   const industry = watch('industry');
   const seniorityVal = watch('seniority');
   const employmentTypeVal = watch('employment_type');
-  const locationVal = watch('location');
 
-  // Check if all required fields are filled - comprehensive validation
-  const isFormValid = !!(
-    selectedTitle && 
-    selectedTitle.trim().length > 0 &&
-    industry && 
-    industry.trim().length > 0 &&
-    seniorityVal && 
-    employmentTypeVal && 
-    locationVal && 
-    locationVal.trim().length > 0 &&
-    description && 
-    description.trim().length >= 10 &&
-    skillsMust.length > 0 &&
-    !errors.title &&
-    !errors.industry &&
-    !errors.seniority &&
-    !errors.employment_type &&
-    !errors.location &&
-    !errors.description
-  );
+  // Check if all required fields are filled
+  const isFormValid = isValid && skillsMust.length > 0;
 
   // Auto-expand skills section when AI fills skills
   useEffect(() => {
@@ -424,11 +405,11 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                     document.getElementById(fieldName);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Flash the field with red border
-      element.classList.add('ring-2', 'ring-destructive');
+      // Flash the field
+      element.classList.add('ring-2', 'ring-destructive', 'ring-offset-2');
       setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-destructive');
-      }, 3000);
+        element.classList.remove('ring-2', 'ring-destructive', 'ring-offset-2');
+      }, 2000);
     }
   };
 
@@ -481,7 +462,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
     if (!data.location || data.location.trim().length === 0) {
       toast.error('Work location is required', { 
-        description: 'Please select a location from the dropdown'
+        description: 'Please select a work location (city or country)'
       });
       scrollToField('location');
       return;
@@ -500,7 +481,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
       toast.error('Must-have skills are required', { 
         description: 'Please add at least one required skill for this position'
       });
-      scrollToField('skills-must-container');
+      scrollToField('skills-must');
       return;
     }
 
@@ -564,18 +545,15 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
         <div className="overflow-y-auto flex-1 px-6 pt-6">
-        <DialogHeader className="mb-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
-              <DialogTitle className="text-2xl mb-1">Post a Job</DialogTitle>
-              <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
-            </div>
+        <DialogHeader>
+          <DialogTitle className="text-2xl">Post a Job</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogDescription>Fill in the details to post a new job opening</DialogDescription>
             <Button 
               type="button" 
               variant="outline" 
               onClick={handleClear} 
-              size="sm"
-              className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950/20 flex-shrink-0"
+              className="h-8 text-xs border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800 dark:border-orange-800 dark:text-orange-400 dark:hover:bg-orange-950/20"
             >
               Clear Form
             </Button>
@@ -886,14 +864,12 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="space-y-4">
               <div className="space-y-2.5">
                 <Label htmlFor="title" className="text-sm font-medium">Job Title <span className="text-destructive">*</span></Label>
-                <div id="title" className="transition-all rounded-md">
-                  <JobTitleAutocomplete
-                    value={selectedTitle}
-                    onChange={(value) => setValue('title', value)}
-                    placeholder="Search job title..."
-                    className={cn(autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}
-                  />
-                </div>
+                <JobTitleAutocomplete
+                  value={selectedTitle}
+                  onChange={(value) => setValue('title', value)}
+                  placeholder="Search job title..."
+                  className={cn(autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                />
                 {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
 
@@ -907,7 +883,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
               <div className="space-y-2.5">
                 <Label htmlFor="industry" className="text-sm font-medium">Industry <span className="text-destructive">*</span></Label>
                 <Select onValueChange={(value) => setValue('industry', value)} value={industry}>
-                  <SelectTrigger id="industry" className={cn("h-11 transition-all", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                  <SelectTrigger className={cn("h-11", autoFilledFields.has('industry') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -923,7 +899,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 <div className="space-y-2.5">
                   <Label htmlFor="seniority" className="text-sm font-medium">Seniority Level <span className="text-destructive">*</span></Label>
                   <Select onValueChange={(value) => setValue('seniority', value as any)} value={seniorityVal || undefined}>
-                    <SelectTrigger id="seniority" className={cn("h-11 transition-all", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <SelectTrigger className={cn("h-11", autoFilledFields.has('seniority') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -941,7 +917,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 <div className="space-y-2.5">
                   <Label htmlFor="employment_type" className="text-sm font-medium">Employment Type <span className="text-destructive">*</span></Label>
                   <Select onValueChange={(value) => setValue('employment_type', value as any)} value={employmentTypeVal || undefined}>
-                    <SelectTrigger id="employment_type" className={cn("h-11 transition-all", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
+                    <SelectTrigger className={cn("h-11", autoFilledFields.has('employment_type') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -978,17 +954,15 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
 
               <div className="space-y-2.5">
                 <Label htmlFor="location" className="text-sm font-medium">Work Location <span className="text-destructive">*</span></Label>
-                <div id="location" className="transition-all rounded-md">
-                  <LocationAutocomplete
-                    value={watch('location') || ''}
-                    onChange={(value) => setValue('location', value)}
-                    placeholder="Search city or country..."
-                    className={cn(autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5')}
-                  />
-                </div>
+                <LocationAutocomplete
+                  value={watch('location') || ''}
+                  onChange={(value) => setValue('location', value)}
+                  placeholder="Search city or country..."
+                  className={cn(autoFilledFields.has('location') && 'bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-0.5')}
+                />
                 {errors.location && <p className="text-sm text-destructive">{errors.location.message}</p>}
                 <p className="text-xs text-muted-foreground">
-                  Select a location from the dropdown - custom locations are not allowed
+                  Select a city (e.g., "Tel Aviv, Israel") or country (e.g., "Israel")
                 </p>
               </div>
             </div>
@@ -1098,11 +1072,10 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             <div className="space-y-2.5">
               <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
               <Textarea 
-                id="description"
                 {...register('description')} 
                 rows={6} 
                 placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
-                className={cn("text-sm resize-none transition-all", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
+                className={cn("text-sm resize-none", autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20')}
               />
               {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
@@ -1135,7 +1108,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                         Add
                       </Button>
                     </div>
-                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2 transition-all", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')} id="skills-must-container">
+                    <div className={cn("flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg border-2", autoFilledFields.has('skills_must') && 'bg-yellow-50 dark:bg-yellow-950/20')}>
                       {skillsMust.map(skill => (
                         <Badge key={skill} variant="secondary" className="gap-1.5 text-sm h-8 px-3">
                           {skill}
