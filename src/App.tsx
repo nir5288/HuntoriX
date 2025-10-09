@@ -21,6 +21,7 @@ import Applications from "./pages/Applications";
 import SavedJobs from "./pages/SavedJobs";
 import SavedHeadhunters from "./pages/SavedHeadhunters";
 import Messages from "./pages/Messages";
+import MessagesNew from "./pages/MessagesNew";
 import HeadhunterProfile from "./pages/HeadhunterProfile";
 import EmployerProfile from "./pages/EmployerProfile";
 import HeadhunterDirectory from "./pages/HeadhunterDirectory";
@@ -73,6 +74,7 @@ const AppContent = () => {
           </Route>
 
           {/* Public routes without dashboard layout */}
+          <Route path="/messages-new" element={<MessagesNew />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/jobs" element={<Opportunities />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
