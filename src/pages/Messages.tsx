@@ -379,7 +379,7 @@ const Messages = () => {
             <div className={`h-full flex flex-col transition-all duration-300 ${sidebarOpen ? (chatSidebarCollapsed ? "ml-16" : "ml-56") : "ml-0"}`}>
               {otherUserId ? <>
                   {/* Fixed Header */}
-                  <div className="h-12 shrink-0 px-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
+                  <div className="h-[72px] shrink-0 px-4 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3">
                 {!sidebarOpen && <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
                     <Menu className="h-5 w-5" />
                   </Button>}
