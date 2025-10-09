@@ -362,7 +362,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
   return (
     <div
       className={cn(
-        "fixed top-16 bottom-0 bg-background border-r transition-all duration-300 ease-in-out",
+        "fixed top-0 bottom-0 bg-background border-r transition-all duration-300 ease-in-out",
         isOpen ? "translate-x-0 z-[300]" : "-translate-x-full -z-10 pointer-events-none",
         isCollapsed ? "w-16" : "w-56"
       )}
