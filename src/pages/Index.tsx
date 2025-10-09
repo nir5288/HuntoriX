@@ -7,6 +7,7 @@ import { Briefcase, Users, TrendingUp, Shield, Clock, Award, Bot, Sparkles, Targ
 import { FeaturedHeadhunters } from '@/components/FeaturedHeadhunters';
 import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
+import HeroFloatingElements from '@/components/HeroFloatingElements';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
 import heroBackground from '@/assets/hero-background.jpg';
 import heroImage from '@/assets/hero-image.png';
@@ -79,11 +80,12 @@ const Index = () => {
             </div>
 
             {/* Right side - Image (50%) */}
-            <div className="hidden lg:flex lg:w-[50%] items-center justify-center">
+            <div className="hidden lg:flex lg:w-[50%] items-center justify-center relative">
+              <HeroFloatingElements />
               <img 
                 src={heroImage} 
                 alt="Headhunter network connecting employers with talent" 
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain relative z-10"
               />
             </div>
           </div>
