@@ -58,10 +58,14 @@ const Index = () => {
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
         {/* Large Background Text */}
-        <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden pb-2">
+        <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center pointer-events-none overflow-hidden">
           <h2 
-            className="font-black text-foreground/[0.05] whitespace-nowrap select-none tracking-tighter leading-none"
-            style={{ fontSize: 'clamp(8rem, 15vw, 22rem)' }}
+            className="font-black text-foreground/[0.05] whitespace-nowrap select-none tracking-tighter leading-none w-screen"
+            style={{ 
+              fontSize: 'clamp(8rem, 15vw, 22rem)',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 20%, rgba(0,0,0,1) 60%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 20%, rgba(0,0,0,1) 60%)'
+            }}
           >
             HUNTORIX
           </h2>
