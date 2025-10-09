@@ -201,6 +201,13 @@
   }
 }
 
+/* Site Container - Shared layout utility */
+@layer utilities {
+  .site-container {
+    @apply mx-auto w-full max-w-[1600px] px-4 sm:px-6 md:px-8;
+  }
+}
+
 /* Accessibility Styles */
 .high-contrast {
   --background: 0 0% 100%;
