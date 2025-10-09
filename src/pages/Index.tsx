@@ -41,21 +41,21 @@ const Index = () => {
       
       {/* Hero Section */}
       <section 
-        className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center"
+        className="relative w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] lg:h-screen bg-cover bg-center bg-no-repeat flex items-center py-8 sm:py-12 lg:py-0"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
-        <div className="w-full mx-auto px-[200px] pb-8 md:pb-12">
-          <div className="flex items-center min-h-[600px]">
-            {/* Left side - Text content (50%) */}
-            <div className="w-full lg:w-[50%] space-y-8">
+        <div className="w-full mx-auto px-4 sm:px-6 md:px-12 lg:px-16 xl:px-[200px] pb-4 sm:pb-8 lg:pb-12">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 min-h-[500px] sm:min-h-[600px]">
+            {/* Left side - Text content */}
+            <div className="w-full lg:w-[50%] space-y-4 sm:space-y-6 lg:space-y-8 text-center lg:text-left">
               <div>
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
-                  <Award className="h-4 w-4" />
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
+                  <Award className="h-3 w-3 sm:h-4 sm:w-4" />
                   Trusted by leading companies
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight">
                 Post a Job.
                 <br />
                 Let the Best Hunters
@@ -63,23 +63,33 @@ const Index = () => {
                 Compete for You.
               </h1>
               
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
                 Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-8">
-                <Button size="lg" variant="hero" onClick={handleEmployerCTA} className="w-full sm:w-auto">
-                  <Briefcase className="mr-2 h-5 w-5" />
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 lg:pt-8 justify-center lg:justify-start">
+                <Button 
+                  size="lg" 
+                  variant="hero" 
+                  onClick={handleEmployerCTA} 
+                  className="w-full sm:w-auto text-sm sm:text-base h-11 sm:h-12 px-6 sm:px-8"
+                >
+                  <Briefcase className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   I'm an Employer
                 </Button>
-                <Button size="lg" variant="mint" onClick={handleHeadhunterCTA} className="w-full sm:w-auto">
-                  <Users className="mr-2 h-5 w-5" />
+                <Button 
+                  size="lg" 
+                  variant="mint" 
+                  onClick={handleHeadhunterCTA} 
+                  className="w-full sm:w-auto text-sm sm:text-base h-11 sm:h-12 px-6 sm:px-8"
+                >
+                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   I'm a Headhunter
                 </Button>
               </div>
             </div>
 
-            {/* Right side - Image (50%) */}
+            {/* Right side - Image */}
             <div className="hidden lg:flex lg:w-[50%] items-center justify-center relative">
               <HeroFloatingElements />
               <img 
