@@ -9,7 +9,7 @@ import { HotOpportunities } from '@/components/HotOpportunities';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
 import HeroFloatingElements from '@/components/HeroFloatingElements';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
-import heroBackground from '@/assets/hero-background.jpg';
+import heroBackground from '@/assets/hero-background-new.png';
 import heroImage from '@/assets/hero-image.png';
 
 const Index = () => {
