@@ -242,21 +242,21 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
 
   return (
     <TooltipProvider>
-      <div className="space-y-16 pb-16 animate-fade-in">
+      <div className="space-y-8 sm:space-y-12 lg:space-y-16 pb-8 sm:pb-12 lg:pb-16 px-4 sm:px-6 animate-fade-in">
         {/* Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+        <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent px-4">
             Choose Your Plan
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-4">
             Select the plan that best fits your needs. You can change plans later.
           </p>
         </div>
 
         {/* Monthly/Yearly Toggle */}
-        <div className="flex items-center justify-center gap-4 p-2 rounded-full bg-muted/50 w-fit mx-auto backdrop-blur-sm border border-border/50">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 p-3 sm:p-2 rounded-2xl sm:rounded-full bg-muted/50 w-full sm:w-fit mx-auto backdrop-blur-sm border border-border/50 max-w-md">
           <span className={cn(
-            "text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200",
+            "text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 w-full sm:w-auto text-center",
             billingCycle === 'monthly' && "bg-primary text-primary-foreground shadow-lg"
           )}>
             Monthly
@@ -267,10 +267,10 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
             className="data-[state=checked]:bg-[hsl(var(--vibrant-mint))]"
           />
           <span className={cn(
-            "text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2",
+            "text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 flex flex-col sm:flex-row items-center justify-center gap-2 w-full sm:w-auto",
             billingCycle === 'yearly' && "bg-primary text-primary-foreground shadow-lg"
           )}>
-            Yearly
+            <span>Yearly</span>
             <Badge 
               variant="secondary" 
               className="text-xs font-bold"
@@ -285,7 +285,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {PLANS.map((plan, index) => {
             const price = getPrice(plan);
             const isSelected = selectedPlan === plan.id;
@@ -425,7 +425,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Plans at a glance strip */}
-        <div className="flex items-center justify-center gap-3 flex-wrap p-6 rounded-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-mint))] animate-fade-in">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-mint))] animate-fade-in">
           {PLANS.map((plan) => {
             const price = getPrice(plan);
             return (
@@ -433,7 +433,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
                 key={plan.id}
                 variant="secondary"
                 className={cn(
-                  "px-5 py-2.5 text-sm font-bold bg-background/95 backdrop-blur-sm hover:scale-105 transition-transform duration-200 border-2",
+                  "px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold bg-background/95 backdrop-blur-sm hover:scale-105 transition-transform duration-200 border-2 whitespace-nowrap",
                   plan.id === 'core' && "border-[hsl(var(--vibrant-lilac))]",
                   plan.locked && "opacity-60"
                 )}
@@ -447,7 +447,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
 
         {/* Feature Comparison Table - Desktop */}
         <div className="hidden md:block space-y-6 animate-fade-in">
-          <h3 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent px-4">
             Plans at a Glance
           </h3>
           
@@ -532,7 +532,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
 
         {/* Feature Comparison - Mobile Cards */}
         <div className="md:hidden space-y-6 animate-fade-in">
-          <h3 className="text-3xl font-bold text-center bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+          <h3 className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent px-4">
             Plans at a Glance
           </h3>
           
@@ -621,7 +621,7 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Helper Notes */}
-        <div className="space-y-3 text-sm max-w-4xl mx-auto p-6 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-fade-in">
+        <div className="space-y-3 text-xs sm:text-sm max-w-4xl mx-auto p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] animate-fade-in">
           <p className="font-semibold text-primary flex items-center gap-2">
             <span className="text-lg">💡</span>
             Applications credits = credits to send applications (1 application = 1 credit).
@@ -645,13 +645,13 @@ export function PlanSelection({ onPlanSelected, userId }: PlanSelectionProps) {
         </div>
 
         {/* Continue Button */}
-        <div className="flex justify-center pt-8 animate-fade-in">
+        <div className="flex justify-center pt-4 sm:pt-8 animate-fade-in px-4">
           <Button
             size="lg"
             disabled={!selectedPlan || submitting}
             onClick={() => selectedPlan && handleSelectPlan(selectedPlan)}
             className={cn(
-              "min-w-[280px] h-14 text-lg font-bold rounded-2xl transition-all duration-300 relative overflow-hidden group shadow-2xl",
+              "w-full sm:w-auto sm:min-w-[280px] h-12 sm:h-14 text-base sm:text-lg font-bold rounded-2xl transition-all duration-300 relative overflow-hidden group shadow-2xl",
               selectedPlan && "hover:scale-105 animate-scale-in"
             )}
             style={selectedPlan ? {
