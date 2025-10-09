@@ -284,12 +284,23 @@ const EmployerDashboard = () => {
     if (!jobToUpdateStatus) return;
     
     try {
-      const { error } = await supabase
+      const { error: jobError } = await supabase
         .from('jobs')
         .update({ status: 'on_hold' })
         .eq('id', jobToUpdateStatus.id);
       
-      if (error) throw error;
+      if (jobError) throw jobError;
+
+      // Store the hold reason in history
+      const { error: historyError } = await supabase
+        .from('job_hold_history')
+        .insert({
+          job_id: jobToUpdateStatus.id,
+          reason: reason,
+          created_by: user?.id,
+        });
+
+      if (historyError) throw historyError;
       
       toast.success(`Job put on hold: ${reason}`);
       fetchDashboardData();

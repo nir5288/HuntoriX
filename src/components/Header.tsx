@@ -462,6 +462,10 @@ export function Header() {
                           <FileText className="mr-2 h-4 w-4" />
                           Job Approvals
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/hold-reasons')}>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Hold Reasons
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setShowEditLegal(true)}>
                           <FileText className="mr-2 h-4 w-4" />
                           Edit Legal Documents

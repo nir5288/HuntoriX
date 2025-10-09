@@ -330,6 +330,48 @@ export type Database = {
           },
         ]
       }
+      job_hold_history: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          job_id: string
+          reason: string
+          resolved_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          job_id: string
+          reason: string
+          resolved_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          job_id?: string
+          reason?: string
+          resolved_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_hold_history_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_hold_history_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_invitations: {
         Row: {
           created_at: string
