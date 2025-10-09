@@ -927,19 +927,6 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                 />
                 {fieldErrors.title && <p className="text-sm text-destructive">{fieldErrors.title}</p>}
               </div>
-                  value={selectedTitle}
-                  onChange={(value) => {
-                    setValue('title', value);
-                    clearFieldError('title');
-                  }}
-                  placeholder="Search job title..."
-                  className={cn(
-                    autoFilledFields.has('title') && 'bg-yellow-50 dark:bg-yellow-950/20',
-                    fieldErrors.title && 'border-destructive ring-2 ring-destructive/20'
-                  )}
-                />
-                {fieldErrors.title && <p className="text-sm text-destructive">{fieldErrors.title}</p>}
-              </div>
 
               {selectedTitle === 'Other' && (
                 <div className="space-y-2.5">
