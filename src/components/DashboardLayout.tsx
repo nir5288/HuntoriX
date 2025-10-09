@@ -25,8 +25,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <AppSidebar role={role} />
         <div className="flex-1 flex flex-col min-w-0">
           <Header />
-          <main className="flex-1 w-full overflow-x-hidden">
-            <div className="w-full max-w-[1400px] mx-auto">
+          <main className="flex-1 w-full overflow-x-hidden pt-14 sm:pt-16">
+            <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
               {children}
             </div>
           </main>
