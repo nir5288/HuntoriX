@@ -223,22 +223,6 @@ export function Header() {
                   </Link>
                 </div>
 
-                {/* Premium Features */}
-                <div className="border-t pt-2 mb-2">
-                  <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">PREMIUM</p>
-                  <Link 
-                    to="/executives" 
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium bg-gradient-to-r from-[hsl(var(--luxury-gold))]/10 via-[hsl(var(--luxury-rose-gold))]/10 to-[hsl(var(--luxury-purple))]/10"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Crown className="h-5 w-5 text-[hsl(var(--luxury-gold))]" />
-                    <span className="bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-semibold">
-                      Executives
-                    </span>
-                    <Badge variant="locked" className="ml-auto text-[9px] px-1.5 py-0">Locked</Badge>
-                  </Link>
-                </div>
-
                 {/* Coming Soon */}
                 <div className="border-t pt-2">
                   <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
@@ -284,10 +268,6 @@ export function Header() {
 
         {/* Right side - Actions */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
-          <Link to="/executives" className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-[hsl(var(--luxury-gold))] via-[hsl(var(--luxury-rose-gold))] to-[hsl(var(--luxury-purple))] bg-clip-text text-transparent font-bold hover:opacity-80 transition whitespace-nowrap text-sm">
-            Executives
-            <Badge variant="locked" className="text-[10px] px-1.5 py-0">Locked</Badge>
-          </Link>
           {user && profile ? (
             <TooltipProvider delayDuration={0}>
               <div className="hidden sm:flex items-center gap-1">
