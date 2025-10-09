@@ -62,7 +62,7 @@ const Index = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter leading-[1.1] animate-fade-in">
+              <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-[1.1] animate-fade-in">
                 <span className="block text-foreground">Post a Job.</span>
                 <span className="block mt-2">
                   <span className="text-[hsl(var(--accent-pink))]">Let the Best</span>
