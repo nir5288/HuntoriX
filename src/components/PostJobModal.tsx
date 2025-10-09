@@ -686,7 +686,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   <Label 
                     htmlFor="ai-upload"
                     className={cn(
-                      "inline-flex items-center gap-2 px-4 py-2 rounded-md cursor-pointer transition-all flex-1 justify-center",
+                      "inline-flex items-center gap-2 px-4 py-2.5 rounded-md cursor-pointer transition-all flex-1 justify-center h-10",
                       "bg-primary text-primary-foreground hover:bg-primary/90",
                       "text-xs font-medium",
                       isParsing && "opacity-50 pointer-events-none"
@@ -708,8 +708,7 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
-                    className="flex-1 text-xs"
+                    className="flex-1 text-xs h-10 px-4 gap-2"
                     disabled={isParsing}
                     onClick={() => {
                       const container = document.getElementById('paste-jd-container');
