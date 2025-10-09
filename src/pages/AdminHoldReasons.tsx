@@ -43,7 +43,7 @@ export default function AdminHoldReasons() {
       setLoading(true);
 
       // Fetch all hold history with job and profile data
-      const { data, error } = await supabase
+      const { data: historyData, error: historyError } = await supabase
         .from("job_hold_history")
         .select(`
           *,
@@ -52,14 +52,64 @@ export default function AdminHoldReasons() {
         `)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (historyError) throw historyError;
+
+      // Also fetch all jobs currently on hold (in case some don't have history entries)
+      const { data: onHoldJobs, error: jobsError } = await supabase
+        .from("jobs")
+        .select(`
+          id,
+          title,
+          job_id_number,
+          status,
+          created_by,
+          updated_at
+        `)
+        .eq("status", "on_hold");
+
+      if (jobsError) throw jobsError;
+
+      // Create a set of job IDs that have history entries
+      const jobIdsWithHistory = new Set(historyData?.map(h => h.job_id) || []);
+
+      // For jobs on hold without history, create placeholder entries
+      const jobsWithoutHistory = onHoldJobs?.filter(job => !jobIdsWithHistory.has(job.id)) || [];
+      
+      const placeholderHistory: HoldHistory[] = await Promise.all(
+        jobsWithoutHistory.map(async (job) => {
+          // Fetch creator profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("name, email")
+            .eq("id", job.created_by)
+            .single();
+
+          return {
+            id: `placeholder-${job.id}`,
+            job_id: job.id,
+            reason: "No reason recorded (job was put on hold before tracking was implemented)",
+            created_by: job.created_by,
+            created_at: job.updated_at,
+            resolved_at: null,
+            job: {
+              title: job.title,
+              job_id_number: job.job_id_number,
+              status: job.status,
+            },
+            profile: profile || { name: "Unknown", email: "" },
+          };
+        })
+      );
+
+      // Combine history data with placeholder entries
+      const allData = [...(historyData as HoldHistory[] || []), ...placeholderHistory];
 
       // Separate current holds (not resolved) from historical ones
-      const current = data?.filter(h => !h.resolved_at && h.job?.status === "on_hold") || [];
-      const historical = data?.filter(h => h.resolved_at || h.job?.status !== "on_hold") || [];
+      const current = allData.filter(h => !h.resolved_at && h.job?.status === "on_hold");
+      const historical = allData.filter(h => h.resolved_at || h.job?.status !== "on_hold");
 
-      setCurrentHolds(current as HoldHistory[]);
-      setHistoricalHolds(historical as HoldHistory[]);
+      setCurrentHolds(current);
+      setHistoricalHolds(historical);
     } catch (error) {
       console.error("Error fetching hold reasons:", error);
     } finally {
