@@ -370,7 +370,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
         left: sidebarOpen ? 'var(--sidebar-width, 16rem)' : 'var(--sidebar-width-icon, 3.5rem)'
       }}
     >
-      <div className="flex items-center justify-between p-3 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20 h-[65px]">
+      <div className="h-12 px-3 flex items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
         {!isCollapsed && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -405,7 +405,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
         </Button>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-65px)]">
+      <ScrollArea className="h-[calc(100vh-3rem)]">
         <TooltipProvider delayDuration={200}>
           {loading ? (
             <div className="p-4 text-center text-muted-foreground">
