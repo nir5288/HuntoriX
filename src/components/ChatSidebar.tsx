@@ -463,7 +463,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                     <>
                       <button
                         onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
-                        className="w-full p-3 pr-12 text-left hover:bg-accent transition-colors"
+                        className="relative z-0 w-full p-3 pr-12 text-left hover:bg-accent transition-colors"
                       >
                         <div className="flex items-start gap-2">
                           <div className="relative">
@@ -501,7 +501,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                       
                       {/* Timestamp - always visible, moves left on hover or when menu open */}
                       <span className={cn(
-                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200 z-[5]",
+                        "absolute top-3 text-[10px] text-muted-foreground whitespace-nowrap transition-all duration-200 z-10",
                         (openMenuKey === `${conv.jobId}-${conv.otherUserId}`) ? "right-12" : "group-hover:right-12 right-3"
                       )}>
                         {formatRelativeTime(conv.lastMessageTime)}
