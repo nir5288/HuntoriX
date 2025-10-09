@@ -150,7 +150,7 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] pt-3 sm:pt-4 md:pt-6">
       {/* Floating pill-shaped header with gradient border */}
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
+      <div className="site-container">
         <div 
           className="relative rounded-full h-16 sm:h-[72px] backdrop-blur-xl shadow-lg transition-all duration-300"
           style={{
@@ -200,17 +200,29 @@ export function Header() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Headhunters
+                Find a Headhunter
               </Link>
               <Link 
                 to="/huntrank" 
-                className={`text-sm font-medium transition-colors opacity-50 cursor-not-allowed ${
+                className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
                   isActive('/huntrank') 
                     ? 'text-foreground' 
-                    : 'text-muted-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 HuntRank
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
+              </Link>
+              <Link 
+                to="/huntbase" 
+                className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                  isActive('/huntbase') 
+                    ? 'text-foreground' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                HuntBase
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Soon</Badge>
               </Link>
             </nav>
 
@@ -225,32 +237,38 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[280px] sm:w-[340px]">
                   <nav className="flex flex-col gap-1 mt-8">
-                    <Link 
-                      to={user ? getDashboardPath() : '/auth'} 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
-                      Dashboard
-                    </Link>
-                    <Link 
-                      to="/opportunities" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Star className="h-5 w-5 text-muted-foreground" />
-                      Opportunities
-                    </Link>
-                    <Link 
-                      to="/headhunters" 
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <User className="h-5 w-5 text-muted-foreground" />
-                      Headhunters
-                    </Link>
-                    {user && (
-                      <>
+                    {/* Main Navigation */}
+                    <div className="mb-2">
+                      <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">MAIN MENU</p>
+                      <Link 
+                        to={user ? getDashboardPath() : '/auth'} 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <LayoutDashboard className="h-5 w-5 text-muted-foreground" />
+                        Dashboard
+                      </Link>
+                      {user && profile?.role === 'employer' && (
+                        <Link 
+                          to="/my-jobs" 
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Briefcase className="h-5 w-5 text-muted-foreground" />
+                          My Jobs
+                        </Link>
+                      )}
+                      {user && profile?.role === 'headhunter' && (
+                        <Link 
+                          to="/applications" 
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Briefcase className="h-5 w-5 text-muted-foreground" />
+                          Applications
+                        </Link>
+                      )}
+                      {user && (
                         <Link 
                           to="/messages" 
                           className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
@@ -259,16 +277,44 @@ export function Header() {
                           <MessagesSquare className="h-5 w-5 text-muted-foreground" />
                           Messages
                         </Link>
-                        <Link 
-                          to="/saved-jobs" 
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Heart className="h-5 w-5 text-muted-foreground" />
-                          Saved Jobs
-                        </Link>
-                      </>
-                    )}
+                      )}
+                    </div>
+
+                    {/* Discover Section */}
+                    <div className="border-t pt-2 mb-2">
+                      <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">DISCOVER</p>
+                      <Link 
+                        to="/opportunities" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Star className="h-5 w-5 text-muted-foreground" />
+                        Opportunities
+                      </Link>
+                      <Link 
+                        to="/headhunters" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5 text-muted-foreground" />
+                        Find a Headhunter
+                      </Link>
+                    </div>
+
+                    {/* Coming Soon */}
+                    <div className="border-t pt-2">
+                      <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">COMING SOON</p>
+                      <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
+                        <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                        HuntRank
+                        <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
+                      </div>
+                      <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50 cursor-not-allowed text-sm font-medium">
+                        <Globe className="h-5 w-5 text-muted-foreground" />
+                        HuntBase
+                        <Badge variant="secondary" className="ml-auto text-[9px] px-1.5 py-0">Soon</Badge>
+                      </div>
+                    </div>
                   </nav>
                 </SheetContent>
               </Sheet>
@@ -276,8 +322,36 @@ export function Header() {
               {user && profile ? (
                 <TooltipProvider delayDuration={0}>
                   {/* Desktop quick actions */}
-                  <div className="hidden md:flex items-center gap-1">
+                  <div className="hidden sm:flex items-center gap-1">
                     <NotificationDropdown />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => navigate('/saved-jobs')}
+                          className="h-9 w-9"
+                        >
+                          <Heart className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>My Saved Jobs</TooltipContent>
+                    </Tooltip>
+                    {profile.role === 'employer' && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate('/saved-headhunters')}
+                            className="h-9 w-9"
+                          >
+                            <Star className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>My Saved Headhunters</TooltipContent>
+                      </Tooltip>
+                    )}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
