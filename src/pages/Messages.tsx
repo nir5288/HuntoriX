@@ -8,8 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { MessageThread } from "@/components/MessageThread";
 import { MessageInput } from "@/components/MessageInput";
+import { VideoCall } from "@/components/VideoCall";
 import { useToast } from "@/hooks/use-toast";
-import { Menu, ArrowLeft, User, Circle } from "lucide-react";
+import { Menu, ArrowLeft, User, Circle, Video } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
@@ -66,6 +67,7 @@ const Messages = () => {
     body: string;
     senderName: string;
   } | null>(null);
+  const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
 
@@ -389,12 +391,21 @@ const Messages = () => {
                         </Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground truncate">{jobTitle}</p>
-                    {statusIndicator ? <div className="flex items-center gap-1.5 text-xs">
+                     {statusIndicator ? <div className="flex items-center gap-1.5 text-xs">
                         <span className={statusIndicator.color}>●</span>
                         <span className={statusIndicator.color}>{statusIndicator.text}</span>
                       </div> : lastSeen ? <p className="text-xs text-muted-foreground">{lastSeen}</p> : null}
                   </div>
                 </Link>
+                
+                <Button
+                  variant="default"
+                  size="icon"
+                  onClick={() => setIsVideoCallOpen(true)}
+                  className="h-10 w-10 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90"
+                >
+                  <Video className="h-5 w-5" />
+                </Button>
               </div>
 
               {/* Scrolling Message Thread */}
@@ -428,6 +439,18 @@ const Messages = () => {
             </div>}
         </div>
       </div>
+      
+      {otherUserId && (
+        <VideoCall
+          isOpen={isVideoCallOpen}
+          onClose={() => setIsVideoCallOpen(false)}
+          otherUserId={otherUserId}
+          otherUserName={otherUserName}
+          otherUserAvatar={otherUserAvatar}
+          currentUserId={user?.id || ""}
+          roomId={`${validJobId || 'direct'}-${[user?.id, otherUserId].sort().join('-')}`}
+        />
+      )}
     </>;
 };
 export default Messages;

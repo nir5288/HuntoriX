@@ -1,0 +1,396 @@
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Video, VideoOff, Mic, MicOff, PhoneOff, Monitor, MonitorOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface VideoCallProps {
+  isOpen: boolean;
+  onClose: () => void;
+  otherUserId: string;
+  otherUserName: string;
+  otherUserAvatar: string | null;
+  currentUserId: string;
+  roomId: string;
+}
+
+export const VideoCall = ({
+  isOpen,
+  onClose,
+  otherUserId,
+  otherUserName,
+  otherUserAvatar,
+  currentUserId,
+  roomId,
+}: VideoCallProps) => {
+  const { toast } = useToast();
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [callStatus, setCallStatus] = useState<"connecting" | "connected" | "ended">("connecting");
+  
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const channelRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    initializeCall();
+
+    return () => {
+      cleanup();
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream]);
+
+  const initializeCall = async () => {
+    try {
+      // Get local media stream
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      setLocalStream(stream);
+
+      // Create peer connection
+      const configuration = {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+        ],
+      };
+      const pc = new RTCPeerConnection(configuration);
+      peerConnectionRef.current = pc;
+
+      // Add local stream tracks to peer connection
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream);
+      });
+
+      // Handle remote stream
+      pc.ontrack = (event) => {
+        setRemoteStream(event.streams[0]);
+        setCallStatus("connected");
+      };
+
+      // Set up signaling channel
+      const channel = supabase.channel(`video-call-${roomId}`);
+      channelRef.current = channel;
+
+      channel
+        .on("broadcast", { event: "offer" }, async ({ payload }) => {
+          if (payload.to === currentUserId) {
+            await pc.setRemoteDescription(new RTCSessionDescription(payload.offer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            
+            channel.send({
+              type: "broadcast",
+              event: "answer",
+              payload: {
+                answer: answer,
+                to: otherUserId,
+                from: currentUserId,
+              },
+            });
+          }
+        })
+        .on("broadcast", { event: "answer" }, async ({ payload }) => {
+          if (payload.to === currentUserId) {
+            await pc.setRemoteDescription(new RTCSessionDescription(payload.answer));
+          }
+        })
+        .on("broadcast", { event: "ice-candidate" }, async ({ payload }) => {
+          if (payload.to === currentUserId && payload.candidate) {
+            await pc.addIceCandidate(new RTCIceCandidate(payload.candidate));
+          }
+        })
+        .on("broadcast", { event: "call-ended" }, ({ payload }) => {
+          if (payload.to === currentUserId) {
+            handleEndCall();
+          }
+        })
+        .subscribe(async (status) => {
+          if (status === "SUBSCRIBED") {
+            // Create and send offer if we're the initiator (lower user ID goes first)
+            if (currentUserId < otherUserId) {
+              const offer = await pc.createOffer();
+              await pc.setLocalDescription(offer);
+              
+              channel.send({
+                type: "broadcast",
+                event: "offer",
+                payload: {
+                  offer: offer,
+                  to: otherUserId,
+                  from: currentUserId,
+                },
+              });
+            }
+          }
+        });
+
+      // Handle ICE candidates
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          channel.send({
+            type: "broadcast",
+            event: "ice-candidate",
+            payload: {
+              candidate: event.candidate,
+              to: otherUserId,
+              from: currentUserId,
+            },
+          });
+        }
+      };
+    } catch (error) {
+      console.error("Error initializing call:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start video call. Please check your camera and microphone permissions.",
+        variant: "destructive",
+      });
+      onClose();
+    }
+  };
+
+  const toggleVideo = () => {
+    if (localStream) {
+      const videoTrack = localStream.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        setIsVideoEnabled(videoTrack.enabled);
+      }
+    }
+  };
+
+  const toggleAudio = () => {
+    if (localStream) {
+      const audioTrack = localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        setIsAudioEnabled(audioTrack.enabled);
+      }
+    }
+  };
+
+  const toggleScreenShare = async () => {
+    try {
+      if (!isScreenSharing) {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+        });
+        
+        const screenTrack = screenStream.getVideoTracks()[0];
+        const sender = peerConnectionRef.current
+          ?.getSenders()
+          .find((s) => s.track?.kind === "video");
+        
+        if (sender) {
+          sender.replaceTrack(screenTrack);
+        }
+
+        screenTrack.onended = () => {
+          toggleScreenShare();
+        };
+
+        setIsScreenSharing(true);
+      } else {
+        const videoTrack = localStream?.getVideoTracks()[0];
+        const sender = peerConnectionRef.current
+          ?.getSenders()
+          .find((s) => s.track?.kind === "video");
+        
+        if (sender && videoTrack) {
+          sender.replaceTrack(videoTrack);
+        }
+        
+        setIsScreenSharing(false);
+      }
+    } catch (error) {
+      console.error("Error toggling screen share:", error);
+      toast({
+        title: "Error",
+        description: "Failed to share screen",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEndCall = () => {
+    setCallStatus("ended");
+    cleanup();
+    onClose();
+  };
+
+  const endCall = () => {
+    // Notify other user
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: "broadcast",
+        event: "call-ended",
+        payload: {
+          to: otherUserId,
+          from: currentUserId,
+        },
+      });
+    }
+    handleEndCall();
+  };
+
+  const cleanup = () => {
+    // Stop all tracks
+    localStream?.getTracks().forEach((track) => track.stop());
+    remoteStream?.getTracks().forEach((track) => track.stop());
+
+    // Close peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+
+    // Unsubscribe from channel
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    setLocalStream(null);
+    setRemoteStream(null);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && endCall()}>
+      <DialogContent className="max-w-6xl h-[90vh] p-0" hideCloseButton>
+        <div className="h-full flex flex-col bg-black">
+          {/* Remote video (main) */}
+          <div className="flex-1 relative">
+            {remoteStream ? (
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+                <Avatar className="h-32 w-32 mb-4">
+                  <AvatarImage src={otherUserAvatar || undefined} />
+                  <AvatarFallback className="text-4xl">
+                    {otherUserName[0]?.toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="text-white text-xl font-medium">{otherUserName}</p>
+                <p className="text-gray-400 mt-2">
+                  {callStatus === "connecting" ? "Connecting..." : "Waiting for response..."}
+                </p>
+              </div>
+            )}
+
+            {/* Local video (picture-in-picture) */}
+            <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20 shadow-xl">
+              {localStream && isVideoEnabled ? (
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover mirror"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-700">
+                  <VideoOff className="h-8 w-8 text-white/50" />
+                </div>
+              )}
+            </div>
+
+            {/* Status indicator */}
+            {callStatus === "connected" && (
+              <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm font-medium flex items-center gap-2">
+                <div className="h-2 w-2 bg-white rounded-full animate-pulse" />
+                Connected
+              </div>
+            )}
+          </div>
+
+          {/* Controls */}
+          <div className="p-6 bg-gradient-to-t from-black/90 to-transparent">
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                variant={isVideoEnabled ? "default" : "destructive"}
+                size="icon"
+                onClick={toggleVideo}
+                className="h-14 w-14 rounded-full"
+              >
+                {isVideoEnabled ? (
+                  <Video className="h-6 w-6" />
+                ) : (
+                  <VideoOff className="h-6 w-6" />
+                )}
+              </Button>
+
+              <Button
+                variant={isAudioEnabled ? "default" : "destructive"}
+                size="icon"
+                onClick={toggleAudio}
+                className="h-14 w-14 rounded-full"
+              >
+                {isAudioEnabled ? (
+                  <Mic className="h-6 w-6" />
+                ) : (
+                  <MicOff className="h-6 w-6" />
+                )}
+              </Button>
+
+              <Button
+                variant={isScreenSharing ? "default" : "secondary"}
+                size="icon"
+                onClick={toggleScreenShare}
+                className="h-14 w-14 rounded-full"
+              >
+                {isScreenSharing ? (
+                  <MonitorOff className="h-6 w-6" />
+                ) : (
+                  <Monitor className="h-6 w-6" />
+                )}
+              </Button>
+
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={endCall}
+                className="h-14 w-14 rounded-full bg-red-500 hover:bg-red-600"
+              >
+                <PhoneOff className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <style>{`
+          .mirror {
+            transform: scaleX(-1);
+          }
+        `}</style>
+      </DialogContent>
+    </Dialog>
+  );
+};
