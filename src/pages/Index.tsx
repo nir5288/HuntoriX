@@ -41,21 +41,21 @@ const Index = () => {
       
       {/* Hero Section */}
       <section 
-        className="relative w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] lg:h-screen bg-cover bg-center bg-no-repeat flex items-center py-[clamp(1.5rem,4vh,3rem)]"
+        className="relative w-full h-screen bg-cover bg-center bg-no-repeat flex items-center"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
-        <div className="w-full mx-auto px-[clamp(1rem,8vw,12.5rem)] pb-[clamp(1rem,2vh,2rem)]">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-[clamp(2rem,4vw,6rem)] min-h-[clamp(28rem,55vh,40rem)]">
-            {/* Left side - Text content */}
-            <div className="w-full lg:w-[50%] space-y-[clamp(1rem,2.5vh,2rem)] text-center lg:text-left">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-[200px]">
+          <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px]">
+            {/* Left side - Text content (50%) */}
+            <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
               <div>
-                <span className="inline-flex items-center gap-2 px-[clamp(0.75rem,1.5vw,1rem)] py-[clamp(0.375rem,0.8vh,0.5rem)] rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-[clamp(0.75rem,1.2vw,0.875rem)] font-semibold mb-[clamp(1rem,1.5vh,1.5rem)]">
-                  <Award className="h-[clamp(0.75rem,1.5vw,1rem)] w-[clamp(0.75rem,1.5vw,1rem)]" />
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-sm font-semibold mb-6">
+                  <Award className="h-4 w-4" />
                   Trusted by leading companies
                 </span>
               </div>
               
-              <h1 className="text-[clamp(2rem,4.5vw,4.5rem)] font-bold tracking-tight leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
                 Post a Job.
                 <br />
                 Let the <span className="whitespace-nowrap">Best Headhunters</span>
@@ -63,34 +63,34 @@ const Index = () => {
                 Compete for You.
               </h1>
               
-              <p className="text-[clamp(1rem,1.8vw,1.5rem)] text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
                 Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-[clamp(0.75rem,1.5vw,1rem)] pt-[clamp(1rem,2vh,2rem)] justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 pt-8 justify-center lg:justify-start">
                 <Button 
                   size="lg" 
                   variant="hero" 
-                  onClick={handleEmployerCTA} 
-                  className="w-full sm:w-auto text-[clamp(0.875rem,1.2vw,1rem)] h-[clamp(2.75rem,3.5vh,3rem)] px-[clamp(1.5rem,2vw,2rem)]"
+                  onClick={handleEmployerCTA}
+                  className="w-full sm:w-auto"
                 >
-                  <Briefcase className="mr-2 h-[clamp(1rem,1.5vw,1.25rem)] w-[clamp(1rem,1.5vw,1.25rem)]" />
+                  <Briefcase className="mr-2 h-5 w-5" />
                   I'm an Employer
                 </Button>
                 <Button 
                   size="lg" 
                   variant="mint" 
-                  onClick={handleHeadhunterCTA} 
-                  className="w-full sm:w-auto text-[clamp(0.875rem,1.2vw,1rem)] h-[clamp(2.75rem,3.5vh,3rem)] px-[clamp(1.5rem,2vw,2rem)]"
+                  onClick={handleHeadhunterCTA}
+                  className="w-full sm:w-auto"
                 >
-                  <Users className="mr-2 h-[clamp(1rem,1.5vw,1.25rem)] w-[clamp(1rem,1.5vw,1.25rem)]" />
+                  <Users className="mr-2 h-5 w-5" />
                   I'm a Headhunter
                 </Button>
               </div>
             </div>
 
-            {/* Right side - Image */}
-            <div className="hidden lg:flex lg:w-[50%] items-center justify-center relative">
+            {/* Right side - Image (50%) */}
+            <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative">
               <HeroFloatingElements />
               <img
                 src={heroImage} 
