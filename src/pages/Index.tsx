@@ -73,7 +73,7 @@ const Index = () => {
         </div>
 
         <div className="max-w-[1600px] mx-auto px-4 py-20 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px] -mt-12">
+          <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px]">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
               <div className="animate-fade-in flex flex-wrap gap-3 justify-center lg:justify-start">
