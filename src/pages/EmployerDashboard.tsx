@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star, Pencil } from 'lucide-react';
+import { Plus, Briefcase, Users, Clock, Check, X, MessageCircle, Eye, EyeOff, Heart, Star, Pencil, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,6 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { OnHoldReasonModal } from '@/components/OnHoldReasonModal';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 const EmployerDashboard = () => {
   const {
     user,
@@ -123,11 +124,29 @@ const EmployerDashboard = () => {
     return colors[status] || 'bg-gray-400';
   };
 
-  const handleStatusClick = (job: any, event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setJobToHold(job);
-    setOnHoldModalOpen(true);
+  const handleStatusChange = async (jobId: string, newStatus: string) => {
+    if (newStatus === 'on_hold') {
+      // Find the job and open the modal
+      const job = jobs.find(j => j.id === jobId);
+      if (job) {
+        setJobToHold(job);
+        setOnHoldModalOpen(true);
+      }
+    } else {
+      // Directly update to 'open'
+      const { error } = await supabase
+        .from('jobs')
+        .update({ status: newStatus })
+        .eq('id', jobId);
+
+      if (error) {
+        toast.error('Failed to update job status');
+        return;
+      }
+
+      toast.success('Job status updated');
+      fetchDashboardData();
+    }
   };
 
   const handleOnHoldConfirm = async (reason: string) => {
@@ -586,13 +605,43 @@ const EmployerDashboard = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-start gap-1.5">
-                            <Badge 
-                              className={`text-[10px] sm:text-xs h-5 cursor-pointer hover:opacity-80 transition-opacity ${getStatusColor(job.status)}`}
-                              onClick={(e) => handleStatusClick(job, e)}
-                              title="Click to put on hold"
-                            >
-                              {job.status.replace('_', ' ')}
-                            </Badge>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Badge 
+                                  className={`text-[10px] sm:text-xs h-5 cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1 ${getStatusColor(job.status)}`}
+                                  title="Click to change status"
+                                >
+                                  {job.status.replace('_', ' ')}
+                                  <ChevronDown className="h-2.5 w-2.5" />
+                                </Badge>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-32 p-1" align="start">
+                                <div className="flex flex-col gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="justify-start h-8 text-xs"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange(job.id, 'open');
+                                    }}
+                                  >
+                                    Open
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="justify-start h-8 text-xs"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange(job.id, 'on_hold');
+                                    }}
+                                  >
+                                    On Hold
+                                  </Button>
+                                </div>
+                              </PopoverContent>
+                            </Popover>
                             <Button
                               variant="ghost"
                               size="icon"
