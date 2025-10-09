@@ -41,21 +41,21 @@ const Index = () => {
       
       {/* Hero Section */}
       <section 
-        className="relative w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] lg:h-screen bg-cover bg-center bg-no-repeat flex items-center py-8 sm:py-12 lg:py-0"
+        className="relative w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] lg:h-screen bg-cover bg-center bg-no-repeat flex items-center py-[clamp(2rem,5vw,4rem)]"
         style={{ backgroundImage: `url(${heroBackground})` }}
       >
-        <div className="w-full mx-auto px-4 sm:px-6 md:px-12 lg:px-16 xl:px-[200px] pb-4 sm:pb-8 lg:pb-12">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 min-h-[500px] sm:min-h-[600px]">
+        <div className="w-full mx-auto px-[clamp(1rem,5vw,12.5rem)] pb-[clamp(1rem,3vw,3rem)]">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-[clamp(2rem,5vw,4rem)] min-h-[clamp(31.25rem,50vh,37.5rem)]">
             {/* Left side - Text content */}
-            <div className="w-full lg:w-[50%] space-y-4 sm:space-y-6 lg:space-y-8 text-center lg:text-left">
+            <div className="w-full lg:w-[50%] space-y-[clamp(1rem,3vw,2rem)] text-center lg:text-left">
               <div>
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
-                  <Award className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="inline-flex items-center gap-2 px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.375rem,1vw,0.5rem)] rounded-full bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-[clamp(0.75rem,2vw,0.875rem)] font-semibold mb-[clamp(1rem,2vw,1.5rem)]">
+                  <Award className="h-[clamp(0.75rem,2vw,1rem)] w-[clamp(0.75rem,2vw,1rem)]" />
                   Trusted by leading companies
                 </span>
               </div>
               
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight">
+              <h1 className="text-[clamp(1.875rem,5vw,4.5rem)] font-bold tracking-tight leading-tight">
                 Post a Job.
                 <br />
                 Let the Best Hunters
@@ -63,27 +63,27 @@ const Index = () => {
                 Compete for You.
               </h1>
               
-              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0">
+              <p className="text-[clamp(1rem,2.5vw,1.5rem)] text-muted-foreground max-w-2xl mx-auto lg:mx-0">
                 Connect employers with expert headhunters. Post jobs, receive curated candidates, and scale your hiring effortlessly.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 lg:pt-8 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-[clamp(0.75rem,2vw,1rem)] pt-[clamp(1rem,3vw,2rem)] justify-center lg:justify-start">
                 <Button 
                   size="lg" 
                   variant="hero" 
                   onClick={handleEmployerCTA} 
-                  className="w-full sm:w-auto text-sm sm:text-base h-11 sm:h-12 px-6 sm:px-8"
+                  className="w-full sm:w-auto text-[clamp(0.875rem,1.5vw,1rem)] h-[clamp(2.75rem,5vw,3rem)] px-[clamp(1.5rem,3vw,2rem)]"
                 >
-                  <Briefcase className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <Briefcase className="mr-2 h-[clamp(1rem,2vw,1.25rem)] w-[clamp(1rem,2vw,1.25rem)]" />
                   I'm an Employer
                 </Button>
                 <Button 
                   size="lg" 
                   variant="mint" 
                   onClick={handleHeadhunterCTA} 
-                  className="w-full sm:w-auto text-sm sm:text-base h-11 sm:h-12 px-6 sm:px-8"
+                  className="w-full sm:w-auto text-[clamp(0.875rem,1.5vw,1rem)] h-[clamp(2.75rem,5vw,3rem)] px-[clamp(1.5rem,3vw,2rem)]"
                 >
-                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <Users className="mr-2 h-[clamp(1rem,2vw,1.25rem)] w-[clamp(1rem,2vw,1.25rem)]" />
                   I'm a Headhunter
                 </Button>
               </div>
@@ -92,7 +92,7 @@ const Index = () => {
             {/* Right side - Image */}
             <div className="hidden lg:flex lg:w-[50%] items-center justify-center relative">
               <HeroFloatingElements />
-              <img 
+              <img
                 src={heroImage} 
                 alt="Headhunter network connecting employers with talent" 
                 className="w-full h-auto object-contain relative z-10"
