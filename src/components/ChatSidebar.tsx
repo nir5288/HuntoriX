@@ -410,17 +410,12 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                   key={`${conv.jobId}-${conv.otherUserId}`}
                   className={cn(
                     "relative group",
-                    activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent/80"
+                    activeJobId === conv.jobId && activeUserId === conv.otherUserId && "bg-accent"
                   )}
                 >
                   <button
                     onClick={() => handleConversationClick(conv.jobId, conv.otherUserId, conv.unreadCount > 0)}
-                    className={cn(
-                      "w-full p-3 text-left transition-colors",
-                      activeJobId === conv.jobId && activeUserId === conv.otherUserId 
-                        ? "bg-accent/80" 
-                        : "hover:bg-accent"
-                    )}
+                    className="w-full p-3 text-left hover:bg-accent transition-colors"
                   >
                     <div className="flex items-start gap-2">
                       <div className="relative">
