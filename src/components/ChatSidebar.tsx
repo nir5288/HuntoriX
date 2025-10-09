@@ -448,19 +448,12 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
                             <p className="max-w-xs">{conv.jobTitle}</p>
                           </TooltipContent>
                         </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <p className={cn(
-                              "text-xs truncate max-w-[100px]",
-                              conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
-                            )}>
-                              {conv.lastMessage}
-                            </p>
-                          </TooltipTrigger>
-                          <TooltipContent side="right">
-                            <p className="max-w-xs">{conv.lastMessage}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <p className={cn(
+                          "text-xs truncate max-w-[100px]",
+                          conv.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                        )}>
+                          {conv.lastMessage}
+                        </p>
                       </div>
                     </div>
                   </button>
