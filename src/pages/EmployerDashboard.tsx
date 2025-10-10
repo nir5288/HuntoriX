@@ -787,13 +787,13 @@ const EmployerDashboard = () => {
                               variant="destructive"
                               size="sm"
                               onClick={(e) => handleRejectAll(job.id, e)}
-                              className="h-7 text-[10px] sm:text-xs px-2 gap-1"
+                              className="hidden sm:flex h-7 text-[10px] sm:text-xs px-2 gap-1"
                               title="Reject all pending applications"
                             >
                               <X className="h-3 w-3" />
                               <span>Reject All</span>
                             </Button>
-                            <div className="relative">
+                            <div className="relative hidden sm:block">
                               <Button
                                 variant="outline"
                                 size="sm"
