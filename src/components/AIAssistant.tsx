@@ -161,11 +161,31 @@ export function AIAssistant() {
     }
   };
 
-  const stopRecording = () => {
+  const stopRecordingAndSend = async () => {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
+      // Stop recording
       mediaRecorder.stop();
       setIsRecording(false);
       setMediaRecorder(null);
+      
+      // Wait a bit for the recording to process and input to be populated
+      setTimeout(() => {
+        if (input.trim()) {
+          handleSend();
+        }
+      }, 1000);
+    }
+  };
+
+  const handleMicPress = () => {
+    if (!isRecording) {
+      startRecording();
+    }
+  };
+
+  const handleMicRelease = () => {
+    if (isRecording) {
+      stopRecordingAndSend();
     }
   };
 
@@ -189,10 +209,6 @@ export function AIAssistant() {
         
         if (data.text) {
           setInput(data.text);
-          toast({
-            title: "Transcribed",
-            description: "Click send to submit your message",
-          });
         }
         
         setIsLoading(false);
@@ -595,15 +611,35 @@ export function AIAssistant() {
           <div className="p-4 border-t border-border">
             <div className="flex gap-2">
               <Button
-                onClick={isRecording ? stopRecording : startRecording}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleMicPress();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleMicRelease();
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleMicPress();
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  handleMicRelease();
+                }}
+                onMouseLeave={() => {
+                  if (isRecording) {
+                    handleMicRelease();
+                  }
+                }}
                 disabled={isLoading}
                 size="icon"
                 variant={isRecording ? "destructive" : "outline"}
                 className={cn(
-                  "shrink-0",
+                  "shrink-0 select-none",
                   isRecording && "animate-pulse"
                 )}
-                title={isRecording ? "Stop recording" : "Start voice input"}
+                title={isRecording ? "Recording... Release to send" : "Hold to record voice message"}
               >
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
