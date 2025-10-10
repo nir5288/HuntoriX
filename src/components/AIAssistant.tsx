@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, ThumbsUp, Mic, MicOff, Globe } from "lucide-react";
+import { MessageCircle, X, Send, ThumbsUp, Mic, MicOff, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -531,26 +532,46 @@ export function AIAssistant() {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  const newLang = language === 'en' ? 'he' : 'en';
-                  setLanguage(newLang);
-                  toast({
-                    title: language === 'en' ? "שפה שונתה לעברית" : "Language changed to English",
-                    description: language === 'en' ? "עכשיו אני אדבר עברית" : "I will now speak English"
-                  });
-                }}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground relative"
-                title={language === 'en' ? "Switch to Hebrew" : "עבור לאנגלית"}
-              >
-                {language === 'en' ? (
-                  <span className="text-lg">🇺🇸</span>
-                ) : (
-                  <span className="text-lg">🇮🇱</span>
-                )}
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    <ChevronDown className="h-3 w-3" />
+                    <span className="text-lg">{language === 'en' ? '🇺🇸' : '🇮🇱'}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32 bg-background border shadow-lg z-[10000]">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setLanguage('en');
+                      toast({
+                        title: "Language changed to English",
+                        description: "I will now speak English"
+                      });
+                    }}
+                    className="flex flex-col items-center gap-1 py-3 cursor-pointer"
+                  >
+                    <span className="text-2xl">🇺🇸</span>
+                    <span className="text-xs font-medium">EN</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setLanguage('he');
+                      toast({
+                        title: "שפה שונתה לעברית",
+                        description: "עכשיו אני אדבר עברית"
+                      });
+                    }}
+                    className="flex flex-col items-center gap-1 py-3 cursor-pointer"
+                  >
+                    <span className="text-2xl">🇮🇱</span>
+                    <span className="text-xs font-medium">HE</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 variant="ghost"
                 size="icon"
