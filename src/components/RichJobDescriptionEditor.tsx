@@ -50,8 +50,30 @@ export function RichJobDescriptionEditor({
   }, [onChange]);
 
   const makeBold = () => {
-    document.execCommand('bold', false);
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    if (range.collapsed) return; // No text selected
+
+    // Get the selected content
+    const selectedContent = range.extractContents();
+    
+    // Create a strong element
+    const strong = document.createElement('strong');
+    strong.appendChild(selectedContent);
+    
+    // Insert the strong element
+    range.insertNode(strong);
+    
+    // Move cursor after the bold text
+    range.setStartAfter(strong);
+    range.setEndAfter(strong);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
     editorRef.current?.focus();
+    handleInput();
   };
 
   const addBullet = () => {
