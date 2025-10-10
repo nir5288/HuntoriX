@@ -364,8 +364,10 @@ export function PlanSelection({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {FEATURE_COMPARISON.map((row, index) => <TableRow key={index} className={cn("border-b", index % 2 === 0 ? 'bg-muted/20' : '')}>
-                    <TableCell className="sticky left-0 bg-background z-10 font-semibold py-4">
+                {FEATURE_COMPARISON.map((row, index) => {
+                  const isHighlighted = row.feature === 'Applications credits' || row.feature === 'Work worldwide';
+                  return <TableRow key={index} className={cn("border-b", isHighlighted ? 'bg-[hsl(var(--accent-mint))] hover:bg-[hsl(var(--accent-mint))]/90' : index % 2 === 0 ? 'bg-muted/20' : '')}>
+                    <TableCell className={cn("sticky left-0 z-10 font-semibold py-4", isHighlighted ? 'bg-[hsl(var(--accent-mint))]' : 'bg-background')}>
                       <div className="flex items-center gap-2">
                         {row.feature}
                         {row.tooltip && <Tooltip>
@@ -382,7 +384,8 @@ export function PlanSelection({
                     <TableCell className="py-4">{renderFeatureValue(row.core)}</TableCell>
                     <TableCell className="py-4">{renderFeatureValue(row.pro)}</TableCell>
                     <TableCell className="py-4">{renderFeatureValue(row.huntorix)}</TableCell>
-                  </TableRow>)}
+                  </TableRow>;
+                })}
               </TableBody>
             </Table>
           </div>
@@ -418,7 +421,8 @@ export function PlanSelection({
                 {FEATURE_COMPARISON.map((row, index) => {
               const value = row[plan.id as keyof typeof row];
               if (value === false) return null;
-              return <div key={index} className="flex items-start justify-between gap-3 text-sm py-2.5 border-b border-border/50 last:border-0">
+              const isHighlighted = row.feature === 'Applications credits' || row.feature === 'Work worldwide';
+              return <div key={index} className={cn("flex items-start justify-between gap-3 text-sm py-2.5 border-b border-border/50 last:border-0", isHighlighted && "bg-[hsl(var(--accent-mint))] -mx-6 px-6 py-3 rounded-lg border-0")}>
                       <div className="flex items-center gap-2 flex-1">
                         <span className="font-semibold">{row.feature}</span>
                         {row.tooltip && <Tooltip>
@@ -438,10 +442,7 @@ export function PlanSelection({
                     </div>;
             })}
                 <Button className={cn("w-full mt-6 h-12 font-bold rounded-xl transition-all duration-200", plan.id === 'core' && "bg-[hsl(var(--vibrant-lilac))] hover:bg-[hsl(var(--vibrant-lilac))] text-white")} variant={plan.locked ? 'outline' : 'default'} disabled={plan.locked} onClick={() => !plan.locked && setSelectedPlan(plan.id)}>
-                  {plan.locked ? <>
-                      <Lock className="mr-2 h-4 w-4" />
-                      Coming soon
-                    </> : `Choose ${plan.name}`}
+                  {plan.locked ? 'Coming soon' : `Choose ${plan.name}`}
                 </Button>
               </CardContent>
             </Card>)}
