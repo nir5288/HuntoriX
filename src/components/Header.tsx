@@ -294,13 +294,14 @@ export function Header() {
 
               {/* Right side - Auth & Actions */}
               <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              {/* Mobile Menu */}
-              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
+              {/* Mobile Menu - Only show when logged in */}
+              {user && (
+                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
                 <SheetContent side="left" className="w-[280px] sm:w-[340px]">
                   <nav className="flex flex-col gap-1 mt-8">
                     {/* Main Navigation */}
@@ -395,6 +396,7 @@ export function Header() {
                   </nav>
                 </SheetContent>
               </Sheet>
+              )}
 
               {user && profile ? (
                 <TooltipProvider delayDuration={0}>
@@ -623,22 +625,23 @@ export function Header() {
                   </DropdownMenu>
                 </TooltipProvider>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   <Button 
                     variant="ghost" 
                     size="sm"
                     onClick={() => navigate('/auth?mode=signin')}
-                    className="text-sm px-3 sm:px-4 h-9"
+                    className="text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-9"
                   >
                     Login
                   </Button>
                   <Button 
                     size="sm"
                     onClick={() => navigate('/auth?mode=signup')}
-                    className="bg-foreground text-background hover:bg-foreground/90 text-sm px-3 sm:px-4 h-9"
+                    className="bg-foreground text-background hover:bg-foreground/90 text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-9"
                   >
-                    Sign up
-                    <ArrowRight className="ml-1 h-4 w-4" />
+                    <span className="hidden sm:inline">Sign up</span>
+                    <span className="sm:hidden">Sign up</span>
+                    <ArrowRight className="ml-1 h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </div>
               )}
