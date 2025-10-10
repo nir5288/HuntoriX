@@ -32,7 +32,7 @@ const JobDetail = () => {
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [hasInvitation, setHasInvitation] = useState(false);
   const [creditsRemaining, setCreditsRemaining] = useState<number | null>(null);
-  const [showNoCreditsAlert, setShowNoCreditsAlert] = useState(false);
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
 
   // Track where user came from for navigation state
   const fromSource = location.state?.from as 'dashboard' | 'applications' | 'saved' | undefined;
@@ -140,7 +140,7 @@ const JobDetail = () => {
     
     // Check if user has credits
     if (creditsRemaining !== null && creditsRemaining <= 0) {
-      setShowNoCreditsAlert(true);
+      setUpgradeDialogOpen(true);
       return;
     }
     
@@ -566,8 +566,8 @@ const JobDetail = () => {
       {/* Apply Modal */}
       {user && job && <ApplyModal open={applyModalOpen} onOpenChange={setApplyModalOpen} jobId={job.id} jobTitle={job.title} headhunterId={user.id} onSuccess={handleApplicationSuccess} />}
       
-      {/* No Credits Alert */}
-      <AlertDialog open={showNoCreditsAlert} onOpenChange={setShowNoCreditsAlert}>
+      {/* No Credits Alert - Same as OpportunityCard */}
+      <AlertDialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>No Credits Remaining</AlertDialogTitle>
@@ -576,11 +576,17 @@ const JobDetail = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button variant="outline" onClick={() => setShowNoCreditsAlert(false)}>
-              Close
+            <Button variant="outline" onClick={() => setUpgradeDialogOpen(false)}>
+              Cancel
             </Button>
-            <Button onClick={() => navigate('/plans')}>
-              View Plans
+            <Button
+              onClick={() => {
+                setUpgradeDialogOpen(false);
+                navigate('/plans');
+              }}
+              className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))]"
+            >
+              Upgrade Plan
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
