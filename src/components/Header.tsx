@@ -506,7 +506,7 @@ export function Header() {
                           </Avatar>
                           <Badge 
                             variant="secondary" 
-                            className="hidden sm:flex capitalize text-xs"
+                            className="flex capitalize text-xs"
                           >
                             {profile.role}
                           </Badge>
