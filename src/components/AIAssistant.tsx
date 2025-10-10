@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import aiAvatar from "@/assets/huntorix-ai-avatar.jpg";
 
 interface Message {
@@ -28,10 +30,15 @@ export function AIAssistant() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [position, setPosition] = useState({ x: 24, y: 24 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const scrollRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   // Fetch user's AI assistant preference from database
   const { data: profile } = useQuery({
@@ -54,6 +61,40 @@ export function AIAssistant() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Handle drag for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({
+      x: touch.clientX - position.x,
+      y: touch.clientY - position.y
+    });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isMobile || !isDragging) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const newX = touch.clientX - dragStart.x;
+    const newY = touch.clientY - dragStart.y;
+    
+    // Keep button within viewport bounds
+    const buttonSize = 56; // h-14 w-14
+    const maxX = window.innerWidth - buttonSize - 24;
+    const maxY = window.innerHeight - buttonSize - 24;
+    
+    setPosition({
+      x: Math.max(24, Math.min(newX, maxX)),
+      y: Math.max(24, Math.min(newY, maxY))
+    });
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobile) return;
+    setIsDragging(false);
+  };
 
   // Create conversation when component mounts or opens
   useEffect(() => {
@@ -284,34 +325,68 @@ export function AIAssistant() {
     <>
       {/* Floating Button */}
       <Button
+        ref={buttonRef}
         onClick={() => {
+          if (isDragging) return; // Don't toggle if dragging
           const newOpenState = !isOpen;
           setIsOpen(newOpenState);
           if (newOpenState) {
             trackEvent('opened');
           }
         }}
-        className="fixed left-6 bottom-6 h-12 px-4 rounded-full shadow-lg hover:shadow-xl z-[9999] bg-gradient-to-r from-primary via-primary-glow to-primary transition-all duration-300 flex items-center gap-2.5 group border border-white/20"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={isMobile ? {
+          left: `${position.x}px`,
+          bottom: `${position.y}px`,
+          top: 'auto',
+          right: 'auto'
+        } : undefined}
+        className={cn(
+          "fixed shadow-lg hover:shadow-xl z-[9999] bg-gradient-to-r from-primary via-primary-glow to-primary transition-all duration-300 border border-white/20",
+          isMobile 
+            ? "h-14 w-14 rounded-full p-0 flex items-center justify-center touch-none"
+            : "left-6 bottom-6 h-12 px-4 rounded-full flex items-center gap-2.5 group"
+        )}
       >
         {isOpen ? (
-          <>
-            <X className="h-4 w-4 text-white" />
-            <span className="text-white font-medium text-xs tracking-wide">Close</span>
-          </>
+          isMobile ? (
+            <X className="h-5 w-5 text-white" />
+          ) : (
+            <>
+              <X className="h-4 w-4 text-white" />
+              <span className="text-white font-medium text-xs tracking-wide">Close</span>
+            </>
+          )
         ) : (
-          <>
+          isMobile ? (
             <div className="relative">
-              <MessageCircle className="h-4 w-4 text-white" />
+              <MessageCircle className="h-5 w-5 text-white" />
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             </div>
-            <span className="text-white font-medium text-xs tracking-wide">HuntoriX AI</span>
-          </>
+          ) : (
+            <>
+              <div className="relative">
+                <MessageCircle className="h-4 w-4 text-white" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              </div>
+              <span className="text-white font-medium text-xs tracking-wide">HuntoriX AI</span>
+            </>
+          )
         )}
       </Button>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed left-6 bottom-24 w-96 h-[500px] bg-background border border-border rounded-lg shadow-2xl z-[9999] flex flex-col">
+        <div 
+          className={cn(
+            "fixed bg-background border border-border rounded-lg shadow-2xl z-[9999] flex flex-col",
+            isMobile 
+              ? "inset-x-4 bottom-24 top-24 w-auto h-auto"
+              : "left-6 bottom-24 w-96 h-[500px]"
+          )}
+        >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
             <div className="flex items-center gap-3">
