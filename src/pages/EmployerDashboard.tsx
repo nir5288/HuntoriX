@@ -763,9 +763,10 @@ const EmployerDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6">
+                          <div className="border-t border-border/50 pt-3 mt-2"></div>
                           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
-                             <span>{jobApplications.length} applications</span>
+                             <span>{jobApplications.length} Applications</span>
                              <span className="hidden sm:inline">•</span>
                              <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
                              {jobEditCounts[job.id] > 0 && (
@@ -773,7 +774,7 @@ const EmployerDashboard = () => {
                                  <span className="hidden sm:inline">•</span>
                                  <button
                                    onClick={(e) => handleViewEditHistory(job, e)}
-                                   className="hidden sm:inline text-xs text-muted-foreground underline hover:text-foreground transition-colors cursor-pointer"
+                                   className="hidden sm:inline text-sm sm:text-base text-muted-foreground underline hover:text-foreground transition-colors cursor-pointer"
                                  >
                                    Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
                                  </button>
