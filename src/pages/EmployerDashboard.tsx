@@ -768,13 +768,19 @@ const EmployerDashboard = () => {
                              <span>{jobApplications.length} applications</span>
                              <span className="hidden sm:inline">•</span>
                              <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
+                             {jobEditCounts[job.id] > 0 && (
+                               <>
+                                 <span className="hidden sm:inline">•</span>
+                                 <button
+                                   onClick={(e) => handleViewEditHistory(job, e)}
+                                   className="hidden sm:inline text-xs text-muted-foreground underline hover:text-foreground transition-colors cursor-pointer"
+                                 >
+                                   Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
+                                 </button>
+                               </>
+                             )}
                            </div>
                            <div className="flex items-center gap-1.5 shrink-0">
-                             {jobEditCounts[job.id] > 0 && (
-                               <span className="hidden sm:inline text-xs text-muted-foreground">
-                                 Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
-                               </span>
-                             )}
                             <Button
                               variant="destructive"
                               size="sm"
