@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Eye, EyeOff, Pencil, Check, X, Clock } from 'lucide-react';
+import { Plus, Briefcase, Eye, EyeOff, Pencil, Check, X, Clock, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { PostJobModal } from '@/components/PostJobModal';
 import { EditJobModal } from '@/components/EditJobModal';
 import { JobEditHistory } from '@/components/JobEditHistory';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
@@ -462,9 +463,45 @@ const MyJobs = () => {
                                   </CardDescription>
                                 </div>
                                 <div className="flex items-start gap-1.5">
-                                  <Badge className={`text-[10px] sm:text-xs h-5 ${getStatusColor(job.status)}`}>
-                                    {job.status}
-                                  </Badge>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className={`h-6 text-[10px] sm:text-xs px-2 gap-1 ${getStatusColor(job.status)} border-0 hover:opacity-80`}
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        {job.status.replace('_', ' ')}
+                                        <ChevronDown className="h-3 w-3" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-36 p-1" align="start">
+                                      <div className="flex flex-col gap-1">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="justify-start h-8 text-xs"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            // Handle status change to open
+                                          }}
+                                        >
+                                          Open
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="justify-start h-8 text-xs"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            // Handle status change to on_hold
+                                          }}
+                                        >
+                                          On Hold
+                                        </Button>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
                                   <Button
                                     variant="ghost"
                                     size="icon"
@@ -491,25 +528,25 @@ const MyJobs = () => {
                               </div>
                             </CardHeader>
                             <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6">
+                              <div className="border-t border-border/50 pt-3 mt-2"></div>
                               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span>{jobApplications.length} applications</span>
+                                  <span>{jobApplications.length} Applications</span>
                                   <span className="hidden sm:inline">•</span>
                                   <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
+                                  {jobEditCounts[job.id] > 0 && (
+                                    <>
+                                      <span className="hidden sm:inline">•</span>
+                                      <button
+                                        onClick={(e) => handleViewEditHistory(job, e)}
+                                        className="hidden sm:inline text-sm sm:text-base text-muted-foreground underline hover:text-foreground transition-colors cursor-pointer"
+                                      >
+                                        Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                  {jobEditCounts[job.id] > 0 && (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={(e) => handleViewEditHistory(job, e)}
-                                      className="hidden sm:flex h-7 text-[10px] sm:text-xs px-2 gap-1"
-                                      title="View edit history"
-                                    >
-                                      <Clock className="h-3 w-3" />
-                                      <span>Last edited ({jobEditCounts[job.id]})</span>
-                                    </Button>
-                                  )}
                                   <Button
                                     variant="destructive"
                                     size="sm"
