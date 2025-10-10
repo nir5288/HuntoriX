@@ -235,9 +235,44 @@ const Auth = () => {
               console.error('Error sending verification email:', emailError);
             }
             
-            // Always redirect to plans page for headhunters after signup
-            toast.success('Account created! Please select your subscription plan.');
-            navigate('/plans');
+            // Check if user pre-selected a plan before signing up
+            if (preSelectedPlan) {
+              // Automatically apply the pre-selected plan
+              try {
+                const { data: planData, error: planError } = await supabase
+                  .from('subscription_plans')
+                  .select('id')
+                  .ilike('name', preSelectedPlan)
+                  .maybeSingle();
+
+                if (!planError && planData) {
+                  await supabase
+                    .from('user_subscriptions')
+                    .insert({
+                      user_id: data.user.id,
+                      plan_id: planData.id,
+                      status: 'active'
+                    });
+                  
+                  localStorage.removeItem('selectedPlan');
+                  toast.success('Account created! Your plan has been activated.');
+                  // Redirect to home to trigger onboarding
+                  navigate('/');
+                } else {
+                  // If plan application fails, redirect to plans page
+                  toast.success('Account created! Please select your subscription plan.');
+                  navigate('/plans');
+                }
+              } catch (error) {
+                console.error('Error applying pre-selected plan:', error);
+                toast.success('Account created! Please select your subscription plan.');
+                navigate('/plans');
+              }
+            } else {
+              // No pre-selected plan, redirect to plans page
+              toast.success('Account created! Please select your subscription plan.');
+              navigate('/plans');
+            }
           } else {
             // Employers don't need plan selection
             toast.success('Account created! Please check your email to verify your account.');
