@@ -353,21 +353,19 @@ export function PlanSelection({
         {/* Employer Notice */}
         {!userId && (
           <div className="max-w-2xl mx-auto">
-            <Card className="shadow-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] border-2 border-border">
-              <CardContent className="p-6 text-center">
-                <p className="text-lg font-semibold text-primary mb-3">
-                  Are you an employer looking to hire?
-                </p>
-                <Button 
-                  variant="default" 
-                  size="lg"
-                  className="font-bold bg-primary hover:bg-primary/90"
-                  onClick={() => navigate('/auth?mode=signup&role=employer')}
-                >
-                  Register as Employer
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="flex items-center justify-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
+              <p className="text-sm text-muted-foreground">
+                Are you an employer?
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="font-semibold"
+                onClick={() => navigate('/auth?mode=signup&role=employer')}
+              >
+                Register as Employer
+              </Button>
+            </div>
           </div>
         )}
 
