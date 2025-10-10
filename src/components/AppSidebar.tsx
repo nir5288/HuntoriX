@@ -231,7 +231,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
 
       {/* Footer with logo */}
       <div 
-        className={`border-t border-slate-700/40 mt-auto ${open ? 'p-4' : 'px-2 py-3'}`}
+        className={`border-t border-slate-700/40 mt-auto ${open ? 'p-4' : 'py-3'}`}
         style={{ backgroundColor: 'rgb(22, 22, 24)' }}
       >
         {open ? (
