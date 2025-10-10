@@ -265,11 +265,6 @@ const HeadhunterDashboard = () => {
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Browse jobs and manage your applications</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <Button size="lg" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-12 text-base flex-1 sm:flex-initial">
-              <Search className="mr-2 h-5 w-5" />
-              <span className="hidden sm:inline">Browse Jobs</span>
-              <span className="sm:hidden">Browse</span>
-            </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/saved-jobs')} className="relative h-12 text-base flex-1 sm:flex-initial">
               <Heart className="mr-2 h-5 w-5" />
               <span className="hidden sm:inline">Saved Jobs</span>
@@ -277,6 +272,11 @@ const HeadhunterDashboard = () => {
               {savedJobsCount > 0 && <Badge className="ml-2 bg-[hsl(var(--accent-pink))] text-white h-5 px-2 text-xs">
                   {savedJobsCount}
                 </Badge>}
+            </Button>
+            <Button size="lg" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-12 text-base flex-1 sm:flex-initial">
+              <Search className="mr-2 h-5 w-5" />
+              <span className="hidden sm:inline">Browse Jobs</span>
+              <span className="sm:hidden">Browse</span>
             </Button>
           </div>
         </div>
