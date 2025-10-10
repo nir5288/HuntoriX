@@ -771,16 +771,9 @@ const EmployerDashboard = () => {
                            </div>
                            <div className="flex items-center gap-1.5 shrink-0">
                              {jobEditCounts[job.id] > 0 && (
-                               <Button
-                                 variant="outline"
-                                 size="sm"
-                                 onClick={(e) => handleViewEditHistory(job, e)}
-                                 className="hidden sm:flex h-7 text-[10px] sm:text-xs px-2 gap-1"
-                                 title="View edit history"
-                               >
-                                 <Clock className="h-3 w-3" />
-                                 <span>Last edited ({jobEditCounts[job.id]})</span>
-                               </Button>
+                               <span className="hidden sm:inline text-xs text-muted-foreground">
+                                 Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
+                               </span>
                              )}
                             <Button
                               variant="destructive"
