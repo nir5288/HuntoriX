@@ -383,10 +383,13 @@ const Messages = () => {
       {/* Show message area on desktop OR on mobile when conversation is selected */}
       {(!isMobile || otherUserId) && (
         <div className={cn("flex-1 flex flex-col min-w-0", !isMobile && "max-w-[65%]")}>
-          <div className="h-full flex flex-col">
+          <div className={cn("h-full flex flex-col", isMobile && "h-screen")}>
               {otherUserId ? <>
-                  {/* Fixed Header */}
-                  <div className="h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4">
+                   {/* Fixed Header */}
+                   <div className={cn(
+                     "h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4",
+                     isMobile && "sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+                   )}>
                   {/* Back button on mobile */}
                   {isMobile && (
                     <Button 
@@ -510,8 +513,11 @@ const Messages = () => {
               </div>
 
               {/* Fixed Input */}
-              <div className="shrink-0">
-                <MessageInput 
+              <div className={cn(
+                "shrink-0",
+                isMobile && "sticky bottom-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+              )}>
+                <MessageInput
                   onSend={handleSendMessage} 
                   disabled={!user || !otherUserId} 
                   replyingTo={replyingTo} 
