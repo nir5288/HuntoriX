@@ -53,25 +53,70 @@ export function RichJobDescriptionEditor({
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
 
+    const root = editorRef.current;
     let range = selection.getRangeAt(0);
     if (range.collapsed) return; // No text selected
 
-    // Exclude leading/trailing spaces from the selection to preserve spacing
+    // Capture original neighbor characters to preserve whitespace
+    const getPrevChar = (node: Node, offset: number): string | null => {
+      if (!root) return null;
+      if (node.nodeType === Node.TEXT_NODE) {
+        const t = node as Text;
+        if (offset > 0) return t.data.charAt(offset - 1);
+      }
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let current: Node | null = walker.nextNode();
+      let prevText: Text | null = null;
+      while (current) {
+        if (current === node) break;
+        prevText = current as Text;
+        current = walker.nextNode();
+      }
+      if (prevText) {
+        const d = prevText.data;
+        return d.length ? d.charAt(d.length - 1) : null;
+      }
+      return null;
+    };
+
+    const getNextChar = (node: Node, offset: number): string | null => {
+      if (!root) return null;
+      if (node.nodeType === Node.TEXT_NODE) {
+        const t = node as Text;
+        if (offset < t.data.length) return t.data.charAt(offset);
+      }
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let current: Node | null = walker.nextNode();
+      while (current && current !== node) current = walker.nextNode();
+      const nextText = walker.nextNode() as Text | null;
+      if (nextText) return nextText.data.length ? nextText.data.charAt(0) : null;
+      return null;
+    };
+
+    const origStart = range.startContainer;
+    const origStartOffset = range.startOffset;
+    const origEnd = range.endContainer;
+    const origEndOffset = range.endOffset;
+
+    const charBefore = getPrevChar(origStart, origStartOffset);
+    const charAfter = getNextChar(origEnd, origEndOffset);
+
+    const isSpaceLike = (ch: string | null) => ch === ' ' || ch === '\u00A0' || ch === '\n' || ch === '\t';
+
+    // Exclude leading/trailing whitespace from selection
     const trimBoundaries = () => {
-      // Trim leading spaces at start
       while (range.startContainer.nodeType === Node.TEXT_NODE) {
         const text = range.startContainer as Text;
-        if (range.startOffset < text.data.length && text.data.charAt(range.startOffset) === ' ') {
+        if (range.startOffset < text.data.length && isSpaceLike(text.data.charAt(range.startOffset))) {
           range.setStart(text, range.startOffset + 1);
         } else {
           break;
         }
       }
-      // Trim trailing spaces at end
       while (range.endContainer.nodeType === Node.TEXT_NODE) {
         const text = range.endContainer as Text;
         const idx = range.endOffset - 1;
-        if (idx >= 0 && text.data.charAt(idx) === ' ') {
+        if (idx >= 0 && isSpaceLike(text.data.charAt(idx))) {
           range.setEnd(text, idx);
         } else {
           break;
@@ -80,16 +125,14 @@ export function RichJobDescriptionEditor({
     };
 
     trimBoundaries();
-    if (range.toString().length === 0) return; // don't bold only spaces
+    if (range.toString().length === 0) return; // don't bold only whitespace
 
-    // Use native command to preserve DOM whitespace exactly
+    // Apply bold via native command to preserve DOM whitespace
     selection.removeAllRanges();
     selection.addRange(range);
     document.execCommand('bold', false);
 
-    const root = editorRef.current;
-
-    // Normalize <b> to <strong> for semantic HTML
+    // Normalize <b> to <strong>
     if (root) {
       const bs = Array.from(root.querySelectorAll('b'));
       bs.forEach((bEl) => {
@@ -99,36 +142,58 @@ export function RichJobDescriptionEditor({
       });
     }
 
-    // Move caret just after the bold element so next typing isn't bold
+    // Identify the <strong> we just created (selection is usually inside it)
     const sel = window.getSelection();
-    if (sel) {
+    let strongAncestor: HTMLElement | null = null;
+    if (sel && root) {
       let node: Node | null = sel.focusNode;
-      let strongAncestor: HTMLElement | null = null;
       while (node && node !== root) {
-        if (node instanceof HTMLElement && (node.tagName === 'STRONG' || node.tagName === 'B')) {
+        if (node instanceof HTMLElement && node.tagName === 'STRONG') {
           strongAncestor = node;
           break;
         }
         node = node.parentNode;
       }
+    }
 
-      const caret = document.createRange();
-      if (strongAncestor) {
-        const next = strongAncestor.nextSibling;
-        if (next && next.nodeType === Node.TEXT_NODE) {
-          const t = next as Text;
-          const offset = t.data.startsWith(' ') ? 1 : 0; // skip a following space if present
-          caret.setStart(next, offset);
-        } else {
-          caret.setStartAfter(strongAncestor);
-        }
-        caret.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(caret);
-      } else {
-        // Fallback: collapse to end
-        sel.collapseToEnd();
+    // Ensure whitespace around bolded text if it existed before
+    const ensureLeadingSpace = () => {
+      if (!strongAncestor) return;
+      const prev = strongAncestor.previousSibling;
+      const hadSpaceBefore = isSpaceLike(charBefore);
+      const hasSpaceNow = prev && prev.nodeType === Node.TEXT_NODE ? isSpaceLike((prev as Text).data.slice(-1)) : false;
+      if (hadSpaceBefore && !hasSpaceNow) {
+        strongAncestor.parentNode?.insertBefore(document.createTextNode(' '), strongAncestor);
       }
+    };
+
+    const ensureTrailingSpace = () => {
+      if (!strongAncestor) return;
+      const next = strongAncestor.nextSibling;
+      const hadSpaceAfter = isSpaceLike(charAfter);
+      const hasSpaceNow = next && next.nodeType === Node.TEXT_NODE ? isSpaceLike((next as Text).data.charAt(0)) : false;
+      if (hadSpaceAfter && !hasSpaceNow) {
+        strongAncestor.parentNode?.insertBefore(document.createTextNode(' '), strongAncestor.nextSibling);
+      }
+    };
+
+    ensureLeadingSpace();
+    ensureTrailingSpace();
+
+    // Move caret after bold element (skip one space if present)
+    if (sel && strongAncestor) {
+      const next = strongAncestor.nextSibling;
+      const caret = document.createRange();
+      if (next && next.nodeType === Node.TEXT_NODE) {
+        const t = next as Text;
+        const offset = isSpaceLike(t.data.charAt(0)) ? 1 : 0;
+        caret.setStart(next, offset);
+      } else {
+        caret.setStartAfter(strongAncestor);
+      }
+      caret.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(caret);
     }
 
     root?.focus();
