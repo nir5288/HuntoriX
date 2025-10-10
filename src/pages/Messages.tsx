@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/components/ui/sidebar";
 interface Message {
   id: string;
   from_user: string;
@@ -54,6 +55,10 @@ const Messages = () => {
   } = useUserPreferences();
   useUpdateLastSeen(); // Update last_seen timestamp
   const isMobile = useIsMobile();
+  const { state: sidebarState } = useSidebar();
+  
+  // Calculate sidebar offset based on main sidebar state
+  const sidebarOffset = sidebarState === "collapsed" ? "3rem" : "16rem";
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chatSidebarCollapsed, setChatSidebarCollapsed] = useState(false);
@@ -369,7 +374,7 @@ const Messages = () => {
     }
     loadMessages(true);
   };
-  return <div className="h-screen flex">
+  return <div className="h-screen flex" style={{ paddingLeft: isMobile ? 0 : sidebarOffset }}>
       {/* Show sidebar on desktop OR on mobile when no conversation is selected */}
       {(!isMobile || !otherUserId) && (
         <ChatSidebar
