@@ -183,11 +183,6 @@ const Auth = () => {
         }
       } else {
         // Sign up flow
-        if (activeTab === 'headhunter') {
-          // Prevent auto-redirect race by enabling plan selection immediately
-          setShowPlanSelection(true);
-        }
-
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -224,9 +219,34 @@ const Auth = () => {
               console.error('Error sending verification email:', emailError);
             }
             
-            // Ensure we have the user id for plan selection
-            setNewUserId(data.user.id);
-            toast.success('Account created! Please select your subscription plan.');
+            // If there's a pre-selected plan, automatically create the subscription
+            if (preSelectedPlan) {
+              try {
+                const { error: subError } = await supabase
+                  .from('user_subscriptions')
+                  .insert({
+                    user_id: data.user.id,
+                    plan_id: preSelectedPlan,
+                    status: 'active',
+                  });
+
+                if (subError) {
+                  console.error('Error creating subscription:', subError);
+                  toast.error('Account created but failed to set up subscription. Please contact support.');
+                } else {
+                  localStorage.removeItem('selectedPlan');
+                  toast.success('Account created! Welcome to Huntorix.');
+                }
+              } catch (error) {
+                console.error('Error setting up subscription:', error);
+                toast.error('Account created but failed to set up subscription. Please contact support.');
+              }
+            } else {
+              // No pre-selected plan, show plan selection
+              setShowPlanSelection(true);
+              setNewUserId(data.user.id);
+              toast.success('Account created! Please select your subscription plan.');
+            }
           } else {
             // Employers don't need plan selection
             toast.success('Account created! Please check your email to verify your account.');
