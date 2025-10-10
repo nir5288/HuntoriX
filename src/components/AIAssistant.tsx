@@ -69,9 +69,11 @@ export function AIAssistant() {
     const touch = e.touches[0];
     setIsDragging(true);
     setHasMoved(false);
+    // Calculate from bottom of screen since we use bottom positioning
+    const buttonBottom = window.innerHeight - touch.clientY;
     setDragStart({
       x: touch.clientX - position.x,
-      y: touch.clientY - position.y
+      y: buttonBottom - position.y
     });
   };
 
@@ -79,8 +81,11 @@ export function AIAssistant() {
     if (!isMobile || !isDragging) return;
     e.preventDefault();
     const touch = e.touches[0];
+    
+    // Calculate positions
     const newX = touch.clientX - dragStart.x;
-    const newY = touch.clientY - dragStart.y;
+    const buttonBottom = window.innerHeight - touch.clientY;
+    const newY = buttonBottom - dragStart.y;
     
     // Mark as moved if dragged more than 5px
     if (Math.abs(newX - position.x) > 5 || Math.abs(newY - position.y) > 5) {
