@@ -1,4 +1,4 @@
-import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, TrendingUp, Database, Star } from "lucide-react";
+import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, TrendingUp, Database, Star, Archive } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -45,12 +45,19 @@ export function AppSidebar({ role }: AppSidebarProps) {
       url: '/saved-headhunters',
       icon: Star,
     }] : []),
-    ...(role === 'headhunter' ? [{
-      title: 'Global Hiring',
-      url: '/global-hiring',
-      icon: Globe,
-      badge: 'Beta',
-    }] : []),
+    ...(role === 'headhunter' ? [
+      {
+        title: 'Talent Vault',
+        url: '/hunt-vault',
+        icon: Archive,
+      },
+      {
+        title: 'Global Hiring',
+        url: '/global-hiring',
+        icon: Globe,
+        badge: 'Beta',
+      }
+    ] : []),
     {
       title: 'Tools',
       url: '#',

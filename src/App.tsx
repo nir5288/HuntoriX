@@ -35,6 +35,7 @@ import Accessibility from "./pages/Accessibility";
 import GlobalHiring from "./pages/GlobalHiring";
 import Plans from "./pages/Plans";
 import WhyHuntorix from "./pages/WhyHuntorix";
+import HuntVault from "./pages/HuntVault";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -72,6 +73,7 @@ const AppContent = () => {
             <Route path="/settings" element={<Settings />} />
             <Route path="/ai-analytics" element={<AIAnalytics />} />
             <Route path="/global-hiring" element={<GlobalHiring />} />
+            <Route path="/hunt-vault" element={<HuntVault />} />
           </Route>
 
           {/* Plan selection without layout */}
