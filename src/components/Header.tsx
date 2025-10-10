@@ -461,12 +461,20 @@ export function Header() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-300">
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={profile.avatar_url} />
-                          <AvatarFallback className="text-sm">
-                            {profile.name?.[0]?.toUpperCase() || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={profile.avatar_url} />
+                            <AvatarFallback className="text-sm">
+                              {profile.name?.[0]?.toUpperCase() || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <Badge 
+                            variant="secondary" 
+                            className="hidden sm:flex capitalize text-xs"
+                          >
+                            {profile.role}
+                          </Badge>
+                        </div>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-64">
