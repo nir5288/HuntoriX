@@ -196,7 +196,7 @@ I'm here to guide you through every feature of Huntorix. Ask me anything about n
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
