@@ -421,7 +421,17 @@ const Messages = () => {
                     </div>
                   </Link>
                   
-                  {!isMobile && (
+                  {isMobile ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90"
+                      onClick={() => setIsVideoCallOpen(true)}
+                      title="Start video call"
+                    >
+                      <Video className="h-5 w-5 text-white" />
+                    </Button>
+                  ) : (
                     <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
                       <PopoverTrigger asChild>
                         <Button
