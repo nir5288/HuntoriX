@@ -87,15 +87,31 @@ const Auth = () => {
         return;
       }
       
-      // Headhunters: check if they need onboarding
-      if (profile.role === 'headhunter') {
-        // If onboarding completed, go to dashboard
+      // Headhunters: check if they have a subscription
+      const checkSubscription = async () => {
+        const { data: subscription } = await supabase
+          .from('user_subscriptions')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // If no subscription, redirect to plans page
+        if (!subscription) {
+          navigate('/plans');
+          return;
+        }
+
+        // If they have a subscription, check onboarding
         if (profile.onboarding_completed) {
           navigate('/dashboard/headhunter');
         } else {
           // If not completed, go to root and let VerificationWrapper handle welcome screen
           navigate('/');
         }
+      };
+
+      if (profile.role === 'headhunter') {
+        checkSubscription();
       }
     }
   }, [user, profile, navigate, showPlanSelection]);
@@ -219,67 +235,9 @@ const Auth = () => {
               console.error('Error sending verification email:', emailError);
             }
             
-            // If there's a pre-selected plan, automatically create the subscription
-            if (preSelectedPlan) {
-              try {
-                // Resolve plan: preSelectedPlan may be a plan UUID or a plan name
-                let planIdToUse: string | null = null;
-                const uuidRegex = /^[0-9a-fA-F-]{36}$/;
-
-                if (uuidRegex.test(preSelectedPlan)) {
-                  planIdToUse = preSelectedPlan;
-                } else {
-                  const { data: planData, error: planError } = await supabase
-                    .from('subscription_plans')
-                    .select('id')
-                    .ilike('name', preSelectedPlan)
-                    .maybeSingle();
-                  if (planError) console.error('Error fetching plan by name:', planError);
-                  planIdToUse = planData?.id ?? null;
-                }
-
-                if (!planIdToUse) {
-                  toast.error("We couldn't find the selected plan. We'll open plan selection now.");
-                  setShowPlanSelection(true);
-                  setNewUserId(data.user.id);
-                } else {
-                  const { error: subError } = await supabase
-                    .from('user_subscriptions')
-                    .insert({
-                      user_id: data.user.id,
-                      plan_id: planIdToUse,
-                      status: 'active',
-                    });
-
-                  if (subError) {
-                    console.error('Error creating subscription:', subError);
-                    toast.error("Account created, but we couldn't set up your subscription. We'll open plan selection now.");
-                    setShowPlanSelection(true);
-                    setNewUserId(data.user.id);
-                  } else {
-                    // Clear the pre-selected plan
-                    localStorage.removeItem('selectedPlan');
-                    setPreSelectedPlan(null);
-
-                    // Refresh profile to get updated data
-                    await refreshProfile();
-
-                    toast.success('Account created! Welcome to Huntorix.');
-                    // Navigation will be handled by the useEffect that checks onboarding_completed
-                  }
-                }
-              } catch (error) {
-                console.error('Error setting up subscription:', error);
-                toast.error("Something went wrong. We'll open plan selection now.");
-                setShowPlanSelection(true);
-                setNewUserId(data.user.id);
-              }
-            } else {
-              // No pre-selected plan, show plan selection
-              setShowPlanSelection(true);
-              setNewUserId(data.user.id);
-              toast.success('Account created! Please select your subscription plan.');
-            }
+            // Always redirect to plans page for headhunters after signup
+            toast.success('Account created! Please select your subscription plan.');
+            navigate('/plans');
           } else {
             // Employers don't need plan selection
             toast.success('Account created! Please check your email to verify your account.');

@@ -33,11 +33,12 @@ const Plans = () => {
     // Clear the stored plan after successful selection
     localStorage.removeItem('selectedPlan');
     await refreshProfile();
-    // Navigate to dashboard based on role
+    
+    // Navigate to home to trigger welcome screen (for headhunters) or dashboard (for employers)
     if (profile?.role === 'employer') {
       navigate('/dashboard/employer');
     } else {
-      navigate('/dashboard/headhunter');
+      navigate('/');
     }
   };
 
