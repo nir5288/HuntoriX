@@ -414,19 +414,21 @@ export function Header() {
                       </Tooltip>
                     )}
                     <NotificationDropdown />
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate('/saved-jobs')}
-                          className="h-9 w-9"
-                        >
-                          <Heart className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>My Saved Jobs</TooltipContent>
-                    </Tooltip>
+                    {profile.role === 'headhunter' && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate('/saved-jobs')}
+                            className="h-9 w-9"
+                          >
+                            <Heart className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>My Saved Jobs</TooltipContent>
+                      </Tooltip>
+                    )}
                     {profile.role === 'employer' && (
                       <Tooltip>
                         <TooltipTrigger asChild>

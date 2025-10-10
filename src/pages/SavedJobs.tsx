@@ -17,9 +17,14 @@ const SavedJobs = () => {
 
   useEffect(() => {
     if (user && !loading) {
+      // Redirect employers to their dashboard
+      if (profile?.role === 'employer') {
+        navigate('/dashboard/employer');
+        return;
+      }
       fetchSavedJobs();
     }
-  }, [user, loading]);
+  }, [user, loading, profile, navigate]);
 
   const fetchSavedJobs = async () => {
     try {

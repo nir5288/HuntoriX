@@ -32,7 +32,6 @@ const EmployerDashboard = () => {
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [editHistoryModalOpen, setEditHistoryModalOpen] = useState(false);
   const [editHistory, setEditHistory] = useState<any[]>([]);
-  const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [savedHeadhuntersCount, setSavedHeadhuntersCount] = useState(0);
   const [sortBy, setSortBy] = useState<'latest' | 'oldest'>(() => {
     return (localStorage.getItem('employer_dashboard_sort_by') as 'latest' | 'oldest') || 'latest';
@@ -144,15 +143,6 @@ const EmployerDashboard = () => {
         if (appsError) throw appsError;
         setApplications(appsData || []);
       }
-
-      // Fetch saved jobs count
-      const { count, error: savedError } = await supabase
-        .from('saved_jobs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id);
-      
-      if (savedError) throw savedError;
-      setSavedJobsCount(count || 0);
 
       // Fetch saved headhunters count
       const { count: headhuntersCount, error: savedHeadhuntersError } = await supabase
@@ -473,16 +463,7 @@ const EmployerDashboard = () => {
               <Star className="h-5 w-5" />
               Saved Headhunters ({savedHeadhuntersCount})
             </Button>
-            <Button 
-              variant="ghost" 
-              size="default"
-              onClick={() => navigate('/saved-jobs')}
-              className="hidden lg:flex items-center gap-2 h-10"
-            >
-              <Heart className="h-5 w-5" />
-              Saved Jobs ({savedJobsCount})
-            </Button>
-            <Button 
+            <Button
               size="default" 
               onClick={() => setPostJobModalOpen(true)} 
               className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-10"
