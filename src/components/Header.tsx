@@ -314,15 +314,10 @@ export function Header() {
                     {profile.role === 'headhunter' && credits && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigate('/settings')}
-                            className="h-9 px-3 gap-1.5"
-                          >
+                          <div className="h-9 px-3 gap-1.5 flex items-center">
                             <Coins className="h-4 w-4" />
                             <span className="text-sm font-medium">{credits.remaining}</span>
-                          </Button>
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>Application Credits</TooltipContent>
                       </Tooltip>
