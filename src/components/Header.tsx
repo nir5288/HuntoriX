@@ -290,6 +290,16 @@ export function Header() {
                 >
                   Find a Headhunter
                 </Link>
+                <Link 
+                  to="/plans" 
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/plans') 
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Pricing
+                </Link>
               </nav>
 
               {/* Right side - Auth & Actions */}
@@ -365,6 +375,14 @@ export function Header() {
                       >
                       <User className="h-5 w-5 text-muted-foreground" />
                         Find a Headhunter
+                      </Link>
+                      <Link 
+                        to="/plans" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Crown className="h-5 w-5 text-muted-foreground" />
+                        Pricing
                       </Link>
                     </div>
 
