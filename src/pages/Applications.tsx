@@ -177,37 +177,37 @@ const Applications = () => {
   }
 
   return (
-      <div className="container px-6 py-6 max-w-7xl">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+      <div className="container px-6 pb-4 sm:pb-6 max-w-7xl -mt-6 sm:-mt-8">
+        <div className="mb-6 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
             My Applications
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
             Track your application status
           </p>
         </div>
 
         <Card>
           <CardHeader className="px-4 py-4">
-            <div className="flex items-center justify-between mb-3">
-              <CardTitle className="text-lg">{filteredApplications.length} {filteredApplications.length === 1 ? 'Application' : 'Applications'}</CardTitle>
+            <div className="flex items-center justify-between mb-3 text-center sm:text-left">
+              <CardTitle className="text-xl sm:text-2xl font-bold flex-1 sm:flex-initial">{filteredApplications.length} {filteredApplications.length === 1 ? 'Application' : 'Applications'}</CardTitle>
             </div>
             
             {/* Filters */}
-            <div className="flex flex-wrap gap-3 pt-3 border-t">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 pt-3 border-t">
               <Button
                 variant={showPendingOnly ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowPendingOnly(!showPendingOnly)}
-                className="h-8 text-xs gap-2"
+                className="w-full sm:w-auto h-10 sm:h-8 text-sm sm:text-xs gap-2"
               >
-                {showPendingOnly && <Check className="h-3.5 w-3.5" />}
+                {showPendingOnly && <Check className="h-4 sm:h-3.5 w-4 sm:w-3.5" />}
                 Pending Review
               </Button>
 
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-8 w-[140px] text-xs">
-                  <Filter className="mr-1.5 h-3 w-3" />
+                <SelectTrigger className="h-10 sm:h-8 w-full sm:w-[140px] text-sm sm:text-xs">
+                  <Filter className="mr-1.5 h-4 sm:h-3 w-4 sm:w-3" />
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -222,8 +222,8 @@ const Applications = () => {
               </Select>
 
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="h-8 w-[140px] text-xs">
-                  <ArrowUpDown className="mr-1.5 h-3 w-3" />
+                <SelectTrigger className="h-10 sm:h-8 w-full sm:w-[140px] text-sm sm:text-xs">
+                  <ArrowUpDown className="mr-1.5 h-4 sm:h-3 w-4 sm:w-3" />
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
@@ -253,142 +253,142 @@ const Applications = () => {
             ) : (
               <div className="space-y-3">
                 {filteredApplications.map((app) => (
-                  <Card key={`${app.type}-${app.id}`} className={`group hover:shadow-md transition-shadow cursor-pointer ${
-                    app.job?.is_exclusive ? 'exclusive-job-card' : ''
-                  }`} onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}>
-                    <CardHeader className="px-4 py-3">
-                      {/* Mobile layout */}
-                      <div className="flex flex-col gap-2.5 sm:hidden">
-                        <div className="space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="text-sm font-semibold leading-tight">{app.job?.title}</CardTitle>
-                            {app.job?.job_id_number && (
-                              <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
-                                #{app.job?.job_id_number}
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          <CardDescription className="text-[11px] leading-tight">
-                            {app.job?.employer?.company_name || app.job?.employer?.name} • {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
-                          </CardDescription>
-                          
-                          <div className="flex flex-wrap gap-1.5">
-                            {app.job?.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
-                                HuntoriX Exclusive
-                              </Badge>
-                            )}
-                            {app.type === 'invitation' && (
-                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-[9px] h-4 px-1.5">
-                                Invitation
-                              </Badge>
-                            )}
-                            <Badge className={`text-[9px] h-4 px-1.5 ${getStatusColor(app.status)}`}>
-                              {app.status}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
-                          {app.status === 'shortlisted' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleChat(app.job_id);
-                              }}
-                              className="h-8 text-[10px]"
-                            >
-                              <MessageCircle className="mr-1 h-3 w-3" />
-                              Chat
-                            </Button>
-                          )}
-                          {app.type === 'invitation' && app.status === 'pending' && (
-                            <Button
-                              variant="hero"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/job-review/${app.job_id}`);
-                              }}
-                              className="h-8 text-[10px]"
-                            >
-                              Review
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+                   <Card key={`${app.type}-${app.id}`} className={`group hover:shadow-md transition-shadow cursor-pointer ${
+                     app.job?.is_exclusive ? 'exclusive-job-card' : ''
+                   }`} onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}>
+                     <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
+                       {/* Mobile layout */}
+                       <div className="flex flex-col gap-4 sm:hidden">
+                         <div className="space-y-3">
+                           <div className="flex items-start justify-between gap-2">
+                             <CardTitle className="text-lg font-semibold leading-tight">{app.job?.title}</CardTitle>
+                             {app.job?.job_id_number && (
+                               <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
+                                 #{app.job?.job_id_number}
+                               </Badge>
+                             )}
+                           </div>
+                           
+                           <CardDescription className="text-sm leading-relaxed">
+                             {app.job?.employer?.company_name || app.job?.employer?.name} • {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
+                           </CardDescription>
+                           
+                           <div className="flex flex-wrap gap-2">
+                             {app.job?.is_exclusive && (
+                               <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2">
+                                 HuntoriX Exclusive
+                               </Badge>
+                             )}
+                             {app.type === 'invitation' && (
+                               <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-6 px-2">
+                                 Invitation
+                               </Badge>
+                             )}
+                             <Badge className={`text-xs h-6 px-2 ${getStatusColor(app.status)}`}>
+                               {app.status}
+                             </Badge>
+                           </div>
+                         </div>
+                         
+                         <div className="flex flex-col gap-2 pt-3 border-t">
+                           {app.status === 'shortlisted' && (
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 handleChat(app.job_id);
+                               }}
+                               className="w-full h-10 text-sm justify-start"
+                             >
+                               <MessageCircle className="mr-2 h-4 w-4" />
+                               Chat with Employer
+                             </Button>
+                           )}
+                           {app.type === 'invitation' && app.status === 'pending' && (
+                             <Button
+                               variant="hero"
+                               size="sm"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 navigate(`/job-review/${app.job_id}`);
+                               }}
+                               className="w-full h-10 text-sm justify-start"
+                             >
+                               Review Invitation
+                             </Button>
+                           )}
+                         </div>
+                       </div>
 
-                      {/* Tablet & Desktop layout - original */}
-                      <div className="hidden sm:flex items-start justify-between">
-                        <div 
-                          className="flex-1 cursor-pointer"
-                          onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-base">{app.job?.title}</CardTitle>
-                            <Badge variant="outline" className="text-xs h-5">
-                              #{app.job?.job_id_number}
-                            </Badge>
-                            {app.job?.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
-                                HuntoriX Exclusive
-                              </Badge>
-                            )}
-                            {app.type === 'invitation' && (
-                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5">
-                                Invitation
-                              </Badge>
-                            )}
-                          </div>
-                          <CardDescription className="text-xs">
-                            {app.job?.employer?.company_name || app.job?.employer?.name} • 
-                            {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)}`}>
-                            {app.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-3 hidden sm:block">
-                      <div className="flex gap-2">
-                        {app.status === 'shortlisted' && (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleChat(app.job_id)}
-                            className="h-7 text-xs"
-                          >
-                            <MessageCircle className="mr-1.5 h-3 w-3" />
-                            Chat
-                          </Button>
-                        )}
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
-                          className="h-7 text-xs"
-                        >
-                          View Details
-                        </Button>
-                        {app.type === 'invitation' && app.status === 'pending' && (
-                          <Button 
-                            size="sm" 
-                            variant="hero"
-                            onClick={() => navigate(`/job-review/${app.job_id}`)}
-                            className="h-7 text-xs"
-                          >
-                            Review
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                       {/* Tablet & Desktop layout - original */}
+                       <div className="hidden sm:flex items-start justify-between">
+                         <div 
+                           className="flex-1 cursor-pointer"
+                           onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
+                         >
+                           <div className="flex items-center gap-2 mb-2">
+                             <CardTitle className="text-base sm:text-lg">{app.job?.title}</CardTitle>
+                             <Badge variant="outline" className="text-xs sm:text-sm h-6">
+                               #{app.job?.job_id_number}
+                             </Badge>
+                             {app.job?.is_exclusive && (
+                               <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs sm:text-sm h-6">
+                                 HuntoriX Exclusive
+                               </Badge>
+                             )}
+                             {app.type === 'invitation' && (
+                               <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs sm:text-sm h-6">
+                                 Invitation
+                               </Badge>
+                             )}
+                           </div>
+                           <CardDescription className="text-sm sm:text-base">
+                             {app.job?.employer?.company_name || app.job?.employer?.name} • 
+                             {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
+                           </CardDescription>
+                         </div>
+                         <div className="flex items-center gap-1.5">
+                           <Badge className={`text-xs sm:text-sm h-6 ${getStatusColor(app.status)}`}>
+                             {app.status}
+                           </Badge>
+                         </div>
+                       </div>
+                     </CardHeader>
+                     <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6 hidden sm:block">
+                       <div className="flex gap-2">
+                         {app.status === 'shortlisted' && (
+                           <Button 
+                             size="sm" 
+                             variant="outline"
+                             onClick={() => handleChat(app.job_id)}
+                             className="h-8 text-sm"
+                           >
+                             <MessageCircle className="mr-1.5 h-4 w-4" />
+                             Chat
+                           </Button>
+                         )}
+                         <Button 
+                           size="sm" 
+                           variant="outline"
+                           onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'applications' } })}
+                           className="h-8 text-sm"
+                         >
+                           View Details
+                         </Button>
+                         {app.type === 'invitation' && app.status === 'pending' && (
+                           <Button 
+                             size="sm" 
+                             variant="hero"
+                             onClick={() => navigate(`/job-review/${app.job_id}`)}
+                             className="h-8 text-sm"
+                           >
+                             Review
+                           </Button>
+                         )}
+                       </div>
+                     </CardContent>
+                   </Card>
                 ))}
               </div>
             )}

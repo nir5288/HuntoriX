@@ -244,7 +244,7 @@ const HeadhunterDashboard = () => {
           </div>
         </div>;
   }
-  return <div className="container px-6 py-6 max-w-7xl">
+  return <div className="container px-6 pb-4 sm:pb-6 max-w-7xl -mt-6 sm:-mt-8">
         {/* Verification Banner */}
         {!profile?.email_verified && <Alert className="mb-4 border-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10">
             <Mail className="h-4 w-4" />
@@ -257,24 +257,24 @@ const HeadhunterDashboard = () => {
             </AlertDescription>
           </Alert>}
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div className="w-full sm:w-auto">
-            <h1 className="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
+          <div className="w-full sm:w-auto text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
               Headhunter Dashboard
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">Browse jobs and manage your applications</p>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Browse jobs and manage your applications</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <Button size="sm" variant="outline" onClick={() => navigate('/saved-jobs')} className="relative h-8 text-[10px] sm:text-xs flex-1 sm:flex-initial">
-              <Heart className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
+            <Button size="lg" variant="outline" onClick={() => navigate('/saved-jobs')} className="relative h-12 text-base flex-1 sm:flex-initial">
+              <Heart className="mr-2 h-5 w-5" />
               <span className="hidden sm:inline">Saved Jobs</span>
               <span className="sm:hidden">Saved</span>
-              {savedJobsCount > 0 && <Badge className="ml-1 sm:ml-1.5 bg-[hsl(var(--accent-pink))] text-white h-4 px-1 text-[9px] sm:text-[10px]">
+              {savedJobsCount > 0 && <Badge className="ml-2 bg-[hsl(var(--accent-pink))] text-white h-5 px-2 text-xs">
                   {savedJobsCount}
                 </Badge>}
             </Button>
-            <Button size="sm" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-8 text-[10px] sm:text-xs flex-1 sm:flex-initial">
-              <Search className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
+            <Button size="lg" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-12 text-base flex-1 sm:flex-initial">
+              <Search className="mr-2 h-5 w-5" />
               <span className="hidden sm:inline">Browse Jobs</span>
               <span className="sm:hidden">Browse</span>
             </Button>
@@ -283,120 +283,120 @@ const HeadhunterDashboard = () => {
 
         {/* Stats */}
         <TooltipProvider delayDuration={0}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
             <Card className={`cursor-pointer transition-all ${applications.filter(a => a.type === 'invitation' && a.status === 'pending' || a.type === 'application' && a.status === 'submitted').length > 0 ? 'bg-[hsl(var(--warning))]/10 hover:bg-[hsl(var(--warning))]/20 border-[hsl(var(--warning))]/30' : ''}`} onClick={() => {
           const pendingCount = applications.filter(a => a.type === 'invitation' && a.status === 'pending' || a.type === 'application' && a.status === 'submitted').length;
           if (pendingCount > 0) {
             setShowPendingOnly(!showPendingOnly);
           }
         }}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <CardTitle className="text-xs font-medium cursor-help flex items-center gap-1">
+                    <CardTitle className="text-xs sm:text-sm font-medium cursor-help flex items-center gap-1 leading-tight">
                       Pending Review
-                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                      <AlertCircle className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Job invitations and applications pending your action</p>
                   </TooltipContent>
                 </Tooltip>
-                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-4 pb-3">
-                <div className="text-xl font-bold">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+                <div className="text-2xl sm:text-3xl font-bold">
                   {applications.filter(a => a.type === 'invitation' && a.status === 'pending' || a.type === 'application' && a.status === 'submitted').length}
                 </div>
-                {applications.filter(a => a.type === 'invitation' && a.status === 'pending' || a.type === 'application' && a.status === 'submitted').length > 0 && <p className="text-[10px] text-muted-foreground mt-1">
+                {applications.filter(a => a.type === 'invitation' && a.status === 'pending' || a.type === 'application' && a.status === 'submitted').length > 0 && <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                     Click to {showPendingOnly ? 'show all' : 'filter'}
                   </p>}
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <CardTitle className="text-xs font-medium cursor-help flex items-center gap-1">
+                    <CardTitle className="text-xs sm:text-sm font-medium cursor-help flex items-center gap-1 leading-tight">
                       Active Applications
-                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                      <AlertCircle className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Applications that are currently submitted or shortlisted</p>
                   </TooltipContent>
                 </Tooltip>
-                <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
+                <Briefcase className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-4 pb-3">
-                <div className="text-xl font-bold">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+                <div className="text-2xl sm:text-3xl font-bold">
                   {applications.filter(a => a.type === 'application' && ['submitted', 'shortlisted'].includes(a.status)).length}
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <CardTitle className="text-xs font-medium cursor-help flex items-center gap-1">
+                    <CardTitle className="text-xs sm:text-sm font-medium cursor-help flex items-center gap-1 leading-tight">
                       Successful Placements
-                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                      <AlertCircle className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Applications where you were selected for the position</p>
                   </TooltipContent>
                 </Tooltip>
-                <CheckCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                <CheckCircle className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-4 pb-3">
-                <div className="text-xl font-bold">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+                <div className="text-2xl sm:text-3xl font-bold">
                   {applications.filter(a => a.type === 'application' && a.status === 'selected').length}
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <CardTitle className="text-xs font-medium cursor-help flex items-center gap-1">
+                    <CardTitle className="text-xs sm:text-sm font-medium cursor-help flex items-center gap-1 leading-tight">
                       Response Time
-                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                      <AlertCircle className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Average response time for employer communications</p>
                   </TooltipContent>
                 </Tooltip>
-                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-4 pb-3">
-                <div className="text-xl font-bold">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+                <div className="text-2xl sm:text-3xl font-bold">
                   {profile?.response_time_hours ? profile.response_time_hours < 2 ? <span className="text-[hsl(var(--success))]">Under 2h</span> : profile.response_time_hours < 24 ? <span className="text-[hsl(var(--accent-mint))]">Under 24h</span> : <span className="text-[hsl(var(--warning))]">Over 24h</span> : <span className="text-muted-foreground text-base">N/A</span>}
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <CardTitle className="text-xs font-medium cursor-help flex items-center gap-1">
+                    <CardTitle className="text-xs sm:text-sm font-medium cursor-help flex items-center gap-1 leading-tight">
                       Success Rate
-                      <AlertCircle className="h-3 w-3 text-muted-foreground" />
+                      <AlertCircle className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                     </CardTitle>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>% of submitted candidates marked as relevant by employers</p>
                   </TooltipContent>
                 </Tooltip>
-                <CheckCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                <CheckCircle className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-4 pb-3">
-                <div className="text-xl font-bold">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+                <div className="text-2xl sm:text-3xl font-bold">
                   {profile?.success_rate ? `${profile.success_rate}%` : '0%'}
                 </div>
               </CardContent>
@@ -408,20 +408,30 @@ const HeadhunterDashboard = () => {
         <Card className="mb-6">
           <CardHeader className="px-4 py-4">
             <div className="flex items-center justify-between mb-3">
-              <div>
-                <CardTitle className="text-lg">My Applications</CardTitle>
-                <CardDescription className="text-xs">Track your application status</CardDescription>
+              <div className="text-center sm:text-left flex-1 sm:flex-initial">
+                <CardTitle className="text-xl sm:text-2xl font-bold">My Applications</CardTitle>
+                <CardDescription className="text-sm sm:text-base mt-1">Track your application status</CardDescription>
               </div>
-              {applications.length > 5 && <Button size="sm" onClick={() => navigate('/applications')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-7 text-xs">
+              {applications.length > 5 && <Button size="sm" onClick={() => navigate('/applications')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-8 text-xs">
                   View All
                 </Button>}
             </div>
             
             {/* Filters */}
-            {applications.length > 0 && <div className="flex flex-wrap gap-3 pt-3 border-t items-center">
+            {applications.length > 0 && <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 pt-3 border-t items-center">
+                <Button
+                  variant={showPendingOnly ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowPendingOnly(!showPendingOnly)}
+                  className="w-full sm:w-auto h-10 sm:h-8 text-sm sm:text-xs gap-2"
+                >
+                  {showPendingOnly && <Check className="h-4 sm:h-3.5 w-4 sm:w-3.5" />}
+                  Pending Review
+                </Button>
+                
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-8 w-[140px] text-xs">
-                    <Filter className="mr-1.5 h-3 w-3" />
+                  <SelectTrigger className="h-10 sm:h-8 w-full sm:w-[140px] text-sm sm:text-xs">
+                    <Filter className="mr-1.5 h-4 sm:h-3 w-4 sm:w-3" />
                     <SelectValue placeholder="Filter" />
                   </SelectTrigger>
                   <SelectContent>
@@ -436,8 +446,8 @@ const HeadhunterDashboard = () => {
                 </Select>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="h-8 w-[140px] text-xs">
-                    <ArrowUpDown className="mr-1.5 h-3 w-3" />
+                  <SelectTrigger className="h-10 sm:h-8 w-full sm:w-[140px] text-sm sm:text-xs">
+                    <ArrowUpDown className="mr-1.5 h-4 sm:h-3 w-4 sm:w-3" />
                     <SelectValue placeholder="Sort" />
                   </SelectTrigger>
                   <SelectContent>
@@ -446,13 +456,6 @@ const HeadhunterDashboard = () => {
                     <SelectItem value="status">By Status</SelectItem>
                   </SelectContent>
                 </Select>
-                
-                <div className="flex items-center gap-2">
-                  <Checkbox id="pending-only" checked={showPendingOnly} onCheckedChange={checked => setShowPendingOnly(checked as boolean)} className="h-4 w-4" />
-                  <Label htmlFor="pending-only" className="text-xs font-medium cursor-pointer">
-                    Pending Review
-                  </Label>
-                </div>
               </div>}
           </CardHeader>
           <CardContent className="px-4 pb-4">
