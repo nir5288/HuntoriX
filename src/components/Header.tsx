@@ -362,10 +362,36 @@ export function Header() {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <User className="h-5 w-5 text-muted-foreground" />
+                      <User className="h-5 w-5 text-muted-foreground" />
                         Find a Headhunter
                       </Link>
                     </div>
+
+                    {/* Auth Buttons for Mobile (when not logged in) */}
+                    {!user && (
+                      <div className="border-t pt-4 px-3 flex flex-col gap-2">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            navigate('/auth?mode=signin');
+                          }}
+                          className="w-full"
+                        >
+                          Login
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            navigate('/auth?mode=signup');
+                          }}
+                          className="w-full"
+                        >
+                          Sign up
+                          <ArrowRight className="ml-1 h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </nav>
                 </SheetContent>
               </Sheet>
@@ -597,7 +623,7 @@ export function Header() {
                   </DropdownMenu>
                 </TooltipProvider>
               ) : (
-                <>
+                <div className="hidden lg:flex items-center gap-2">
                   <Button 
                     variant="ghost" 
                     size="sm"
@@ -614,7 +640,7 @@ export function Header() {
                     Sign up
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>
