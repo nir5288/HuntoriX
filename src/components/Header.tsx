@@ -434,7 +434,7 @@ export function Header() {
                         <>
                           <div className="px-2 py-2 space-y-2">
                             <button
-                              onClick={() => navigate('/settings')}
+                              onClick={() => navigate('/plans')}
                               className="flex items-center gap-2 hover:opacity-80 transition w-full"
                             >
                               <span className="text-sm text-muted-foreground">Plan:</span>

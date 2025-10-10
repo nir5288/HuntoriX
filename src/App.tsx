@@ -33,6 +33,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Accessibility from "./pages/Accessibility";
 import GlobalHiring from "./pages/GlobalHiring";
+import Plans from "./pages/Plans";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -69,6 +70,9 @@ const AppContent = () => {
             <Route path="/ai-analytics" element={<AIAnalytics />} />
             <Route path="/global-hiring" element={<GlobalHiring />} />
           </Route>
+
+          {/* Plan selection without layout */}
+          <Route path="/plans" element={<Plans />} />
 
           {/* Public routes without dashboard layout */}
           <Route path="/opportunities" element={<Opportunities />} />
