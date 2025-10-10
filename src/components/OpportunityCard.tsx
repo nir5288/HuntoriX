@@ -608,6 +608,9 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
+          <Button variant="outline" onClick={() => setUpgradeDialogOpen(false)}>
+            Cancel
+          </Button>
           <AlertDialogAction
             onClick={() => {
               setUpgradeDialogOpen(false);
