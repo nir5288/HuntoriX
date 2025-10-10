@@ -497,15 +497,15 @@ const EmployerDashboard = () => {
         {/* Jobs List */}
         <Card>
           <CardHeader className="px-4 py-4">
-            <div>
-              <CardTitle className="text-base sm:text-lg">My Jobs</CardTitle>
-              <CardDescription className="text-[10px] sm:text-xs">View and manage your job postings</CardDescription>
+            <div className="text-center sm:text-left">
+              <CardTitle className="text-xl sm:text-2xl font-bold">My Jobs</CardTitle>
+              <CardDescription className="text-sm sm:text-base mt-1">View and manage your job postings</CardDescription>
             </div>
-            <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-3 pt-3 border-t mt-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-4 border-t mt-4">
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Label htmlFor="sort-jobs" className="text-[10px] sm:text-xs font-medium shrink-0">Sort:</Label>
+                <Label htmlFor="sort-jobs" className="text-sm sm:text-base font-medium shrink-0">Sort:</Label>
                 <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
-                  <SelectTrigger id="sort-jobs" className="h-7 sm:h-8 w-full sm:w-[120px] text-[10px] sm:text-xs">
+                  <SelectTrigger id="sort-jobs" className="h-10 sm:h-11 w-full sm:w-[140px] text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -514,27 +514,23 @@ const EmployerDashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="pending-only" 
-                  checked={showPendingOnly} 
-                  onCheckedChange={(checked) => setShowPendingOnly(checked as boolean)}
-                  className="h-3.5 sm:h-4 w-3.5 sm:w-4"
-                />
-                <Label htmlFor="pending-only" className="text-[10px] sm:text-xs font-medium cursor-pointer">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button
+                  variant={showPendingOnly ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowPendingOnly(!showPendingOnly)}
+                  className="flex-1 sm:flex-initial h-10 text-sm sm:text-base"
+                >
                   Pending Review
-                </Label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="private-only" 
-                  checked={showPrivateOnly} 
-                  onCheckedChange={(checked) => setShowPrivateOnly(checked as boolean)}
-                  className="h-3.5 sm:h-4 w-3.5 sm:w-4"
-                />
-                <Label htmlFor="private-only" className="text-[10px] sm:text-xs font-medium cursor-pointer">
+                </Button>
+                <Button
+                  variant={showPrivateOnly ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowPrivateOnly(!showPrivateOnly)}
+                  className="flex-1 sm:flex-initial h-10 text-sm sm:text-base"
+                >
                   Private Only
-                </Label>
+                </Button>
               </div>
             </div>
           </CardHeader>
