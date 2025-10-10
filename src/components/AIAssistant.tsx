@@ -33,6 +33,7 @@ export function AIAssistant() {
   const [position, setPosition] = useState({ x: 24, y: 24 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { toast } = useToast();
@@ -67,6 +68,7 @@ export function AIAssistant() {
     if (!isMobile) return;
     const touch = e.touches[0];
     setIsDragging(true);
+    setHasMoved(false);
     setDragStart({
       x: touch.clientX - position.x,
       y: touch.clientY - position.y
@@ -79,6 +81,11 @@ export function AIAssistant() {
     const touch = e.touches[0];
     const newX = touch.clientX - dragStart.x;
     const newY = touch.clientY - dragStart.y;
+    
+    // Mark as moved if dragged more than 5px
+    if (Math.abs(newX - position.x) > 5 || Math.abs(newY - position.y) > 5) {
+      setHasMoved(true);
+    }
     
     // Keep button within viewport bounds
     const buttonSize = 56; // h-14 w-14
@@ -94,6 +101,19 @@ export function AIAssistant() {
   const handleTouchEnd = () => {
     if (!isMobile) return;
     setIsDragging(false);
+  };
+
+  const handleButtonClick = () => {
+    // Only toggle if not dragging
+    if (hasMoved) {
+      setHasMoved(false);
+      return;
+    }
+    const newOpenState = !isOpen;
+    setIsOpen(newOpenState);
+    if (newOpenState) {
+      trackEvent('opened');
+    }
   };
 
   // Create conversation when component mounts or opens
@@ -326,14 +346,7 @@ export function AIAssistant() {
       {/* Floating Button */}
       <Button
         ref={buttonRef}
-        onClick={() => {
-          if (isDragging) return; // Don't toggle if dragging
-          const newOpenState = !isOpen;
-          setIsOpen(newOpenState);
-          if (newOpenState) {
-            trackEvent('opened');
-          }
-        }}
+        onClick={handleButtonClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -341,12 +354,13 @@ export function AIAssistant() {
           left: `${position.x}px`,
           bottom: `${position.y}px`,
           top: 'auto',
-          right: 'auto'
+          right: 'auto',
+          cursor: isDragging ? 'grabbing' : 'grab'
         } : undefined}
         className={cn(
-          "fixed shadow-lg hover:shadow-xl z-[9999] bg-gradient-to-r from-primary via-primary-glow to-primary transition-all duration-300 border border-white/20",
+          "fixed shadow-lg hover:shadow-xl z-[9999] bg-gradient-to-r from-primary via-primary-glow to-primary transition-shadow duration-300 border border-white/20",
           isMobile 
-            ? "h-14 w-14 rounded-full p-0 flex items-center justify-center touch-none"
+            ? "h-14 w-14 rounded-full p-0 flex items-center justify-center touch-none active:scale-95"
             : "left-6 bottom-6 h-12 px-4 rounded-full flex items-center gap-2.5 group"
         )}
       >
