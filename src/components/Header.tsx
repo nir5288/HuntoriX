@@ -271,6 +271,16 @@ export function Header() {
                   Dashboard
                 </Link>
                 <Link 
+                  to="/why-huntorix" 
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/why-huntorix') 
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Why Huntorix
+                </Link>
+                <Link 
                   to="/opportunities" 
                   className={`text-sm font-medium transition-colors ${
                     isActive('/opportunities') 
@@ -360,11 +370,19 @@ export function Header() {
                     <div className="border-t pt-2 mb-2">
                       <p className="text-xs font-semibold text-muted-foreground px-3 mb-2">DISCOVER</p>
                       <Link 
-                        to="/opportunities" 
+                        to="/why-huntorix" 
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <Star className="h-5 w-5 text-muted-foreground" />
+                        Why Huntorix
+                      </Link>
+                      <Link 
+                        to="/opportunities" 
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition text-sm font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Briefcase className="h-5 w-5 text-muted-foreground" />
                         Opportunities
                       </Link>
                       <Link 

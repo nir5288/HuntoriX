@@ -34,6 +34,7 @@ import TermsOfService from "./pages/TermsOfService";
 import Accessibility from "./pages/Accessibility";
 import GlobalHiring from "./pages/GlobalHiring";
 import Plans from "./pages/Plans";
+import WhyHuntorix from "./pages/WhyHuntorix";
 
 import { useEffect } from 'react';
 import { VerificationWrapper } from './components/VerificationWrapper';
@@ -77,6 +78,7 @@ const AppContent = () => {
           <Route path="/plans" element={<Plans />} />
 
           {/* Public routes without dashboard layout */}
+          <Route path="/why-huntorix" element={<WhyHuntorix />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/jobs" element={<Opportunities />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
