@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown, Menu, ArrowRight, Coins } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown, Menu, ArrowRight, Coins, AlertCircle, X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -29,6 +29,7 @@ import { ManageBannersModal } from './ManageBannersModal';
 import EditLegalDocumentModal from './EditLegalDocumentModal';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
@@ -206,64 +207,93 @@ export function Header() {
   const isHomepage = location.pathname === '/';
   
   return (
-    <header className={`${isHomepage ? 'fixed' : 'relative'} top-0 left-0 right-0 z-[100] pt-3 sm:pt-4 md:pt-6`}>
-      {/* Floating pill-shaped header with gradient border */}
-      <div className="site-container">
-        <div 
-          className="relative rounded-full h-16 sm:h-[72px] backdrop-blur-xl shadow-lg transition-all duration-300"
-          style={{
-            background: `linear-gradient(hsl(var(--background) / ${isScrolled ? '0.8' : '0.6'}), hsl(var(--background) / ${isScrolled ? '0.8' : '0.6'})) padding-box, linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink))) border-box`,
-            border: '2px solid transparent',
-          }}
-        >
-          <div className="relative h-full flex items-center justify-between px-4 sm:px-6 md:px-8">
-            {/* Logo - Left */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-300"
-            >
-              <Briefcase className="h-6 w-6" />
-              <span className="font-bold whitespace-nowrap text-lg sm:text-xl">
-                HUNTORIX
-              </span>
-            </Link>
+    <>
+      {/* Pending downgrade banner */}
+      {user && profile?.role === 'headhunter' && credits?.nextPlan && credits?.changeDate && (
+        <div className="fixed top-0 left-0 right-0 z-[101] bg-gradient-to-r from-yellow-500/10 via-yellow-600/10 to-orange-500/10 border-b border-yellow-500/20 backdrop-blur-sm">
+          <div className="site-container">
+            <Alert className="border-0 bg-transparent py-2">
+              <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+              <AlertDescription className="ml-2 flex items-center justify-between flex-1">
+                <span className="text-sm text-yellow-800 dark:text-yellow-200">
+                  Your plan will change to <strong>{credits.nextPlan}</strong> on{' '}
+                  <strong>
+                    {credits.changeDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </strong>
+                  . You'll keep your current credits until then.
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/plans')}
+                  className="text-yellow-800 dark:text-yellow-200 hover:text-yellow-900 dark:hover:text-yellow-100 font-medium shrink-0 ml-4"
+                >
+                  Upgrade Now
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+        </div>
+      )}
+      
+      <header className={`${isHomepage ? 'fixed' : 'relative'} ${credits?.nextPlan ? 'top-12' : 'top-0'} left-0 right-0 z-[100] pt-3 sm:pt-4 md:pt-6`}>
+        {/* Floating pill-shaped header with gradient border */}
+        <div className="site-container">
+          <div 
+            className="relative rounded-full h-16 sm:h-[72px] backdrop-blur-xl shadow-lg transition-all duration-300"
+            style={{
+              background: `linear-gradient(hsl(var(--background) / ${isScrolled ? '0.8' : '0.6'}), hsl(var(--background) / ${isScrolled ? '0.8' : '0.6'})) padding-box, linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink))) border-box`,
+              border: '2px solid transparent',
+            }}
+          >
+            <div className="relative h-full flex items-center justify-between px-4 sm:px-6 md:px-8">
+              {/* Logo - Left */}
+              <Link 
+                to="/" 
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-300"
+              >
+                <Briefcase className="h-6 w-6" />
+                <span className="font-bold whitespace-nowrap text-lg sm:text-xl">
+                  HUNTORIX
+                </span>
+              </Link>
 
-            {/* Center Navigation - Desktop Only */}
-            <nav className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-6">
-              <Link 
-                to={user ? getDashboardPath() : '/auth'} 
-                className={`text-sm font-medium transition-colors ${
-                  isActive('/dashboard') 
-                    ? 'text-foreground' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                to="/opportunities" 
-                className={`text-sm font-medium transition-colors ${
-                  isActive('/opportunities') 
-                    ? 'text-foreground' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Opportunities
-              </Link>
-              <Link 
-                to="/headhunters" 
-                className={`text-sm font-medium transition-colors ${
-                  isActive('/headhunters') 
-                    ? 'text-foreground' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                Find a Headhunter
-              </Link>
-            </nav>
+              {/* Center Navigation - Desktop Only */}
+              <nav className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-6">
+                <Link 
+                  to={user ? getDashboardPath() : '/auth'} 
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/dashboard') 
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/opportunities" 
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/opportunities') 
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Opportunities
+                </Link>
+                <Link 
+                  to="/headhunters" 
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/headhunters') 
+                      ? 'text-foreground' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Find a Headhunter
+                </Link>
+              </nav>
 
-            {/* Right side - Auth & Actions */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Right side - Auth & Actions */}
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               {/* Mobile Menu */}
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
@@ -499,15 +529,6 @@ export function Header() {
                                   <div className="text-xs text-yellow-600 dark:text-yellow-500 font-medium pt-1 border-t">
                                     Changing to {credits.nextPlan} on{' '}
                                     {credits.changeDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate('/plans');
-                                      }}
-                                      className="block mt-1 text-primary hover:underline"
-                                    >
-                                      Upgrade now
-                                    </button>
                                   </div>
                                 )}
                               </div>
@@ -620,5 +641,6 @@ export function Header() {
         </>
       )}
     </header>
+    </>
   );
 }

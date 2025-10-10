@@ -247,7 +247,7 @@ export function PlanSelection({
     try {
       const { data: existing } = await supabase
         .from('user_subscriptions')
-        .select('id, credits_reset_at')
+        .select('id, credits_reset_at, next_plan_id')
         .eq('user_id', userId)
         .maybeSingle();
       
@@ -269,7 +269,11 @@ export function PlanSelection({
           if (error) throw error;
           toast.success('Your plan will be downgraded at the next billing cycle');
         } else {
-          // For upgrades, apply immediately and clear any pending downgrades
+          // For upgrades
+          // If there's a pending downgrade, cancel it and keep current credits
+          // Otherwise, reset credits to full amount of new plan
+          const shouldResetCredits = !existing.next_plan_id;
+          
           const { error } = await supabase
             .from('user_subscriptions')
             .update({
@@ -277,14 +281,19 @@ export function PlanSelection({
               status: 'active',
               next_plan_id: null,
               plan_change_effective_date: null,
-              credits_used: 0,
-              credits_reset_at: new Date().toISOString(),
+              credits_used: shouldResetCredits ? 0 : undefined,
+              credits_reset_at: shouldResetCredits ? new Date().toISOString() : undefined,
               updated_at: new Date().toISOString()
             })
             .eq('user_id', userId);
           
           if (error) throw error;
-          toast.success('Plan upgraded successfully!');
+          
+          if (existing.next_plan_id) {
+            toast.success('Plan change cancelled - continuing with upgraded plan!');
+          } else {
+            toast.success('Plan upgraded successfully!');
+          }
         }
       } else {
         // New subscription
