@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, ThumbsUp, Mic, MicOff } from "lucide-react";
+import { MessageCircle, X, Send, ThumbsUp, Mic, MicOff, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,6 +37,7 @@ export function AIAssistant() {
   const [isRecording, setIsRecording] = useState(false);
   const [isMicPressed, setIsMicPressed] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [language, setLanguage] = useState<'en' | 'he'>('en');
   const audioChunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -293,7 +294,10 @@ export function AIAssistant() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ messages: newMessages }),
+          body: JSON.stringify({ 
+            messages: newMessages,
+            language: language 
+          }),
         }
       );
 
@@ -527,6 +531,26 @@ export function AIAssistant() {
               </div>
             </div>
             <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  const newLang = language === 'en' ? 'he' : 'en';
+                  setLanguage(newLang);
+                  toast({
+                    title: language === 'en' ? "שפה שונתה לעברית" : "Language changed to English",
+                    description: language === 'en' ? "עכשיו אני אדבר עברית" : "I will now speak English"
+                  });
+                }}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground relative"
+                title={language === 'en' ? "Switch to Hebrew" : "עבור לאנגלית"}
+              >
+                {language === 'en' ? (
+                  <span className="text-lg">🇺🇸</span>
+                ) : (
+                  <span className="text-lg">🇮🇱</span>
+                )}
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"

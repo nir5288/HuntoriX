@@ -9,12 +9,16 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, language = 'en' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are Huntorix AI, an intelligent assistant for the Huntorix platform - a comprehensive headhunting and executive recruitment marketplace connecting employers with top headhunters.
+    const languageInstruction = language === 'he' 
+      ? '\n\n**CRITICAL: RESPOND IN HEBREW ONLY. All your responses must be in Hebrew language.**'
+      : '\n\n**CRITICAL: RESPOND IN ENGLISH ONLY. All your responses must be in English language.**';
+
+    const systemPrompt = `You are Huntorix AI, an intelligent assistant for the Huntorix platform - a comprehensive headhunting and executive recruitment marketplace connecting employers with top headhunters.${languageInstruction}
 
 **COMMUNICATION STYLE:**
 - Keep answers SHORT and SIMPLE - be concise but informative
