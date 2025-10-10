@@ -420,28 +420,28 @@ const EmployerDashboard = () => {
   const renderVariant1 = () => (
     <>
       <div className="w-full px-4 sm:px-6 py-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <div className="w-full sm:w-auto">
-            <h1 className="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
+          <div className="w-full sm:w-auto text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
               Employer Dashboard
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">Manage your job postings and applications</p>
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Manage your job postings and applications</p>
           </div>
-          <Button size="sm" onClick={() => setPostJobModalOpen(true)} className="w-full sm:w-auto bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
-            <Plus className="mr-1.5 h-4 w-4" />
+          <Button size="lg" onClick={() => setPostJobModalOpen(true)} className="w-full sm:w-auto h-12 text-base bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
+            <Plus className="mr-2 h-5 w-5" />
             Post Job
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
-              <CardTitle className="text-[10px] sm:text-xs font-medium">Active Jobs</CardTitle>
-              <Briefcase className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Active Jobs</CardTitle>
+              <Briefcase className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-2 sm:pb-3">
-              <div className="text-lg sm:text-xl font-bold">{jobs.filter(j => j.status === 'open').length}</div>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <div className="text-2xl sm:text-3xl font-bold">{jobs.filter(j => j.status === 'open').length}</div>
             </CardContent>
           </Card>
 
@@ -458,15 +458,15 @@ const EmployerDashboard = () => {
             }}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
-              <CardTitle className="text-[10px] sm:text-xs font-medium">Pending Review</CardTitle>
-              <Clock className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Pending Review</CardTitle>
+              <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-2 sm:pb-3">
-              <div className="text-lg sm:text-xl font-bold">
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <div className="text-2xl sm:text-3xl font-bold">
                 {applications.filter(a => a.status === 'submitted').length}
               </div>
               {applications.filter(a => a.status === 'submitted').length > 0 && (
-                <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                   Click to {showPendingOnly ? 'show all' : 'filter'}
                 </p>
               )}
@@ -475,21 +475,21 @@ const EmployerDashboard = () => {
 
           <Card onClick={() => navigate('/saved-headhunters')} className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
-              <CardTitle className="text-[10px] sm:text-xs font-medium">Saved Headhunters</CardTitle>
-              <Star className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Saved Headhunters</CardTitle>
+              <Star className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-2 sm:pb-3">
-              <div className="text-lg sm:text-xl font-bold">{savedHeadhuntersCount}</div>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <div className="text-2xl sm:text-3xl font-bold">{savedHeadhuntersCount}</div>
             </CardContent>
           </Card>
 
           <Card onClick={() => navigate('/saved-jobs')} className="cursor-pointer hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
-              <CardTitle className="text-[10px] sm:text-xs font-medium">Saved Jobs</CardTitle>
-              <Heart className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-muted-foreground" />
+              <CardTitle className="text-xs sm:text-sm font-medium">Saved Jobs</CardTitle>
+              <Heart className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-2 sm:pb-3">
-              <div className="text-lg sm:text-xl font-bold">{savedJobsCount}</div>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <div className="text-2xl sm:text-3xl font-bold">{savedJobsCount}</div>
             </CardContent>
           </Card>
         </div>
