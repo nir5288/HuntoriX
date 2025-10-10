@@ -105,6 +105,13 @@ const FEATURE_COMPARISON = [{
   pro: '5',
   huntorix: '5'
 }, {
+  feature: 'Bulk apply',
+  free: false,
+  core: false,
+  pro: true,
+  huntorix: true,
+  tooltip: 'Apply to multiple jobs at once with a single click.'
+}, {
   feature: 'Statistics & application insights',
   free: false,
   core: true,
