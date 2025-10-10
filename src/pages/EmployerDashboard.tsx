@@ -342,6 +342,55 @@ const EmployerDashboard = () => {
     }
   };
 
+  const handleRejectAll = async (jobId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      // Get all submitted applications for this job
+      const jobApplications = applications.filter(a => a.job_id === jobId && a.status === 'submitted');
+      
+      if (jobApplications.length === 0) {
+        toast.info('No pending applications to reject');
+        return;
+      }
+
+      // Update all applications to rejected
+      const { error: updateError } = await supabase
+        .from('applications')
+        .update({ status: 'rejected' })
+        .eq('job_id', jobId)
+        .eq('status', 'submitted');
+
+      if (updateError) throw updateError;
+
+      // Create notifications for all headhunters
+      const notifications = jobApplications.map(app => ({
+        user_id: app.headhunter_id,
+        type: 'status_change',
+        payload: {
+          job_id: jobId,
+          application_id: app.id,
+          status: 'rejected'
+        },
+        is_read: false,
+        title: 'Application Rejected',
+        message: 'Your application has been rejected'
+      }));
+
+      const { error: notifError } = await supabase
+        .from('notifications')
+        .insert(notifications as any);
+
+      if (notifError) console.error('Notification error:', notifError);
+
+      toast.success(`Rejected ${jobApplications.length} applications`);
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error rejecting applications:', error);
+      toast.error('Failed to reject applications');
+    }
+  };
+
   // Show loading screen while auth is loading
   if (loading || !user || !profile) {
     return (
@@ -596,6 +645,15 @@ const EmployerDashboard = () => {
                               </Badge>
                             </div>
                             <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={(e) => handleRejectAll(job.id, e)}
+                              className="h-8 w-8 p-0"
+                              title="Reject all applications"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
                               variant="ghost"
                               size="icon"
                               onClick={(e) => handleEditJob(job, e)}
@@ -724,23 +782,35 @@ const EmployerDashboard = () => {
                               </>
                             )}
                           </div>
-                          <div className="relative shrink-0">
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="relative">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate('/headhunters');
+                                }}
+                                className="h-7 text-[10px] sm:text-xs px-2 gap-1"
+                                title="Invite headhunters to this job"
+                              >
+                                <Users className="h-3 w-3" />
+                                <span>Invite to Job</span>
+                              </Button>
+                              <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
+                                New
+                              </Badge>
+                            </div>
                             <Button
-                              variant="outline"
+                              variant="destructive"
                               size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate('/headhunters');
-                              }}
+                              onClick={(e) => handleRejectAll(job.id, e)}
                               className="h-7 text-[10px] sm:text-xs px-2 gap-1"
-                              title="Invite headhunters to this job"
+                              title="Reject all pending applications"
                             >
-                              <Users className="h-3 w-3" />
-                              <span>Invite to Job</span>
+                              <X className="h-3 w-3" />
+                              <span>Reject All</span>
                             </Button>
-                            <Badge className="absolute -top-1 -right-1 bg-[hsl(var(--accent-pink))] text-white text-[8px] sm:text-[10px] h-3.5 sm:h-4 px-1">
-                              New
-                            </Badge>
                           </div>
                         </div>
                       </CardContent>
