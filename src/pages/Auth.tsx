@@ -222,32 +222,20 @@ const Auth = () => {
             // If there's a pre-selected plan, automatically create the subscription
             if (preSelectedPlan) {
               try {
-                // First, get the actual plan UUID from the plan name
-                const { data: planData, error: planError } = await supabase
-                  .from('subscription_plans')
-                  .select('id')
-                  .eq('name', preSelectedPlan)
-                  .single();
-
-                if (planError || !planData) {
-                  console.error('Error fetching plan:', planError);
-                  toast.error('Account created but could not find the selected plan. Please select a plan from your dashboard.');
-                  setShowPlanSelection(true);
-                  setNewUserId(data.user.id);
-                  return;
-                }
-
+                // preSelectedPlan is already the plan UUID, so use it directly
                 const { error: subError } = await supabase
                   .from('user_subscriptions')
                   .insert({
                     user_id: data.user.id,
-                    plan_id: planData.id,
+                    plan_id: preSelectedPlan,
                     status: 'active',
                   });
 
                 if (subError) {
                   console.error('Error creating subscription:', subError);
-                  toast.error('Account created but failed to set up subscription. Please contact support.');
+                  toast.error('Account created but failed to set up subscription. Please select a plan from your dashboard.');
+                  setShowPlanSelection(true);
+                  setNewUserId(data.user.id);
                 } else {
                   // Clear the pre-selected plan
                   localStorage.removeItem('selectedPlan');
@@ -261,7 +249,9 @@ const Auth = () => {
                 }
               } catch (error) {
                 console.error('Error setting up subscription:', error);
-                toast.error('Account created but failed to set up subscription. Please contact support.');
+                toast.error('Account created but failed to set up subscription. Please select a plan from your dashboard.');
+                setShowPlanSelection(true);
+                setNewUserId(data.user.id);
               }
             } else {
               // No pre-selected plan, show plan selection
