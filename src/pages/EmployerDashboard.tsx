@@ -419,7 +419,7 @@ const EmployerDashboard = () => {
   // Render different UI variants
   const renderVariant1 = () => (
     <>
-      <div className="w-full px-4 sm:px-6 py-6">
+      <div className="w-full px-4 sm:px-6 py-4 sm:py-6 mt-16 sm:mt-20">
         <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
           <div className="w-full sm:w-auto text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
@@ -436,9 +436,9 @@ const EmployerDashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
               <CardTitle className="text-xs sm:text-sm font-medium">Active Jobs</CardTitle>
-              <Briefcase className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
+              <Briefcase className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
               <div className="text-2xl sm:text-3xl font-bold">{jobs.filter(j => j.status === 'open').length}</div>
@@ -457,9 +457,9 @@ const EmployerDashboard = () => {
               }
             }}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
               <CardTitle className="text-xs sm:text-sm font-medium">Pending Review</CardTitle>
-              <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
+              <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
               <div className="text-2xl sm:text-3xl font-bold">
@@ -474,9 +474,9 @@ const EmployerDashboard = () => {
           </Card>
 
           <Card onClick={() => navigate('/saved-headhunters')} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
-              <CardTitle className="text-xs sm:text-sm font-medium">Saved Headhunters</CardTitle>
-              <Star className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
+              <CardTitle className="text-xs sm:text-sm font-medium leading-tight">Saved Headhunters</CardTitle>
+              <Star className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
               <div className="text-2xl sm:text-3xl font-bold">{savedHeadhuntersCount}</div>
@@ -484,9 +484,9 @@ const EmployerDashboard = () => {
           </Card>
 
           <Card onClick={() => navigate('/saved-jobs')} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
               <CardTitle className="text-xs sm:text-sm font-medium">Saved Jobs</CardTitle>
-              <Heart className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground" />
+              <Heart className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
               <div className="text-2xl sm:text-3xl font-bold">{savedJobsCount}</div>
