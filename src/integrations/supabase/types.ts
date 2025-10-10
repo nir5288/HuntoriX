@@ -1194,6 +1194,7 @@ export type Database = {
       user_subscriptions: {
         Row: {
           created_at: string | null
+          credits_used: number
           id: string
           plan_id: string
           status: string
@@ -1202,6 +1203,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          credits_used?: number
           id?: string
           plan_id: string
           status?: string
@@ -1210,6 +1212,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          credits_used?: number
           id?: string
           plan_id?: string
           status?: string
@@ -1328,6 +1331,14 @@ export type Database = {
         Returns: {
           headhunter_id: string
           saves_count: number
+        }[]
+      }
+      get_user_credits: {
+        Args: { p_user_id: string }
+        Returns: {
+          credits_remaining: number
+          credits_used: number
+          total_credits: number
         }[]
       }
       has_role: {

@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth';
-import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown, Menu, ArrowRight } from 'lucide-react';
+import { Briefcase, LogOut, LayoutDashboard, Settings, MessagesSquare, User, Heart, Moon, Sun, Globe, Circle, Star, Shield, BarChart3, FileText, Crown, Menu, ArrowRight, Coins } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -40,6 +40,7 @@ export function Header() {
   const [showManageBanners, setShowManageBanners] = useState(false);
   const [showEditLegal, setShowEditLegal] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<{ name: string; price_usd: number } | null>(null);
+  const [credits, setCredits] = useState<{ total: number; used: number; remaining: number } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
@@ -61,10 +62,11 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch subscription plan for headhunters
+  // Fetch subscription plan and credits for headhunters
   useEffect(() => {
     if (user && profile?.role === 'headhunter') {
       fetchCurrentPlan();
+      fetchCredits();
     }
   }, [user, profile]);
 
@@ -91,6 +93,27 @@ export function Header() {
       }
     } catch (error) {
       console.error('Error fetching plan:', error);
+    }
+  };
+
+  const fetchCredits = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('get_user_credits', { p_user_id: user.id });
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setCredits({
+          total: data[0].total_credits,
+          used: data[0].credits_used,
+          remaining: data[0].credits_remaining
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching credits:', error);
     }
   };
 
@@ -288,6 +311,22 @@ export function Header() {
                 <TooltipProvider delayDuration={0}>
                   {/* Desktop quick actions */}
                   <div className="hidden sm:flex items-center gap-1">
+                    {profile.role === 'headhunter' && credits && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate('/settings')}
+                            className="h-9 px-3 gap-1.5"
+                          >
+                            <Coins className="h-4 w-4" />
+                            <span className="text-sm font-medium">{credits.remaining}</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Application Credits</TooltipContent>
+                      </Tooltip>
+                    )}
                     <NotificationDropdown />
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -398,8 +437,8 @@ export function Header() {
 
                       {profile?.role === 'headhunter' && currentPlan && (
                         <>
-                          <div className="px-2 py-2">
-                            <div className="flex items-center gap-2">
+                          <div className="px-2 py-2 space-y-2">
+                            <div className="flex items-center justify-between">
                               <span className="text-sm text-muted-foreground">Plan:</span>
                               <button
                                 onClick={() => navigate('/settings')}
@@ -413,6 +452,16 @@ export function Header() {
                                 )}
                               </button>
                             </div>
+                            {credits && (
+                              <div className="space-y-1">
+                                <div className="text-sm font-medium text-foreground">
+                                  {credits.remaining} credits remaining
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {credits.used} credits used
+                                </div>
+                              </div>
+                            )}
                           </div>
                           <DropdownMenuSeparator />
                         </>
