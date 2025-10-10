@@ -314,7 +314,7 @@ export function Header() {
                     {profile.role === 'headhunter' && credits && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="h-9 px-3 gap-1.5 flex items-center">
+                          <div className="h-9 px-3 gap-1.5 flex items-center cursor-default">
                             <Coins className="h-4 w-4" />
                             <span className="text-sm font-medium">{credits.remaining}</span>
                           </div>
