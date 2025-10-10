@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, Check, X, MessageCircle, Heart } from 'lucide-react';
+import { ArrowLeft, MapPin, Briefcase, DollarSign, Clock, Check, X, MessageCircle, Heart, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ApplyModal } from '@/components/ApplyModal';
@@ -444,8 +444,25 @@ const JobDetail = () => {
         {/* Applications Section - Only visible to job creator */}
         {user && job?.created_by === user.id && applications.length > 0 && <Card className="mt-8">
             <CardHeader>
-              <CardTitle>Applications ({applications.length})</CardTitle>
-              <CardDescription>Review and manage applications for this job</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Applications ({applications.length})</CardTitle>
+                  <CardDescription>Review and manage applications for this job</CardDescription>
+                </div>
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Sparkles className="h-4 w-4" />
+                        AI Assist
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">Our AI will investigate the headhunters based on their success rate and other data to help you pick the best candidate</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
