@@ -518,7 +518,7 @@ export function AIAssistant() {
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
+          <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-cyan-100 via-blue-50 to-purple-100 dark:from-cyan-950/40 dark:via-blue-950/30 dark:to-purple-950/40">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9 border border-primary/20">
                 <AvatarImage src={aiAvatar} alt="Huntorix AI" />
