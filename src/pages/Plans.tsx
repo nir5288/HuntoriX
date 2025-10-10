@@ -8,6 +8,8 @@ const Plans = () => {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
+  console.log('Plans page rendering, user:', user?.id, 'profile:', profile?.role);
+
   const handlePlanSelected = async () => {
     if (!user) {
       navigate('/auth?role=headhunter');
@@ -24,16 +26,16 @@ const Plans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
       <Header />
-      <div className="flex items-center justify-center p-4 pt-24">
+      <main className="flex-1 flex items-center justify-center p-4 py-8 mt-8">
         <div className="w-full max-w-6xl">
-          <Card className="shadow-2xl">
+          <Card className="shadow-2xl bg-white">
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold">Subscription Plans</CardTitle>
-              <CardDescription>Choose the plan that best fits your needs</CardDescription>
+              <CardTitle className="text-3xl font-bold text-foreground">Subscription Plans</CardTitle>
+              <CardDescription className="text-muted-foreground">Choose the plan that best fits your needs</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-white">
               {user ? (
                 <PlanSelection userId={user.id} onPlanSelected={handlePlanSelected} />
               ) : (
@@ -50,7 +52,7 @@ const Plans = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
