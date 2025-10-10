@@ -540,16 +540,30 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
 
                 <div className="space-y-2.5">
                   <Label htmlFor="status" className="text-sm font-medium">Job Status</Label>
-                  <Select onValueChange={(value) => setValue('status', value as any)} value={jobStatus}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="on_hold">On Hold</SelectItem>
-                      <SelectItem value="success">Success</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {job?.status === 'pending_review' ? (
+                    <>
+                      <div className="h-11 px-3 rounded-md border bg-muted/50 flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Pending Review</span>
+                        <Badge variant="secondary" className="bg-warning/10 text-warning border-warning/20">
+                          Under Review
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Status cannot be changed while job is pending admin review
+                      </p>
+                    </>
+                  ) : (
+                    <Select onValueChange={(value) => setValue('status', value as any)} value={jobStatus}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="on_hold">On Hold</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               </div>
             </Card>
