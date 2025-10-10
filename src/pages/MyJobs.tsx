@@ -28,9 +28,15 @@ const MyJobs = () => {
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [editHistoryModalOpen, setEditHistoryModalOpen] = useState(false);
   const [editHistory, setEditHistory] = useState<any[]>([]);
-  const [sortBy, setSortBy] = useState<'latest' | 'oldest'>('latest');
-  const [showPendingOnly, setShowPendingOnly] = useState(false);
-  const [showPrivateOnly, setShowPrivateOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'latest' | 'oldest'>(() => {
+    return (localStorage.getItem('my_jobs_sort_by') as 'latest' | 'oldest') || 'latest';
+  });
+  const [showPendingOnly, setShowPendingOnly] = useState(() => {
+    return localStorage.getItem('my_jobs_show_pending') === 'true';
+  });
+  const [showPrivateOnly, setShowPrivateOnly] = useState(() => {
+    return localStorage.getItem('my_jobs_show_private') === 'true';
+  });
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -38,6 +44,19 @@ const MyJobs = () => {
       fetchJobsData();
     }
   }, [user, loading]);
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('my_jobs_sort_by', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('my_jobs_show_pending', showPendingOnly.toString());
+  }, [showPendingOnly]);
+
+  useEffect(() => {
+    localStorage.setItem('my_jobs_show_private', showPrivateOnly.toString());
+  }, [showPrivateOnly]);
 
   const fetchJobsData = async () => {
     try {

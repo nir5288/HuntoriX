@@ -34,9 +34,15 @@ const EmployerDashboard = () => {
   const [editHistory, setEditHistory] = useState<any[]>([]);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [savedHeadhuntersCount, setSavedHeadhuntersCount] = useState(0);
-  const [sortBy, setSortBy] = useState<'latest' | 'oldest'>('latest');
-  const [showPendingOnly, setShowPendingOnly] = useState(false);
-  const [showPrivateOnly, setShowPrivateOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'latest' | 'oldest'>(() => {
+    return (localStorage.getItem('employer_dashboard_sort_by') as 'latest' | 'oldest') || 'latest';
+  });
+  const [showPendingOnly, setShowPendingOnly] = useState(() => {
+    return localStorage.getItem('employer_dashboard_show_pending') === 'true';
+  });
+  const [showPrivateOnly, setShowPrivateOnly] = useState(() => {
+    return localStorage.getItem('employer_dashboard_show_private') === 'true';
+  });
   const [jobEditCounts, setJobEditCounts] = useState<Record<string, number>>({});
   const [visibleJobCount, setVisibleJobCount] = useState(3);
   const [onHoldModalOpen, setOnHoldModalOpen] = useState(false);
@@ -47,6 +53,19 @@ const EmployerDashboard = () => {
       fetchDashboardData();
     }
   }, [user, loading]);
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('employer_dashboard_sort_by', sortBy);
+  }, [sortBy]);
+
+  useEffect(() => {
+    localStorage.setItem('employer_dashboard_show_pending', showPendingOnly.toString());
+  }, [showPendingOnly]);
+
+  useEffect(() => {
+    localStorage.setItem('employer_dashboard_show_private', showPrivateOnly.toString());
+  }, [showPrivateOnly]);
   const fetchDashboardData = async () => {
     try {
       // Fetch jobs
