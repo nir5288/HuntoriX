@@ -63,6 +63,7 @@ export default {
           lilac: "hsl(var(--vibrant-lilac))",
         },
         "accent-purple": "270 60% 55%",
+        "accent-ocean": "200 85% 50%",
         "primary-glow": "220 27% 25%",
       },
       borderRadius: {

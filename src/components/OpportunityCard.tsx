@@ -198,15 +198,15 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     if (!industry) return 'hsl(var(--surface))';
     
     const colorMap: { [key: string]: string } = {
-      'Software/Tech': 'hsl(var(--accent-lilac))',
-      'Biotech/Healthcare': 'hsl(var(--accent-mint))',
+      'Software/Tech': 'hsl(var(--accent-mint))',
+      'Biotech/Healthcare': 'hsl(var(--success))',
       'Finance/Fintech': 'hsl(var(--accent-pink))',
       'Energy/Cleantech': 'hsl(var(--warning))',
-      'AI / Data Science': 'hsl(var(--primary))',
+      'AI / Data Science': 'hsl(var(--vibrant-lilac))',
       'Cybersecurity': 'hsl(var(--destructive))',
-      'Semiconductors / Hardware': 'hsl(var(--accent-ocean))',
+      'Semiconductors / Hardware': 'hsl(200 85% 50%)',
       'Telecom / Networking': 'hsl(var(--accent-lilac))',
-      'Public/Non-profit': 'hsl(var(--surface))',
+      'Public/Non-profit': 'hsl(215 25% 65%)',
       'Other': 'hsl(var(--muted))'
     };
     

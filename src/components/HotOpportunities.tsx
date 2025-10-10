@@ -116,15 +116,15 @@ export function HotOpportunities() {
     if (!industry) return 'bg-[hsl(var(--surface))] text-foreground';
     
     const colorMap: { [key: string]: string } = {
-      'Software/Tech': 'bg-[hsl(var(--accent-lilac))] text-foreground',
-      'Biotech/Healthcare': 'bg-[hsl(var(--accent-mint))] text-foreground',
+      'Software/Tech': 'bg-[hsl(var(--accent-mint))] text-foreground',
+      'Biotech/Healthcare': 'bg-[hsl(var(--success))] text-white',
       'Finance/Fintech': 'bg-[hsl(var(--accent-pink))] text-foreground',
       'Energy/Cleantech': 'bg-[hsl(var(--warning))] text-foreground',
-      'AI / Data Science': 'bg-[hsl(var(--primary))] text-foreground',
-      'Cybersecurity': 'bg-[hsl(var(--destructive))] text-foreground',
-      'Semiconductors / Hardware': 'bg-[hsl(var(--accent-ocean))] text-foreground',
+      'AI / Data Science': 'bg-[hsl(var(--vibrant-lilac))] text-white',
+      'Cybersecurity': 'bg-[hsl(var(--destructive))] text-white',
+      'Semiconductors / Hardware': 'bg-[hsl(200_85%_50%)] text-white',
       'Telecom / Networking': 'bg-[hsl(var(--accent-lilac))] text-foreground',
-      'Public/Non-profit': 'bg-[hsl(var(--surface))] text-foreground',
+      'Public/Non-profit': 'bg-[hsl(215_25%_65%)] text-foreground',
       'Other': 'bg-[hsl(var(--muted))] text-foreground'
     };
     
