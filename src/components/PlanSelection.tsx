@@ -221,24 +221,24 @@ export function PlanSelection({
   return <TooltipProvider>
       <div className="space-y-16 pb-16 animate-fade-in">
         {/* Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent">
+        <div className="text-center space-y-4 max-w-3xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--vibrant-pink))] via-[hsl(var(--vibrant-lilac))] to-[hsl(var(--vibrant-mint))] bg-clip-text text-transparent break-words">
             Choose Your Plan
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground break-words px-2">
             Select the plan that best fits your needs. You can change plans later.
           </p>
         </div>
 
         {/* Monthly/Yearly Toggle */}
-        <div className="flex items-center justify-center gap-4 p-2 rounded-full bg-muted/50 w-fit mx-auto backdrop-blur-sm border border-border/50">
-          <span className={cn("text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200", billingCycle === 'monthly' && "bg-primary text-primary-foreground shadow-lg")}>
+        <div className="flex items-center justify-center gap-2 sm:gap-4 p-2 rounded-full bg-muted/50 w-fit mx-auto backdrop-blur-sm border border-border/50 max-w-[95vw]">
+          <span className={cn("text-xs sm:text-sm font-semibold px-2 sm:px-4 py-2 rounded-full transition-all duration-200 whitespace-nowrap", billingCycle === 'monthly' && "bg-primary text-primary-foreground shadow-lg")}>
             Monthly
           </span>
-          <Switch checked={billingCycle === 'yearly'} onCheckedChange={checked => setBillingCycle(checked ? 'yearly' : 'monthly')} className="data-[state=checked]:bg-[hsl(var(--vibrant-mint))]" />
-          <span className={cn("text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2", billingCycle === 'yearly' && "bg-primary text-primary-foreground shadow-lg")}>
-            Yearly
-            <Badge variant="secondary" className="text-xs font-bold" style={{
+          <Switch checked={billingCycle === 'yearly'} onCheckedChange={checked => setBillingCycle(checked ? 'yearly' : 'monthly')} className="data-[state=checked]:bg-[hsl(var(--vibrant-mint))] shrink-0" />
+          <span className={cn("text-xs sm:text-sm font-semibold px-2 sm:px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-1 sm:gap-2", billingCycle === 'yearly' && "bg-primary text-primary-foreground shadow-lg")}>
+            <span className="whitespace-nowrap">Yearly</span>
+            <Badge variant="secondary" className="text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 whitespace-nowrap" style={{
             backgroundColor: 'hsl(var(--vibrant-mint))',
             color: 'hsl(var(--primary))'
           }}>
