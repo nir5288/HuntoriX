@@ -763,24 +763,25 @@ const EmployerDashboard = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
-                            <span>{jobApplications.length} applications</span>
-                            <span className="hidden sm:inline">•</span>
-                            <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
-                            {jobEditCounts[job.id] > 0 && (
-                              <>
-                                <span className="hidden sm:inline">•</span>
-                                <span 
-                                  className="underline cursor-pointer hover:text-[hsl(var(--accent-pink))] transition-colors"
-                                  onClick={(e) => handleViewEditHistory(job, e)}
-                                >
-                                  Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
+                             <span>{jobApplications.length} applications</span>
+                             <span className="hidden sm:inline">•</span>
+                             <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
+                           </div>
+                           <div className="flex items-center gap-1.5 shrink-0">
+                             {jobEditCounts[job.id] > 0 && (
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={(e) => handleViewEditHistory(job, e)}
+                                 className="hidden sm:flex h-7 text-[10px] sm:text-xs px-2 gap-1"
+                                 title="View edit history"
+                               >
+                                 <Clock className="h-3 w-3" />
+                                 <span>Last edited ({jobEditCounts[job.id]})</span>
+                               </Button>
+                             )}
                             <Button
                               variant="destructive"
                               size="sm"
