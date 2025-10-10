@@ -367,18 +367,18 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
         "bg-background border-r shrink-0 h-full w-72"
       )}
     >
-      <div className="h-[72px] px-3 flex items-center border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
-        {isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/dashboard')}
-            className="mr-2"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        )}
-        <DropdownMenu>
+      <div className="h-[72px] px-3 flex items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
+        <div className="flex items-center gap-2">
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/dashboard')}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
+          <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-1.5 hover:opacity-80 transition">
               <span className="text-sm font-medium capitalize">
@@ -387,7 +387,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
               <ChevronDown className="h-4 w-4" />
             </button>
           </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="z-[500] bg-popover">
+          <DropdownMenuContent align="start" className="z-[500] bg-popover">
               <DropdownMenuItem onClick={() => setFilter("all")}>
                 All messages
               </DropdownMenuItem>
@@ -399,6 +399,7 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
               </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
 
       <ScrollArea className="h-[calc(100vh-72px)]">
