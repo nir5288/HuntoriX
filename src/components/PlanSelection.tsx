@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -176,6 +177,7 @@ export function PlanSelection({
   userId,
   initialSelectedPlan
 }: PlanSelectionProps) {
+  const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(initialSelectedPlan as PlanId | null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
   const [submitting, setSubmitting] = useState(false);
@@ -347,6 +349,27 @@ export function PlanSelection({
             Select the plan that best fits your needs. You can change plans later.
           </p>
         </div>
+
+        {/* Employer Notice */}
+        {!userId && (
+          <div className="max-w-2xl mx-auto">
+            <Card className="shadow-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] border-2 border-border">
+              <CardContent className="p-6 text-center">
+                <p className="text-lg font-semibold text-primary mb-3">
+                  Are you an employer looking to hire?
+                </p>
+                <Button 
+                  variant="default" 
+                  size="lg"
+                  className="font-bold bg-primary hover:bg-primary/90"
+                  onClick={() => navigate('/auth?mode=signup&role=employer')}
+                >
+                  Register as Employer
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Monthly/Yearly Toggle */}
         <div className="flex items-center justify-center gap-2 sm:gap-4 p-2 rounded-full bg-muted/50 w-fit mx-auto backdrop-blur-sm border border-border/50 max-w-[95vw]">

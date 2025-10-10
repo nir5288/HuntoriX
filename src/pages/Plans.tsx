@@ -47,26 +47,7 @@ const Plans = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
       <Header />
       <main className="flex-1 flex items-center justify-center p-4 py-8 mt-8">
-        <div className="w-full max-w-6xl space-y-6">
-          {/* Employer Notice */}
-          {!user && (
-            <Card className="shadow-lg bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-mint))] border-2 border-border">
-              <CardContent className="p-6 text-center">
-                <p className="text-lg font-semibold text-primary mb-3">
-                  Are you an employer looking to hire?
-                </p>
-                <Button 
-                  variant="default" 
-                  size="lg"
-                  className="font-bold bg-primary hover:bg-primary/90"
-                  onClick={() => navigate('/auth?mode=signup&role=employer')}
-                >
-                  Register as Employer
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
+        <div className="w-full max-w-6xl">
           <Card className="shadow-2xl bg-white">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold text-foreground">Subscription Plans</CardTitle>
