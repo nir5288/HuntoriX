@@ -67,6 +67,28 @@ export function Header() {
     if (user && profile?.role === 'headhunter') {
       fetchCurrentPlan();
       fetchCredits();
+      
+      // Set up realtime subscription for credit updates
+      const channel = supabase
+        .channel('user-subscriptions-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'user_subscriptions',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            // Refetch credits when subscription is updated
+            fetchCredits();
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user, profile]);
 

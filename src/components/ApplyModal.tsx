@@ -179,7 +179,7 @@ export function ApplyModal({ open, onOpenChange, onSuccess, jobId, jobTitle, hea
 
       toast({
         title: 'Application Sent',
-        description: "We'll notify you about updates",
+        description: "We'll notify you about updates. 1 credit has been deducted.",
       });
 
       if (onSuccess) {
