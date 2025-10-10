@@ -22,66 +22,71 @@ export function RichJobDescriptionEditor({
 }: RichJobDescriptionEditorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const baseRows = 6;
-  const expandedRows = 18; // 3x the original
+  const editorRef = useRef<HTMLDivElement>(null);
+  const baseHeight = '144px'; // 6 rows
+  const expandedHeight = '432px'; // 18 rows (3x)
+
+  // Auto-collapse when content is empty
+  useEffect(() => {
+    if (!value || value.trim() === '') {
+      setIsExpanded(false);
+    }
+  }, [value]);
 
   // Auto-expand based on content
   useEffect(() => {
-    if (textareaRef.current) {
-      const lineHeight = 24; // approximate line height
-      const padding = 16; // padding in pixels
-      const contentHeight = textareaRef.current.scrollHeight;
-      const visibleHeight = textareaRef.current.clientHeight;
+    if (editorRef.current && value) {
+      const contentHeight = editorRef.current.scrollHeight;
+      const visibleHeight = editorRef.current.clientHeight;
       
-      // Auto-expand if content is larger than visible area
-      if (contentHeight > visibleHeight + padding && !isExpanded) {
+      if (contentHeight > visibleHeight && !isExpanded) {
         setIsExpanded(true);
       }
     }
   }, [value]);
 
-  const insertAtCursor = (before: string, after: string = '') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  // Sync content with value prop
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value;
+    }
+  }, [value]);
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = value.substring(start, end);
-    const newText = value.substring(0, start) + before + selectedText + after + value.substring(end);
-    
-    onChange(newText);
-    
-    // Restore cursor position
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + before.length + selectedText.length + after.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
   };
 
   const makeBold = () => {
-    insertAtCursor('**', '**');
+    document.execCommand('bold', false);
+    editorRef.current?.focus();
   };
 
   const addBullet = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+    const selection = window.getSelection();
+    if (!selection || !editorRef.current) return;
 
-    const start = textarea.selectionStart;
-    const beforeCursor = value.substring(0, start);
-    const afterCursor = value.substring(start);
-    
-    // Check if we're at the start of a line
-    const lastNewline = beforeCursor.lastIndexOf('\n');
-    const currentLineStart = lastNewline === -1 ? 0 : lastNewline + 1;
-    const isStartOfLine = start === currentLineStart;
-    
-    if (isStartOfLine) {
-      insertAtCursor('• ');
-    } else {
-      insertAtCursor('\n• ');
+    // Check if we're already in a list
+    let node = selection.anchorNode;
+    let inList = false;
+    while (node && node !== editorRef.current) {
+      if (node.nodeName === 'LI') {
+        inList = true;
+        break;
+      }
+      node = node.parentNode;
     }
+
+    if (inList) {
+      // Remove list formatting
+      document.execCommand('insertUnorderedList', false);
+    } else {
+      // Add list formatting
+      document.execCommand('insertUnorderedList', false);
+    }
+    
+    editorRef.current.focus();
   };
 
   const toggleDirection = () => {
@@ -90,6 +95,32 @@ export function RichJobDescriptionEditor({
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      const selection = window.getSelection();
+      if (!selection) return;
+
+      // Check if we're in an empty list item
+      let node = selection.anchorNode;
+      let listItem: HTMLLIElement | null = null;
+      
+      while (node && node !== editorRef.current) {
+        if (node.nodeName === 'LI') {
+          listItem = node as HTMLLIElement;
+          break;
+        }
+        node = node.parentNode;
+      }
+
+      if (listItem && (!listItem.textContent || listItem.textContent.trim() === '')) {
+        // Empty list item - remove bullet
+        e.preventDefault();
+        document.execCommand('insertUnorderedList', false);
+        document.execCommand('formatBlock', false, 'p');
+      }
+    }
   };
 
   return (
@@ -152,27 +183,27 @@ export function RichJobDescriptionEditor({
         </Button>
       </div>
 
-      {/* Textarea */}
-      <textarea
-        ref={textareaRef}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={isExpanded ? expandedRows : baseRows}
+      {/* Rich Text Editor */}
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        onKeyDown={handleKeyDown}
         dir={direction}
-        placeholder={placeholder}
+        data-placeholder={placeholder}
+        style={{ 
+          minHeight: isExpanded ? expandedHeight : baseHeight,
+          maxHeight: isExpanded ? expandedHeight : baseHeight 
+        }}
         className={cn(
-          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none transition-all duration-300",
+          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 overflow-y-auto transition-all duration-300",
+          "prose prose-sm max-w-none dark:prose-invert",
+          "[&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:text-muted-foreground [&:empty]:before:pointer-events-none",
           autoFilled && 'bg-yellow-50 dark:bg-yellow-950/20',
           error && 'border-destructive ring-2 ring-destructive/20',
           className
         )}
       />
-
-      {/* Helper text */}
-      <div className="text-xs text-muted-foreground space-y-1">
-        <p>💡 Tips: Use **text** for bold, • for bullets</p>
-        {isExpanded && <p className="text-primary">✨ Expanded to 3x size for detailed descriptions</p>}
-      </div>
     </div>
   );
 }
