@@ -623,19 +623,19 @@ export function Header() {
                   </DropdownMenu>
                 </TooltipProvider>
               ) : (
-                <div className="hidden lg:flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <Button 
                     variant="ghost" 
                     size="sm"
                     onClick={() => navigate('/auth?mode=signin')}
-                    className="text-sm px-4 h-9"
+                    className="text-sm px-3 sm:px-4 h-9"
                   >
                     Login
                   </Button>
                   <Button 
                     size="sm"
                     onClick={() => navigate('/auth?mode=signup')}
-                    className="bg-foreground text-background hover:bg-foreground/90 text-sm px-4 h-9"
+                    className="bg-foreground text-background hover:bg-foreground/90 text-sm px-3 sm:px-4 h-9"
                   >
                     Sign up
                     <ArrowRight className="ml-1 h-4 w-4" />
