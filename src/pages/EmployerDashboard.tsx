@@ -419,7 +419,7 @@ const EmployerDashboard = () => {
   // Render different UI variants
   const renderVariant1 = () => (
     <>
-      <div className="w-full px-4 sm:px-6 py-4 sm:py-6 mt-4 sm:mt-6">
+      <div className="w-full px-4 sm:px-6 py-4 sm:py-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
           <div className="w-full sm:w-auto text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
