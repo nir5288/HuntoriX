@@ -438,20 +438,18 @@ export function Header() {
                       {profile?.role === 'headhunter' && currentPlan && (
                         <>
                           <div className="px-2 py-2 space-y-2">
-                            <div className="flex items-center justify-between">
+                            <button
+                              onClick={() => navigate('/settings')}
+                              className="flex items-center gap-2 hover:opacity-80 transition w-full"
+                            >
                               <span className="text-sm text-muted-foreground">Plan:</span>
-                              <button
-                                onClick={() => navigate('/settings')}
-                                className="flex items-center gap-1.5 hover:opacity-80 transition"
-                              >
-                                <span className={`text-sm font-medium ${currentPlan.name === 'Huntorix' ? 'underline' : ''}`}>
-                                  {currentPlan.name}
-                                </span>
-                                {currentPlan.name === 'Huntorix' && (
-                                  <Crown className="h-3.5 w-3.5 text-yellow-500" />
-                                )}
-                              </button>
-                            </div>
+                              <span className={`text-sm font-medium ${currentPlan.name === 'Huntorix' ? 'underline' : ''}`}>
+                                {currentPlan.name}
+                              </span>
+                              {currentPlan.name === 'Huntorix' && (
+                                <Crown className="h-3.5 w-3.5 text-yellow-500" />
+                              )}
+                            </button>
                             {credits && (
                               <div className="space-y-1">
                                 <div className="text-sm font-medium text-foreground">
