@@ -277,6 +277,8 @@ export function PlanSelection({
               status: 'active',
               next_plan_id: null,
               plan_change_effective_date: null,
+              credits_used: 0,
+              credits_reset_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             })
             .eq('user_id', userId);
