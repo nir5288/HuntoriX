@@ -222,11 +222,26 @@ const Auth = () => {
             // If there's a pre-selected plan, automatically create the subscription
             if (preSelectedPlan) {
               try {
+                // First, get the actual plan UUID from the plan name
+                const { data: planData, error: planError } = await supabase
+                  .from('subscription_plans')
+                  .select('id')
+                  .eq('name', preSelectedPlan)
+                  .single();
+
+                if (planError || !planData) {
+                  console.error('Error fetching plan:', planError);
+                  toast.error('Account created but could not find the selected plan. Please select a plan from your dashboard.');
+                  setShowPlanSelection(true);
+                  setNewUserId(data.user.id);
+                  return;
+                }
+
                 const { error: subError } = await supabase
                   .from('user_subscriptions')
                   .insert({
                     user_id: data.user.id,
-                    plan_id: preSelectedPlan,
+                    plan_id: planData.id,
                     status: 'active',
                   });
 
