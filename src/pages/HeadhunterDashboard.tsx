@@ -410,7 +410,7 @@ const HeadhunterDashboard = () => {
                 <CardTitle className="text-xl sm:text-2xl font-bold">My Applications</CardTitle>
                 <CardDescription className="text-sm sm:text-base mt-1">Track your application status</CardDescription>
               </div>
-              {applications.length > 5 && <Button size="sm" onClick={() => navigate('/applications')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-8 text-xs">
+              {applications.length > 5 && <Button size="sm" onClick={() => navigate('/applications')} className="hidden sm:inline-flex bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-8 text-xs">
                   View All
                 </Button>}
             </div>
