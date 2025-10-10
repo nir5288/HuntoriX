@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, ThumbsUp } from "lucide-react";
+import { MessageCircle, X, Send, ThumbsUp, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,6 +34,9 @@ export function AIAssistant() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { toast } = useToast();
@@ -118,6 +121,90 @@ export function AIAssistant() {
     setIsOpen(newOpenState);
     if (newOpenState) {
       trackEvent('opened');
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      
+      audioChunksRef.current = [];
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await processVoiceInput(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      
+      toast({
+        title: "Recording",
+        description: "Speak now...",
+      });
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        title: "Error",
+        description: "Could not access microphone",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+    }
+  };
+
+  const processVoiceInput = async (audioBlob: Blob) => {
+    try {
+      setIsLoading(true);
+      
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      
+      reader.onloadend = async () => {
+        const base64Audio = (reader.result as string).split(',')[1];
+        
+        // Send to voice-to-text edge function
+        const { data, error } = await supabase.functions.invoke('voice-to-text', {
+          body: { audio: base64Audio }
+        });
+        
+        if (error) throw error;
+        
+        if (data.text) {
+          setInput(data.text);
+          toast({
+            title: "Transcribed",
+            description: "Click send to submit your message",
+          });
+        }
+        
+        setIsLoading(false);
+      };
+    } catch (error) {
+      console.error('Error processing voice:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process voice input",
+        variant: "destructive",
+      });
+      setIsLoading(false);
     }
   };
 
@@ -507,19 +594,32 @@ export function AIAssistant() {
           {/* Input */}
           <div className="p-4 border-t border-border">
             <div className="flex gap-2">
+              <Button
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isLoading}
+                size="icon"
+                variant={isRecording ? "destructive" : "outline"}
+                className={cn(
+                  "shrink-0",
+                  isRecording && "animate-pulse"
+                )}
+                title={isRecording ? "Stop recording" : "Start voice input"}
+              >
+                {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </Button>
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me anything..."
-                disabled={isLoading}
+                disabled={isLoading || isRecording}
                 className="flex-1"
               />
               <Button
                 onClick={handleSend}
-                disabled={!input.trim() || isLoading}
+                disabled={!input.trim() || isLoading || isRecording}
                 size="icon"
-                className="bg-gradient-to-r from-primary to-accent-purple"
+                className="bg-gradient-to-r from-primary to-accent-purple shrink-0"
               >
                 <Send className="h-4 w-4" />
               </Button>
