@@ -143,11 +143,13 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
             event: 'INSERT',
             schema: 'public',
             table: 'applications',
-            filter: `job_id=eq.${job.id},headhunter_id=eq.${currentUser.id}`
+            filter: `job_id=eq.${job.id}`
           },
-          () => {
-            // Application created - update state immediately
-            setHasApplied(true);
+          (payload) => {
+            // Check if this application is from the current user
+            if (payload.new.headhunter_id === currentUser.id) {
+              setHasApplied(true);
+            }
           }
         )
         .subscribe();
