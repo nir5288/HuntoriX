@@ -310,9 +310,19 @@ const JobDetail = () => {
                     }} className="text-foreground border-0">
                           {job.industry}
                         </Badge>}
-                      {job.status && <Badge className={`${getStatusColor(job.status)} text-white border-0`}>
+                      {job.status === 'pending_review' ? (
+                        <div className="flex flex-col gap-1">
+                          <Badge className="bg-[hsl(var(--warning))] text-white border-0 flex items-center gap-1.5">
+                            <Clock className="h-3.5 w-3.5" />
+                            Pending Review
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">Review may take up to 1 hour</span>
+                        </div>
+                      ) : job.status && (
+                        <Badge className={`${getStatusColor(job.status)} text-white border-0`}>
                           {job.status}
-                        </Badge>}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <TooltipProvider delayDuration={0}>
