@@ -458,7 +458,7 @@ const JobDetail = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="max-w-xs">Our AI analyzes each headhunter&apos;s success rate and performance data to help you choose the best match</p>
+                      <p className="max-w-sm">Our AI analyzes each headhunter&apos;s success rate and performance data to help you choose the best match</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
