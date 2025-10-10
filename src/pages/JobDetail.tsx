@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { ApplyModal } from '@/components/ApplyModal';
 import { formatSeniority } from '@/lib/seniorityUtils';
 import { RichJobDescription } from '@/components/RichJobDescription';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 const JobDetail = () => {
   const {
     id
@@ -30,6 +31,8 @@ const JobDetail = () => {
   const [savingJob, setSavingJob] = useState(false);
   const [applyModalOpen, setApplyModalOpen] = useState(false);
   const [hasInvitation, setHasInvitation] = useState(false);
+  const [creditsRemaining, setCreditsRemaining] = useState<number | null>(null);
+  const [showNoCreditsAlert, setShowNoCreditsAlert] = useState(false);
 
   // Track where user came from for navigation state
   const fromSource = location.state?.from as 'dashboard' | 'applications' | 'saved' | undefined;
@@ -43,7 +46,10 @@ const JobDetail = () => {
   useEffect(() => {
     fetchJob();
     checkSaved();
-  }, [id, user]);
+    if (user && profile?.role === 'headhunter') {
+      fetchCredits();
+    }
+  }, [id, user, profile]);
   const checkSaved = async () => {
     if (!user) return;
     const {
@@ -104,6 +110,24 @@ const JobDetail = () => {
       setLoading(false);
     }
   };
+  const fetchCredits = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('get_user_credits', {
+        p_user_id: user.id
+      });
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setCreditsRemaining(data[0].credits_remaining);
+      }
+    } catch (error) {
+      console.error('Error fetching credits:', error);
+    }
+  };
+
   const handleApply = () => {
     if (!user) {
       navigate('/auth?role=headhunter');
@@ -113,6 +137,13 @@ const JobDetail = () => {
       toast.error('Only headhunters can apply to jobs');
       return;
     }
+    
+    // Check if user has credits
+    if (creditsRemaining !== null && creditsRemaining <= 0) {
+      setShowNoCreditsAlert(true);
+      return;
+    }
+    
     setApplyModalOpen(true);
   };
   const handleApplicationSuccess = () => {
@@ -534,6 +565,26 @@ const JobDetail = () => {
 
       {/* Apply Modal */}
       {user && job && <ApplyModal open={applyModalOpen} onOpenChange={setApplyModalOpen} jobId={job.id} jobTitle={job.title} headhunterId={user.id} onSuccess={handleApplicationSuccess} />}
+      
+      {/* No Credits Alert */}
+      <AlertDialog open={showNoCreditsAlert} onOpenChange={setShowNoCreditsAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>No Credits Remaining</AlertDialogTitle>
+            <AlertDialogDescription>
+              You've used all your application credits for this month. Upgrade your plan to continue applying to jobs.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant="outline" onClick={() => setShowNoCreditsAlert(false)}>
+              Close
+            </Button>
+            <Button onClick={() => navigate('/plans')}>
+              View Plans
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>;
 };
 export default JobDetail;
