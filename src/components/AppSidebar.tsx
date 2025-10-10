@@ -142,7 +142,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupContent>
             <TooltipProvider delayDuration={200} skipDelayDuration={0}>
-              <SidebarMenu className="gap-1.5 px-3">
+              <SidebarMenu className={`gap-1.5 ${open ? 'px-3' : 'px-0'}`}>
                 {items.map((item) => {
                   const isActiveItem = isActive(item.url);
                   const isSoon = item.url === '#';
