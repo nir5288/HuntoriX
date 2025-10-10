@@ -372,12 +372,7 @@ const Messages = () => {
     }
     loadMessages(true);
   };
-  return <div 
-    className="h-screen flex transition-all duration-200"
-    style={{ 
-      paddingLeft: isMobile ? 0 : mainSidebarOpen ? '16rem' : '3.5rem'
-    }}
-  >
+  return <div className="h-screen flex">
       {/* Show sidebar on desktop OR on mobile when no conversation is selected */}
       {(!isMobile || !otherUserId) && (
         <ChatSidebar
