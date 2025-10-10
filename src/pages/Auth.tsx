@@ -234,8 +234,15 @@ const Auth = () => {
                   console.error('Error creating subscription:', subError);
                   toast.error('Account created but failed to set up subscription. Please contact support.');
                 } else {
+                  // Clear the pre-selected plan
                   localStorage.removeItem('selectedPlan');
+                  setPreSelectedPlan(null);
+                  
+                  // Refresh profile to get updated data
+                  await refreshProfile();
+                  
                   toast.success('Account created! Welcome to Huntorix.');
+                  // Navigation will be handled by the useEffect that checks onboarding_completed
                 }
               } catch (error) {
                 console.error('Error setting up subscription:', error);

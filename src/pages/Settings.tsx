@@ -160,6 +160,12 @@ const Settings = () => {
   const [selectedPalette, setSelectedPalette] = useState<string>(() => {
     return localStorage.getItem("color-palette") || "default";
   });
+  const [credits, setCredits] = useState<{
+    total: number;
+    used: number;
+    remaining: number;
+    planName: string;
+  } | null>(null);
 
   // Subscribe to AI assistant preference so the toggle updates live
   const { data: aiPref } = useQuery({
@@ -219,8 +225,44 @@ const Settings = () => {
       loadProfileData();
       // Fetch the latest AI assistant preference from database
       fetchAiAssistantPreference();
+      // Fetch credits for headhunters
+      if (profile.role === 'headhunter') {
+        fetchCredits();
+      }
     }
   }, [user, profile]);
+
+  const fetchCredits = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('get_user_credits', {
+        p_user_id: user.id,
+      });
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        const creditData = data[0];
+        
+        // Get plan name
+        const { data: subscription } = await supabase
+          .from('user_subscriptions')
+          .select('subscription_plans(name)')
+          .eq('user_id', user.id)
+          .single();
+        
+        setCredits({
+          total: creditData.total_credits,
+          used: creditData.credits_used,
+          remaining: creditData.credits_remaining,
+          planName: subscription?.subscription_plans?.name || 'Free',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching credits:', error);
+    }
+  };
 
   useEffect(() => {
     setLocalShowStatus(showStatus);
@@ -593,6 +635,41 @@ const Settings = () => {
         ) : (
           // Headhunter Settings
           <div className="space-y-6">
+            {credits && (
+              <Card className="border-[hsl(var(--accent-lilac))]/20 bg-gradient-to-br from-[hsl(var(--accent-lilac))]/5 to-[hsl(var(--accent-pink))]/5">
+                <CardHeader>
+                  <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Subscription & Credits</CardTitle>
+                  <CardDescription>Your current plan and application credits</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg bg-background/50 border border-[hsl(var(--accent-mint))]/20">
+                      <div className="text-sm text-muted-foreground mb-1">Current Plan</div>
+                      <div className="text-2xl font-bold bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+                        {credits.planName}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg bg-background/50 border border-[hsl(var(--accent-pink))]/20">
+                      <div className="text-sm text-muted-foreground mb-1">Application Credits</div>
+                      <div className="text-2xl font-bold text-foreground">
+                        {credits.remaining} / {credits.total}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {credits.used} used this month
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/plans')}
+                    className="w-full"
+                  >
+                    Manage Subscription
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+            
             <Card className="border-[hsl(var(--accent-mint))]/20 bg-gradient-to-br from-background to-[hsl(var(--surface))]">
               <CardHeader>
                 <CardTitle className="text-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">Personal Information</CardTitle>
