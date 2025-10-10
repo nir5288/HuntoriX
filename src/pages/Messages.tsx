@@ -382,13 +382,16 @@ const Messages = () => {
 
       {/* Show message area on desktop OR on mobile when conversation is selected */}
       {(!isMobile || otherUserId) && (
-        <div className={cn("flex-1 flex flex-col min-w-0", !isMobile && "max-w-[65%]")}>
-          <div className={cn("h-full flex flex-col", isMobile && "h-screen")}>
+        <div className={cn(
+          "flex flex-col min-w-0",
+          isMobile ? "fixed inset-0 w-full h-full" : "flex-1 max-w-[65%]"
+        )}>
+          <div className="h-full flex flex-col overflow-hidden">
               {otherUserId ? <>
                    {/* Fixed Header */}
                    <div className={cn(
                      "h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4",
-                     isMobile && "sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+                     isMobile && "bg-background"
                    )}>
                   {/* Back button on mobile */}
                   {isMobile && (
@@ -501,7 +504,7 @@ const Messages = () => {
                 </div>
 
               {/* Scrolling Message Thread */}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden min-h-0">
                 <MessageThread messages={messages} currentUserId={user?.id || ""} currentUserProfile={profile} loading={loading} onEdited={loadMessages} onReply={message => {
               const isFromMe = message.from_user === user.id;
               setReplyingTo({
@@ -515,7 +518,7 @@ const Messages = () => {
               {/* Fixed Input */}
               <div className={cn(
                 "shrink-0",
-                isMobile && "sticky bottom-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+                isMobile && "bg-background border-t"
               )}>
                 <MessageInput
                   onSend={handleSendMessage} 
