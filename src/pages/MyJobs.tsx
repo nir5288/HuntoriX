@@ -364,14 +364,15 @@ const MyJobs = () => {
                         return sortBy === 'latest' ? dateB - dateA : dateA - dateB;
                       });
                       
-                        return (
-                          <div className="text-center py-8 text-base text-muted-foreground">
-                            No jobs match your filters
-                          </div>
-                        );
-                      
-                      return filteredJobs.map(job => {
-                        const jobApplications = applications.filter(a => a.job_id === job.id);
+                        if (filteredJobs.length === 0) {
+                          return (
+                            <div className="text-center py-8 text-base text-muted-foreground">
+                              No jobs match your filters
+                            </div>
+                          );
+                        }
+                        return filteredJobs.map(job => {
+                          const jobApplications = applications.filter(a => a.job_id === job.id);
                         const pendingCount = jobApplications.filter(a => a.status === 'submitted').length;
                         
                         return (
