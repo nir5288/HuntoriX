@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
 import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { RichJobDescriptionEditor } from '@/components/RichJobDescriptionEditor';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -612,18 +613,13 @@ export function EditJobModal({ open, onOpenChange, job, onSuccess }: EditJobModa
               
               <div className="space-y-2.5" data-field="description">
                 <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
-                <Textarea 
-                  {...register('description')} 
-                  rows={6} 
-                  placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
-                  className={cn(
-                    "text-sm resize-none",
-                    fieldErrors.description && 'border-destructive ring-2 ring-destructive/20'
-                  )}
-                  onChange={(e) => {
-                    register('description').onChange(e);
+                <RichJobDescriptionEditor
+                  value={watch('description') || ''}
+                  onChange={(value) => {
+                    setValue('description', value);
                     clearFieldError('description');
                   }}
+                  error={!!fieldErrors.description}
                 />
                 {fieldErrors.description && <p className="text-sm text-destructive">{fieldErrors.description}</p>}
               </div>

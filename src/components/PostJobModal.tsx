@@ -22,6 +22,7 @@ import { LocationAutocomplete } from '@/components/LocationAutocomplete';
 import { JobTitleAutocomplete } from '@/components/JobTitleAutocomplete';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ExclusiveJobPromotionModal } from '@/components/ExclusiveJobPromotionModal';
+import { RichJobDescriptionEditor } from '@/components/RichJobDescriptionEditor';
 
 const jobTitles = [
   'Software Engineer', 'Backend Engineer', 'Frontend Engineer', 'Full-Stack Engineer',
@@ -1211,19 +1212,14 @@ export function PostJobModal({ open, onOpenChange, userId }: PostJobModalProps) 
             
             <div className="space-y-2.5" data-field="description">
               <Label htmlFor="description" className="text-sm font-medium">Role Overview <span className="text-destructive">*</span></Label>
-              <Textarea 
-                {...register('description')} 
-                rows={6} 
-                placeholder="Describe the role, key responsibilities, requirements, and what makes this opportunity exciting..."
-                className={cn(
-                  "text-sm resize-none",
-                  autoFilledFields.has('description') && 'bg-yellow-50 dark:bg-yellow-950/20',
-                  fieldErrors.description && 'border-destructive ring-2 ring-destructive/20'
-                )}
-                onChange={(e) => {
-                  register('description').onChange(e);
+              <RichJobDescriptionEditor
+                value={watch('description') || ''}
+                onChange={(value) => {
+                  setValue('description', value);
                   clearFieldError('description');
                 }}
+                autoFilled={autoFilledFields.has('description')}
+                error={!!fieldErrors.description}
               />
               {fieldErrors.description && <p className="text-sm text-destructive">{fieldErrors.description}</p>}
             </div>
