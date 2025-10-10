@@ -105,8 +105,8 @@ export function VerificationWrapper({ children }: VerificationWrapperProps) {
   if (showPlanSelection && user) {
     const uid = user.id;
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl">
+      <div className="fixed inset-0 bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="w-full max-w-6xl my-8">
           <Card className="shadow-2xl">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold">Choose your plan</CardTitle>
