@@ -304,14 +304,13 @@ export function Header() {
 
               {/* Right side - Auth & Actions */}
               <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              {/* Mobile Menu - Only show when logged in */}
-              {user && (
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
-                      <Menu className="h-5 w-5" />
-                    </Button>
-                  </SheetTrigger>
+              {/* Mobile Menu */}
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
                 <SheetContent side="left" className="w-[280px] sm:w-[340px]">
                   <nav className="flex flex-col gap-1 mt-8">
                     {/* Main Navigation */}
@@ -414,7 +413,6 @@ export function Header() {
                   </nav>
                 </SheetContent>
               </Sheet>
-              )}
 
               {user && profile ? (
                 <TooltipProvider delayDuration={0}>
