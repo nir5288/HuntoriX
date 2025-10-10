@@ -454,15 +454,6 @@ const EmployerDashboard = () => {
             <p className="text-base text-muted-foreground">Manage your hiring pipeline</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="default"
-              onClick={() => navigate('/saved-headhunters')}
-              className="hidden lg:flex items-center gap-2 h-10"
-            >
-              <Star className="h-5 w-5" />
-              Saved Headhunters ({savedHeadhuntersCount})
-            </Button>
             <Button
               size="default" 
               onClick={() => setPostJobModalOpen(true)} 

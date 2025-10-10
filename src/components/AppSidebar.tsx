@@ -1,4 +1,4 @@
-import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, TrendingUp, Database } from "lucide-react";
+import { Home, Briefcase, MessageCircle, Wrench, BarChart3, HelpCircle, ChevronLeft, ChevronRight, Globe, TrendingUp, Database, Star } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import {
@@ -40,6 +40,11 @@ export function AppSidebar({ role }: AppSidebarProps) {
       url: '/messages',
       icon: MessageCircle,
     },
+    ...(role === 'employer' ? [{
+      title: 'Saved Headhunters',
+      url: '/saved-headhunters',
+      icon: Star,
+    }] : []),
     ...(role === 'headhunter' ? [{
       title: 'Global Hiring',
       url: '/global-hiring',
