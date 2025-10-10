@@ -176,14 +176,29 @@ export function PlanSelection({
   const handleSelectPlan = async (planId: PlanId) => {
     setSubmitting(true);
     try {
+      // First, get the actual UUID for the plan from subscription_plans table
+      const { data: planData, error: planError } = await supabase
+        .from('subscription_plans')
+        .select('id')
+        .ilike('name', planId)
+        .single();
+
+      if (planError || !planData) {
+        throw new Error(`Plan "${planId}" not found in subscription_plans table`);
+      }
+
+      const planUuid = planData.id;
+
+      // Check if user already has a subscription
       const {
         data: existing
       } = await supabase.from('user_subscriptions').select('id').eq('user_id', userId).maybeSingle();
+      
       if (existing) {
         const {
           error
         } = await supabase.from('user_subscriptions').update({
-          plan_id: planId,
+          plan_id: planUuid,
           status: 'active',
           updated_at: new Date().toISOString()
         }).eq('user_id', userId);
@@ -193,7 +208,7 @@ export function PlanSelection({
           error
         } = await supabase.from('user_subscriptions').insert({
           user_id: userId,
-          plan_id: planId,
+          plan_id: planUuid,
           status: 'active'
         });
         if (error) throw error;
