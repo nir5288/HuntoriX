@@ -10,7 +10,7 @@ import { MessageThread } from "@/components/MessageThread";
 import { MessageInput } from "@/components/MessageInput";
 import { VideoCall } from "@/components/VideoCall";
 import { useToast } from "@/hooks/use-toast";
-import { Menu, ArrowLeft, User, Circle, Video, CalendarIcon } from "lucide-react";
+import { Menu, ArrowLeft, User, Circle, Video, CalendarIcon, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 interface Message {
   id: string;
   from_user: string;
@@ -52,6 +53,7 @@ const Messages = () => {
     status: myStatus
   } = useUserPreferences();
   useUpdateLastSeen(); // Update last_seen timestamp
+  const isMobile = useIsMobile();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chatSidebarCollapsed, setChatSidebarCollapsed] = useState(false);
@@ -83,15 +85,15 @@ const Messages = () => {
   // Handle "null" string from URL
   const validJobId = jobId && jobId !== "null" ? jobId : null;
 
-  // Auto-open last conversation on initial load
+  // Auto-open last conversation on initial load (desktop only)
   useEffect(() => {
     if (!user) {
       navigate("/auth");
       return;
     }
 
-    // If no conversation selected, load the most recent one
-    if (!otherUserId) {
+    // If no conversation selected and on desktop, load the most recent one
+    if (!otherUserId && !isMobile) {
       const loadLastConversation = async () => {
         try {
           const { data: messages } = await supabase
@@ -112,7 +114,7 @@ const Messages = () => {
       };
       loadLastConversation();
     }
-  }, [user, otherUserId, navigate]);
+  }, [user, otherUserId, navigate, isMobile]);
 
   useEffect(() => {
     if (!user) {
@@ -368,56 +370,69 @@ const Messages = () => {
     loadMessages(true);
   };
   return <div className="h-screen flex ml-0">
-      <ChatSidebar
-        isOpen={true} 
-        onClose={() => {}}
-        isCollapsed={false}
-        onToggleCollapse={() => {}}
-      />
+      {/* Show sidebar on desktop OR on mobile when no conversation is selected */}
+      {(!isMobile || !otherUserId) && (
+        <ChatSidebar
+          isOpen={true} 
+          onClose={() => {}}
+          isCollapsed={false}
+          onToggleCollapse={() => {}}
+        />
+      )}
 
-      <div className="flex-1 flex flex-col min-w-0 max-w-[65%]">
-        <div className="h-full flex flex-col">
-            {otherUserId ? <>
-                {/* Fixed Header */}
-                <div className="h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4">
-                {!sidebarOpen && <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
-                    <Menu className="h-5 w-5" />
-                  </Button>}
-                
-                
-                <Link to={otherUserRole === "headhunter" ? `/profile/headhunter/${otherUserId}` : `/profile/employer/${otherUserId}`} className="flex items-center gap-3 flex-1 hover:opacity-80 transition">
-                  <div className="relative">
-                    {otherUserAvatar ? <img src={otherUserAvatar} alt={otherUserName} className="h-10 w-10 rounded-full object-cover" /> : <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center">
-                        <User className="h-5 w-5" />
-                      </div>}
-                    {statusIndicator && <Circle className={`absolute bottom-0 right-0 h-3 w-3 fill-current ${statusIndicator.color} border-2 border-background rounded-full`} />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h2 className="font-semibold text-base">{otherUserName}</h2>
-                      {otherUserRole && <Badge variant="outline" className="text-xs capitalize">
-                          {otherUserRole}
-                        </Badge>}
-                    </div>
-                    <p className="text-xs text-muted-foreground truncate">{jobTitle}</p>
-                     {statusIndicator ? <div className="flex items-center gap-1.5 text-xs">
-                        <span className={statusIndicator.color}>●</span>
-                        <span className={statusIndicator.color}>{statusIndicator.text}</span>
-                      </div> : lastSeen ? <p className="text-xs text-muted-foreground">{lastSeen}</p> : null}
-                  </div>
-                </Link>
-                
-                <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="default"
-                      className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
-                      title="Schedule a video call"
+      {/* Show message area on desktop OR on mobile when conversation is selected */}
+      {(!isMobile || otherUserId) && (
+        <div className={cn("flex-1 flex flex-col min-w-0", !isMobile && "max-w-[65%]")}>
+          <div className="h-full flex flex-col">
+              {otherUserId ? <>
+                  {/* Fixed Header */}
+                  <div className="h-[72px] shrink-0 border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/10 via-[hsl(var(--accent-mint))]/10 to-[hsl(var(--accent-lilac))]/10 flex items-center gap-3 px-4">
+                  {/* Back button on mobile */}
+                  {isMobile && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => navigate('/messages')}
                     >
-                      <Video className="h-4 w-4" />
-                      <span className="text-sm font-semibold">Schedule a video call</span>
+                      <ArrowLeft className="h-5 w-5" />
                     </Button>
-                  </PopoverTrigger>
+                  )}
+                
+                  
+                  <Link to={otherUserRole === "headhunter" ? `/profile/headhunter/${otherUserId}` : `/profile/employer/${otherUserId}`} className="flex items-center gap-3 flex-1 hover:opacity-80 transition">
+                    <div className="relative">
+                      {otherUserAvatar ? <img src={otherUserAvatar} alt={otherUserName} className="h-10 w-10 rounded-full object-cover" /> : <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] flex items-center justify-center">
+                          <User className="h-5 w-5" />
+                        </div>}
+                      {statusIndicator && <Circle className={`absolute bottom-0 right-0 h-3 w-3 fill-current ${statusIndicator.color} border-2 border-background rounded-full`} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-semibold text-base">{otherUserName}</h2>
+                        {otherUserRole && <Badge variant="outline" className="text-xs capitalize">
+                            {otherUserRole}
+                          </Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{jobTitle}</p>
+                       {statusIndicator ? <div className="flex items-center gap-1.5 text-xs">
+                          <span className={statusIndicator.color}>●</span>
+                          <span className={statusIndicator.color}>{statusIndicator.text}</span>
+                        </div> : lastSeen ? <p className="text-xs text-muted-foreground">{lastSeen}</p> : null}
+                    </div>
+                  </Link>
+                  
+                  {!isMobile && (
+                    <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="default"
+                          className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
+                          title="Schedule a video call"
+                        >
+                          <Video className="h-4 w-4" />
+                          <span className="text-sm font-semibold">Schedule a video call</span>
+                        </Button>
+                      </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="end">
                     <div className="p-4 space-y-4">
                       <div className="space-y-2">
@@ -469,8 +484,9 @@ const Messages = () => {
                       </Button>
                     </div>
                   </PopoverContent>
-                </Popover>
-              </div>
+                    </Popover>
+                  )}
+                </div>
 
               {/* Scrolling Message Thread */}
               <div className="flex-1 overflow-hidden">
@@ -494,17 +510,19 @@ const Messages = () => {
                   onInputClick={markMessagesAsRead}
                 />
               </div>
-            </> : <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
-              {!sidebarOpen && <Button variant="outline" onClick={() => setSidebarOpen(true)} className="mx-0 my-[20px]">
-                  <Menu className="h-4 w-4 mr-2" />
-                  Open Conversations
-                </Button>}
-              <p className="mx-0 my-[35px]">Select a conversation to start messaging</p>
-            </div>}
+            </> : !isMobile && (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Select a conversation to start messaging</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      )}
         
-        {otherUserId && (
+      {otherUserId && (
           <VideoCall
             isOpen={isVideoCallOpen}
             onClose={() => setIsVideoCallOpen(false)}
