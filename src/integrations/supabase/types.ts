@@ -1194,27 +1194,39 @@ export type Database = {
       user_subscriptions: {
         Row: {
           created_at: string | null
+          credits_reset_at: string | null
           credits_used: number
           id: string
+          next_plan_id: string | null
+          plan_change_effective_date: string | null
           plan_id: string
+          previous_plan_id: string | null
           status: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          credits_reset_at?: string | null
           credits_used?: number
           id?: string
+          next_plan_id?: string | null
+          plan_change_effective_date?: string | null
           plan_id: string
+          previous_plan_id?: string | null
           status?: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
+          credits_reset_at?: string | null
           credits_used?: number
           id?: string
+          next_plan_id?: string | null
+          plan_change_effective_date?: string | null
           plan_id?: string
+          previous_plan_id?: string | null
           status?: string
           updated_at?: string | null
           user_id?: string
@@ -1337,7 +1349,11 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: {
           credits_remaining: number
+          credits_reset_at: string
           credits_used: number
+          next_plan_name: string
+          plan_change_date: string
+          plan_will_change: boolean
           total_credits: number
         }[]
       }

@@ -2,13 +2,23 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Lock, Info, Loader2 } from 'lucide-react';
+import { Check, Lock, Info, Loader2, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 type PlanId = 'free' | 'core' | 'pro' | 'huntorix';
 type BillingCycle = 'monthly' | 'yearly';
 interface Plan {
@@ -169,17 +179,26 @@ export function PlanSelection({
   const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
   const [submitting, setSubmitting] = useState(false);
+  const [downgradeDialogOpen, setDowngradeDialogOpen] = useState(false);
+  const [pendingPlanChange, setPendingPlanChange] = useState<{ planId: PlanId; planUuid: string; resetDate: Date } | null>(null);
   const getPrice = (plan: Plan) => {
     if (plan.monthlyPrice === 0) return 0;
     return billingCycle === 'yearly' ? plan.monthlyPrice * 10 : plan.monthlyPrice;
   };
+  const getPlanCredits = (planName: string): number => {
+    const lowerName = planName.toLowerCase();
+    if (lowerName === 'free') return 20;
+    if (lowerName === 'core') return 250;
+    return 999999; // Unlimited for pro/huntorix
+  };
+
   const handleSelectPlan = async (planId: PlanId) => {
     setSubmitting(true);
     try {
       // First, get the actual UUID for the plan from subscription_plans table
       const { data: planData, error: planError } = await supabase
         .from('subscription_plans')
-        .select('id')
+        .select('id, name')
         .ilike('name', planId)
         .single();
 
@@ -189,38 +208,109 @@ export function PlanSelection({
 
       const planUuid = planData.id;
 
-      // Check if user already has a subscription
-      const {
-        data: existing
-      } = await supabase.from('user_subscriptions').select('id').eq('user_id', userId).maybeSingle();
+      // Check if user already has a subscription and get current plan info
+      const { data: existing } = await supabase
+        .from('user_subscriptions')
+        .select('id, plan_id, credits_reset_at, subscription_plans(name)')
+        .eq('user_id', userId)
+        .maybeSingle();
       
-      if (existing) {
-        const {
-          error
-        } = await supabase.from('user_subscriptions').update({
-          plan_id: planUuid,
-          status: 'active',
-          updated_at: new Date().toISOString()
-        }).eq('user_id', userId);
-        if (error) throw error;
-      } else {
-        const {
-          error
-        } = await supabase.from('user_subscriptions').insert({
-          user_id: userId,
-          plan_id: planUuid,
-          status: 'active'
-        });
-        if (error) throw error;
+      if (existing?.subscription_plans) {
+        const currentPlanName = (existing.subscription_plans as any).name;
+        const currentCredits = getPlanCredits(currentPlanName);
+        const newCredits = getPlanCredits(planData.name);
+        
+        // Check if this is a downgrade
+        if (newCredits < currentCredits) {
+          // Calculate next reset date (1 month from credits_reset_at)
+          const resetDate = new Date(existing.credits_reset_at);
+          resetDate.setMonth(resetDate.getMonth() + 1);
+          
+          // Store pending change and show confirmation dialog
+          setPendingPlanChange({ planId, planUuid, resetDate });
+          setDowngradeDialogOpen(true);
+          setSubmitting(false);
+          return;
+        }
       }
-      toast.success('Plan selected successfully!');
-      onPlanSelected();
+      
+      // If not a downgrade or no existing subscription, proceed immediately
+      await applyPlanChange(planUuid, false);
     } catch (error) {
       console.error('Error selecting plan:', error);
       toast.error('Failed to select plan. Please try again.');
-    } finally {
       setSubmitting(false);
     }
+  };
+  
+  const applyPlanChange = async (planUuid: string, isDowngrade: boolean) => {
+    try {
+      const { data: existing } = await supabase
+        .from('user_subscriptions')
+        .select('id, credits_reset_at')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (existing) {
+        if (isDowngrade) {
+          // For downgrades, schedule the change for next month
+          const resetDate = new Date(existing.credits_reset_at);
+          resetDate.setMonth(resetDate.getMonth() + 1);
+          
+          const { error } = await supabase
+            .from('user_subscriptions')
+            .update({
+              next_plan_id: planUuid,
+              plan_change_effective_date: resetDate.toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', userId);
+          
+          if (error) throw error;
+          toast.success('Your plan will be downgraded at the next billing cycle');
+        } else {
+          // For upgrades, apply immediately
+          const { error } = await supabase
+            .from('user_subscriptions')
+            .update({
+              plan_id: planUuid,
+              status: 'active',
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', userId);
+          
+          if (error) throw error;
+          toast.success('Plan upgraded successfully!');
+        }
+      } else {
+        // New subscription
+        const { error } = await supabase
+          .from('user_subscriptions')
+          .insert({
+            user_id: userId,
+            plan_id: planUuid,
+            status: 'active'
+          });
+        
+        if (error) throw error;
+        toast.success('Plan selected successfully!');
+      }
+      
+      onPlanSelected();
+    } catch (error) {
+      console.error('Error applying plan change:', error);
+      throw error;
+    } finally {
+      setSubmitting(false);
+      setDowngradeDialogOpen(false);
+      setPendingPlanChange(null);
+    }
+  };
+  
+  const confirmDowngrade = async () => {
+    if (!pendingPlanChange) return;
+    setSubmitting(true);
+    await applyPlanChange(pendingPlanChange.planUuid, true);
   };
   const renderFeatureValue = (value: any) => {
     if (value === true) return <div className="flex justify-center">
@@ -502,5 +592,57 @@ export function PlanSelection({
           </Button>
         </div>
       </div>
+      
+      {/* Downgrade Confirmation Dialog */}
+      <AlertDialog open={downgradeDialogOpen} onOpenChange={setDowngradeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              Downgrade Confirmation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <p>You are about to downgrade your plan.</p>
+              {pendingPlanChange && (
+                <>
+                  <p className="font-medium text-foreground">
+                    Your current credits will remain available until{' '}
+                    <span className="text-primary">
+                      {pendingPlanChange.resetDate.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </span>
+                  </p>
+                  <p>
+                    After this date, you will be switched to the new plan with its credit allocation.
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    You can upgrade back to your current plan at any time without waiting.
+                  </p>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={submitting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDowngrade}
+              disabled={submitting}
+              className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))]"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Confirm Downgrade'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>;
 }

@@ -40,7 +40,14 @@ export function Header() {
   const [showManageBanners, setShowManageBanners] = useState(false);
   const [showEditLegal, setShowEditLegal] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<{ name: string; price_usd: number } | null>(null);
-  const [credits, setCredits] = useState<{ total: number; used: number; remaining: number } | null>(null);
+  const [credits, setCredits] = useState<{ 
+    total: number; 
+    used: number; 
+    remaining: number;
+    resetDate?: Date;
+    nextPlan?: string;
+    changeDate?: Date;
+  } | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [switchRoleModal, setSwitchRoleModal] = useState<{
@@ -128,10 +135,14 @@ export function Header() {
       if (error) throw error;
       
       if (data && data.length > 0) {
+        const creditData = data[0];
         setCredits({
-          total: data[0].total_credits,
-          used: data[0].credits_used,
-          remaining: data[0].credits_remaining
+          total: creditData.total_credits,
+          used: creditData.credits_used,
+          remaining: creditData.credits_remaining,
+          resetDate: creditData.credits_reset_at ? new Date(creditData.credits_reset_at) : undefined,
+          nextPlan: creditData.plan_will_change ? creditData.next_plan_name : undefined,
+          changeDate: creditData.plan_change_date ? new Date(creditData.plan_change_date) : undefined,
         });
       }
     } catch (error) {
@@ -475,6 +486,26 @@ export function Header() {
                                 <div className="text-xs text-muted-foreground">
                                   {credits.used} credits used
                                 </div>
+                                {credits.resetDate && (
+                                  <div className="text-xs text-muted-foreground">
+                                    Resets on {credits.resetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                  </div>
+                                )}
+                                {credits.nextPlan && credits.changeDate && (
+                                  <div className="text-xs text-yellow-600 dark:text-yellow-500 font-medium pt-1 border-t">
+                                    Changing to {credits.nextPlan} on{' '}
+                                    {credits.changeDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate('/plans');
+                                      }}
+                                      className="block mt-1 text-primary hover:underline"
+                                    >
+                                      Upgrade now
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
