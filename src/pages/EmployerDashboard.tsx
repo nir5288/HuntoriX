@@ -137,7 +137,8 @@ const EmployerDashboard = () => {
     const colors: Record<string, string> = {
       open: 'bg-[hsl(var(--success))]',
       on_hold: 'bg-[hsl(var(--warning))]',
-      success: 'bg-[hsl(var(--success))]'
+      success: 'bg-[hsl(var(--success))]',
+      pending_review: 'bg-[hsl(var(--warning))]'
     };
     return colors[status] || 'bg-gray-400';
   };
@@ -658,9 +659,19 @@ const EmployerDashboard = () => {
                                   {pendingCount} Pending
                                 </Badge>
                               )}
-                              <Badge className={`text-sm h-7 px-3 ${getStatusColor(job.status)}`}>
-                                {job.status}
-                              </Badge>
+                              {job.status === 'pending_review' ? (
+                                <div className="flex flex-col gap-1">
+                                  <Badge className={`text-sm h-7 px-3 ${getStatusColor(job.status)} flex items-center gap-1.5`}>
+                                    <Clock className="h-3.5 w-3.5" />
+                                    Pending Review
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">Review may take up to 1 hour</span>
+                                </div>
+                              ) : (
+                                <Badge className={`text-sm h-7 px-3 ${getStatusColor(job.status)}`}>
+                                  {job.status}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           
@@ -744,39 +755,49 @@ const EmployerDashboard = () => {
                             </CardDescription>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="default"
-                                  className={`h-9 px-4 gap-2 ${getStatusColor(job.status)} border-0 hover:opacity-80`}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {job.status.replace('_', ' ')}
-                                  <ChevronDown className="h-4 w-4" />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-40 p-2" align="start">
-                                <div className="flex flex-col gap-1">
+                            {job.status === 'pending_review' ? (
+                              <div className="flex flex-col items-end gap-1">
+                                <Badge className={`text-sm h-7 px-3 ${getStatusColor(job.status)} flex items-center gap-1.5`}>
+                                  <Clock className="h-3.5 w-3.5" />
+                                  Pending Review
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">Review may take up to 1 hour</span>
+                              </div>
+                            ) : (
+                              <Popover>
+                                <PopoverTrigger asChild>
                                   <Button
                                     variant="ghost"
                                     size="default"
-                                    className="justify-start h-9 w-full"
-                                    onClick={(e) => handleStatusChange(job, 'open', e)}
+                                    className={`h-9 px-4 gap-2 ${getStatusColor(job.status)} border-0 hover:opacity-80`}
+                                    onClick={(e) => e.stopPropagation()}
                                   >
-                                    Open
+                                    {job.status.replace('_', ' ')}
+                                    <ChevronDown className="h-4 w-4" />
                                   </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="default"
-                                    className="justify-start h-9 w-full"
-                                    onClick={(e) => handleStatusChange(job, 'on_hold', e)}
-                                  >
-                                    On Hold
-                                  </Button>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-40 p-2" align="start">
+                                  <div className="flex flex-col gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="default"
+                                      className="justify-start h-9 w-full"
+                                      onClick={(e) => handleStatusChange(job, 'open', e)}
+                                    >
+                                      Open
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="default"
+                                      className="justify-start h-9 w-full"
+                                      onClick={(e) => handleStatusChange(job, 'on_hold', e)}
+                                    >
+                                      On Hold
+                                    </Button>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            )}
                             <Button
                               variant="ghost"
                               size="icon"
