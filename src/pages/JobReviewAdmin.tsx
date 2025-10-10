@@ -48,6 +48,43 @@ export default function JobReviewAdmin() {
     }
   }, [isAdmin, isLoadingAdmin, navigate]);
 
+  // Set up realtime subscription for job updates
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const channel = supabase
+      .channel('admin-jobs-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'jobs',
+          filter: 'status=eq.pending_review'
+        },
+        (payload) => {
+          console.log('Admin job change:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            // Fetch the complete job data with profile info
+            fetchPendingJobs();
+          } else if (payload.eventType === 'UPDATE') {
+            // Remove job from list if no longer pending_review
+            if (payload.new.status !== 'pending_review') {
+              setJobs(prevJobs => prevJobs.filter(job => job.id !== payload.new.id));
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setJobs(prevJobs => prevJobs.filter(job => job.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
+
   const fetchPendingJobs = async () => {
     try {
       const { data, error } = await supabase

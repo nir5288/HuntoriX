@@ -54,6 +54,42 @@ const EmployerDashboard = () => {
     }
   }, [user, loading]);
 
+  // Set up realtime subscription for job updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('jobs-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'jobs',
+          filter: `created_by=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Job updated:', payload);
+          // Update the job in the local state
+          setJobs(prevJobs => 
+            prevJobs.map(job => 
+              job.id === payload.new.id ? payload.new : job
+            )
+          );
+          
+          // Show toast if job was approved
+          if (payload.old.status === 'pending_review' && payload.new.status === 'open') {
+            toast.success(`Job "${payload.new.title}" has been approved!`);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   // Save filters to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('employer_dashboard_sort_by', sortBy);
