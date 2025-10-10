@@ -269,12 +269,14 @@ export function PlanSelection({
           if (error) throw error;
           toast.success('Your plan will be downgraded at the next billing cycle');
         } else {
-          // For upgrades, apply immediately
+          // For upgrades, apply immediately and clear any pending downgrades
           const { error } = await supabase
             .from('user_subscriptions')
             .update({
               plan_id: planUuid,
               status: 'active',
+              next_plan_id: null,
+              plan_change_effective_date: null,
               updated_at: new Date().toISOString()
             })
             .eq('user_id', userId);
