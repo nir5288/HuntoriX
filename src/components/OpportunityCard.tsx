@@ -10,6 +10,15 @@ import { formatDistanceToNow, differenceInHours } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatSeniority } from '@/lib/seniorityUtils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type Job = {
   id: string;
@@ -48,6 +57,8 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   const [isHoveringSkills, setIsHoveringSkills] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [savingJob, setSavingJob] = useState(false);
+  const [creditsRemaining, setCreditsRemaining] = useState<number | null>(null);
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
 
   // Auto-scroll carousel with bidirectional movement - pause on hover
   useEffect(() => {
@@ -108,6 +119,29 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     
     checkSaved();
   }, [currentUser, job.id]);
+
+  // Fetch credits for headhunters
+  useEffect(() => {
+    const fetchCredits = async () => {
+      if (!currentUser || currentUserRole !== 'headhunter') return;
+      
+      try {
+        const { data, error } = await supabase.rpc('get_user_credits', {
+          p_user_id: currentUser.id,
+        });
+
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setCreditsRemaining(data[0].credits_remaining);
+        }
+      } catch (error) {
+        console.error('Error fetching credits:', error);
+      }
+    };
+
+    fetchCredits();
+  }, [currentUser, currentUserRole]);
 
   useEffect(() => {
     const checkApplication = async () => {
@@ -240,6 +274,12 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
     // Guard: Already applied
     if (hasApplied) {
       return; // Button should be disabled
+    }
+
+    // Guard: No credits remaining
+    if (creditsRemaining !== null && creditsRemaining <= 0) {
+      setUpgradeDialogOpen(true);
+      return;
     }
 
     // All guards passed - proceed with apply
@@ -382,6 +422,7 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
   };
 
   return (
+    <>
     <Card className={`rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full ${
       job.is_exclusive ? 'exclusive-job-card' : ''
     }`}>
@@ -557,5 +598,28 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         {renderButton()}
       </CardFooter>
     </Card>
+
+    <AlertDialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>No Credits Remaining</AlertDialogTitle>
+          <AlertDialogDescription>
+            You've used all your application credits for this month. Upgrade your plan to continue applying to jobs.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction
+            onClick={() => {
+              setUpgradeDialogOpen(false);
+              navigate('/plans');
+            }}
+            className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))]"
+          >
+            Upgrade Plan
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
