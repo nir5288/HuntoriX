@@ -55,7 +55,7 @@ const PLANS: Plan[] = [{
   name: 'Pro',
   monthlyPrice: 39,
   description: 'Unlimited credits',
-  features: ['Everything in Core', 'Featured profile', 'Analytics dashboard', 'AI tools', 'Video calls', 'AI/Video badges on job cards'],
+  features: ['Everything in Core', 'Bulk apply', 'Featured profile', 'Analytics dashboard', 'AI tools', 'Video calls', 'AI/Video badges on job cards'],
   locked: true,
   icon: ''
 }, {
