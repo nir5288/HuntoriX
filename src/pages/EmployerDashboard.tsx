@@ -514,12 +514,12 @@ const EmployerDashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex gap-2 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <Button
                   variant={showPendingOnly ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowPendingOnly(!showPendingOnly)}
-                  className="flex-1 sm:flex-initial h-10 text-sm sm:text-base"
+                  className="w-full sm:w-auto h-10 text-sm sm:text-base"
                 >
                   Pending Review
                 </Button>
@@ -527,7 +527,7 @@ const EmployerDashboard = () => {
                   variant={showPrivateOnly ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowPrivateOnly(!showPrivateOnly)}
-                  className="flex-1 sm:flex-initial h-10 text-sm sm:text-base"
+                  className="w-full sm:w-auto h-10 text-sm sm:text-base"
                 >
                   Private Only
                 </Button>
