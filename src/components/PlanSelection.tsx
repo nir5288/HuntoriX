@@ -475,7 +475,7 @@ export function PlanSelection({
                       <div className="flex flex-col items-center gap-3 py-4">
                         <span className="text-xl font-bold">{plan.name}</span>
                         {plan.id === 'core'}
-                        <Button size="sm" variant={plan.locked ? 'outline' : 'default'} disabled={plan.locked} onClick={() => !plan.locked && setSelectedPlan(plan.id)} className="mt-2 w-full font-semibold">
+                        <Button size="sm" variant={plan.locked ? 'outline' : (selectedPlan === plan.id ? 'default' : 'outline')} disabled={plan.locked} onClick={() => !plan.locked && setSelectedPlan(plan.id)} className={cn("mt-2 w-full font-semibold", selectedPlan === plan.id && !plan.locked && "ring-2 ring-[hsl(var(--vibrant-mint))] shadow-lg")}>
                           {plan.locked ? <>
                               <Lock className="mr-1 h-3 w-3" />
                               Locked
