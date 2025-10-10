@@ -53,25 +53,61 @@ export function RichJobDescriptionEditor({
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
 
-    const range = selection.getRangeAt(0);
+    let range = selection.getRangeAt(0);
     if (range.collapsed) return; // No text selected
 
-    // Get the selected content
-    const selectedContent = range.extractContents();
-    
-    // Create a strong element
+    // Exclude leading/trailing spaces from the selection to preserve spacing
+    const trimBoundaries = () => {
+      // Trim leading spaces at start
+      while (range.startContainer.nodeType === Node.TEXT_NODE) {
+        const text = range.startContainer as Text;
+        if (range.startOffset < text.data.length && text.data.charAt(range.startOffset) === ' ') {
+          range.setStart(text, range.startOffset + 1);
+        } else {
+          break;
+        }
+      }
+      // Trim trailing spaces at end
+      while (range.endContainer.nodeType === Node.TEXT_NODE) {
+        const text = range.endContainer as Text;
+        const idx = range.endOffset - 1;
+        if (idx >= 0 && text.data.charAt(idx) === ' ') {
+          range.setEnd(text, idx);
+        } else {
+          break;
+        }
+      }
+    };
+
+    trimBoundaries();
+    if (range.toString().length === 0) return; // don't bold only spaces
+
     const strong = document.createElement('strong');
-    strong.appendChild(selectedContent);
-    
-    // Insert the strong element
-    range.insertNode(strong);
-    
-    // Move cursor after the bold text and collapse
-    range.setStartAfter(strong);
+
+    // Prefer surroundContents to keep boundaries intact
+    try {
+      range.surroundContents(strong);
+    } catch (e) {
+      const frag = range.extractContents();
+      strong.appendChild(frag);
+      range.insertNode(strong);
+    }
+
+    // Place caret just after the bold element, but if the next text node
+    // begins with a space, move caret after that space to avoid "joined" words
+    range = document.createRange();
+    const next = strong.nextSibling;
+    if (next && next.nodeType === Node.TEXT_NODE) {
+      const t = next as Text;
+      const advanceBy = t.data.startsWith(' ') ? 1 : 0;
+      range.setStart(next, advanceBy);
+    } else {
+      range.setStartAfter(strong);
+    }
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
-    
+
     editorRef.current?.focus();
     handleInput();
   };
