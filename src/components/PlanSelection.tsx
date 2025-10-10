@@ -442,6 +442,24 @@ export function PlanSelection({
         })}
         </div>
 
+        {/* Continue Button - Desktop/Tablet Only */}
+        <div className="hidden md:flex justify-center animate-fade-in">
+          <Button size="lg" disabled={!selectedPlan || submitting} onClick={() => selectedPlan && handleSelectPlan(selectedPlan)} className={cn("min-w-[280px] h-14 text-lg font-bold rounded-2xl transition-all duration-300 relative overflow-hidden group shadow-2xl", selectedPlan && "hover:scale-105 animate-scale-in")} style={selectedPlan ? {
+          background: 'linear-gradient(135deg, hsl(var(--vibrant-mint)), hsl(var(--vibrant-lilac)))'
+        } : {}}>
+            {!submitting && selectedPlan && <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />}
+            <span className="relative z-10">
+              {submitting ? <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Processing...
+                </> : <>
+                  Continue
+                  <span className="ml-2">→</span>
+                </>}
+            </span>
+          </Button>
+        </div>
+
         {/* Plans at a glance strip */}
         <div className="flex items-center justify-center gap-3 flex-wrap p-6 rounded-2xl bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-mint))] animate-fade-in">
           {PLANS.map(plan => {
