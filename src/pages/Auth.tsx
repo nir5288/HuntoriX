@@ -28,12 +28,26 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPlanSelection, setShowPlanSelection] = useState(false);
   const [newUserId, setNewUserId] = useState<string | null>(null);
+  const [preSelectedPlan, setPreSelectedPlan] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Check for pre-selected plan from pricing page
+  useEffect(() => {
+    const selectedPlan = localStorage.getItem('selectedPlan');
+    if (selectedPlan) {
+      setPreSelectedPlan(selectedPlan);
+      // If coming with a plan, set to signup mode for headhunter
+      if (searchParams.get('mode') !== 'signin') {
+        setIsLogin(false);
+        setActiveTab('headhunter');
+      }
+    }
+  }, [searchParams]);
 
   // Handle OAuth callback and role assignment
   useEffect(() => {
@@ -228,6 +242,9 @@ const Auth = () => {
   };
 
   const handlePlanSelected = async () => {
+    // Clear the pre-selected plan from localStorage
+    localStorage.removeItem('selectedPlan');
+    setPreSelectedPlan(null);
     await refreshProfile();
     setShowPlanSelection(false);
   };
@@ -291,7 +308,11 @@ const Auth = () => {
             </CardHeader>
             <CardContent>
               {uid ? (
-                <PlanSelection userId={uid} onPlanSelected={handlePlanSelected} />
+                <PlanSelection 
+                  userId={uid} 
+                  onPlanSelected={handlePlanSelected}
+                  initialSelectedPlan={preSelectedPlan}
+                />
               ) : (
                 <div className="flex items-center justify-center p-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />

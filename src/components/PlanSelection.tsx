@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,8 +31,9 @@ interface Plan {
   icon: string;
 }
 interface PlanSelectionProps {
-  onPlanSelected: () => void;
+  onPlanSelected: (planId?: string) => void;
   userId: string;
+  initialSelectedPlan?: string | null;
 }
 const PLANS: Plan[] = [{
   id: 'free',
@@ -181,13 +182,23 @@ const FEATURE_COMPARISON = [{
 }];
 export function PlanSelection({
   onPlanSelected,
-  userId
+  userId,
+  initialSelectedPlan
 }: PlanSelectionProps) {
-  const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(
+    initialSelectedPlan as PlanId | null
+  );
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
   const [submitting, setSubmitting] = useState(false);
   const [downgradeDialogOpen, setDowngradeDialogOpen] = useState(false);
   const [pendingPlanChange, setPendingPlanChange] = useState<{ planId: PlanId; planUuid: string; resetDate: Date } | null>(null);
+  
+  // Update selected plan if initialSelectedPlan changes
+  useEffect(() => {
+    if (initialSelectedPlan) {
+      setSelectedPlan(initialSelectedPlan as PlanId);
+    }
+  }, [initialSelectedPlan]);
   const getPrice = (plan: Plan) => {
     if (plan.monthlyPrice === 0) return 0;
     return billingCycle === 'yearly' ? plan.monthlyPrice * 10 : plan.monthlyPrice;
@@ -201,6 +212,13 @@ export function PlanSelection({
 
   const handleSelectPlan = async (planId: PlanId) => {
     setSubmitting(true);
+    
+    // If no userId, user is not logged in - store plan and redirect to signup
+    if (!userId) {
+      onPlanSelected(planId);
+      return;
+    }
+    
     try {
       // First, get the actual UUID for the plan from subscription_plans table
       const { data: planData, error: planError } = await supabase

@@ -3,19 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import { PlanSelection } from '@/components/PlanSelection';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/Header';
+import { useEffect, useState } from 'react';
 
 const Plans = () => {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const [initialPlan, setInitialPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check for pre-selected plan from URL or localStorage
+    const selectedPlan = localStorage.getItem('selectedPlan');
+    if (selectedPlan) {
+      setInitialPlan(selectedPlan);
+    }
+  }, []);
 
   console.log('Plans page rendering, user:', user?.id, 'profile:', profile?.role);
 
-  const handlePlanSelected = async () => {
+  const handlePlanSelected = async (planId?: string) => {
     if (!user) {
-      navigate('/auth?role=headhunter');
+      // Store selected plan in localStorage and redirect to signup
+      if (planId) {
+        localStorage.setItem('selectedPlan', planId);
+      }
+      navigate('/auth?mode=signup&role=headhunter');
       return;
     }
     
+    // Clear the stored plan after successful selection
+    localStorage.removeItem('selectedPlan');
     await refreshProfile();
     // Navigate to dashboard based on role
     if (profile?.role === 'employer') {
@@ -33,22 +49,18 @@ const Plans = () => {
           <Card className="shadow-2xl bg-white">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold text-foreground">Subscription Plans</CardTitle>
-              <CardDescription className="text-muted-foreground">Choose the plan that best fits your needs</CardDescription>
+              <CardDescription className="text-muted-foreground">
+                {user 
+                  ? "Choose the plan that best fits your needs" 
+                  : "Choose a plan and sign up to get started"}
+              </CardDescription>
             </CardHeader>
             <CardContent className="bg-white">
-              {user ? (
-                <PlanSelection userId={user.id} onPlanSelected={handlePlanSelected} />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">Please sign in to select a plan</p>
-                  <button 
-                    onClick={() => navigate('/auth?role=headhunter')}
-                    className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 px-6 py-2 rounded-lg font-medium"
-                  >
-                    Sign In
-                  </button>
-                </div>
-              )}
+              <PlanSelection 
+                userId={user?.id || ''} 
+                onPlanSelected={handlePlanSelected}
+                initialSelectedPlan={initialPlan}
+              />
             </CardContent>
           </Card>
         </div>
