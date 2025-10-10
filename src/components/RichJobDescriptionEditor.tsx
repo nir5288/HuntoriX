@@ -66,13 +66,8 @@ export function RichJobDescriptionEditor({
     // Insert the strong element
     range.insertNode(strong);
     
-    // Insert a space after the bold text
-    const spaceNode = document.createTextNode('\u200B'); // Zero-width space
-    strong.parentNode?.insertBefore(spaceNode, strong.nextSibling);
-    
-    // Move cursor after the space
-    range.setStartAfter(spaceNode);
-    range.setEndAfter(spaceNode);
+    // Move cursor after the bold text and collapse
+    range.setStartAfter(strong);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
