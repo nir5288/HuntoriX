@@ -783,6 +783,16 @@ const EmployerDashboard = () => {
                             )}
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={(e) => handleRejectAll(job.id, e)}
+                              className="h-7 text-[10px] sm:text-xs px-2 gap-1"
+                              title="Reject all pending applications"
+                            >
+                              <X className="h-3 w-3" />
+                              <span>Reject All</span>
+                            </Button>
                             <div className="relative">
                               <Button
                                 variant="outline"
@@ -801,16 +811,6 @@ const EmployerDashboard = () => {
                                 New
                               </Badge>
                             </div>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={(e) => handleRejectAll(job.id, e)}
-                              className="h-7 text-[10px] sm:text-xs px-2 gap-1"
-                              title="Reject all pending applications"
-                            >
-                              <X className="h-3 w-3" />
-                              <span>Reject All</span>
-                            </Button>
                           </div>
                         </div>
                       </CardContent>
