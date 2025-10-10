@@ -264,19 +264,17 @@ const HeadhunterDashboard = () => {
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Browse jobs and manage your applications</p>
           </div>
-          <div className="flex flex-col-reverse sm:flex-row gap-2 w-full sm:w-auto">
-            <Button size="lg" variant="outline" onClick={() => navigate('/saved-jobs')} className="relative h-12 text-base flex-1 sm:flex-initial">
-              <Heart className="mr-2 h-5 w-5" />
-              <span className="hidden sm:inline">Saved Jobs</span>
-              <span className="sm:hidden">Saved</span>
-              {savedJobsCount > 0 && <Badge className="ml-2 bg-[hsl(var(--accent-pink))] text-white h-5 px-2 text-xs">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <Button size="lg" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-14 text-lg px-8 flex-1 sm:flex-initial">
+              <Search className="mr-2 h-6 w-6" />
+              Browse Jobs
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/saved-jobs')} className="relative h-14 text-lg px-8 flex-1 sm:flex-initial">
+              <Heart className="mr-2 h-6 w-6" />
+              Saved Jobs
+              {savedJobsCount > 0 && <Badge className="ml-2 bg-[hsl(var(--accent-pink))] text-white h-6 px-2.5 text-sm">
                   {savedJobsCount}
                 </Badge>}
-            </Button>
-            <Button size="lg" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-12 text-base flex-1 sm:flex-initial">
-              <Search className="mr-2 h-5 w-5" />
-              <span className="hidden sm:inline">Browse Jobs</span>
-              <span className="sm:hidden">Browse</span>
             </Button>
           </div>
         </div>
@@ -468,41 +466,41 @@ const HeadhunterDashboard = () => {
                 {filteredApplications.slice(0, 5).map(app => <Card key={`${app.type}-${app.id}`} className={`group hover:shadow-md transition-shadow cursor-pointer ${
                     app.job?.is_exclusive ? 'exclusive-job-card' : ''
                   }`} onClick={() => navigate(`/jobs/${app.job_id}`, { state: { from: 'dashboard' } })}>
-                    <CardHeader className="px-4 py-3">
+                    <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
                       {/* Mobile layout */}
-                      <div className="flex flex-col gap-2.5 sm:hidden">
-                        <div className="space-y-2">
+                      <div className="flex flex-col gap-4 sm:hidden">
+                        <div className="space-y-3">
                           <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="text-sm font-semibold leading-tight">{app.job?.title}</CardTitle>
+                            <CardTitle className="text-lg font-semibold leading-tight">{app.job?.title}</CardTitle>
                             {app.job?.job_id_number && (
-                              <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
+                              <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
                                 #{app.job?.job_id_number}
                               </Badge>
                             )}
                           </div>
                           
-                          <CardDescription className="text-[11px] leading-tight">
+                          <CardDescription className="text-sm leading-relaxed">
                             {app.job?.employer?.company_name || app.job?.employer?.name} • {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                           
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-2">
                             {app.job?.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2">
                                 HuntoriX Exclusive
                               </Badge>
                             )}
                             {app.type === 'invitation' && (
-                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-[9px] h-4 px-1.5">
+                              <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-6 px-2">
                                 Invitation
                               </Badge>
                             )}
-                            <Badge className={`text-[9px] h-4 px-1.5 ${getStatusColor(app.status)}`}>
+                            <Badge className={`text-xs h-6 px-2 ${getStatusColor(app.status)}`}>
                               {app.status}
                             </Badge>
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
+                        <div className="flex flex-col gap-2 pt-3 border-t">
                           {app.status === 'shortlisted' && (
                             <Button
                               variant="outline"
@@ -511,10 +509,10 @@ const HeadhunterDashboard = () => {
                                 e.stopPropagation();
                                 handleChat(app.job_id);
                               }}
-                              className="h-8 text-[10px]"
+                              className="w-full h-10 text-sm justify-start"
                             >
-                              <MessageCircle className="mr-1 h-3 w-3" />
-                              Chat
+                              <MessageCircle className="mr-2 h-4 w-4" />
+                              Chat with Employer
                             </Button>
                           )}
                           {app.type === 'invitation' && app.status === 'pending' && (
@@ -525,15 +523,15 @@ const HeadhunterDashboard = () => {
                                 e.stopPropagation();
                                 navigate(`/job-review/${app.job_id}`, { state: { from: 'dashboard' } });
                               }}
-                              className="h-8 text-[10px]"
+                              className="w-full h-10 text-sm justify-start"
                             >
-                              Review
+                              Review Invitation
                             </Button>
                           )}
                         </div>
                       </div>
 
-                      {/* Tablet & Desktop layout - original */}
+                      {/* Tablet & Desktop layout */}
                       <div className="hidden sm:flex items-start justify-between">
                         <div className="flex-1 cursor-pointer" onClick={() => navigate(`/jobs/${app.job_id}`, {
                   state: {
@@ -541,37 +539,37 @@ const HeadhunterDashboard = () => {
                   }
                 })}>
                           <div className="flex items-center gap-2 mb-1">
-                            <CardTitle className="text-base">{app.job?.title}</CardTitle>
-                            <Badge variant="outline" className="text-xs h-5">
+                            <CardTitle className="text-base sm:text-lg">{app.job?.title}</CardTitle>
+                            <Badge variant="outline" className="text-xs sm:text-sm h-6 px-3">
                               #{app.job?.job_id_number}
                             </Badge>
                             {app.job?.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs sm:text-sm h-6">
                                 HuntoriX Exclusive
                               </Badge>
                             )}
-                            {app.type === 'invitation' && <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs h-5 bg-fuchsia-500">
+                            {app.type === 'invitation' && <Badge className="bg-[hsl(var(--accent-lilac))] text-white text-xs sm:text-sm h-6">
                                 Invitation
                               </Badge>}
                           </div>
-                          <CardDescription className="text-xs">
+                          <CardDescription className="text-sm sm:text-base">
                             {app.type === 'invitation' ? 'Invited' : 'Applied'} {new Date(app.created_at).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <Badge className={`text-xs h-5 ${getStatusColor(app.status)}`}>
+                          <Badge className={`text-xs sm:text-sm h-6 px-3 ${getStatusColor(app.status)}`}>
                             {app.status}
                           </Badge>
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="px-4 pb-3 hidden sm:block">
+                    <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6 hidden sm:block">
                       <div className="flex gap-2">
                         {app.status === 'shortlisted' && <Button size="sm" variant="outline" onClick={e => {
                   e.stopPropagation();
                   handleChat(app.job_id);
-                }} className="h-7 text-xs">
-                            <MessageCircle className="mr-1.5 h-3 w-3" />
+                }} className="h-8 text-sm">
+                            <MessageCircle className="mr-1.5 h-4 w-4" />
                             Chat
                           </Button>}
                         <Button size="sm" variant="outline" onClick={e => {
@@ -581,7 +579,7 @@ const HeadhunterDashboard = () => {
                       from: 'dashboard'
                     }
                   });
-                }} className="h-7 text-xs">
+                }} className="h-8 text-sm">
                           View Details
                         </Button>
                         {app.type === 'invitation' && app.status === 'pending' && <Button size="sm" variant="hero" onClick={e => {
@@ -591,7 +589,7 @@ const HeadhunterDashboard = () => {
                       from: 'dashboard'
                     }
                   });
-                }} className="h-7 text-xs">
+                }} className="h-8 text-sm">
                             Review
                           </Button>}
                       </div>
@@ -630,38 +628,38 @@ const HeadhunterDashboard = () => {
               from: 'dashboard'
             }
           })}>
-                    <CardHeader className="px-4 py-3">
+                    <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
                       {/* Mobile layout */}
-                      <div className="flex flex-col gap-2.5 sm:hidden">
-                        <div className="space-y-2">
+                      <div className="flex flex-col gap-4 sm:hidden">
+                        <div className="space-y-3">
                           <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="text-sm font-semibold leading-tight">{job.title}</CardTitle>
+                            <CardTitle className="text-lg font-semibold leading-tight">{job.title}</CardTitle>
                             {job.job_id_number && (
-                              <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
+                              <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
                                 #{job.job_id_number}
                               </Badge>
                             )}
                           </div>
                           
-                          <CardDescription className="text-[11px] leading-tight">
+                          <CardDescription className="text-sm leading-relaxed">
                             {job.employer?.company_name || job.employer?.name} • {job.location}
                           </CardDescription>
                           
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-2">
                             {job.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2">
                                 HuntoriX Exclusive
                               </Badge>
                             )}
-                            <Badge className="bg-[hsl(var(--accent-mint))] text-[9px] h-4 px-1.5">
+                            <Badge className="bg-[hsl(var(--accent-mint))] text-white text-xs h-6 px-2">
                               {job.fee_model === 'percent_fee' ? `${job.fee_value}%` : `${job.fee_value} ${job.budget_currency}`}
                             </Badge>
                           </div>
 
                           {job.skills_must && job.skills_must.length > 0 && (
-                            <div className="flex flex-wrap gap-1 pt-1.5 border-t">
+                            <div className="flex flex-wrap gap-2 pt-3 border-t">
                               {job.skills_must.slice(0, 3).map((skill: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-[9px] h-4 px-1.5">
+                                <Badge key={idx} variant="secondary" className="text-xs h-6 px-2">
                                   {skill}
                                 </Badge>
                               ))}
@@ -674,24 +672,24 @@ const HeadhunterDashboard = () => {
                       <div className="hidden sm:flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <CardTitle className="text-base">{job.title}</CardTitle>
-                            <Badge variant="outline" className="text-xs h-5">
+                            <CardTitle className="text-base sm:text-lg">{job.title}</CardTitle>
+                            <Badge variant="outline" className="text-xs sm:text-sm h-6 px-3">
                               #{job.job_id_number}
                             </Badge>
                             {job.is_exclusive && (
-                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-5">
+                              <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs sm:text-sm h-6">
                                 HuntoriX Exclusive
                               </Badge>
                             )}
                           </div>
-                          <CardDescription className="text-xs">
+                          <CardDescription className="text-sm sm:text-base">
                             {job.employer?.company_name || job.employer?.name} • {job.location}
                           </CardDescription>
-                          {job.skills_must && job.skills_must.length > 0 && <div className="flex flex-wrap gap-1.5 mt-2">
-                              {job.skills_must.slice(0, 4).map((skill: string, idx: number) => <Badge key={idx} variant="secondary" className="text-xs">{skill}</Badge>)}
+                          {job.skills_must && job.skills_must.length > 0 && <div className="flex flex-wrap gap-2 mt-2">
+                              {job.skills_must.slice(0, 4).map((skill: string, idx: number) => <Badge key={idx} variant="secondary" className="text-xs sm:text-sm h-6 px-3">{skill}</Badge>)}
                             </div>}
                         </div>
-                        <Badge className="bg-[hsl(var(--accent-mint))] text-xs h-5">
+                        <Badge className="bg-[hsl(var(--accent-mint))] text-white text-xs sm:text-sm h-6 px-3">
                           {job.fee_model === 'percent_fee' ? `${job.fee_value}%` : `${job.fee_value} ${job.budget_currency}`}
                         </Badge>
                       </div>
