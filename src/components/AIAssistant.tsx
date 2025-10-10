@@ -35,6 +35,7 @@ export function AIAssistant() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isMicPressed, setIsMicPressed] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -179,12 +180,14 @@ export function AIAssistant() {
 
   const handleMicPress = () => {
     if (!isRecording) {
+      setIsMicPressed(true);
       startRecording();
     }
   };
 
   const handleMicRelease = () => {
     if (isRecording) {
+      setIsMicPressed(false);
       stopRecordingAndSend();
     }
   };
@@ -636,8 +639,9 @@ export function AIAssistant() {
                 size="icon"
                 variant={isRecording ? "destructive" : "outline"}
                 className={cn(
-                  "shrink-0 select-none",
-                  isRecording && "animate-pulse"
+                  "shrink-0 select-none transition-all duration-300",
+                  isRecording && "animate-pulse",
+                  isMicPressed && "scale-150"
                 )}
                 title={isRecording ? "Recording... Release to send" : "Hold to record voice message"}
               >
