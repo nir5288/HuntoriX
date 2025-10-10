@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Eye, EyeOff, Pencil, Check, X, Clock, ChevronDown } from 'lucide-react';
+import { Plus, Briefcase, Eye, EyeOff, Pencil, Check, X, Clock, ChevronDown, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -16,7 +16,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
-import { Users } from 'lucide-react';
 
 const MyJobs = () => {
   const { user, profile, loading } = useRequireAuth('employer');
@@ -238,17 +237,15 @@ const MyJobs = () => {
   return (
     <>
       <div className="w-full px-4 sm:px-6 pb-4 sm:pb-6 -mt-6 sm:-mt-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
-              <div className="w-full sm:w-auto text-center sm:text-left">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-                  My Jobs
-                </h1>
-                <p className="text-sm sm:text-base md:text-lg text-muted-foreground">View and manage all your job postings</p>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight mb-1">My Jobs</h1>
+                <p className="text-muted-foreground">Manage all your job postings</p>
               </div>
               <Button 
                 size="lg" 
                 onClick={() => setPostJobModalOpen(true)} 
-                className="w-full sm:w-auto h-12 text-base bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
+                className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
               >
                 <Plus className="mr-2 h-5 w-5" />
                 Post Job
@@ -256,16 +253,54 @@ const MyJobs = () => {
             </div>
 
             <Card>
-              <CardHeader className="px-4 py-4">
-                <div className="text-center sm:text-left">
-                  <CardTitle className="text-xl sm:text-2xl font-bold">All Jobs</CardTitle>
-                  <CardDescription className="text-sm sm:text-base mt-1">{jobs.length} total job postings</CardDescription>
+              <CardHeader className="px-6 py-5 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-semibold">All Jobs</CardTitle>
+                    <CardDescription className="mt-1">{jobs.length} total postings</CardDescription>
+                  </div>
+                  
+                  {/* Modern Filters */}
+                  <div className="hidden lg:flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-background">
+                      <Label htmlFor="sort-jobs" className="text-sm text-muted-foreground">Sort by</Label>
+                      <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
+                        <SelectTrigger id="sort-jobs" className="h-8 w-[120px] border-0 shadow-none focus:ring-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="latest">Latest</SelectItem>
+                          <SelectItem value="oldest">Oldest</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <Button
+                      variant={showPendingOnly ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setShowPendingOnly(!showPendingOnly)}
+                      className={showPendingOnly ? "bg-[hsl(var(--warning))] hover:bg-[hsl(var(--warning))]/90" : ""}
+                    >
+                      <Clock className="mr-2 h-4 w-4" />
+                      Pending
+                    </Button>
+                    <Button
+                      variant={showPrivateOnly ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setShowPrivateOnly(!showPrivateOnly)}
+                    >
+                      <EyeOff className="mr-2 h-4 w-4" />
+                      Private
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-4 border-t mt-4">
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Label htmlFor="sort-jobs" className="text-sm sm:text-base font-medium shrink-0">Sort:</Label>
+                
+                {/* Mobile Filters */}
+                <div className="flex lg:hidden flex-col gap-2 pt-4 border-t mt-4">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="sort-jobs-mobile" className="text-sm font-medium">Sort:</Label>
                     <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
-                      <SelectTrigger id="sort-jobs" className="h-10 sm:h-11 w-full sm:w-[140px] text-sm sm:text-base">
+                      <SelectTrigger id="sort-jobs-mobile" className="h-10 flex-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -274,12 +309,12 @@ const MyJobs = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <div className="flex gap-2">
                     <Button
                       variant={showPendingOnly ? "default" : "outline"}
                       size="sm"
                       onClick={() => setShowPendingOnly(!showPendingOnly)}
-                      className="w-full sm:w-auto h-10 text-sm sm:text-base"
+                      className="flex-1"
                     >
                       Pending Review
                     </Button>
@@ -287,7 +322,7 @@ const MyJobs = () => {
                       variant={showPrivateOnly ? "default" : "outline"}
                       size="sm"
                       onClick={() => setShowPrivateOnly(!showPrivateOnly)}
-                      className="w-full sm:w-auto h-10 text-sm sm:text-base"
+                      className="flex-1"
                     >
                       Private Only
                     </Button>

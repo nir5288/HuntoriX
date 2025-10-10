@@ -420,36 +420,57 @@ const EmployerDashboard = () => {
   const renderVariant1 = () => (
     <>
       <div className="w-full px-4 sm:px-6 pb-4 sm:pb-6 -mt-6 sm:-mt-8">
-        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
-          <div className="w-full sm:w-auto text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-              Employer Dashboard
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Manage your job postings and applications</p>
+        {/* Modern Header with Actions */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight mb-1">Dashboard</h1>
+            <p className="text-muted-foreground">Manage your hiring pipeline</p>
           </div>
-          <Button size="lg" onClick={() => setPostJobModalOpen(true)} className="w-full sm:w-auto h-12 text-base bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950">
-            <Plus className="mr-2 h-5 w-5" />
-            Post Job
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/saved-headhunters')}
+              className="hidden lg:flex items-center gap-2"
+            >
+              <Star className="h-4 w-4" />
+              Saved Headhunters ({savedHeadhuntersCount})
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/saved-jobs')}
+              className="hidden lg:flex items-center gap-2"
+            >
+              <Heart className="h-4 w-4" />
+              Saved Jobs ({savedJobsCount})
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => setPostJobModalOpen(true)} 
+              className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              Post Job
+            </Button>
+          </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
-              <CardTitle className="text-xs sm:text-sm font-medium">Active Jobs</CardTitle>
-              <Briefcase className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <Card className="border-l-4 border-l-[hsl(var(--accent-mint))]">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Active Jobs</CardTitle>
+              <Briefcase className="h-5 w-5 text-[hsl(var(--accent-mint))]" />
             </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
-              <div className="text-2xl sm:text-3xl font-bold">{jobs.filter(j => j.status === 'open').length}</div>
+            <CardContent>
+              <div className="text-3xl font-bold">{jobs.filter(j => j.status === 'open').length}</div>
             </CardContent>
           </Card>
 
           <Card
-            className={`cursor-pointer transition-all ${
+            className={`border-l-4 cursor-pointer transition-all ${
               applications.filter(a => a.status === 'submitted').length > 0 
-                ? 'bg-[hsl(var(--warning))]/10 hover:bg-[hsl(var(--warning))]/20 border-[hsl(var(--warning))]/30' 
-                : ''
+                ? 'border-l-[hsl(var(--warning))] bg-[hsl(var(--warning))]/5 hover:bg-[hsl(var(--warning))]/10' 
+                : 'border-l-border'
             }`}
             onClick={() => {
               if (applications.filter(a => a.status === 'submitted').length > 0) {
@@ -457,55 +478,73 @@ const EmployerDashboard = () => {
               }
             }}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
-              <CardTitle className="text-xs sm:text-sm font-medium">Pending Review</CardTitle>
-              <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Pending Review</CardTitle>
+              <Clock className="h-5 w-5 text-[hsl(var(--warning))]" />
             </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
-              <div className="text-2xl sm:text-3xl font-bold">
+            <CardContent>
+              <div className="text-3xl font-bold">
                 {applications.filter(a => a.status === 'submitted').length}
               </div>
               {applications.filter(a => a.status === 'submitted').length > 0 && (
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Click to {showPendingOnly ? 'show all' : 'filter'}
                 </p>
               )}
-            </CardContent>
-          </Card>
-
-          <Card onClick={() => navigate('/saved-headhunters')} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
-              <CardTitle className="text-xs sm:text-sm font-medium leading-tight">Saved Headhunters</CardTitle>
-              <Star className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
-            </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
-              <div className="text-2xl sm:text-3xl font-bold">{savedHeadhuntersCount}</div>
-            </CardContent>
-          </Card>
-
-          <Card onClick={() => navigate('/saved-jobs')} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-4 pt-3 sm:pt-4 min-h-[60px]">
-              <CardTitle className="text-xs sm:text-sm font-medium">Saved Jobs</CardTitle>
-              <Heart className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
-            </CardHeader>
-            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
-              <div className="text-2xl sm:text-3xl font-bold">{savedJobsCount}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Jobs List */}
         <Card>
-          <CardHeader className="px-4 py-4">
-            <div className="text-center sm:text-left">
-              <CardTitle className="text-xl sm:text-2xl font-bold">My Jobs</CardTitle>
-              <CardDescription className="text-sm sm:text-base mt-1">View and manage your job postings</CardDescription>
+          <CardHeader className="px-6 py-5 border-b">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl font-semibold">My Jobs</CardTitle>
+                <CardDescription className="mt-1">{jobs.length} total postings</CardDescription>
+              </div>
+              
+              {/* Modern Filters */}
+              <div className="hidden lg:flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-background">
+                  <Label htmlFor="sort-jobs" className="text-sm text-muted-foreground">Sort by</Label>
+                  <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
+                    <SelectTrigger id="sort-jobs" className="h-8 w-[120px] border-0 shadow-none focus:ring-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="latest">Latest</SelectItem>
+                      <SelectItem value="oldest">Oldest</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Button
+                  variant={showPendingOnly ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setShowPendingOnly(!showPendingOnly)}
+                  className={showPendingOnly ? "bg-[hsl(var(--warning))] hover:bg-[hsl(var(--warning))]/90" : ""}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  Pending
+                </Button>
+                <Button
+                  variant={showPrivateOnly ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setShowPrivateOnly(!showPrivateOnly)}
+                >
+                  <EyeOff className="mr-2 h-4 w-4" />
+                  Private
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-4 border-t mt-4">
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Label htmlFor="sort-jobs" className="text-sm sm:text-base font-medium shrink-0">Sort:</Label>
+            
+            {/* Mobile Filters */}
+            <div className="flex lg:hidden flex-col gap-2 pt-4 border-t mt-4">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="sort-jobs-mobile" className="text-sm font-medium">Sort:</Label>
                 <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
-                  <SelectTrigger id="sort-jobs" className="h-10 sm:h-11 w-full sm:w-[140px] text-sm sm:text-base">
+                  <SelectTrigger id="sort-jobs-mobile" className="h-10 flex-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -514,12 +553,12 @@ const EmployerDashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <div className="flex gap-2">
                 <Button
                   variant={showPendingOnly ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowPendingOnly(!showPendingOnly)}
-                  className="w-full sm:w-auto h-10 text-sm sm:text-base"
+                  className="flex-1"
                 >
                   Pending Review
                 </Button>
@@ -527,7 +566,7 @@ const EmployerDashboard = () => {
                   variant={showPrivateOnly ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowPrivateOnly(!showPrivateOnly)}
-                  className="w-full sm:w-auto h-10 text-sm sm:text-base"
+                  className="flex-1"
                 >
                   Private Only
                 </Button>
