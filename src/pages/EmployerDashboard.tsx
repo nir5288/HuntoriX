@@ -662,6 +662,17 @@ const EmployerDashboard = () => {
                               <Users className="h-4 w-4 mr-2" />
                               Invite to Job
                             </Button>
+                            {jobEditCounts[job.id] > 0 && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => handleViewEditHistory(job, e)}
+                                className="w-full h-10 text-sm justify-start"
+                              >
+                                <Clock className="h-4 w-4 mr-2" />
+                                Last Edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
+                              </Button>
+                            )}
                           </div>
                         </div>
 
