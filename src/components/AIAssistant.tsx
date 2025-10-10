@@ -25,7 +25,7 @@ export function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "👋 Hi! I'm Huntorix AI, your guide to Huntorix. How can I help you navigate the platform today?"
+      content: "How can I help you navigate the platform today?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -511,39 +511,43 @@ export function AIAssistant() {
       {isOpen && (
         <div 
           className={cn(
-            "fixed bg-background border border-border rounded-lg shadow-2xl z-[9999] flex flex-col",
+            "fixed bg-background/95 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl shadow-2xl z-[9999] flex flex-col overflow-hidden animate-scale-in",
             isMobile 
               ? "inset-x-4 bottom-24 top-24 w-auto h-auto"
-              : "left-6 bottom-24 w-96 h-[500px]"
+              : "left-6 bottom-24 w-96 h-[600px]"
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-cyan-100 via-blue-50 to-purple-100 dark:from-cyan-950/40 dark:via-blue-950/30 dark:to-purple-950/40">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 border border-primary/20">
+          <div className="flex items-center justify-between p-5 border-b border-white/10 bg-gradient-to-r from-cyan-400/20 via-blue-400/20 to-purple-400/20 backdrop-blur-sm relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 animate-pulse"></div>
+            <div className="flex items-center gap-3 relative z-10">
+              <Avatar className="h-10 w-10 border-2 border-white/30 shadow-lg ring-2 ring-primary/20">
                 <AvatarImage src={aiAvatar} alt="Huntorix AI" />
-                <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white font-semibold text-xs">
+                <AvatarFallback className="bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-500 text-white font-bold text-sm">
                   AI
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-semibold text-sm text-foreground">Huntorix AI</h3>
-                <p className="text-xs text-muted-foreground">Your intelligent assistant</p>
+                <h3 className="font-bold text-base text-foreground">Huntorix AI</h3>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+                  <p className="text-xs text-muted-foreground font-medium">Online</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 relative z-10">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 px-2 text-muted-foreground hover:text-foreground flex items-center gap-1"
+                    className="h-9 px-2.5 text-foreground/70 hover:text-foreground hover:bg-white/10 flex items-center gap-1.5 rounded-xl transition-all"
                   >
-                    <ChevronDown className="h-3 w-3" />
-                    <span className="text-lg">{language === 'en' ? '🇺🇸' : '🇮🇱'}</span>
+                    <span className="text-xl">{language === 'en' ? '🇺🇸' : '🇮🇱'}</span>
+                    <ChevronDown className="h-3.5 w-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-32 bg-background border shadow-lg z-[10000]">
+                <DropdownMenuContent align="end" className="w-36 bg-background/95 backdrop-blur-xl border border-white/20 shadow-2xl z-[10000] rounded-xl">
                   <DropdownMenuItem
                     onClick={() => {
                       setLanguage('en');
@@ -552,10 +556,10 @@ export function AIAssistant() {
                         description: "I will now speak English"
                       });
                     }}
-                    className="flex flex-col items-center gap-1 py-3 cursor-pointer"
+                    className="flex flex-col items-center gap-1.5 py-3 cursor-pointer rounded-lg hover:bg-white/10"
                   >
                     <span className="text-2xl">🇺🇸</span>
-                    <span className="text-xs font-medium">EN</span>
+                    <span className="text-xs font-semibold">EN</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
@@ -565,10 +569,10 @@ export function AIAssistant() {
                         description: "עכשיו אני אדבר עברית"
                       });
                     }}
-                    className="flex flex-col items-center gap-1 py-3 cursor-pointer"
+                    className="flex flex-col items-center gap-1.5 py-3 cursor-pointer rounded-lg hover:bg-white/10"
                   >
                     <span className="text-2xl">🇮🇱</span>
-                    <span className="text-xs font-medium">HE</span>
+                    <span className="text-xs font-semibold">HE</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -576,7 +580,7 @@ export function AIAssistant() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(false)}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                className="h-9 w-9 text-foreground/70 hover:text-foreground hover:bg-white/10 rounded-xl transition-all"
                 title="Close chat"
               >
                 <X className="h-4 w-4" />
@@ -585,8 +589,8 @@ export function AIAssistant() {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-            <div className="space-y-4">
+          <ScrollArea className="flex-1 p-5" ref={scrollRef}>
+            <div className="space-y-5">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -595,33 +599,33 @@ export function AIAssistant() {
                   }`}
                 >
                   {message.role === "assistant" && (
-                    <Avatar className="h-8 w-8 border border-primary/20">
+                    <Avatar className="h-9 w-9 border-2 border-white/20 shadow-md">
                       <AvatarImage src={aiAvatar} alt="Huntorix AI" />
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white text-xs">
+                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-500 text-white text-xs font-bold">
                         AI
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-2">
                     <div
                       dir={language === 'he' ? 'rtl' : 'ltr'}
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                      className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm transition-all hover:shadow-md ${
                         message.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-foreground"
+                          ? "bg-gradient-to-br from-primary to-accent-purple text-white"
+                          : "bg-muted/80 backdrop-blur-sm text-foreground border border-white/10"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                     </div>
                     {message.role === "assistant" && message.id && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleLike(message.id!, message.liked)}
-                        className={`h-6 w-6 p-0 ${message.liked ? 'text-primary' : 'text-muted-foreground'}`}
+                        className={`h-7 w-7 p-0 rounded-lg transition-all ${message.liked ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-primary/5'}`}
                         title={message.liked ? "Unlike this response" : "Like this response"}
                       >
-                        <ThumbsUp className={`h-3 w-3 ${message.liked ? 'fill-current' : ''}`} />
+                        <ThumbsUp className={`h-3.5 w-3.5 ${message.liked ? 'fill-current' : ''}`} />
                       </Button>
                     )}
                   </div>
@@ -629,17 +633,17 @@ export function AIAssistant() {
               ))}
               {isLoading && (
                 <div className="flex gap-3">
-                  <Avatar className="h-8 w-8 border border-primary/20">
+                  <Avatar className="h-9 w-9 border-2 border-white/20 shadow-md">
                     <AvatarImage src={aiAvatar} alt="Huntorix AI" />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary-glow text-white text-xs">
+                    <AvatarFallback className="bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-500 text-white text-xs font-bold">
                       AI
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-muted rounded-lg px-4 py-2">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <div className="bg-muted/80 backdrop-blur-sm border border-white/10 rounded-2xl px-5 py-3 shadow-sm">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <div className="w-2.5 h-2.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <div className="w-2.5 h-2.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                   </div>
                 </div>
@@ -648,8 +652,8 @@ export function AIAssistant() {
           </ScrollArea>
 
           {/* Input */}
-          <div className="p-4 border-t border-border">
-            <div className="flex gap-2">
+          <div className="p-5 border-t border-white/10 bg-gradient-to-r from-background/50 to-background/30 backdrop-blur-sm">
+            <div className="flex gap-2.5">
               <Button
                 onTouchStart={(e) => {
                   e.preventDefault();
@@ -676,8 +680,8 @@ export function AIAssistant() {
                 size="icon"
                 variant={isRecording ? "destructive" : "outline"}
                 className={cn(
-                  "shrink-0 select-none transition-all duration-300",
-                  isRecording && "animate-pulse",
+                  "shrink-0 select-none transition-all duration-300 rounded-xl border-white/20",
+                  isRecording && "animate-pulse shadow-lg shadow-red-500/50",
                   isMicPressed && "scale-150"
                 )}
                 title={isRecording ? "Recording... Release to send" : "Hold to record voice message"}
@@ -691,13 +695,13 @@ export function AIAssistant() {
                 onKeyPress={handleKeyPress}
                 placeholder={language === 'he' ? 'שאל אותי כל דבר...' : 'Ask me anything...'}
                 disabled={isLoading || isRecording}
-                className="flex-1"
+                className="flex-1 rounded-xl border-white/20 bg-background/50 backdrop-blur-sm focus-visible:ring-primary/50"
               />
               <Button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading || isRecording}
                 size="icon"
-                className="bg-gradient-to-r from-primary to-accent-purple shrink-0"
+                className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-600 shrink-0 rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
                 <Send className="h-4 w-4" />
               </Button>
