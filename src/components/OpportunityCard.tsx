@@ -586,11 +586,11 @@ export function OpportunityCard({ job, currentUser, currentUserRole, onApply, re
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-4 sm:p-6 pt-4 border-t">
+      <CardFooter className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 p-4 sm:p-6 pt-4 border-t">
         <Button 
           variant="outline" 
           size="sm"
-          className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+          className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 shrink-0"
           onClick={() => navigate(`/job/${job.id}`, { state: { from: 'opportunities' } })}
         >
           View Details
