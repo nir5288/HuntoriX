@@ -265,7 +265,7 @@ const HeadhunterDashboard = () => {
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Browse jobs and manage your applications</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <Button size="lg" onClick={() => navigate('/opportunities')} className="bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-14 text-lg px-8 flex-1 sm:flex-initial">
+            <Button size="lg" onClick={() => navigate('/opportunities')} className="h-14 text-lg px-8 flex-1 sm:flex-initial">
               <Search className="mr-2 h-6 w-6" />
               Browse Jobs
             </Button>
@@ -597,7 +597,7 @@ const HeadhunterDashboard = () => {
                   </Card>)}
               </div>
               {applications.length > 5 && (
-                <div className="mt-4 text-center">
+                <div className="mt-4 text-center hidden sm:block">
                   <Button 
                     variant="outline" 
                     onClick={() => navigate('/applications')}
