@@ -264,7 +264,7 @@ const HeadhunterDashboard = () => {
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Browse jobs and manage your applications</p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 w-full sm:w-auto">
             <Button size="lg" variant="outline" onClick={() => navigate('/saved-jobs')} className="relative h-12 text-base flex-1 sm:flex-initial">
               <Heart className="mr-2 h-5 w-5" />
               <span className="hidden sm:inline">Saved Jobs</span>
@@ -304,7 +304,7 @@ const HeadhunterDashboard = () => {
                 </Tooltip>
                 <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4 min-h-[72px] flex flex-col justify-start">
                 <div className="text-2xl sm:text-3xl font-bold">
                   {applications.filter(a => a.type === 'invitation' && a.status === 'pending' || a.type === 'application' && a.status === 'submitted').length}
                 </div>
@@ -329,7 +329,7 @@ const HeadhunterDashboard = () => {
                 </Tooltip>
                 <Briefcase className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4 min-h-[72px] flex flex-col justify-start">
                 <div className="text-2xl sm:text-3xl font-bold">
                   {applications.filter(a => a.type === 'application' && ['submitted', 'shortlisted'].includes(a.status)).length}
                 </div>
@@ -351,7 +351,7 @@ const HeadhunterDashboard = () => {
                 </Tooltip>
                 <CheckCircle className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4 min-h-[72px] flex flex-col justify-start">
                 <div className="text-2xl sm:text-3xl font-bold">
                   {applications.filter(a => a.type === 'application' && a.status === 'selected').length}
                 </div>
@@ -373,7 +373,7 @@ const HeadhunterDashboard = () => {
                 </Tooltip>
                 <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4 min-h-[72px] flex flex-col justify-start">
                 <div className="text-2xl sm:text-3xl font-bold">
                   {profile?.response_time_hours ? profile.response_time_hours < 2 ? <span className="text-[hsl(var(--success))]">Under 2h</span> : profile.response_time_hours < 24 ? <span className="text-[hsl(var(--accent-mint))]">Under 24h</span> : <span className="text-[hsl(var(--warning))]">Over 24h</span> : <span className="text-muted-foreground text-base">N/A</span>}
                 </div>
@@ -395,7 +395,7 @@ const HeadhunterDashboard = () => {
                 </Tooltip>
                 <CheckCircle className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4 min-h-[72px] flex flex-col justify-start">
                 <div className="text-2xl sm:text-3xl font-bold">
                   {profile?.success_rate ? `${profile.success_rate}%` : '0%'}
                 </div>
