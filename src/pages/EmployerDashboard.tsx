@@ -650,6 +650,18 @@ const EmployerDashboard = () => {
                                 </>
                               )}
                             </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/headhunters');
+                              }}
+                              className="w-full h-10 text-sm justify-start"
+                            >
+                              <Users className="h-4 w-4 mr-2" />
+                              Invite to Job
+                            </Button>
                           </div>
                         </div>
 
