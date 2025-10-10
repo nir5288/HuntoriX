@@ -154,7 +154,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         isActive={isActiveItem}
                         tooltip={getTooltip(item.title)}
                         className={`group rounded-xl leading-none transition-all duration-200 ${
-                          open ? 'h-14 px-4' : 'h-12 w-12 pl-2 pr-0 flex items-center justify-start'
+                          open ? 'h-14 px-4' : 'h-12 w-12 p-0 grid place-items-center'
                         } ${
                           isSoon 
                             ? 'cursor-not-allowed' 
@@ -164,7 +164,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         }`}
                       >
                         {item.url === '#' ? (
-                          <div className={`${open ? 'flex items-center gap-4 w-full' : 'flex items-center justify-start w-full pl-2'}`}>
+                          <div className={`${open ? 'flex items-center gap-4 w-full' : 'grid place-items-center'}`}>
                             <div className="grid place-items-center h-8 w-8 rounded-full">
                               <item.icon className="h-6 w-6 text-slate-500/70" />
                             </div>
@@ -180,7 +180,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             )}
                           </div>
                         ) : (
-                          <NavLink to={item.url} className={`${open ? 'flex items-center gap-4 w-full' : 'flex items-center justify-start w-full pl-2'}`}>
+                          <NavLink to={item.url} className={`${open ? 'flex items-center gap-4 w-full' : 'grid place-items-center'}`}>
                             <div className={`grid place-items-center rounded-full ${open ? 'h-8 w-8' : 'h-8 w-8'}`}>
                               <item.icon 
                                 className="h-6 w-6 flex-shrink-0 transition-all duration-200"
