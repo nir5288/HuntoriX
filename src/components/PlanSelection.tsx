@@ -373,7 +373,15 @@ export function PlanSelection({
           const isRecommended = plan.id === 'core';
           return <Card key={plan.id} style={{
             animationDelay: `${index * 100}ms`
-          }} className={cn("group relative cursor-pointer transition-all duration-300 rounded-3xl flex flex-col h-full animate-fade-in overflow-hidden", "hover:shadow-2xl hover:-translate-y-2", isSelected && !plan.locked && "ring-2 ring-[hsl(var(--vibrant-mint))] shadow-2xl scale-[1.02]", isRecommended && "border-2 border-[hsl(var(--vibrant-lilac))] shadow-[0_8px_40px_rgba(167,139,250,0.25)] bg-gradient-to-br from-[hsl(var(--accent-lilac))] via-background to-background", !isRecommended && "border-2 border-border", plan.locked && "opacity-70 cursor-not-allowed hover:shadow-lg hover:translate-y-0", !isSelected && !plan.locked && !isRecommended && "hover:border-[hsl(var(--accent-mint))]")} onClick={() => !plan.locked && setSelectedPlan(plan.id)}>
+          }} className={cn("group relative cursor-pointer transition-all duration-300 rounded-3xl flex flex-col h-full animate-fade-in overflow-hidden", "hover:shadow-2xl hover:-translate-y-2", isSelected && !plan.locked && "ring-2 ring-[hsl(var(--vibrant-mint))] shadow-2xl scale-[1.02]", isRecommended && "border-2 border-[hsl(var(--vibrant-lilac))] shadow-[0_8px_40px_rgba(167,139,250,0.25)] bg-gradient-to-br from-[hsl(var(--accent-lilac))] via-background to-background", !isRecommended && "border-2 border-border", plan.locked && "opacity-70 cursor-not-allowed hover:shadow-lg hover:translate-y-0", !isSelected && !plan.locked && !isRecommended && "hover:border-[hsl(var(--accent-mint))]")} onClick={() => {
+            if (!plan.locked) {
+              setSelectedPlan(plan.id);
+              // Auto-continue on mobile
+              if (window.innerWidth < 768) {
+                handleSelectPlan(plan.id);
+              }
+            }
+          }}>
                 {/* Gradient overlay for recommended */}
                 {isRecommended && <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--vibrant-lilac)/0.08)] to-transparent pointer-events-none" />}
 
