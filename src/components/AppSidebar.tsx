@@ -105,7 +105,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
         style={{ backgroundColor: 'rgb(22, 22, 24)' }}
       >
         {open && (
-          <div className="flex items-center gap-3 px-1">
+          <div className="flex items-center gap-3 px-1 animate-in fade-in-0 slide-in-from-left-2 duration-300">
             <div 
               className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-base shadow-xl"
               style={{
@@ -169,7 +169,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                               <item.icon className="h-6 w-6 text-slate-500/70" />
                             </div>
                             {open && (
-                              <div className="flex items-center gap-2 flex-1 justify-between">
+                              <div className="flex items-center gap-2 flex-1 justify-between animate-in fade-in-0 slide-in-from-left-2 duration-300">
                                 <span className="text-sm font-medium text-slate-500/80">{item.title}</span>
                                 {'badge' in item && item.badge && (
                                   <Badge variant="secondary" className="text-[9px] px-2 py-0.5 h-5 bg-slate-800/80 text-slate-400 border-slate-700/50 font-medium">
@@ -183,7 +183,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                           <NavLink to={item.url} className={`${open ? 'flex items-center gap-4 w-full' : 'flex items-center justify-center'}`}>
                             <div className={`flex items-center justify-center rounded-full ${open ? 'h-8 w-8' : 'h-8 w-8'}`}>
                               <item.icon 
-                                className="h-6 w-6 flex-shrink-0 transition-all duration-200"
+                                className="h-6 w-6 flex-shrink-0 transition-all duration-300 ease-out"
                                 style={{
                                   color: isActiveItem 
                                     ? 'hsl(var(--accent-mint))' 
@@ -195,7 +195,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                               />
                             </div>
                             {open && (
-                              <div className="flex items-center gap-2 flex-1 justify-between">
+                              <div className="flex items-center gap-2 flex-1 justify-between animate-in fade-in-0 slide-in-from-left-2 duration-300">
                                 <span className={`text-base font-semibold transition-colors ${
                                   isActiveItem ? 'text-white' : 'text-slate-300'
                                 }`}>
@@ -235,25 +235,25 @@ export function AppSidebar({ role }: AppSidebarProps) {
         style={{ backgroundColor: 'rgb(22, 22, 24)' }}
       >
         {open ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 animate-in fade-in-0 slide-in-from-left-2 duration-300">
             <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg transition-all duration-300"
               style={{
                 background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
               }}
             >
-              <Briefcase className="h-5 w-5" />
+              <Briefcase className="h-5 w-5 transition-all duration-300" />
             </div>
             <span className="font-bold text-lg text-white tracking-tight">HUNTORIX</span>
           </div>
         ) : (
           <div 
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg mx-auto"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg mx-auto transition-all duration-300"
             style={{
               background: 'linear-gradient(135deg, hsl(var(--accent-mint)), hsl(var(--accent-lilac)), hsl(var(--accent-pink)))',
             }}
           >
-            <Briefcase className="h-5 w-5" />
+            <Briefcase className="h-5 w-5 transition-all duration-300" />
           </div>
         )}
       </div>
