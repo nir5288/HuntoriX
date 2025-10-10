@@ -97,8 +97,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
       collapsible="icon" 
       className="border-r border-slate-800/50 transition-all duration-300"
       style={{ 
-        backgroundColor: 'rgb(18, 18, 20)',
-        width: open ? '16rem' : '3.4rem'
+        backgroundColor: 'rgb(18, 18, 20)'
       }}
     >
       <SidebarHeader 
