@@ -599,9 +599,8 @@ const HeadhunterDashboard = () => {
               {applications.length > 5 && (
                 <div className="mt-4 text-center">
                   <Button 
-                    variant="outline" 
                     onClick={() => navigate('/applications')}
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
                   >
                     View All Applications
                   </Button>
