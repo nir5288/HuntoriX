@@ -577,16 +577,7 @@ export function AIAssistant() {
                 size="icon"
                 onClick={() => setIsOpen(false)}
                 className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                title="Minimize chat"
-              >
-                <span className="text-lg font-bold">−</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDismiss}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                title="Hide AI Assistant permanently"
+                title="Close chat"
               >
                 <X className="h-4 w-4" />
               </Button>
