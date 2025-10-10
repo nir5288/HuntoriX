@@ -613,6 +613,7 @@ export function AIAssistant() {
                   )}
                   <div className="flex flex-col gap-1">
                     <div
+                      dir={language === 'he' ? 'rtl' : 'ltr'}
                       className={`max-w-[80%] rounded-lg px-4 py-2 ${
                         message.role === "user"
                           ? "bg-primary text-primary-foreground"
@@ -693,10 +694,11 @@ export function AIAssistant() {
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
               <Input
+                dir={language === 'he' ? 'rtl' : 'ltr'}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask me anything..."
+                placeholder={language === 'he' ? 'שאל אותי כל דבר...' : 'Ask me anything...'}
                 disabled={isLoading || isRecording}
                 className="flex-1"
               />
