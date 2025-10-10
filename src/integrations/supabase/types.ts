@@ -1352,7 +1352,7 @@ export type Database = {
           credits_reset_at: string
           credits_used: number
           next_plan_name: string
-          plan_change_date: string
+          plan_change_effective_date: string
           plan_will_change: boolean
           total_credits: number
         }[]

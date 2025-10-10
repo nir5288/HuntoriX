@@ -143,7 +143,7 @@ export function Header() {
           remaining: creditData.credits_remaining,
           resetDate: creditData.credits_reset_at ? new Date(creditData.credits_reset_at) : undefined,
           nextPlan: creditData.plan_will_change ? creditData.next_plan_name : undefined,
-          changeDate: creditData.plan_change_date ? new Date(creditData.plan_change_date) : undefined,
+          changeDate: creditData.plan_change_effective_date ? new Date(creditData.plan_change_effective_date) : undefined,
         });
       }
     } catch (error) {
