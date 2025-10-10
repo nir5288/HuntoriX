@@ -81,6 +81,17 @@ const Auth = () => {
 
   useEffect(() => {
     if (user && profile && !showPlanSelection) {
+      // Skip plan check if we just registered with a pre-selected plan
+      const skipCheck = sessionStorage.getItem('skipPlanCheck');
+      if (skipCheck) {
+        sessionStorage.removeItem('skipPlanCheck');
+        // Go directly to onboarding flow
+        if (profile.role === 'headhunter' && !profile.onboarding_completed) {
+          navigate('/');
+          return;
+        }
+      }
+      
       // Employers always go to their dashboard
       if (profile.role === 'employer') {
         navigate('/dashboard/employer');
@@ -246,7 +257,7 @@ const Auth = () => {
                   .maybeSingle();
 
                 if (!planError && planData) {
-                  await supabase
+                  const { error: subError } = await supabase
                     .from('user_subscriptions')
                     .insert({
                       user_id: data.user.id,
@@ -254,10 +265,20 @@ const Auth = () => {
                       status: 'active'
                     });
                   
-                  localStorage.removeItem('selectedPlan');
-                  toast.success('Account created! Your plan has been activated.');
-                  // Redirect to home to trigger onboarding
-                  navigate('/');
+                  if (!subError) {
+                    localStorage.removeItem('selectedPlan');
+                    // Wait a moment for the subscription to be fully created
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await refreshProfile();
+                    toast.success('Account created! Your plan has been activated.');
+                    // Redirect to home to trigger onboarding - set flag to prevent redirect loop
+                    sessionStorage.setItem('skipPlanCheck', 'true');
+                    navigate('/');
+                  } else {
+                    console.error('Error creating subscription:', subError);
+                    toast.success('Account created! Please select your subscription plan.');
+                    navigate('/plans');
+                  }
                 } else {
                   // If plan application fails, redirect to plans page
                   toast.success('Account created! Please select your subscription plan.');
