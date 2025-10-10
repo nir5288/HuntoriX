@@ -113,11 +113,12 @@ const Index = () => {
                   </Button>
                   <Button
                     size="lg"
+                    variant="secondary"
                     onClick={handleHeadhunterCTA}
-                    className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:scale-105 bg-gradient-to-r from-[hsl(var(--accent-mint))] via-[hsl(var(--accent-lilac))] to-[hsl(var(--accent-pink))] text-white hover:opacity-90 border-0"
+                    className="w-full sm:w-auto text-base font-bold px-8 py-6 shadow-lg hover:shadow-xl transition-all hover:scale-105"
                   >
                     <Users className="mr-2 h-5 w-5" />
-                    I&apos;m a Headhunter
+                    I'm a Headhunter
                   </Button>
                 </div>
                 
