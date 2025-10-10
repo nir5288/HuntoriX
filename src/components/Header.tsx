@@ -488,13 +488,17 @@ export function Header() {
                                 </div>
                                 {credits.resetDate && (
                                   <div className="text-xs text-muted-foreground">
-                                    Resets on {credits.resetDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                    Resets on {(() => {
+                                      const nextReset = new Date(credits.resetDate);
+                                      nextReset.setMonth(nextReset.getMonth() + 1);
+                                      return nextReset.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                                    })()}
                                   </div>
                                 )}
                                 {credits.nextPlan && credits.changeDate && (
                                   <div className="text-xs text-yellow-600 dark:text-yellow-500 font-medium pt-1 border-t">
                                     Changing to {credits.nextPlan} on{' '}
-                                    {credits.changeDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                    {credits.changeDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                     <button 
                                       onClick={(e) => {
                                         e.stopPropagation();
