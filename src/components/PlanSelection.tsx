@@ -316,10 +316,7 @@ export function PlanSelection({
               }} disabled={plan.locked || submitting}>
                     {!plan.locked && !isSelected && <span className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--vibrant-pink)/0.1)] via-[hsl(var(--vibrant-lilac)/0.1)] to-[hsl(var(--vibrant-mint)/0.1)] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />}
                     <span className="relative z-10">
-                      {plan.locked ? 'Coming soon' : isSelected ? <>
-                          <Check className="mr-2 h-5 w-5" strokeWidth={3} />
-                          Selected
-                        </> : 'Select Plan'}
+                      {plan.locked ? 'Coming soon' : isSelected ? 'Selected' : 'Select Plan'}
                     </span>
                   </Button>
                 </CardContent>
