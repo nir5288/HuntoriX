@@ -4,7 +4,7 @@ import { useRequireAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Briefcase, Eye, EyeOff, Pencil, Check, X } from 'lucide-react';
+import { Plus, Briefcase, Eye, EyeOff, Pencil, Check, X, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -234,39 +234,37 @@ const MyJobs = () => {
     );
   }
 
-    return (
-      <>
-        <div className="w-full px-4 sm:px-6 py-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-              <div className="w-full sm:w-auto">
-                <h1 className="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
+  return (
+    <>
+      <div className="w-full px-4 sm:px-6 pb-4 sm:pb-6 -mt-6 sm:-mt-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between mb-6 gap-4">
+              <div className="w-full sm:w-auto text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
                   My Jobs
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground">View and manage all your job postings</p>
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground">View and manage all your job postings</p>
               </div>
               <Button 
-                size="sm" 
+                size="lg" 
                 onClick={() => setPostJobModalOpen(true)} 
-                className="w-full sm:w-auto bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
+                className="w-full sm:w-auto h-12 text-base bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950"
               >
-                <Plus className="mr-1.5 h-4 w-4" />
+                <Plus className="mr-2 h-5 w-5" />
                 Post Job
               </Button>
             </div>
 
             <Card>
               <CardHeader className="px-4 py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-base sm:text-lg">All Jobs</CardTitle>
-                    <CardDescription className="text-[10px] sm:text-xs">{jobs.length} total job postings</CardDescription>
-                  </div>
+                <div className="text-center sm:text-left">
+                  <CardTitle className="text-xl sm:text-2xl font-bold">All Jobs</CardTitle>
+                  <CardDescription className="text-sm sm:text-base mt-1">{jobs.length} total job postings</CardDescription>
                 </div>
-                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-3 pt-3 border-t mt-3">
+                <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-4 border-t mt-4">
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Label htmlFor="sort-jobs" className="text-[10px] sm:text-xs font-medium shrink-0">Sort:</Label>
+                    <Label htmlFor="sort-jobs" className="text-sm sm:text-base font-medium shrink-0">Sort:</Label>
                     <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
-                      <SelectTrigger id="sort-jobs" className="h-7 sm:h-8 w-full sm:w-[120px] text-[10px] sm:text-xs">
+                      <SelectTrigger id="sort-jobs" className="h-10 sm:h-11 w-full sm:w-[140px] text-sm sm:text-base">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -275,27 +273,23 @@ const MyJobs = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox 
-                      id="pending-only" 
-                      checked={showPendingOnly} 
-                      onCheckedChange={(checked) => setShowPendingOnly(checked as boolean)}
-                      className="h-3.5 sm:h-4 w-3.5 sm:w-4"
-                    />
-                    <Label htmlFor="pending-only" className="text-[10px] sm:text-xs font-medium cursor-pointer">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <Button
+                      variant={showPendingOnly ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowPendingOnly(!showPendingOnly)}
+                      className="w-full sm:w-auto h-10 text-sm sm:text-base"
+                    >
                       Pending Review
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox 
-                      id="private-only" 
-                      checked={showPrivateOnly} 
-                      onCheckedChange={(checked) => setShowPrivateOnly(checked as boolean)}
-                      className="h-3.5 sm:h-4 w-3.5 sm:w-4"
-                    />
-                    <Label htmlFor="private-only" className="text-[10px] sm:text-xs font-medium cursor-pointer">
+                    </Button>
+                    <Button
+                      variant={showPrivateOnly ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowPrivateOnly(!showPrivateOnly)}
+                      className="w-full sm:w-auto h-10 text-sm sm:text-base"
+                    >
                       Private Only
-                    </Label>
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
@@ -352,116 +346,118 @@ const MyJobs = () => {
                             }`}
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
-                            <CardHeader className="px-4 py-3">
+                            <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
                               {/* Mobile layout - enhanced */}
-                              <div className="flex flex-col gap-2.5 sm:hidden">
-                                <div className="space-y-2">
+                              <div className="flex flex-col gap-4 sm:hidden">
+                                <div className="space-y-3">
                                   <div className="flex items-start justify-between gap-2">
-                                    <CardTitle className="text-sm font-semibold leading-tight">{job.title}</CardTitle>
+                                    <CardTitle className="text-lg font-semibold leading-tight">{job.title}</CardTitle>
                                     {job.job_id_number && (
-                                      <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
+                                      <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
                                         #{job.job_id_number}
                                       </Badge>
                                     )}
                                   </div>
                                   
-                                  <CardDescription className="text-[11px] leading-tight">
+                                  <CardDescription className="text-sm leading-relaxed">
                                     {job.location} • {job.employment_type?.replace('_', ' ')}
                                   </CardDescription>
                                   
-                                  <div className="flex flex-wrap gap-1.5">
+                                  <div className="flex flex-wrap gap-2">
                                     {job.is_exclusive && (
-                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
+                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2">
                                         HuntoriX Exclusive
                                       </Badge>
                                     )}
                                     {pendingCount > 0 && (
-                                      <Badge className="bg-[hsl(var(--warning))] text-white text-[9px] h-4 px-1.5">
+                                      <Badge className="bg-[hsl(var(--warning))] text-white text-xs h-6 px-2">
                                         {pendingCount} Pending
                                       </Badge>
                                     )}
-                                    <Badge className={`text-[9px] h-4 px-1.5 ${getStatusColor(job.status)}`}>
+                                    <Badge className={`text-xs h-6 px-2 ${getStatusColor(job.status)}`}>
                                       {job.status}
                                     </Badge>
                                   </div>
                                 </div>
                                 
-                                <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
-                                  <div className="relative">
+                                <div className="flex flex-col gap-2 pt-3 border-t">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={(e) => handleEditJob(job, e)}
+                                    className="w-full h-10 text-sm justify-start"
+                                  >
+                                    <Pencil className="h-4 w-4 mr-2 text-[hsl(var(--accent-pink))]" />
+                                    Edit Job
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
+                                    className="w-full h-10 text-sm justify-start"
+                                  >
+                                    {job.visibility === 'public' ? (
+                                      <>
+                                        <Eye className="h-4 w-4 mr-2 text-[hsl(var(--accent-mint))]" />
+                                        Make Private
+                                      </>
+                                    ) : (
+                                      <>
+                                        <EyeOff className="h-4 w-4 mr-2 text-muted-foreground" />
+                                        Make Public
+                                      </>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate('/headhunters');
+                                    }}
+                                    className="w-full h-10 text-sm justify-start"
+                                  >
+                                    <Users className="h-4 w-4 mr-2" />
+                                    Invite to Job
+                                  </Button>
+                                  {jobEditCounts[job.id] > 0 && (
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate('/headhunters');
-                                      }}
-                                      className="h-8 w-8 p-0"
-                                      title="Invite headhunters"
+                                      onClick={(e) => handleViewEditHistory(job, e)}
+                                      className="w-full h-10 text-sm justify-start"
                                     >
-                                      <Users className="h-3.5 w-3.5" />
+                                      <Clock className="h-4 w-4 mr-2" />
+                                      Last Edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
                                     </Button>
-                                    <Badge className="absolute -top-0.5 -right-0.5 bg-[hsl(var(--accent-pink))] text-white text-[7px] h-2.5 w-2.5 p-0 flex items-center justify-center rounded-full">
-                                      
-                                    </Badge>
-                                  </div>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={(e) => handleRejectAll(job.id, e)}
-                                    className="h-8 w-8 p-0"
-                                    title="Reject all applications"
-                                  >
-                                    <X className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => handleEditJob(job, e)}
-                                    className="h-8 w-8"
-                                    title="Edit job"
-                                  >
-                                    <Pencil className="h-3.5 w-3.5 text-[hsl(var(--accent-pink))]" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                    className="h-8 w-8"
-                                    title={job.visibility === 'public' ? 'Make private' : 'Make public'}
-                                  >
-                                    {job.visibility === 'public' ? (
-                                      <Eye className="h-3.5 w-3.5 text-[hsl(var(--accent-mint))]" />
-                                    ) : (
-                                      <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                                    )}
-                                  </Button>
+                                  )}
                                 </div>
                               </div>
 
                               {/* Tablet & Desktop layout - side by side */}
                               <div className="hidden sm:flex items-start justify-between gap-3">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                    <CardTitle className="text-sm sm:text-base break-words">{job.title}</CardTitle>
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <CardTitle className="text-base sm:text-lg break-words">{job.title}</CardTitle>
                                     {job.job_id_number && (
-                                      <Badge variant="outline" className="text-[10px] sm:text-xs h-5 shrink-0">
+                                      <Badge variant="outline" className="text-xs sm:text-sm h-6 shrink-0">
                                         #{job.job_id_number}
                                       </Badge>
                                     )}
                                     {job.is_exclusive && (
-                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs sm:text-sm h-6 px-3">
                                         HuntoriX Exclusive
                                       </Badge>
                                     )}
                                   </div>
                                   {pendingCount > 0 && (
                                     <div className="flex items-center gap-2 mb-2">
-                                      <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
+                                      <Badge className="bg-[hsl(var(--warning))] text-white text-xs sm:text-sm h-6">
                                         {pendingCount} Pending
                                       </Badge>
                                     </div>
                                   )}
-                                  <CardDescription className="text-xs">
+                                  <CardDescription className="text-sm sm:text-base">
                                     {job.location} • {job.employment_type?.replace('_', ' ')}
                                   </CardDescription>
                                 </div>
@@ -494,36 +490,37 @@ const MyJobs = () => {
                                 </div>
                               </div>
                             </CardHeader>
-                            <CardContent className="px-4 pb-3">
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-muted-foreground">
+                            <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6">
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
                                   <span>{jobApplications.length} applications</span>
                                   <span className="hidden sm:inline">•</span>
                                   <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
-                                  {jobEditCounts[job.id] > 0 && (
-                                    <>
-                                      <span className="hidden sm:inline">•</span>
-                                      <span 
-                                        className="underline cursor-pointer hover:text-[hsl(var(--accent-pink))] transition-colors"
-                                        onClick={(e) => handleViewEditHistory(job, e)}
-                                      >
-                                        Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
-                                      </span>
-                                    </>
-                                  )}
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
+                                  {jobEditCounts[job.id] > 0 && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={(e) => handleViewEditHistory(job, e)}
+                                      className="hidden sm:flex h-7 text-[10px] sm:text-xs px-2 gap-1"
+                                      title="View edit history"
+                                    >
+                                      <Clock className="h-3 w-3" />
+                                      <span>Last edited ({jobEditCounts[job.id]})</span>
+                                    </Button>
+                                  )}
                                   <Button
                                     variant="destructive"
                                     size="sm"
                                     onClick={(e) => handleRejectAll(job.id, e)}
-                                    className="h-7 text-[10px] sm:text-xs px-2 gap-1"
+                                    className="hidden sm:flex h-7 text-[10px] sm:text-xs px-2 gap-1"
                                     title="Reject all pending applications"
                                   >
                                     <X className="h-3 w-3" />
                                     <span>Reject All</span>
                                   </Button>
-                                  <div className="relative">
+                                  <div className="relative hidden sm:block">
                                     <Button
                                       variant="outline"
                                       size="sm"
