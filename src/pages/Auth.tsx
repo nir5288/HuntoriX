@@ -106,8 +106,14 @@ const Auth = () => {
           .eq('user_id', user.id)
           .maybeSingle();
 
-        // If no subscription, redirect to plans page
+        // If no subscription, redirect to plans page, unless a plan was pre-selected
         if (!subscription) {
+          const pendingPlan = localStorage.getItem('selectedPlan');
+          const skipCheck = sessionStorage.getItem('skipPlanCheck');
+          if (pendingPlan || skipCheck) {
+            // Avoid flicker to /plans while applying/just applied a pre-selected plan
+            return;
+          }
           navigate('/plans');
           return;
         }
