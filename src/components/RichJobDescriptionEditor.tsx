@@ -82,33 +82,56 @@ export function RichJobDescriptionEditor({
     trimBoundaries();
     if (range.toString().length === 0) return; // don't bold only spaces
 
-    const strong = document.createElement('strong');
-
-    // Prefer surroundContents to keep boundaries intact
-    try {
-      range.surroundContents(strong);
-    } catch (e) {
-      const frag = range.extractContents();
-      strong.appendChild(frag);
-      range.insertNode(strong);
-    }
-
-    // Place caret just after the bold element, but if the next text node
-    // begins with a space, move caret after that space to avoid "joined" words
-    range = document.createRange();
-    const next = strong.nextSibling;
-    if (next && next.nodeType === Node.TEXT_NODE) {
-      const t = next as Text;
-      const advanceBy = t.data.startsWith(' ') ? 1 : 0;
-      range.setStart(next, advanceBy);
-    } else {
-      range.setStartAfter(strong);
-    }
-    range.collapse(true);
+    // Use native command to preserve DOM whitespace exactly
     selection.removeAllRanges();
     selection.addRange(range);
+    document.execCommand('bold', false);
 
-    editorRef.current?.focus();
+    const root = editorRef.current;
+
+    // Normalize <b> to <strong> for semantic HTML
+    if (root) {
+      const bs = Array.from(root.querySelectorAll('b'));
+      bs.forEach((bEl) => {
+        const strong = document.createElement('strong');
+        strong.innerHTML = bEl.innerHTML;
+        bEl.replaceWith(strong);
+      });
+    }
+
+    // Move caret just after the bold element so next typing isn't bold
+    const sel = window.getSelection();
+    if (sel) {
+      let node: Node | null = sel.focusNode;
+      let strongAncestor: HTMLElement | null = null;
+      while (node && node !== root) {
+        if (node instanceof HTMLElement && (node.tagName === 'STRONG' || node.tagName === 'B')) {
+          strongAncestor = node;
+          break;
+        }
+        node = node.parentNode;
+      }
+
+      const caret = document.createRange();
+      if (strongAncestor) {
+        const next = strongAncestor.nextSibling;
+        if (next && next.nodeType === Node.TEXT_NODE) {
+          const t = next as Text;
+          const offset = t.data.startsWith(' ') ? 1 : 0; // skip a following space if present
+          caret.setStart(next, offset);
+        } else {
+          caret.setStartAfter(strongAncestor);
+        }
+        caret.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(caret);
+      } else {
+        // Fallback: collapse to end
+        sel.collapseToEnd();
+      }
+    }
+
+    root?.focus();
     handleInput();
   };
 
