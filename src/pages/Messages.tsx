@@ -421,19 +421,18 @@ const Messages = () => {
                     </div>
                   </Link>
                   
-                  {isMobile ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90"
-                      onClick={() => setIsVideoCallOpen(true)}
-                      title="Start video call"
-                    >
-                      <Video className="h-5 w-5 text-white" />
-                    </Button>
-                  ) : (
-                    <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
-                      <PopoverTrigger asChild>
+                  <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
+                    <PopoverTrigger asChild>
+                      {isMobile ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90"
+                          title="Schedule video call"
+                        >
+                          <Video className="h-5 w-5 text-white" />
+                        </Button>
+                      ) : (
                         <Button
                           variant="default"
                           className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
@@ -442,7 +441,8 @@ const Messages = () => {
                           <Video className="h-4 w-4" />
                           <span className="text-sm font-semibold">Schedule a video call</span>
                         </Button>
-                      </PopoverTrigger>
+                      )}
+                    </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="end">
                     <div className="p-4 space-y-4">
                       <div className="space-y-2">
@@ -494,8 +494,7 @@ const Messages = () => {
                       </Button>
                     </div>
                   </PopoverContent>
-                    </Popover>
-                  )}
+                </Popover>
                 </div>
 
               {/* Scrolling Message Thread */}
