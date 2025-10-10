@@ -41,9 +41,11 @@ import { DashboardLayoutWrapper } from './components/DashboardLayoutWrapper';
 import { AIAssistant } from './components/AIAssistant';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { AccessibilityWidget } from './components/AccessibilityWidget';
+import { useIsMobile } from './hooks/use-mobile';
 
 const AppContent = () => {
   const location = useLocation();
+  const isMobile = useIsMobile();
   const hideFooter = location.pathname === '/messages';
 
   // Always scroll to top on route change
@@ -96,7 +98,7 @@ const AppContent = () => {
       </VerificationWrapper>
       {!hideFooter && <Footer />}
       <AIAssistant />
-      <AccessibilityWidget />
+      {!isMobile && <AccessibilityWidget />}
     </>
   );
 };
