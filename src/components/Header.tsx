@@ -236,7 +236,7 @@ export function Header() {
         </div>
       )}
       
-      <header className={`${isHomepage ? 'fixed' : 'relative'} ${credits?.nextPlan ? 'top-12' : 'top-0'} left-0 right-0 z-[100] pt-3 sm:pt-4 md:pt-6`}>
+      <header className={`${isHomepage ? 'fixed' : 'relative'} ${credits?.nextPlan ? 'top-12' : 'top-0'} left-0 right-0 z-[100] ${isHomepage ? '' : 'pt-3 sm:pt-4 md:pt-6'}`}>
         {/* Floating pill-shaped header with gradient border */}
         <div className="site-container">
           <div 
