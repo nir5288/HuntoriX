@@ -225,7 +225,7 @@ export function PlanSelection({
         .from('subscription_plans')
         .select('id, name')
         .ilike('name', planId)
-        .single();
+        .maybeSingle();
 
       if (planError || !planData) {
         throw new Error(`Plan "${planId}" not found in subscription_plans table`);
