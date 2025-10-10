@@ -240,32 +240,32 @@ const MyJobs = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-0.5">My Jobs</h1>
-                <p className="text-xs sm:text-sm text-muted-foreground">Manage all your job postings</p>
+                <p className="text-sm text-muted-foreground">Manage all your job postings</p>
               </div>
               <Button 
                 size="sm" 
                 onClick={() => setPostJobModalOpen(true)} 
-                className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-8 text-xs"
+                className="bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] hover:opacity-90 text-slate-950 h-9"
               >
-                <Plus className="mr-1.5 h-3.5 w-3.5" />
+                <Plus className="mr-1.5 h-4 w-4" />
                 Post Job
               </Button>
             </div>
 
             <Card>
-              <CardHeader className="px-4 sm:px-5 py-3 border-b">
+              <CardHeader className="px-5 py-4 border-b">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-base sm:text-lg font-semibold">All Jobs</CardTitle>
-                    <CardDescription className="mt-0.5 text-xs">{jobs.length} total postings</CardDescription>
+                    <CardTitle className="text-lg font-semibold">All Jobs</CardTitle>
+                    <CardDescription className="mt-1 text-sm">{jobs.length} total postings</CardDescription>
                   </div>
                   
                   {/* Modern Filters */}
                   <div className="hidden lg:flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border bg-background">
-                      <Label htmlFor="sort-jobs" className="text-[10px] text-muted-foreground">Sort by</Label>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-background">
+                      <Label htmlFor="sort-jobs" className="text-xs text-muted-foreground">Sort by</Label>
                       <Select value={sortBy} onValueChange={(value: 'latest' | 'oldest') => setSortBy(value)}>
-                        <SelectTrigger id="sort-jobs" className="h-6 w-[100px] border-0 shadow-none focus:ring-0 text-xs">
+                        <SelectTrigger id="sort-jobs" className="h-8 w-[110px] border-0 shadow-none focus:ring-0">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -279,18 +279,18 @@ const MyJobs = () => {
                       variant={showPendingOnly ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setShowPendingOnly(!showPendingOnly)}
-                      className={`h-6 text-[10px] px-2 ${showPendingOnly ? "bg-[hsl(var(--warning))] hover:bg-[hsl(var(--warning))]/90" : ""}`}
+                      className={`h-8 ${showPendingOnly ? "bg-[hsl(var(--warning))] hover:bg-[hsl(var(--warning))]/90" : ""}`}
                     >
-                      <Clock className="mr-1 h-3 w-3" />
+                      <Clock className="mr-1.5 h-3.5 w-3.5" />
                       Pending
                     </Button>
                     <Button
                       variant={showPrivateOnly ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setShowPrivateOnly(!showPrivateOnly)}
-                      className="h-6 text-[10px] px-2"
+                      className="h-8"
                     >
-                      <EyeOff className="mr-1 h-3 w-3" />
+                      <EyeOff className="mr-1.5 h-3.5 w-3.5" />
                       Private
                     </Button>
                   </div>
@@ -330,19 +330,19 @@ const MyJobs = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="px-4 pb-4 pt-3">
+              <CardContent className="px-5 pb-5 pt-4">
                 {jobs.length === 0 ? (
                   <div className="text-center py-8">
-                    <Briefcase className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                    <h3 className="text-sm font-semibold mb-1">No jobs yet</h3>
-                    <p className="text-xs text-muted-foreground mb-3">Post your first job to get started</p>
-                    <Button size="sm" variant="hero" onClick={() => setPostJobModalOpen(true)} className="h-8 text-xs">
-                      <Plus className="mr-1.5 h-3 w-3" />
+                    <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <h3 className="text-base font-semibold mb-1">No jobs yet</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Post your first job to get started</p>
+                    <Button size="sm" variant="hero" onClick={() => setPostJobModalOpen(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
                       Post a Job
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {(() => {
                       let filteredJobs = [...jobs];
                       
@@ -378,44 +378,44 @@ const MyJobs = () => {
                         return (
                           <Card 
                             key={job.id} 
-                            className={`group hover:border-primary/20 transition-all cursor-pointer border ${
+                            className={`group hover:border-primary/30 hover:bg-accent/5 transition-all cursor-pointer border ${
                               job.is_exclusive ? 'exclusive-job-card' : ''
                             }`}
                             onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}
                           >
-                            <CardHeader className="px-4 sm:px-5 py-3 sm:py-4">
+                            <CardHeader className="px-5 py-4">
                               {/* Mobile layout - enhanced */}
                               <div className="flex flex-col gap-3 sm:hidden">
-                                <div className="space-y-2">
-                                  <div className="flex items-start justify-between gap-2">
-                                    <CardTitle className="text-base font-semibold leading-tight">{job.title}</CardTitle>
-                                    {job.job_id_number && (
-                                      <Badge variant="outline" className="text-[10px] h-5 px-1.5 shrink-0">
-                                        #{job.job_id_number}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  
-                                  <CardDescription className="text-xs leading-relaxed">
-                                    {job.location} • {job.employment_type?.replace('_', ' ')}
-                                  </CardDescription>
-                                  
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {job.is_exclusive && (
-                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] h-5 px-2">
-                                        HuntoriX Exclusive
-                                      </Badge>
-                                    )}
-                                    {pendingCount > 0 && (
-                                      <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] h-5 px-2">
-                                        {pendingCount} Pending
-                                      </Badge>
-                                    )}
-                                    <Badge className={`text-[10px] h-5 px-2 ${getStatusColor(job.status)}`}>
-                                      {job.status}
+                              <div className="space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <CardTitle className="text-base font-semibold leading-tight">{job.title}</CardTitle>
+                                  {job.job_id_number && (
+                                    <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
+                                      #{job.job_id_number}
                                     </Badge>
-                                  </div>
+                                  )}
                                 </div>
+                                
+                                <CardDescription className="text-sm leading-relaxed">
+                                  {job.location} • {job.employment_type?.replace('_', ' ')}
+                                </CardDescription>
+                                
+                                <div className="flex flex-wrap gap-2">
+                                  {job.is_exclusive && (
+                                    <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2.5">
+                                      HuntoriX Exclusive
+                                    </Badge>
+                                  )}
+                                  {pendingCount > 0 && (
+                                    <Badge className="bg-[hsl(var(--warning))] text-white text-xs h-6 px-2.5">
+                                      {pendingCount} Pending
+                                    </Badge>
+                                  )}
+                                  <Badge className={`text-xs h-6 px-2.5 ${getStatusColor(job.status)}`}>
+                                    {job.status}
+                                  </Badge>
+                                </div>
+                              </div>
                                 
                                 <div className="flex flex-col gap-1.5 pt-2 border-t">
                                   <Button
@@ -474,47 +474,47 @@ const MyJobs = () => {
                               {/* Tablet & Desktop layout - side by side */}
                               <div className="hidden sm:flex items-start justify-between gap-3">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                                    <CardTitle className="text-sm font-semibold">{job.title}</CardTitle>
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <CardTitle className="text-base font-semibold">{job.title}</CardTitle>
                                     {job.job_id_number && (
-                                      <Badge variant="outline" className="text-[10px] h-5 px-1.5 shrink-0">
+                                      <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
                                         #{job.job_id_number}
                                       </Badge>
                                     )}
                                     {job.is_exclusive && (
-                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] h-5 px-2">
+                                      <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2.5">
                                         HuntoriX Exclusive
                                       </Badge>
                                     )}
                                     {pendingCount > 0 && (
-                                      <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] h-5 px-2">
+                                      <Badge className="bg-[hsl(var(--warning))] text-white text-xs h-6 px-2.5">
                                         {pendingCount} Pending
                                       </Badge>
                                     )}
                                   </div>
-                                  <CardDescription className="text-xs">
+                                  <CardDescription className="text-sm">
                                     {job.location} • {job.employment_type?.replace('_', ' ')}
                                   </CardDescription>
                                 </div>
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1.5">
                                   <Popover>
                                     <PopoverTrigger asChild>
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className={`h-6 text-[10px] px-2 gap-0.5 ${getStatusColor(job.status)} border-0 hover:opacity-80`}
+                                        className={`h-8 px-3 gap-1 ${getStatusColor(job.status)} border-0 hover:opacity-80`}
                                         onClick={(e) => e.stopPropagation()}
                                       >
                                         {job.status.replace('_', ' ')}
-                                        <ChevronDown className="h-2.5 w-2.5" />
+                                        <ChevronDown className="h-3.5 w-3.5" />
                                       </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-32 p-1" align="start">
-                                      <div className="flex flex-col gap-0.5">
+                                    <PopoverContent className="w-36 p-1" align="start">
+                                      <div className="flex flex-col gap-1">
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="justify-start h-7 text-xs"
+                                          className="justify-start h-8 w-full"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             // Handle status change to open
@@ -525,7 +525,7 @@ const MyJobs = () => {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="justify-start h-7 text-xs"
+                                          className="justify-start h-8 w-full"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             // Handle status change to on_hold
@@ -540,31 +540,31 @@ const MyJobs = () => {
                                     variant="ghost"
                                     size="icon"
                                     onClick={(e) => handleEditJob(job, e)}
-                                    className="h-6 w-6 hover:bg-accent"
+                                    className="h-8 w-8 hover:bg-accent/50"
                                     title="Edit job"
                                   >
-                                    <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                    <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                                    className="h-6 w-6 hover:bg-accent"
+                                    className="h-8 w-8 hover:bg-accent/50"
                                     title={job.visibility === 'public' ? 'Make private' : 'Make public'}
                                   >
                                     {job.visibility === 'public' ? (
-                                      <Eye className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                      <Eye className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                                     ) : (
-                                      <EyeOff className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                      <EyeOff className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                                     )}
                                   </Button>
                                 </div>
                               </div>
                             </CardHeader>
-                            <CardContent className="px-4 sm:px-5 pb-3 sm:pb-4 pt-0">
-                              <div className="border-t border-border/30 pt-2.5"></div>
+                            <CardContent className="px-5 pb-4 pt-0">
+                              <div className="border-t border-border/30 pt-3"></div>
                               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                                <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                                   <span>{jobApplications.length} Applications</span>
                                   <span className="hidden sm:inline">•</span>
                                   <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
@@ -573,22 +573,22 @@ const MyJobs = () => {
                                       <span className="hidden sm:inline">•</span>
                                       <button
                                         onClick={(e) => handleViewEditHistory(job, e)}
-                                        className="hidden sm:inline text-xs text-muted-foreground underline hover:text-foreground transition-colors cursor-pointer"
+                                        className="hidden sm:inline text-sm text-muted-foreground underline hover:text-foreground transition-colors cursor-pointer"
                                       >
                                         Last edited ({jobEditCounts[job.id]} {jobEditCounts[job.id] === 1 ? 'edit' : 'edits'})
                                       </button>
                                     </>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1 shrink-0">
+                                <div className="flex items-center gap-1.5 shrink-0">
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={(e) => handleRejectAll(job.id, e)}
-                                    className="hidden sm:flex h-6 text-[10px] px-2 gap-1 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    className="hidden sm:flex h-8 gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
                                     title="Reject all pending applications"
                                   >
-                                    <X className="h-3 w-3" />
+                                    <X className="h-3.5 w-3.5" />
                                     <span>Reject All</span>
                                   </Button>
                                   <Button
@@ -598,11 +598,14 @@ const MyJobs = () => {
                                       e.stopPropagation();
                                       navigate('/headhunters');
                                     }}
-                                    className="hidden sm:flex h-6 text-[10px] px-2 gap-1 hover:bg-accent"
+                                    className="hidden sm:flex h-8 gap-1.5 hover:bg-accent/50 relative"
                                     title="Invite headhunters to this job"
                                   >
-                                    <Users className="h-3 w-3" />
+                                    <Users className="h-3.5 w-3.5" />
                                     <span>Invite to Job</span>
+                                    <Badge className="absolute -top-1 -right-1 h-4 px-1 text-[9px] bg-gradient-to-r from-[hsl(var(--accent-pink))] to-[hsl(var(--accent-lilac))] text-slate-950 border-0">
+                                      new
+                                    </Badge>
                                   </Button>
                                 </div>
                               </div>
