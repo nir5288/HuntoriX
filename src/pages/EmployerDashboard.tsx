@@ -588,87 +588,66 @@ const EmployerDashboard = () => {
               return <Card key={job.id} className={`group hover:shadow-md transition-shadow cursor-pointer ${
                 job.is_exclusive ? 'exclusive-job-card' : ''
               }`} onClick={() => navigate(`/jobs/${job.id}`, { state: { from: 'dashboard' } })}>
-                      <CardHeader className="px-4 py-3">
+                      <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
                         {/* Mobile layout - enhanced */}
-                        <div className="flex flex-col gap-2.5 sm:hidden">
-                          <div className="space-y-2">
+                        <div className="flex flex-col gap-4 sm:hidden">
+                          <div className="space-y-3">
                             <div className="flex items-start justify-between gap-2">
-                              <CardTitle className="text-sm font-semibold leading-tight">{job.title}</CardTitle>
+                              <CardTitle className="text-lg font-semibold leading-tight">{job.title}</CardTitle>
                               {job.job_id_number && (
-                                <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0">
+                                <Badge variant="outline" className="text-xs h-6 px-2 shrink-0">
                                   #{job.job_id_number}
                                 </Badge>
                               )}
                             </div>
                             
-                            <CardDescription className="text-[11px] leading-tight">
+                            <CardDescription className="text-sm leading-relaxed">
                               {job.location} • {job.employment_type?.replace('_', ' ')}
                             </CardDescription>
                             
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex flex-wrap gap-2">
                               {job.is_exclusive && (
-                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[9px] h-4 px-1.5">
+                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs h-6 px-2">
                                   HuntoriX Exclusive
                                 </Badge>
                               )}
                               {pendingCount > 0 && (
-                                <Badge className="bg-[hsl(var(--warning))] text-white text-[9px] h-4 px-1.5">
+                                <Badge className="bg-[hsl(var(--warning))] text-white text-xs h-6 px-2">
                                   {pendingCount} Pending
                                 </Badge>
                               )}
-                              <Badge className={`text-[9px] h-4 px-1.5 ${getStatusColor(job.status)}`}>
+                              <Badge className={`text-xs h-6 px-2 ${getStatusColor(job.status)}`}>
                                 {job.status}
                               </Badge>
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-end gap-1 pt-1.5 border-t">
-                            <div className="relative">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate('/headhunters');
-                                }}
-                                className="h-8 w-8 p-0"
-                                title="Invite headhunters"
-                              >
-                                <Users className="h-3.5 w-3.5" />
-                              </Button>
-                              <Badge className="absolute -top-0.5 -right-0.5 bg-[hsl(var(--accent-pink))] text-white text-[7px] h-2.5 w-2.5 p-0 flex items-center justify-center rounded-full">
-                                
-                              </Badge>
-                            </div>
+                          <div className="flex flex-col gap-2 pt-3 border-t">
                             <Button
-                              variant="destructive"
+                              variant="outline"
                               size="sm"
-                              onClick={(e) => handleRejectAll(job.id, e)}
-                              className="h-8 w-8 p-0"
-                              title="Reject all applications"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
                               onClick={(e) => handleEditJob(job, e)}
-                              className="h-8 w-8"
-                              title="Edit job"
+                              className="w-full h-10 text-sm justify-start"
                             >
-                              <Pencil className="h-3.5 w-3.5 text-[hsl(var(--accent-pink))]" />
+                              <Pencil className="h-4 w-4 mr-2 text-[hsl(var(--accent-pink))]" />
+                              Edit Job
                             </Button>
                             <Button
-                              variant="ghost"
-                              size="icon"
+                              variant="outline"
+                              size="sm"
                               onClick={(e) => toggleVisibility(job.id, job.visibility, e)}
-                              className="h-8 w-8"
-                              title={job.visibility === 'public' ? 'Make private' : 'Make public'}
+                              className="w-full h-10 text-sm justify-start"
                             >
                               {job.visibility === 'public' ? (
-                                <Eye className="h-3.5 w-3.5 text-[hsl(var(--accent-mint))]" />
+                                <>
+                                  <Eye className="h-4 w-4 mr-2 text-[hsl(var(--accent-mint))]" />
+                                  Make Private
+                                </>
                               ) : (
-                                <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                                <>
+                                  <EyeOff className="h-4 w-4 mr-2 text-muted-foreground" />
+                                  Make Public
+                                </>
                               )}
                             </Button>
                           </div>
@@ -677,27 +656,27 @@ const EmployerDashboard = () => {
                         {/* Tablet & Desktop layout - side by side */}
                         <div className="hidden sm:flex items-start justify-between gap-3">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <CardTitle className="text-sm sm:text-base break-words">{job.title}</CardTitle>
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <CardTitle className="text-base sm:text-lg break-words">{job.title}</CardTitle>
                               {job.job_id_number && (
-                                <Badge variant="outline" className="text-[10px] sm:text-xs h-5 shrink-0">
+                                <Badge variant="outline" className="text-xs sm:text-sm h-6 shrink-0">
                                   #{job.job_id_number}
                                 </Badge>
                               )}
                               {job.is_exclusive && (
-                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-[10px] sm:text-xs h-5 px-2">
+                                <Badge className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white border-0 font-semibold text-xs sm:text-sm h-6 px-3">
                                   HuntoriX Exclusive
                                 </Badge>
                               )}
                             </div>
                             {pendingCount > 0 && (
                               <div className="flex items-center gap-2 mb-2">
-                                <Badge className="bg-[hsl(var(--warning))] text-white text-[10px] sm:text-xs h-5">
+                                <Badge className="bg-[hsl(var(--warning))] text-white text-xs sm:text-sm h-6">
                                   {pendingCount} Pending
                                 </Badge>
                               </div>
                             )}
-                            <CardDescription className="text-xs">
+                            <CardDescription className="text-sm sm:text-base">
                               {job.location} • {job.employment_type?.replace('_', ' ')}
                             </CardDescription>
                           </div>
@@ -760,15 +739,15 @@ const EmployerDashboard = () => {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="px-4 pb-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <CardContent className="px-5 sm:px-6 pb-5 sm:pb-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm sm:text-base text-muted-foreground">
                             <span>{jobApplications.length} applications</span>
-                            <span>•</span>
+                            <span className="hidden sm:inline">•</span>
                             <span>Posted {format(new Date(job.created_at), 'MMM d, yyyy')}</span>
                             {jobEditCounts[job.id] > 0 && (
                               <>
-                                <span>•</span>
+                                <span className="hidden sm:inline">•</span>
                                 <span 
                                   className="underline cursor-pointer hover:text-[hsl(var(--accent-pink))] transition-colors"
                                   onClick={(e) => handleViewEditHistory(job, e)}
