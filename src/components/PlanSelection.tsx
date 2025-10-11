@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Lock, Info, Loader2, AlertTriangle } from 'lucide-react';
+import { Check, Lock, Info, Loader2, AlertTriangle, Rocket, Zap, Crown, Building2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
@@ -16,50 +16,90 @@ type BillingCycle = 'monthly' | 'yearly';
 interface Plan {
   id: PlanId;
   name: string;
-  monthlyPrice: number;
+  price: { monthly: number; yearly: number };
   description: string;
-  features: string[];
+  features: { text: string; tooltip?: string; included?: boolean }[];
   locked: boolean;
-  icon: string;
+  icon: any;
 }
 interface PlanSelectionProps {
   onPlanSelected: (planId?: string) => void;
   userId: string;
   initialSelectedPlan?: string | null;
 }
-const PLANS: Plan[] = [{
-  id: 'free',
-  name: 'Free',
-  monthlyPrice: 0,
-  description: '20 credits / month',
-  features: ['Access to public jobs', 'Basic profile', 'Chat', 'Dashboard', 'Max 3 CVs per job'],
-  locked: false,
-  icon: ''
-}, {
-  id: 'core',
-  name: 'Core',
-  monthlyPrice: 29,
-  description: '250 credits / month',
-  features: ['Everything in Free', 'Priority support', 'Advanced search filters', 'Candidate process visibility', 'Statistics & application insights', 'Max 5 CVs per job'],
-  locked: false,
-  icon: ''
-}, {
-  id: 'pro',
-  name: 'Pro',
-  monthlyPrice: 39,
-  description: 'Unlimited credits',
-  features: ['Everything in Core', 'Bulk apply', 'Featured profile', 'Analytics dashboard', 'AI tools', 'Video calls', 'AI/Video badges on job cards'],
-  locked: true,
-  icon: ''
-}, {
-  id: 'huntorix',
-  name: 'HuntoriX',
-  monthlyPrice: 79,
-  description: 'Unlimited credits',
-  features: ['Everything in Pro', 'AI matchmaking & candidate search', 'Work worldwide', 'Dedicated account manager', 'White-label solution', 'Custom integrations', 'Job notifications (by role & industry)'],
-  locked: true,
-  icon: ''
-}];
+const PLANS: Plan[] = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: { monthly: 0, yearly: 0 },
+    description: 'Perfect for getting started',
+    features: [
+      { text: '5 Application credits', tooltip: 'Sending a request to work on a job costs 1 credit. You get 5 credits per month.' },
+      { text: '3 active job postings', tooltip: 'Post up to 3 jobs at once' },
+      { text: '50 CVs per job', tooltip: 'You can send up to 50 CVs per job posting' },
+      { text: 'Basic job matching', tooltip: 'Get matched with relevant jobs or headhunters' },
+      { text: 'Standard messaging', tooltip: 'Send and receive messages with other users' },
+      { text: 'Support', tooltip: 'Get help via email within 48 hours', included: true },
+    ],
+    locked: false,
+    icon: Rocket
+  },
+  {
+    id: 'core',
+    name: 'Core',
+    price: { monthly: 99, yearly: 990 },
+    description: 'For growing professionals',
+    features: [
+      { text: '25 Application credits', tooltip: 'Sending a request to work on a job costs 1 credit. You get 25 credits per month.' },
+      { text: '10 active job postings', tooltip: 'Post up to 10 jobs at once' },
+      { text: '200 CVs per job', tooltip: 'You can send up to 200 CVs per job posting' },
+      { text: 'Talent Vault', tooltip: 'Store and manage your candidate database with unlimited CV storage', included: true },
+      { text: 'Advanced job matching', tooltip: 'Get AI-powered matches with the most relevant opportunities' },
+      { text: 'Priority messaging', tooltip: 'Get faster response times and priority in message queues' },
+      { text: 'Analytics dashboard', tooltip: 'Track your applications and job posting performance' },
+      { text: 'Support', tooltip: 'Get priority email support within 24 hours', included: true },
+    ],
+    locked: false,
+    icon: Zap
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: { monthly: 199, yearly: 1990 },
+    description: 'For power users and agencies',
+    features: [
+      { text: 'Unlimited Application credits', tooltip: 'Send unlimited requests to work on jobs - no credit limits.' },
+      { text: 'Unlimited job postings', tooltip: 'Post unlimited active jobs' },
+      { text: 'Unlimited CVs per job', tooltip: 'You can send unlimited CVs per job posting' },
+      { text: 'Talent Vault', tooltip: 'Store and manage your candidate database with unlimited CV storage', included: true },
+      { text: 'AI-powered insights', tooltip: 'Get advanced AI analysis and recommendations' },
+      { text: 'Advanced analytics', tooltip: 'Comprehensive analytics with custom reports' },
+      { text: 'Team collaboration', tooltip: 'Share access with team members (up to 5)' },
+      { text: 'API access', tooltip: 'Integrate with your own tools and systems' },
+      { text: 'Support', tooltip: 'Get dedicated support with 4-hour response time', included: true },
+    ],
+    locked: false,
+    icon: Crown
+  },
+  {
+    id: 'huntorix',
+    name: 'Huntorix',
+    price: { monthly: 499, yearly: 4990 },
+    description: 'Complete headhunting solution',
+    features: [
+      { text: 'Everything in Pro', tooltip: 'All Pro plan features included' },
+      { text: 'Talent Vault', tooltip: 'Store and manage your candidate database with unlimited CV storage', included: true },
+      { text: 'White-label solution', tooltip: 'Rebrand the platform with your company identity' },
+      { text: 'Custom integrations', tooltip: 'Custom API integrations with your existing systems' },
+      { text: 'Unlimited team members', tooltip: 'No limit on team size' },
+      { text: 'Advanced automation', tooltip: 'Automate repetitive tasks and workflows' },
+      { text: 'Custom reports', tooltip: 'Create and schedule custom analytics reports' },
+      { text: 'Support', tooltip: 'Round-the-clock phone and email support with dedicated account manager', included: true },
+    ],
+    locked: false,
+    icon: Building2
+  }
+];
 const FEATURE_COMPARISON = [{
   feature: 'Profile & registration',
   free: true,
@@ -167,10 +207,11 @@ const FEATURE_COMPARISON = [{
   tooltip: 'Early heads-up based on your target roles & industries (HuntoriX only).'
 }, {
   feature: 'Support',
-  free: 'Standard',
-  core: 'Standard',
-  pro: 'Priority',
-  huntorix: 'Dedicated'
+  free: true,
+  core: true,
+  pro: true,
+  huntorix: true,
+  tooltip: 'Email support with varying response times based on plan.'
 }];
 export function PlanSelection({
   onPlanSelected,
@@ -195,13 +236,13 @@ export function PlanSelection({
     }
   }, [initialSelectedPlan]);
   const getPrice = (plan: Plan) => {
-    if (plan.monthlyPrice === 0) return 0;
-    return billingCycle === 'yearly' ? plan.monthlyPrice * 10 : plan.monthlyPrice;
+    if (plan.price.monthly === 0) return 0;
+    return billingCycle === 'yearly' ? plan.price.yearly : plan.price.monthly;
   };
   const getPlanCredits = (planName: string): number => {
     const lowerName = planName.toLowerCase();
-    if (lowerName === 'free') return 20;
-    if (lowerName === 'core') return 250;
+    if (lowerName === 'free') return 5;
+    if (lowerName === 'core') return 25;
     return 999999; // Unlimited for pro/huntorix
   };
   const handleSelectPlan = async (planId: PlanId) => {
@@ -436,7 +477,7 @@ export function PlanSelection({
                         / {billingCycle === 'yearly' ? 'year' : 'mo'}
                       </span>
                     </div>
-                    {billingCycle === 'yearly' && plan.monthlyPrice > 0 && <p className="text-sm font-medium mt-3 px-3 py-1.5 rounded-full bg-[hsl(var(--accent-mint))] text-primary w-fit">
+                    {billingCycle === 'yearly' && plan.price.monthly > 0 && <p className="text-sm font-medium mt-3 px-3 py-1.5 rounded-full bg-[hsl(var(--accent-mint))] text-primary w-fit">
                         💰 Save 2 months
                       </p>}
                   </div>
@@ -450,7 +491,19 @@ export function PlanSelection({
                         <div className={cn("rounded-full p-1 shrink-0 transition-all duration-200", isRecommended ? "bg-[hsl(var(--vibrant-lilac)/0.2)]" : "bg-[hsl(var(--accent-mint))]")}>
                           <Check className={cn("h-4 w-4 shrink-0 transition-transform duration-200 group-hover/feature:scale-110", isRecommended ? "text-[hsl(var(--vibrant-lilac))]" : "text-primary")} strokeWidth={3} />
                         </div>
-                        <span className="leading-relaxed font-medium">{feature}</span>
+                        <span className="leading-relaxed font-medium flex items-center gap-1.5">
+                          {feature.text}
+                          {feature.tooltip && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-[hsl(var(--vibrant-mint))] transition-colors" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p className="text-sm">{feature.tooltip}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </span>
                       </li>)}
                   </ul>
 
