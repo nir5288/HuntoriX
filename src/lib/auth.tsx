@@ -62,34 +62,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
-        // Handle token refresh errors by attempting to recover the session
-        if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed successfully');
-        }
-        
-        // Only sign out on explicit SIGNED_OUT event, not on token refresh failures
-        if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          return;
-        }
-        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           await fetchProfile(session.user.id);
-        } else if (event !== 'SIGNED_OUT') {
-          // If no session but not explicitly signed out, try to recover
-          const { data: { session: recoveredSession } } = await supabase.auth.getSession();
-          if (recoveredSession) {
-            setSession(recoveredSession);
-            setUser(recoveredSession.user);
-            await fetchProfile(recoveredSession.user.id);
-          } else {
-            setProfile(null);
-          }
+        } else {
+          setProfile(null);
         }
       }
     );
