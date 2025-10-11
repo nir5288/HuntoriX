@@ -33,6 +33,7 @@ export const VideoCall = ({
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [callStatus, setCallStatus] = useState<"connecting" | "connected" | "ended" | "permission-denied">("connecting");
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [hasCamera, setHasCamera] = useState(true);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -63,11 +64,41 @@ export const VideoCall = ({
 
   const initializeCall = async () => {
     try {
-      // Get local media stream
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      let stream: MediaStream | null = null;
+      
+      // Try to get both video and audio first
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        setHasCamera(true);
+        setIsVideoEnabled(true);
+      } catch (videoError: any) {
+        console.log("Failed to get video, trying audio only:", videoError);
+        
+        // If video fails, try audio only
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          setHasCamera(false);
+          setIsVideoEnabled(false);
+          
+          toast({
+            title: "Audio-only mode",
+            description: "No camera detected. Continuing with audio only.",
+          });
+        } catch (audioError: any) {
+          // If audio also fails, throw error
+          throw audioError;
+        }
+      }
+
+      if (!stream) {
+        throw new Error("Failed to get media stream");
+      }
+
       setLocalStream(stream);
       setCallStatus("connecting");
       setPermissionError(null);
@@ -168,23 +199,23 @@ export const VideoCall = ({
       console.error("Error initializing call:", error);
       setCallStatus("permission-denied");
       
-      let errorMessage = "Failed to access camera and microphone.";
+      let errorMessage = "Failed to access microphone.";
       let errorDetails = "";
 
       if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-        errorMessage = "Camera and microphone access denied";
-        errorDetails = "Please allow access to your camera and microphone in your browser settings, then try again.";
+        errorMessage = "Microphone access denied";
+        errorDetails = "Please allow access to your microphone in your browser settings, then try again.";
       } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
-        errorMessage = "No camera or microphone found";
-        errorDetails = "Please connect a camera and microphone to your device.";
+        errorMessage = "No microphone found";
+        errorDetails = "Please connect a microphone to your device.";
       } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
-        errorMessage = "Camera or microphone is already in use";
-        errorDetails = "Please close other applications using your camera or microphone and try again.";
+        errorMessage = "Microphone is already in use";
+        errorDetails = "Please close other applications using your microphone and try again.";
       } else if (error.name === "OverconstrainedError") {
-        errorMessage = "Camera or microphone constraints not satisfied";
-        errorDetails = "Your device may not support the required video/audio settings.";
+        errorMessage = "Microphone constraints not satisfied";
+        errorDetails = "Your device may not support the required audio settings.";
       } else if (error.name === "TypeError") {
-        errorMessage = "Browser does not support video calls";
+        errorMessage = "Browser does not support audio calls";
         errorDetails = "Please use a modern browser like Chrome, Firefox, or Safari.";
       }
 
@@ -200,6 +231,14 @@ export const VideoCall = ({
   };
 
   const toggleVideo = () => {
+    if (!hasCamera) {
+      toast({
+        title: "No camera available",
+        description: "Your device doesn't have a camera connected.",
+      });
+      return;
+    }
+    
     if (localStream) {
       const videoTrack = localStream.getVideoTracks()[0];
       if (videoTrack) {
@@ -373,7 +412,7 @@ export const VideoCall = ({
 
             {/* Local video (picture-in-picture) */}
             <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20 shadow-xl">
-              {localStream && isVideoEnabled ? (
+              {localStream && isVideoEnabled && hasCamera ? (
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -382,8 +421,11 @@ export const VideoCall = ({
                   className="w-full h-full object-cover mirror"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-700">
-                  <VideoOff className="h-8 w-8 text-white/50" />
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-700">
+                  <VideoOff className="h-8 w-8 text-white/50 mb-2" />
+                  {!hasCamera && (
+                    <p className="text-xs text-white/70 text-center px-2">Audio only</p>
+                  )}
                 </div>
               )}
             </div>
@@ -405,8 +447,10 @@ export const VideoCall = ({
                 size="icon"
                 onClick={toggleVideo}
                 className="h-14 w-14 rounded-full"
+                disabled={!hasCamera}
+                title={!hasCamera ? "No camera available" : isVideoEnabled ? "Turn off camera" : "Turn on camera"}
               >
-                {isVideoEnabled ? (
+                {isVideoEnabled && hasCamera ? (
                   <Video className="h-6 w-6" />
                 ) : (
                   <VideoOff className="h-6 w-6" />
