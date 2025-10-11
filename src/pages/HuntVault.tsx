@@ -166,7 +166,7 @@ function SortableTableHead({ column }: SortableHeaderProps) {
     <TableHead
       ref={setNodeRef}
       style={style}
-      className="relative"
+      className="relative min-w-[150px]"
     >
       <div className="flex items-center gap-2">
         <div
@@ -466,7 +466,7 @@ export default function HuntVault() {
                         <input type="checkbox" className="rounded" />
                       </TableHead>
                       {fixedColumns.map((column) => (
-                        <TableHead key={column.id}>{column.label}</TableHead>
+                        <TableHead key={column.id} className="min-w-[200px]">{column.label}</TableHead>
                       ))}
                       <SortableContext
                         items={visibleColumns.map((col) => col.id)}
@@ -476,7 +476,7 @@ export default function HuntVault() {
                           <SortableTableHead key={column.id} column={column} />
                         ))}
                       </SortableContext>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="text-right min-w-[120px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -497,7 +497,7 @@ export default function HuntVault() {
                           switch (column.id) {
                             case "candidate":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[200px]">
                                   <div className="flex items-center gap-3">
                                     <Avatar className="h-10 w-10">
                                       <AvatarImage src={candidate.avatar} />
@@ -511,7 +511,7 @@ export default function HuntVault() {
                               );
                             case "location":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[200px]">
                                   <div className="flex items-center gap-2 text-muted-foreground">
                                     <MapPin className="h-4 w-4" />
                                     {candidate.location}
@@ -526,13 +526,13 @@ export default function HuntVault() {
                           switch (column.id) {
                             case "age":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[100px]">
                                   <span className="text-muted-foreground">{candidate.age || "N/A"}</span>
                                 </TableCell>
                               );
                             case "gender":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[120px]">
                                   <Badge variant="secondary" className="rounded-full">
                                     {candidate.gender || "N/A"}
                                   </Badge>
@@ -540,7 +540,7 @@ export default function HuntVault() {
                               );
                             case "industry":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[150px]">
                                   <Badge variant="secondary" className="rounded-full">
                                     {candidate.industry}
                                   </Badge>
@@ -548,7 +548,7 @@ export default function HuntVault() {
                               );
                             case "skills":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[200px]">
                                   <div className="flex gap-1 flex-wrap">
                                     {candidate.tags.slice(0, 2).map((tag, idx) => (
                                       <Badge
@@ -575,8 +575,8 @@ export default function HuntVault() {
                               );
                             case "progress":
                               return (
-                                <TableCell key={column.id}>
-                                  <div className="flex items-center gap-2 min-w-[120px]">
+                                <TableCell key={column.id} className="min-w-[150px]">
+                                  <div className="flex items-center gap-2">
                                     <Progress
                                       value={candidate.progress}
                                       className="h-2 flex-1"
@@ -589,7 +589,7 @@ export default function HuntVault() {
                               );
                             case "status":
                               return (
-                                <TableCell key={column.id}>
+                                <TableCell key={column.id} className="min-w-[120px]">
                                   <div className="flex items-center gap-2">
                                     <div
                                       className={`h-2 w-2 rounded-full ${getStatusColor(
@@ -602,7 +602,7 @@ export default function HuntVault() {
                               );
                             case "lastUpdated":
                               return (
-                                <TableCell key={column.id} className="text-muted-foreground">
+                                <TableCell key={column.id} className="text-muted-foreground min-w-[140px]">
                                   {candidate.lastUpdated}
                                 </TableCell>
                               );
@@ -610,7 +610,7 @@ export default function HuntVault() {
                               return null;
                           }
                         })}
-                        <TableCell className="text-right">
+                        <TableCell className="text-right min-w-[120px]">
                           <div className="flex items-center justify-end gap-1">
                             <Button
                               variant="ghost"
