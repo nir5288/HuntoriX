@@ -178,6 +178,7 @@ export const VideoCall = ({
         })
         .on("broadcast", { event: "call-ended" }, ({ payload }) => {
           if (payload.to === currentUserId) {
+            playCallSound('end');
             handleEndCall();
           }
         })
@@ -431,13 +432,37 @@ export const VideoCall = ({
   };
 
   const cleanup = () => {
-    // Stop all tracks
-    localStream?.getTracks().forEach((track) => track.stop());
-    remoteStream?.getTracks().forEach((track) => track.stop());
+    // Stop all local tracks
+    if (localStream) {
+      localStream.getTracks().forEach((track) => {
+        track.stop();
+        console.log('Stopped local track:', track.kind);
+      });
+    }
+    
+    // Stop all remote tracks
+    if (remoteStream) {
+      remoteStream.getTracks().forEach((track) => {
+        track.stop();
+        console.log('Stopped remote track:', track.kind);
+      });
+    }
+
+    // Clear video elements
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = null;
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
 
     // Stop speech recognition
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.log('Speech recognition already stopped');
+      }
       recognitionRef.current = null;
     }
 
@@ -464,11 +489,22 @@ export const VideoCall = ({
     setCallDuration(0);
     setCallStartTime(null);
     setCurrentSubtitle("");
+    setIsVideoEnabled(true);
+    setIsAudioEnabled(true);
+    setIsScreenSharing(false);
+    setCallStatus("connecting");
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && endCall()}>
-      <DialogContent className="max-w-6xl h-[90vh] p-0" hideCloseButton>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        endCall();
+      }
+    }}>
+      <DialogContent className="max-w-6xl h-[90vh] p-0" hideCloseButton aria-describedby="video-call-description">
+        <span id="video-call-description" className="sr-only">
+          Video call with {otherUserName}
+        </span>
         <div className="h-full flex flex-col bg-black">
           {/* Remote video (main) */}
           <div className="flex-1 relative">
