@@ -46,24 +46,25 @@ const Plans = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))]">
       <Header />
-      <main className="flex-1 flex items-center justify-center p-4 py-12 mt-16">
-        <div className="w-full max-w-7xl">
-          <div className="text-center mb-12 space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(var(--accent-pink))] via-[hsl(var(--accent-mint))] to-[hsl(var(--accent-lilac))] bg-clip-text text-transparent">
-              Choose the perfect plan for your needs
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {user 
-                ? "Unlock powerful features to accelerate your recruiting success" 
-                : "Get started with a plan that fits your recruiting goals"}
-            </p>
-          </div>
-          
-          <PlanSelection 
-            userId={user?.id || ''} 
-            onPlanSelected={handlePlanSelected}
-            initialSelectedPlan={initialPlan}
-          />
+      <main className="flex-1 flex items-center justify-center p-4 py-8 mt-8">
+        <div className="w-full max-w-6xl">
+          <Card className="shadow-2xl bg-white">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold text-foreground">Subscription Plans</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                {user 
+                  ? "Choose the plan that best fits your needs" 
+                  : "Choose a plan and sign up to get started"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="bg-white">
+              <PlanSelection 
+                userId={user?.id || ''} 
+                onPlanSelected={handlePlanSelected}
+                initialSelectedPlan={initialPlan}
+              />
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
