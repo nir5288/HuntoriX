@@ -31,7 +31,8 @@ export const VideoCall = ({
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [callStatus, setCallStatus] = useState<"connecting" | "connected" | "ended">("connecting");
+  const [callStatus, setCallStatus] = useState<"connecting" | "connected" | "ended" | "permission-denied">("connecting");
+  const [permissionError, setPermissionError] = useState<string | null>(null);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -68,6 +69,8 @@ export const VideoCall = ({
         audio: true,
       });
       setLocalStream(stream);
+      setCallStatus("connecting");
+      setPermissionError(null);
 
       // Create peer connection
       const configuration = {
@@ -161,14 +164,38 @@ export const VideoCall = ({
           });
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error initializing call:", error);
+      setCallStatus("permission-denied");
+      
+      let errorMessage = "Failed to access camera and microphone.";
+      let errorDetails = "";
+
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        errorMessage = "Camera and microphone access denied";
+        errorDetails = "Please allow access to your camera and microphone in your browser settings, then try again.";
+      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+        errorMessage = "No camera or microphone found";
+        errorDetails = "Please connect a camera and microphone to your device.";
+      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        errorMessage = "Camera or microphone is already in use";
+        errorDetails = "Please close other applications using your camera or microphone and try again.";
+      } else if (error.name === "OverconstrainedError") {
+        errorMessage = "Camera or microphone constraints not satisfied";
+        errorDetails = "Your device may not support the required video/audio settings.";
+      } else if (error.name === "TypeError") {
+        errorMessage = "Browser does not support video calls";
+        errorDetails = "Please use a modern browser like Chrome, Firefox, or Safari.";
+      }
+
+      setPermissionError(errorDetails);
+      
       toast({
-        title: "Error",
-        description: "Failed to start video call. Please check your camera and microphone permissions.",
+        title: errorMessage,
+        description: errorDetails,
         variant: "destructive",
+        duration: 6000,
       });
-      onClose();
     }
   };
 
@@ -283,7 +310,46 @@ export const VideoCall = ({
         <div className="h-full flex flex-col bg-black">
           {/* Remote video (main) */}
           <div className="flex-1 relative">
-            {remoteStream ? (
+            {callStatus === "permission-denied" ? (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-900/20 to-gray-900 p-8">
+                <div className="bg-red-500/10 border-2 border-red-500/30 rounded-lg p-6 max-w-md">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="h-16 w-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                      <VideoOff className="h-8 w-8 text-red-500" />
+                    </div>
+                  </div>
+                  <h3 className="text-white text-xl font-semibold text-center mb-2">
+                    Permission Required
+                  </h3>
+                  <p className="text-gray-300 text-center mb-4">
+                    {permissionError}
+                  </p>
+                  <div className="space-y-2 text-sm text-gray-400">
+                    <p className="font-semibold text-white">To enable camera and microphone:</p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Click the camera icon in your browser's address bar</li>
+                      <li>Select "Allow" for camera and microphone</li>
+                      <li>Click the "Retry" button below</li>
+                    </ol>
+                  </div>
+                  <div className="flex gap-2 mt-6">
+                    <Button
+                      onClick={initializeCall}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      Retry
+                    </Button>
+                    <Button
+                      onClick={endCall}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : remoteStream ? (
               <video
                 ref={remoteVideoRef}
                 autoPlay
