@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Video, VideoOff, Mic, MicOff, PhoneOff, Monitor, MonitorOff, Clock, Subtitles } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, PhoneOff, Monitor, MonitorOff, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { playCallSound } from "@/utils/callSounds";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 interface VideoCallProps {
   isOpen: boolean;
@@ -30,7 +28,6 @@ export const VideoCall = ({
   currentUserId,
   currentUserName,
   roomId,
-  jobId = null,
 }: VideoCallProps) => {
   const { toast } = useToast();
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -42,20 +39,13 @@ export const VideoCall = ({
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [hasCamera, setHasCamera] = useState(true);
   const [callDuration, setCallDuration] = useState(0);
-  const [showSubtitles, setShowSubtitles] = useState(false);
-  const [currentSubtitle, setCurrentSubtitle] = useState("");
-  const [callStartTime, setCallStartTime] = useState<number | null>(null);
-  const [conversationTranscript, setConversationTranscript] = useState<string[]>([]);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const channelRef = useRef<any>(null);
-  const recognitionRef = useRef<any>(null);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const startedRef = useRef(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const isTranscribingRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -144,7 +134,6 @@ export const VideoCall = ({
         if (!startedRef.current) {
           startedRef.current = true;
           playCallSound('accept');
-          setCallStartTime(Date.now());
           
           // Start duration timer once
           if (!durationIntervalRef.current) {
@@ -152,10 +141,6 @@ export const VideoCall = ({
               setCallDuration(prev => prev + 1);
             }, 1000);
           }
-          
-          // Start subtitles
-          setShowSubtitles(true);
-          initializeSpeechRecognition();
         }
       };
 
@@ -266,243 +251,10 @@ export const VideoCall = ({
     }
   };
 
-  const initializeSpeechRecognition = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      console.log("Speech recognition not supported, using MediaRecorder fallback");
-      startRecorderFallback();
-      return;
-    }
-
-    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onresult = (event: any) => {
-      const results = Array.from(event.results);
-      const lastResult = results[results.length - 1] as any;
-      const transcript = lastResult[0].transcript;
-      
-      console.log('Speech recognized:', transcript, 'Final:', lastResult.isFinal);
-      
-      if (showSubtitles) {
-        setCurrentSubtitle(transcript);
-      }
-      
-      // Store final transcripts for summary
-      if (lastResult.isFinal && transcript.trim()) {
-        setConversationTranscript(prev => {
-          const updated = [...prev, transcript.trim()];
-          console.log('Transcript updated. Total segments:', updated.length);
-          return updated;
-        });
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
-      // Fallback to MediaRecorder on persistent errors
-      if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'network') {
-        startRecorderFallback();
-      }
-      // Try to restart
-      setTimeout(() => {
-        try {
-          recognition.start();
-          console.log('Speech recognition restarted');
-        } catch (e) {
-          console.log('Could not restart recognition:', e);
-        }
-      }, 1000);
-    };
-
-    recognition.onend = () => {
-      console.log('Speech recognition ended');
-      // Auto-restart if still in call
-      if (callStatus === 'connected') {
-        try {
-          recognition.start();
-        } catch (e) {
-          console.log('Could not restart recognition:', e);
-        }
-      }
-    };
-
-    recognitionRef.current = recognition;
-    
-    // Start immediately
-    try {
-      recognition.start();
-      console.log('Speech recognition started');
-    } catch (e) {
-      console.error('Failed to start recognition:', e);
-      // Fallback
-      startRecorderFallback();
-    }
-  };
-
-  const blobToBase64 = async (blob: Blob): Promise<string> => {
-    const buffer = await blob.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-      binary += String.fromCharCode.apply(null, Array.from(chunk));
-    }
-    return btoa(binary);
-  };
-
-  const startRecorderFallback = () => {
-    try {
-      if (!localStream || mediaRecorderRef.current) return;
-      if (!("MediaRecorder" in window)) return;
-
-      const mimeType = (window as any).MediaRecorder?.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : 'audio/webm';
-      const mr = new MediaRecorder(localStream, { mimeType });
-      mediaRecorderRef.current = mr;
-
-      mr.ondataavailable = async (e: BlobEvent) => {
-        if (!e.data || e.data.size === 0) return;
-        if (isTranscribingRef.current) return; // Drop if busy
-        isTranscribingRef.current = true;
-        try {
-          const base64 = await blobToBase64(e.data);
-          const { data, error } = await supabase.functions.invoke('voice-to-text', {
-            body: { audio: base64 }
-          });
-          if (!error && data?.text) {
-            setConversationTranscript(prev => [...prev, data.text]);
-            if (showSubtitles) setCurrentSubtitle(data.text);
-          } else {
-            console.log('Transcription error:', error);
-          }
-        } catch (err) {
-          console.error('Transcription failed:', err);
-        } finally {
-          isTranscribingRef.current = false;
-        }
-      };
-
-      // Emit chunks every 3s
-      mr.start(3000);
-      console.log('MediaRecorder fallback started');
-    } catch (e) {
-      console.error('Failed to start MediaRecorder fallback:', e);
-    }
-  };
-
-  const stopRecorderFallback = () => {
-    try {
-      const mr = mediaRecorderRef.current;
-      if (mr && mr.state !== 'inactive') {
-        mr.stop();
-      }
-    } catch (e) {
-      console.log('MediaRecorder already stopped');
-    } finally {
-      mediaRecorderRef.current = null;
-    }
-  };
-
-  const toggleSubtitles = () => {
-    const newShowSubtitles = !showSubtitles;
-    setShowSubtitles(newShowSubtitles);
-    
-    console.log('Toggling subtitles:', newShowSubtitles);
-    
-    if (!newShowSubtitles) {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {
-          console.log('Could not stop recognition:', e);
-        }
-      }
-      stopRecorderFallback();
-      setCurrentSubtitle("");
-    } else if (callStatus === 'connected') {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-          console.log('Subtitles enabled, recognition started');
-        } catch (e) {
-          console.log('Could not start recognition:', e);
-        }
-      } else {
-        startRecorderFallback();
-      }
-    }
-  };
-
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const generateCallSummary = async () => {
-    try {
-      const duration = formatDuration(callDuration);
-      const conversationText = conversationTranscript.join(' ');
-      
-      console.log('Generating summary. Transcript:', conversationText);
-      
-      // Always generate a summary if call lasted more than 5 seconds
-      if (callDuration <= 5) {
-        console.log("Call too short for summary");
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('generate-call-summary', {
-        body: {
-          callDuration: duration,
-          participants: [currentUserName, otherUserName],
-          conversation: conversationText || "No conversation transcript available"
-        }
-      });
-
-      if (error) {
-        console.error("Edge function error:", error);
-        throw error;
-      }
-
-      console.log('Summary generated:', data.summary);
-
-      // Send summary as a message in the chat with job_id if available
-      const messageData: any = {
-        from_user: currentUserId,
-        to_user: otherUserId,
-        body: `📞 **Call Summary** (${duration})\n\n${data.summary}`,
-        attachments: {
-          type: 'call_summary',
-          duration: duration,
-          timestamp: new Date().toISOString()
-        }
-      };
-
-      // Include job_id if it exists
-      if (jobId) {
-        messageData.job_id = jobId;
-      }
-
-      const { error: insertError } = await supabase
-        .from('messages')
-        .insert(messageData);
-      
-      if (insertError) {
-        console.error("Message insert error:", insertError);
-        throw insertError;
-      }
-      
-      console.log("Call summary sent successfully to chat");
-    } catch (error) {
-      console.error("Error generating call summary:", error);
-    }
   };
 
   const toggleVideo = () => {
@@ -579,14 +331,6 @@ export const VideoCall = ({
   const handleEndCall = async () => {
     playCallSound('end');
     setCallStatus("ended");
-    
-    console.log('Ending call. Duration:', callDuration, 'Transcript length:', conversationTranscript.length);
-    
-    // Generate AI summary if call lasted more than 5 seconds
-    if (callStartTime && callDuration > 5) {
-      await generateCallSummary();
-    }
-    
     cleanup();
     onClose();
   };
@@ -608,9 +352,6 @@ export const VideoCall = ({
 
   const cleanup = () => {
     console.log("Starting cleanup...");
-
-    // Stop any ongoing transcription fallback
-    stopRecorderFallback();
     
     // Reset start guard
     startedRef.current = false;
@@ -662,17 +403,6 @@ export const VideoCall = ({
       console.log('Remote video cleared');
     }
 
-    // Stop speech recognition
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-        recognitionRef.current.abort();
-      } catch (e) {
-        console.log('Speech recognition already stopped');
-      }
-      recognitionRef.current = null;
-    }
-
     // Clear duration timer
     if (durationIntervalRef.current) {
       clearInterval(durationIntervalRef.current);
@@ -708,13 +438,9 @@ export const VideoCall = ({
     setLocalStream(null);
     setRemoteStream(null);
     setCallDuration(0);
-    setCallStartTime(null);
-    setCurrentSubtitle("");
-    setConversationTranscript([]);
     setIsVideoEnabled(true);
     setIsAudioEnabled(true);
     setIsScreenSharing(false);
-    setShowSubtitles(false);
     setCallStatus("connecting");
     
     console.log("Cleanup complete - all media tracks stopped");
@@ -726,13 +452,14 @@ export const VideoCall = ({
         endCall();
       }
     }}>
-      <DialogContent className="max-w-6xl h-[90vh] p-0" hideCloseButton aria-describedby="video-call-description">
+      <DialogContent className="max-w-full w-full h-full md:max-w-[95vw] md:h-[95vh] p-0 border-0" hideCloseButton aria-describedby="video-call-description">
+        <DialogTitle className="sr-only">Video call with {otherUserName}</DialogTitle>
         <span id="video-call-description" className="sr-only">
           Video call with {otherUserName}
         </span>
-        <div className="h-full flex flex-col bg-black">
+        <div className="h-full flex flex-col bg-black rounded-lg overflow-hidden">
           {/* Remote video (main) */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-h-0">
             {callStatus === "permission-denied" ? (
               <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-900/20 to-gray-900 p-8">
                 <div className="bg-red-500/10 border-2 border-red-500/30 rounded-lg p-6 max-w-md">
@@ -777,7 +504,7 @@ export const VideoCall = ({
                 ref={remoteVideoRef}
                 autoPlay
                 playsInline
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-black"
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
@@ -795,7 +522,7 @@ export const VideoCall = ({
             )}
 
             {/* Local video (picture-in-picture) */}
-            <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20 shadow-xl">
+            <div className="absolute bottom-24 right-4 md:bottom-4 w-32 h-24 md:w-48 md:h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/20 shadow-2xl z-10">
               {localStream && isVideoEnabled && hasCamera ? (
                 <video
                   ref={localVideoRef}
@@ -806,9 +533,9 @@ export const VideoCall = ({
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-700">
-                  <VideoOff className="h-8 w-8 text-white/50 mb-2" />
+                  <VideoOff className="h-6 w-6 md:h-8 md:w-8 text-white/50 mb-1" />
                   {!hasCamera && (
-                    <p className="text-xs text-white/70 text-center px-2">Audio only</p>
+                    <p className="text-[10px] md:text-xs text-white/70 text-center px-2">Audio only</p>
                   )}
                 </div>
               )}
@@ -816,46 +543,39 @@ export const VideoCall = ({
 
             {/* Status and info bar */}
             {callStatus === "connected" && (
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                <div className="bg-black/60 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm font-medium flex items-center gap-3">
+              <div className="absolute top-2 md:top-4 left-2 md:left-4 right-2 md:right-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0 z-10">
+                <div className="bg-black/70 backdrop-blur-md px-3 py-2 rounded-lg text-white text-xs md:text-sm font-medium flex items-center gap-2 md:gap-3 shadow-lg">
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-                    <span>Connected</span>
+                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50" />
+                    <span className="hidden md:inline">Connected</span>
                   </div>
                   <div className="flex items-center gap-1 text-gray-300">
                     <Clock className="h-3 w-3" />
                     <span>{formatDuration(callDuration)}</span>
                   </div>
                 </div>
-                <div className="bg-black/60 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
+                <div className="bg-black/70 backdrop-blur-md px-3 py-2 rounded-lg text-white text-xs md:text-sm font-medium shadow-lg">
                   {otherUserName}
                 </div>
-              </div>
-            )}
-
-            {/* Subtitles */}
-            {showSubtitles && currentSubtitle && (
-              <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm px-6 py-3 rounded-lg max-w-2xl">
-                <p className="text-white text-center text-lg">{currentSubtitle}</p>
               </div>
             )}
           </div>
 
           {/* Controls */}
-          <div className="p-6 bg-gradient-to-t from-black/90 to-transparent">
-            <div className="flex items-center justify-center gap-4">
+          <div className="p-3 md:p-6 bg-gradient-to-t from-black via-black/95 to-transparent border-t border-white/5">
+            <div className="flex items-center justify-center gap-2 md:gap-4">
               <Button
                 variant={isVideoEnabled ? "default" : "destructive"}
                 size="icon"
                 onClick={toggleVideo}
-                className="h-14 w-14 rounded-full"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-full shadow-lg hover:scale-105 transition-transform"
                 disabled={!hasCamera}
                 title={!hasCamera ? "No camera available" : isVideoEnabled ? "Turn off camera" : "Turn on camera"}
               >
                 {isVideoEnabled && hasCamera ? (
-                  <Video className="h-6 w-6" />
+                  <Video className="h-5 w-5 md:h-6 md:w-6" />
                 ) : (
-                  <VideoOff className="h-6 w-6" />
+                  <VideoOff className="h-5 w-5 md:h-6 md:w-6" />
                 )}
               </Button>
 
@@ -863,12 +583,13 @@ export const VideoCall = ({
                 variant={isAudioEnabled ? "default" : "destructive"}
                 size="icon"
                 onClick={toggleAudio}
-                className="h-14 w-14 rounded-full"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-full shadow-lg hover:scale-105 transition-transform"
+                title={isAudioEnabled ? "Mute" : "Unmute"}
               >
                 {isAudioEnabled ? (
-                  <Mic className="h-6 w-6" />
+                  <Mic className="h-5 w-5 md:h-6 md:w-6" />
                 ) : (
-                  <MicOff className="h-6 w-6" />
+                  <MicOff className="h-5 w-5 md:h-6 md:w-6" />
                 )}
               </Button>
 
@@ -876,37 +597,24 @@ export const VideoCall = ({
                 variant={isScreenSharing ? "default" : "secondary"}
                 size="icon"
                 onClick={toggleScreenShare}
-                className="h-14 w-14 rounded-full"
-                title="Share screen"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-full shadow-lg hover:scale-105 transition-transform"
+                title={isScreenSharing ? "Stop sharing" : "Share screen"}
               >
                 {isScreenSharing ? (
-                  <MonitorOff className="h-6 w-6" />
+                  <MonitorOff className="h-5 w-5 md:h-6 md:w-6" />
                 ) : (
-                  <Monitor className="h-6 w-6" />
+                  <Monitor className="h-5 w-5 md:h-6 md:w-6" />
                 )}
-              </Button>
-
-              <Button
-                variant={showSubtitles ? "default" : "secondary"}
-                size="icon"
-                onClick={toggleSubtitles}
-                className={cn(
-                  "h-14 w-14 rounded-full",
-                  showSubtitles && "bg-blue-600 hover:bg-blue-700"
-                )}
-                title={showSubtitles ? "Disable live subtitles" : "Enable live subtitles"}
-              >
-                <Subtitles className="h-6 w-6" />
               </Button>
 
               <Button
                 variant="destructive"
                 size="icon"
                 onClick={endCall}
-                className="h-14 w-14 rounded-full bg-red-500 hover:bg-red-600"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-red-500 hover:bg-red-600 shadow-lg hover:scale-105 transition-transform"
                 title="End call"
               >
-                <PhoneOff className="h-6 w-6" />
+                <PhoneOff className="h-5 w-5 md:h-6 md:w-6" />
               </Button>
             </div>
           </div>
