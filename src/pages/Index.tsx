@@ -118,7 +118,7 @@ const Index = () => {
             </div>
 
             {/* Right side - Image (50%) */}
-            <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative animate-fade-in">
+            <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative animate-fade-in mt-16">
               <HeroFloatingElements />
               <img
                 src={heroImage}
@@ -126,17 +126,17 @@ const Index = () => {
                 className="w-full h-auto object-contain relative z-10 drop-shadow-2xl"
               />
               
-              {/* Floating Badges */}
-              <div className="absolute left-[15%] top-1/2 -translate-y-1/2 z-20 space-y-6">
+              {/* Floating Badges - Staggered near woman's avatar */}
+              <div className="absolute left-[20%] top-[45%] -translate-y-1/2 z-20 flex flex-col gap-6">
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-1_6s_ease-in-out_infinite]">
                   <Award className="h-3.5 w-3.5" />
                   Top Rated Platform
                 </span>
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-2_7s_ease-in-out_infinite]">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-2_7s_ease-in-out_infinite] ml-8">
                   <Sparkles className="h-3.5 w-3.5" />
                   AI-Powered Platform
                 </span>
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-3_8s_ease-in-out_infinite]">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-3_8s_ease-in-out_infinite] ml-4">
                   <Shield className="h-3.5 w-3.5" />
                   Verified Professionals
                 </span>
