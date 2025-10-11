@@ -127,7 +127,7 @@ const Index = () => {
               />
               
               {/* Floating Badges - Staggered near woman's avatar */}
-              <div className="absolute left-0 top-[25%] z-20 flex flex-col gap-6">
+              <div className="absolute -left-32 top-[15%] z-20 flex flex-col gap-6">
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-1_6s_ease-in-out_infinite]">
                   <Award className="h-3.5 w-3.5" />
                   Top Rated Platform
