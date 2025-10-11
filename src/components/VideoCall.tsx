@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { playCallSound } from "@/utils/callSounds";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface VideoCallProps {
   isOpen: boolean;
@@ -273,24 +274,57 @@ export const VideoCall = ({
       const lastResult = results[results.length - 1] as any;
       const transcript = lastResult[0].transcript;
       
+      console.log('Speech recognized:', transcript, 'Final:', lastResult.isFinal);
+      
       if (showSubtitles) {
         setCurrentSubtitle(transcript);
       }
       
       // Store final transcripts for summary
       if (lastResult.isFinal && transcript.trim()) {
-        setConversationTranscript(prev => [...prev, transcript.trim()]);
+        setConversationTranscript(prev => {
+          const updated = [...prev, transcript.trim()];
+          console.log('Transcript updated. Total segments:', updated.length);
+          return updated;
+        });
       }
     };
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
+      // Try to restart if it failed
+      if (event.error === 'no-speech' || event.error === 'audio-capture') {
+        setTimeout(() => {
+          try {
+            recognition.start();
+            console.log('Speech recognition restarted');
+          } catch (e) {
+            console.log('Could not restart recognition:', e);
+          }
+        }, 1000);
+      }
+    };
+
+    recognition.onend = () => {
+      console.log('Speech recognition ended, restarting...');
+      // Auto-restart if still in call
+      if (callStatus === 'connected') {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.log('Could not restart recognition:', e);
+        }
+      }
     };
 
     recognitionRef.current = recognition;
     
-    if (showSubtitles) {
+    // Start immediately
+    try {
       recognition.start();
+      console.log('Speech recognition started');
+    } catch (e) {
+      console.error('Failed to start recognition:', e);
     }
   };
 
@@ -298,11 +332,24 @@ export const VideoCall = ({
     const newShowSubtitles = !showSubtitles;
     setShowSubtitles(newShowSubtitles);
     
-    if (newShowSubtitles && recognitionRef.current) {
-      recognitionRef.current.start();
-    } else if (recognitionRef.current) {
-      recognitionRef.current.stop();
+    console.log('Toggling subtitles:', newShowSubtitles);
+    
+    if (!newShowSubtitles) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          console.log('Could not stop recognition:', e);
+        }
+      }
       setCurrentSubtitle("");
+    } else if (recognitionRef.current && callStatus === 'connected') {
+      try {
+        recognitionRef.current.start();
+        console.log('Subtitles enabled, recognition started');
+      } catch (e) {
+        console.log('Could not start recognition:', e);
+      }
     }
   };
 
@@ -476,38 +523,52 @@ export const VideoCall = ({
   const cleanup = () => {
     console.log("Starting cleanup...");
     
-    // Stop all local tracks aggressively
+    // Stop all local tracks aggressively - critical for mobile
     if (localStream) {
-      localStream.getTracks().forEach((track) => {
+      const tracks = localStream.getTracks();
+      console.log('Stopping local tracks:', tracks.length);
+      tracks.forEach((track) => {
         if (track.readyState === 'live') {
           track.stop();
           track.enabled = false;
-          console.log('Stopped local track:', track.kind, track.label);
+          // Force remove from stream
+          localStream.removeTrack(track);
+          console.log('Stopped and removed local track:', track.kind, track.label);
         }
       });
     }
     
     // Stop all remote tracks
     if (remoteStream) {
-      remoteStream.getTracks().forEach((track) => {
+      const tracks = remoteStream.getTracks();
+      console.log('Stopping remote tracks:', tracks.length);
+      tracks.forEach((track) => {
         if (track.readyState === 'live') {
           track.stop();
           track.enabled = false;
-          console.log('Stopped remote track:', track.kind);
+          remoteStream.removeTrack(track);
+          console.log('Stopped and removed remote track:', track.kind);
         }
       });
     }
 
-    // Clear and pause video elements
+    // Clear and pause video elements - critical for mobile browsers
     if (localVideoRef.current) {
-      localVideoRef.current.pause();
-      localVideoRef.current.srcObject = null;
-      localVideoRef.current.load();
+      const video = localVideoRef.current;
+      video.pause();
+      video.srcObject = null;
+      video.load();
+      // Force remove all source references
+      video.removeAttribute('src');
+      console.log('Local video cleared');
     }
     if (remoteVideoRef.current) {
-      remoteVideoRef.current.pause();
-      remoteVideoRef.current.srcObject = null;
-      remoteVideoRef.current.load();
+      const video = remoteVideoRef.current;
+      video.pause();
+      video.srcObject = null;
+      video.load();
+      video.removeAttribute('src');
+      console.log('Remote video cleared');
     }
 
     // Stop speech recognition
@@ -527,11 +588,19 @@ export const VideoCall = ({
       durationIntervalRef.current = null;
     }
 
-    // Close peer connection
+    // Close peer connection and remove all tracks
     if (peerConnectionRef.current) {
-      peerConnectionRef.current.getSenders().forEach(sender => {
+      const senders = peerConnectionRef.current.getSenders();
+      console.log('Removing peer connection senders:', senders.length);
+      senders.forEach(sender => {
         if (sender.track) {
           sender.track.stop();
+          sender.track.enabled = false;
+        }
+        try {
+          peerConnectionRef.current?.removeTrack(sender);
+        } catch (e) {
+          console.log('Could not remove track from peer:', e);
         }
       });
       peerConnectionRef.current.close();
@@ -557,7 +626,7 @@ export const VideoCall = ({
     setShowSubtitles(false);
     setCallStatus("connecting");
     
-    console.log("Cleanup complete");
+    console.log("Cleanup complete - all media tracks stopped");
   };
 
   return (
@@ -730,8 +799,11 @@ export const VideoCall = ({
                 variant={showSubtitles ? "default" : "secondary"}
                 size="icon"
                 onClick={toggleSubtitles}
-                className="h-14 w-14 rounded-full"
-                title="Toggle live subtitles"
+                className={cn(
+                  "h-14 w-14 rounded-full",
+                  showSubtitles && "bg-blue-600 hover:bg-blue-700"
+                )}
+                title={showSubtitles ? "Disable live subtitles" : "Enable live subtitles"}
               >
                 <Subtitles className="h-6 w-6" />
               </Button>
