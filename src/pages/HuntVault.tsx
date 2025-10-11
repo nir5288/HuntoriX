@@ -119,9 +119,12 @@ interface ColumnConfig {
   visible: boolean;
 }
 
-const defaultColumns: ColumnConfig[] = [
+const fixedColumns: ColumnConfig[] = [
   { id: "candidate", label: "Candidate", visible: true },
   { id: "location", label: "Location", visible: true },
+];
+
+const defaultColumns: ColumnConfig[] = [
   { id: "industry", label: "Industry", visible: true },
   { id: "skills", label: "Skills", visible: true },
   { id: "progress", label: "Progress", visible: true },
@@ -383,6 +386,7 @@ export default function HuntVault() {
                   <PopoverContent className="w-64 rounded-xl" align="end">
                     <div className="space-y-4">
                       <h4 className="font-medium text-sm">Show/Hide Columns</h4>
+                      <p className="text-xs text-muted-foreground">Candidate & Location are always visible</p>
                       <div className="space-y-3">
                         {columns.map((column) => (
                           <div key={column.id} className="flex items-center space-x-2">
@@ -451,6 +455,9 @@ export default function HuntVault() {
                       <TableHead className="w-12">
                         <input type="checkbox" className="rounded" />
                       </TableHead>
+                      {fixedColumns.map((column) => (
+                        <TableHead key={column.id}>{column.label}</TableHead>
+                      ))}
                       <SortableContext
                         items={visibleColumns.map((col) => col.id)}
                         strategy={horizontalListSortingStrategy}
@@ -476,7 +483,7 @@ export default function HuntVault() {
                             onClick={(e) => e.stopPropagation()}
                           />
                         </TableCell>
-                        {visibleColumns.map((column) => {
+                        {fixedColumns.map((column) => {
                           switch (column.id) {
                             case "candidate":
                               return (
@@ -501,6 +508,12 @@ export default function HuntVault() {
                                   </div>
                                 </TableCell>
                               );
+                            default:
+                              return null;
+                          }
+                        })}
+                        {visibleColumns.map((column) => {
+                          switch (column.id) {
                             case "industry":
                               return (
                                 <TableCell key={column.id}>
