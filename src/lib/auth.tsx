@@ -30,7 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        // Don't sign out on profile fetch errors
+        return;
+      }
       
       // Check if headhunter account is verified and active
       if (data.role === 'headhunter' && data.account_status === 'deactivated') {
@@ -42,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
+      // Don't sign out on unexpected errors
     }
   };
 
@@ -54,25 +59,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
+        
+        // Handle token refresh errors by attempting to recover the session
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed successfully');
+        }
+        
+        // Only sign out on explicit SIGNED_OUT event, not on token refresh failures
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          return;
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
+          await fetchProfile(session.user.id);
+        } else if (event !== 'SIGNED_OUT') {
+          // If no session but not explicitly signed out, try to recover
+          const { data: { session: recoveredSession } } = await supabase.auth.getSession();
+          if (recoveredSession) {
+            setSession(recoveredSession);
+            setUser(recoveredSession.user);
+            await fetchProfile(recoveredSession.user.id);
+          } else {
+            setProfile(null);
+          }
         }
       }
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchProfile(session.user.id).then(() => setLoading(false));
+        await fetchProfile(session.user.id).then(() => setLoading(false));
       } else {
         setLoading(false);
       }
