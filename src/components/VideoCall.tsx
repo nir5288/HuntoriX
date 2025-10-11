@@ -17,6 +17,7 @@ interface VideoCallProps {
   currentUserId: string;
   currentUserName: string;
   roomId: string;
+  jobId?: string | null;
 }
 
 export const VideoCall = ({
@@ -28,6 +29,7 @@ export const VideoCall = ({
   currentUserId,
   currentUserName,
   roomId,
+  jobId = null,
 }: VideoCallProps) => {
   const { toast } = useToast();
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -315,8 +317,11 @@ export const VideoCall = ({
       const duration = formatDuration(callDuration);
       const conversationText = conversationTranscript.join(' ');
       
-      if (!conversationText.trim()) {
-        console.log("No conversation to summarize");
+      console.log('Generating summary. Transcript:', conversationText);
+      
+      // Always generate a summary if call lasted more than 5 seconds
+      if (callDuration <= 5) {
+        console.log("Call too short for summary");
         return;
       }
 
@@ -324,14 +329,19 @@ export const VideoCall = ({
         body: {
           callDuration: duration,
           participants: [currentUserName, otherUserName],
-          conversation: conversationText
+          conversation: conversationText || "No conversation transcript available"
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Edge function error:", error);
+        throw error;
+      }
 
-      // Send summary as a message in the chat
-      await supabase.from('messages').insert({
+      console.log('Summary generated:', data.summary);
+
+      // Send summary as a message in the chat with job_id if available
+      const messageData: any = {
         from_user: currentUserId,
         to_user: otherUserId,
         body: `📞 **Call Summary** (${duration})\n\n${data.summary}`,
@@ -340,9 +350,23 @@ export const VideoCall = ({
           duration: duration,
           timestamp: new Date().toISOString()
         }
-      });
+      };
+
+      // Include job_id if it exists
+      if (jobId) {
+        messageData.job_id = jobId;
+      }
+
+      const { error: insertError } = await supabase
+        .from('messages')
+        .insert(messageData);
       
-      console.log("Call summary sent successfully");
+      if (insertError) {
+        console.error("Message insert error:", insertError);
+        throw insertError;
+      }
+      
+      console.log("Call summary sent successfully to chat");
     } catch (error) {
       console.error("Error generating call summary:", error);
     }
@@ -423,8 +447,10 @@ export const VideoCall = ({
     playCallSound('end');
     setCallStatus("ended");
     
-    // Generate AI summary if call was connected
-    if (callStartTime && callDuration > 10) {
+    console.log('Ending call. Duration:', callDuration, 'Transcript length:', conversationTranscript.length);
+    
+    // Generate AI summary if call lasted more than 5 seconds
+    if (callStartTime && callDuration > 5) {
       await generateCallSummary();
     }
     

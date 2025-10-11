@@ -13,10 +13,17 @@ serve(async (req) => {
   try {
     const { callDuration, participants, conversation } = await req.json();
     
+    console.log('Generating summary for call duration:', callDuration, 'with conversation length:', conversation?.length || 0);
+    
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    const hasConversation = conversation && conversation.trim().length > 0;
+    const prompt = hasConversation 
+      ? `Summarize this video call conversation between ${participants[0]} and ${participants[1]} that lasted ${callDuration}:\n\n"${conversation}"\n\nProvide a brief professional summary covering: 1) Main topics discussed, 2) Key points or decisions, 3) Any action items mentioned. Keep it under 4 sentences.`
+      : `Generate a brief professional note for a ${callDuration} video call between ${participants[0]} and ${participants[1]}. No transcript was captured. Mention the call occurred, its duration, and suggest following up if needed. Keep it under 2 sentences.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -33,7 +40,7 @@ serve(async (req) => {
           },
           {
             role: "user",
-            content: `Summarize this video call conversation between ${participants[0]} and ${participants[1]} that lasted ${callDuration}:\n\n"${conversation}"\n\nProvide a brief professional summary covering: 1) Main topics discussed, 2) Key points or decisions, 3) Any action items mentioned. Keep it under 4 sentences.`
+            content: prompt
           }
         ],
       }),
@@ -47,6 +54,8 @@ serve(async (req) => {
 
     const data = await response.json();
     const summary = data.choices?.[0]?.message?.content || "Call completed successfully.";
+
+    console.log('Summary generated successfully');
 
     return new Response(
       JSON.stringify({ summary }),
