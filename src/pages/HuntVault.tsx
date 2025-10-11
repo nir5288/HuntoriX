@@ -65,6 +65,8 @@ interface Candidate {
   progress: number;
   status: "active" | "pending" | "rejected" | "placed";
   lastUpdated: string;
+  age?: number;
+  gender?: string;
 }
 
 const mockCandidates: Candidate[] = [
@@ -78,6 +80,8 @@ const mockCandidates: Candidate[] = [
     progress: 75,
     status: "active",
     lastUpdated: "2 hours ago",
+    age: 32,
+    gender: "Female",
   },
   {
     id: "2",
@@ -88,6 +92,8 @@ const mockCandidates: Candidate[] = [
     progress: 45,
     status: "pending",
     lastUpdated: "1 day ago",
+    age: 28,
+    gender: "Male",
   },
   {
     id: "3",
@@ -98,6 +104,8 @@ const mockCandidates: Candidate[] = [
     progress: 90,
     status: "placed",
     lastUpdated: "3 days ago",
+    age: 35,
+    gender: "Female",
   },
 ];
 
@@ -125,6 +133,8 @@ const fixedColumns: ColumnConfig[] = [
 ];
 
 const defaultColumns: ColumnConfig[] = [
+  { id: "age", label: "Age", visible: true },
+  { id: "gender", label: "Gender", visible: true },
   { id: "industry", label: "Industry", visible: true },
   { id: "skills", label: "Skills", visible: true },
   { id: "progress", label: "Progress", visible: true },
@@ -514,6 +524,20 @@ export default function HuntVault() {
                         })}
                         {visibleColumns.map((column) => {
                           switch (column.id) {
+                            case "age":
+                              return (
+                                <TableCell key={column.id}>
+                                  <span className="text-muted-foreground">{candidate.age || "N/A"}</span>
+                                </TableCell>
+                              );
+                            case "gender":
+                              return (
+                                <TableCell key={column.id}>
+                                  <Badge variant="secondary" className="rounded-full">
+                                    {candidate.gender || "N/A"}
+                                  </Badge>
+                                </TableCell>
+                              );
                             case "industry":
                               return (
                                 <TableCell key={column.id}>
