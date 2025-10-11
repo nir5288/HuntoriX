@@ -547,7 +547,7 @@ export function AIAssistant() {
                     <ChevronDown className="h-3.5 w-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-20 bg-background/95 backdrop-blur-xl border border-white/20 shadow-2xl z-[10000] rounded-xl">
+                <DropdownMenuContent align="end" className="w-14 bg-background/95 backdrop-blur-xl border border-white/20 shadow-2xl z-[10000] rounded-xl">
                   <DropdownMenuItem
                     onClick={() => {
                       setLanguage('en');
@@ -556,10 +556,10 @@ export function AIAssistant() {
                         description: "I will now speak English"
                       });
                     }}
-                    className="flex flex-col items-center gap-0.5 py-1.5 cursor-pointer rounded-lg hover:bg-white/10"
+                    className="flex flex-col items-center gap-0 py-1 cursor-pointer rounded-lg hover:bg-white/10"
                   >
-                    <span className="text-base">🇺🇸</span>
-                    <span className="text-[10px] font-semibold">EN</span>
+                    <span className="text-sm">🇺🇸</span>
+                    <span className="text-[9px] font-semibold">EN</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
@@ -569,10 +569,10 @@ export function AIAssistant() {
                         description: "עכשיו אני אדבר עברית"
                       });
                     }}
-                    className="flex flex-col items-center gap-0.5 py-1.5 cursor-pointer rounded-lg hover:bg-white/10"
+                    className="flex flex-col items-center gap-0 py-1 cursor-pointer rounded-lg hover:bg-white/10"
                   >
-                    <span className="text-base">🇮🇱</span>
-                    <span className="text-[10px] font-semibold">HE</span>
+                    <span className="text-sm">🇮🇱</span>
+                    <span className="text-[9px] font-semibold">HE</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
