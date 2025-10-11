@@ -243,18 +243,12 @@ const Messages = () => {
     <div className="h-screen flex">
       {/* Show sidebar on desktop OR on mobile when no conversation is selected */}
       {(!isMobile || !otherUserId) && (
-        <div
-          className={cn(
-            isMobile ? "fixed inset-0 w-full h-full z-10 bg-background" : "w-auto"
-          )}
-        >
-          <ChatSidebar
-            isOpen={true}
-            onClose={() => {}}
-            isCollapsed={false}
-            onToggleCollapse={() => {}}
-          />
-        </div>
+        <ChatSidebar
+          isOpen={true}
+          onClose={() => {}}
+          isCollapsed={false}
+          onToggleCollapse={() => {}}
+        />
       )}
 
       {/* Show message area on desktop OR on mobile when conversation is selected */}

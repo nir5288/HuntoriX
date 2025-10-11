@@ -364,7 +364,8 @@ export const ChatSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse }: 
   return (
     <div
       className={cn(
-        "bg-background border-r shrink-0 h-full w-72"
+        "bg-background border-r shrink-0 h-full",
+        isMobile ? "w-full" : "w-72"
       )}
     >
       <div className="h-[72px] px-3 flex items-center justify-between border-b bg-gradient-to-r from-[hsl(var(--accent-pink))]/20 via-[hsl(var(--accent-mint))]/20 to-[hsl(var(--accent-lilac))]/20">
