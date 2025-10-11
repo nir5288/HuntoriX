@@ -740,6 +740,7 @@ const Messages = () => {
             otherUserName={otherUserName}
             otherUserAvatar={otherUserAvatar}
             currentUserId={user?.id || ""}
+            currentUserName={profile?.name || "User"}
             roomId={`${validJobId || 'direct'}-${[user?.id, otherUserId].sort().join('-')}`}
           />
         )}
