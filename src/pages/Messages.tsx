@@ -243,12 +243,16 @@ const Messages = () => {
     <div className="h-screen flex">
       {/* Show sidebar on desktop OR on mobile when no conversation is selected */}
       {(!isMobile || !otherUserId) && (
-        <ChatSidebar
-          isOpen={true}
-          onClose={() => {}}
-          isCollapsed={false}
-          onToggleCollapse={() => {}}
-        />
+        <div className={cn(
+          isMobile ? "fixed inset-0 w-full h-full z-10" : "w-auto"
+        )}>
+          <ChatSidebar
+            isOpen={true}
+            onClose={() => {}}
+            isCollapsed={false}
+            onToggleCollapse={() => {}}
+          />
+        </div>
       )}
 
       {/* Show message area on desktop OR on mobile when conversation is selected */}
@@ -256,7 +260,7 @@ const Messages = () => {
         <div
           className={cn(
             "flex flex-col min-w-0",
-            isMobile ? "fixed inset-0 w-full h-full" : "flex-1 max-w-[65%]"
+            isMobile ? "fixed inset-0 w-full h-full z-10" : "flex-1 max-w-[65%]"
           )}
         >
           <div className="h-full flex flex-col overflow-hidden">
@@ -282,7 +286,7 @@ const Messages = () => {
                   setScheduleTime={setScheduleTime}
                   onScheduleCall={handleScheduleCall}
                   onInstantCall={handleInstantCall}
-                  onBack={() => navigate('/messages')}
+                  onBack={() => navigate('/messages', { replace: true })}
                 />
 
                 {/* Scrolling Message Thread */}
