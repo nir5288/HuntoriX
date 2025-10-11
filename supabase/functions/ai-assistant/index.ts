@@ -1,14 +1,103 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Rate limiting: 20 requests per minute per user
+const RATE_LIMIT = 20;
+const RATE_WINDOW = 60000; // 1 minute in ms
+
+async function checkRateLimit(supabase: any, userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('rate_limits')
+    .select('request_count, window_start')
+    .eq('identifier', userId)
+    .eq('endpoint', 'ai-assistant')
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Rate limit check error:', error);
+    return true;
+  }
+
+  const now = new Date();
+  
+  if (!data) {
+    await supabase.from('rate_limits').insert({
+      identifier: userId,
+      endpoint: 'ai-assistant',
+      request_count: 1,
+      window_start: now.toISOString()
+    });
+    return true;
+  }
+
+  const windowStart = new Date(data.window_start);
+  const timeSinceWindow = now.getTime() - windowStart.getTime();
+
+  if (timeSinceWindow > RATE_WINDOW) {
+    await supabase.from('rate_limits')
+      .update({
+        request_count: 1,
+        window_start: now.toISOString()
+      })
+      .eq('identifier', userId)
+      .eq('endpoint', 'ai-assistant');
+    return true;
+  }
+
+  if (data.request_count >= RATE_LIMIT) {
+    return false;
+  }
+
+  await supabase.from('rate_limits')
+    .update({ request_count: data.request_count + 1 })
+    .eq('identifier', userId)
+    .eq('endpoint', 'ai-assistant');
+  
+  return true;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Check rate limit
+    const allowed = await checkRateLimit(supabase, user.id);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const { messages, language = 'en' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     

@@ -1,4 +1,26 @@
 import { supabase } from '@/integrations/supabase/client';
+import { z } from 'zod';
+
+// Message validation schema
+const messageSchema = z.object({
+  body: z.string()
+    .min(1, 'Message cannot be empty')
+    .max(10000, 'Message too long')
+    .trim(),
+  attachments: z.array(z.object({
+    name: z.string(),
+    url: z.string().url(),
+    type: z.string(),
+    size: z.number().max(10 * 1024 * 1024) // 10MB max
+  })).optional()
+});
+
+/**
+ * Validate message content
+ */
+export const validateMessage = (body: string, attachments?: any[]) => {
+  return messageSchema.parse({ body, attachments });
+};
 
 /**
  * Upload files to storage and return attachment metadata

@@ -15,18 +15,111 @@ interface VerificationEmailRequest {
   name: string;
 }
 
+// Rate limiting: 3 emails per hour per user
+const RATE_LIMIT = 3;
+const RATE_WINDOW = 3600000; // 1 hour in ms
+
+async function checkEmailRateLimit(supabase: any, userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('rate_limits')
+    .select('request_count, window_start')
+    .eq('identifier', userId)
+    .eq('endpoint', 'send-verification-email')
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Rate limit check error:', error);
+    return true;
+  }
+
+  const now = new Date();
+  
+  if (!data) {
+    await supabase.from('rate_limits').insert({
+      identifier: userId,
+      endpoint: 'send-verification-email',
+      request_count: 1,
+      window_start: now.toISOString()
+    });
+    return true;
+  }
+
+  const windowStart = new Date(data.window_start);
+  const timeSinceWindow = now.getTime() - windowStart.getTime();
+
+  if (timeSinceWindow > RATE_WINDOW) {
+    await supabase.from('rate_limits')
+      .update({
+        request_count: 1,
+        window_start: now.toISOString()
+      })
+      .eq('identifier', userId)
+      .eq('endpoint', 'send-verification-email');
+    return true;
+  }
+
+  if (data.request_count >= RATE_LIMIT) {
+    return false;
+  }
+
+  await supabase.from('rate_limits')
+    .update({ request_count: data.request_count + 1 })
+    .eq('identifier', userId)
+    .eq('endpoint', 'send-verification-email');
+  
+  return true;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Verify user
+    const { data: { user }, error: userError } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+    
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+    }
+
     const { userId, email, name }: VerificationEmailRequest = await req.json();
+
+    // Ensure user can only send verification for themselves
+    if (userId !== user.id) {
+      return new Response(JSON.stringify({ error: 'Cannot send verification for another user' }), {
+        status: 403,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+    }
+
+    // Check rate limit
+    const allowed = await checkEmailRateLimit(supabase, userId);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Too many verification emails. Please try again later.' }), {
+        status: 429,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+    }
 
     console.log("Sending verification email to:", email);
 

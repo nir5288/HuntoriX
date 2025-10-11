@@ -995,6 +995,33 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          identifier: string
+          request_count: number | null
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          identifier: string
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          identifier?: string
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       saved_headhunters: {
         Row: {
           created_at: string
@@ -1250,6 +1277,10 @@ export type Database = {
         Args: { p_job_id: string; p_user1_id: string; p_user2_id: string }
         Returns: undefined
       }
+      delete_old_submissions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_job_id_number: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -1271,6 +1302,47 @@ export type Database = {
           cover_image_url: string
           created_at: string
           email: string
+          expertise: string[]
+          founded_year: number
+          hourly_rate: number
+          id: string
+          industries: string[]
+          languages: string[]
+          last_seen: string
+          linkedin: string
+          location: string
+          name: string
+          open_positions: number
+          placement_fee_percent: number
+          placements_count: number
+          rating_avg: number
+          response_time: string
+          role: string
+          skills: string[]
+          specializations: string[]
+          success_rate: number
+          team_size: number
+          verified: boolean
+          website: string
+          years_experience: number
+        }[]
+      }
+      get_public_profile_safe: {
+        Args: { profile_id: string }
+        Returns: {
+          active_searches: number
+          avatar_url: string
+          bio: string
+          certifications: string[]
+          company: string
+          company_benefits: string[]
+          company_culture: string
+          company_mission: string
+          company_name: string
+          company_sector: string
+          company_size: string
+          cover_image_url: string
+          created_at: string
           expertise: string[]
           founded_year: number
           hourly_rate: number
