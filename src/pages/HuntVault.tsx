@@ -462,11 +462,20 @@ export default function HuntVault() {
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-border/40">
-                      <TableHead className="w-12">
+                      <TableHead className="w-12 sticky left-0 bg-card z-10">
                         <input type="checkbox" className="rounded" />
                       </TableHead>
                       {fixedColumns.map((column) => (
-                        <TableHead key={column.id} className="min-w-[200px]">{column.label}</TableHead>
+                        <TableHead 
+                          key={column.id} 
+                          className={`min-w-[200px] ${
+                            column.id === 'candidate' 
+                              ? 'sticky left-12 bg-card z-10 border-r border-border/40' 
+                              : ''
+                          }`}
+                        >
+                          {column.label}
+                        </TableHead>
                       ))}
                       <SortableContext
                         items={visibleColumns.map((col) => col.id)}
@@ -486,7 +495,7 @@ export default function HuntVault() {
                         className="hover:bg-muted/50 border-border/40 cursor-pointer transition-colors"
                         onClick={() => setSelectedCandidate(candidate)}
                       >
-                        <TableCell>
+                        <TableCell className="sticky left-0 bg-card z-10">
                           <input
                             type="checkbox"
                             className="rounded"
@@ -497,7 +506,7 @@ export default function HuntVault() {
                           switch (column.id) {
                             case "candidate":
                               return (
-                                <TableCell key={column.id} className="min-w-[200px]">
+                                <TableCell key={column.id} className="min-w-[200px] sticky left-12 bg-card z-10 border-r border-border/40">
                                   <div className="flex items-center gap-3">
                                     <Avatar className="h-10 w-10">
                                       <AvatarImage src={candidate.avatar} />
