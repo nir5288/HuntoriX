@@ -1,5 +1,22 @@
 import { useState } from "react";
-import { Archive, Upload, Search, Filter, RefreshCw, Save, Eye, Edit, Trash2, X, FileText, Building2, MapPin, User } from "lucide-react";
+import { Archive, Upload, Search, Filter, RefreshCw, Save, Eye, Edit, Trash2, X, FileText, Building2, MapPin, User, Settings2, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +38,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -90,6 +113,62 @@ const locations = ["All", "San Francisco", "New York", "London", "Remote"];
 const seniorities = ["All", "Junior", "Mid", "Senior", "Lead"];
 const statuses = ["All", "Active", "Pending", "Rejected", "Placed"];
 
+interface ColumnConfig {
+  id: string;
+  label: string;
+  visible: boolean;
+}
+
+const defaultColumns: ColumnConfig[] = [
+  { id: "candidate", label: "Candidate", visible: true },
+  { id: "location", label: "Location", visible: true },
+  { id: "industry", label: "Industry", visible: true },
+  { id: "skills", label: "Skills", visible: true },
+  { id: "progress", label: "Progress", visible: true },
+  { id: "status", label: "Status", visible: true },
+  { id: "lastUpdated", label: "Last Updated", visible: true },
+];
+
+interface SortableHeaderProps {
+  column: ColumnConfig;
+}
+
+function SortableTableHead({ column }: SortableHeaderProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TableHead
+      ref={setNodeRef}
+      style={style}
+      className="relative"
+    >
+      <div className="flex items-center gap-2">
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <span>{column.label}</span>
+      </div>
+    </TableHead>
+  );
+}
+
 export default function HuntVault() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState("All");
@@ -100,6 +179,36 @@ export default function HuntVault() {
   const [rowsPerPage, setRowsPerPage] = useState("10");
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [columns, setColumns] = useState<ColumnConfig[]>(defaultColumns);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setColumns((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const toggleColumnVisibility = (columnId: string) => {
+    setColumns((cols) =>
+      cols.map((col) =>
+        col.id === columnId ? { ...col, visible: !col.visible } : col
+      )
+    );
+  };
+
+  const visibleColumns = columns.filter((col) => col.visible);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -264,6 +373,36 @@ export default function HuntVault() {
                 </Button>
               </div>
               <div className="flex gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="rounded-xl">
+                      <Settings2 className="h-4 w-4 mr-2" />
+                      Customize Columns
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 rounded-xl" align="end">
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-sm">Show/Hide Columns</h4>
+                      <div className="space-y-3">
+                        {columns.map((column) => (
+                          <div key={column.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={column.id}
+                              checked={column.visible}
+                              onCheckedChange={() => toggleColumnVisibility(column.id)}
+                            />
+                            <label
+                              htmlFor={column.id}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                            >
+                              {column.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <Dialog open={uploadModalOpen} onOpenChange={setUploadModalOpen}>
                   <DialogTrigger asChild>
                     <Button className="rounded-xl bg-gradient-to-r from-accent-mint via-accent-lilac to-accent-pink hover:opacity-90">
@@ -301,141 +440,175 @@ export default function HuntVault() {
         <Card className="border-border/40 bg-card/80 backdrop-blur-sm">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-border/40">
-                    <TableHead className="w-12">
-                      <input type="checkbox" className="rounded" />
-                    </TableHead>
-                    <TableHead>Candidate</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Industry</TableHead>
-                    <TableHead>Skills</TableHead>
-                    <TableHead>Progress</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Last Updated</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockCandidates.map((candidate) => (
-                    <TableRow
-                      key={candidate.id}
-                      className="hover:bg-muted/50 border-border/40 cursor-pointer transition-colors"
-                      onClick={() => setSelectedCandidate(candidate)}
-                    >
-                      <TableCell>
-                        <input
-                          type="checkbox"
-                          className="rounded"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={candidate.avatar} />
-                            <AvatarFallback className="bg-gradient-to-br from-accent-mint to-accent-lilac text-white">
-                              {getInitials(candidate.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium">{candidate.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <MapPin className="h-4 w-4" />
-                          {candidate.location}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="rounded-full">
-                          {candidate.industry}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1 flex-wrap">
-                          {candidate.tags.slice(0, 2).map((tag, idx) => (
-                            <Badge
-                              key={idx}
-                              variant="outline"
-                              className="rounded-full text-xs"
-                              style={{
-                                borderColor: `hsl(var(--accent-${
-                                  idx === 0 ? "mint" : "lilac"
-                                }))`,
-                                color: `hsl(var(--accent-${idx === 0 ? "mint" : "lilac"}))`,
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-border/40">
+                      <TableHead className="w-12">
+                        <input type="checkbox" className="rounded" />
+                      </TableHead>
+                      <SortableContext
+                        items={visibleColumns.map((col) => col.id)}
+                        strategy={horizontalListSortingStrategy}
+                      >
+                        {visibleColumns.map((column) => (
+                          <SortableTableHead key={column.id} column={column} />
+                        ))}
+                      </SortableContext>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mockCandidates.map((candidate) => (
+                      <TableRow
+                        key={candidate.id}
+                        className="hover:bg-muted/50 border-border/40 cursor-pointer transition-colors"
+                        onClick={() => setSelectedCandidate(candidate)}
+                      >
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            className="rounded"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </TableCell>
+                        {visibleColumns.map((column) => {
+                          switch (column.id) {
+                            case "candidate":
+                              return (
+                                <TableCell key={column.id}>
+                                  <div className="flex items-center gap-3">
+                                    <Avatar className="h-10 w-10">
+                                      <AvatarImage src={candidate.avatar} />
+                                      <AvatarFallback className="bg-gradient-to-br from-accent-mint to-accent-lilac text-white">
+                                        {getInitials(candidate.name)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="font-medium">{candidate.name}</span>
+                                  </div>
+                                </TableCell>
+                              );
+                            case "location":
+                              return (
+                                <TableCell key={column.id}>
+                                  <div className="flex items-center gap-2 text-muted-foreground">
+                                    <MapPin className="h-4 w-4" />
+                                    {candidate.location}
+                                  </div>
+                                </TableCell>
+                              );
+                            case "industry":
+                              return (
+                                <TableCell key={column.id}>
+                                  <Badge variant="secondary" className="rounded-full">
+                                    {candidate.industry}
+                                  </Badge>
+                                </TableCell>
+                              );
+                            case "skills":
+                              return (
+                                <TableCell key={column.id}>
+                                  <div className="flex gap-1 flex-wrap">
+                                    {candidate.tags.slice(0, 2).map((tag, idx) => (
+                                      <Badge
+                                        key={idx}
+                                        variant="outline"
+                                        className="rounded-full text-xs"
+                                        style={{
+                                          borderColor: `hsl(var(--accent-${
+                                            idx === 0 ? "mint" : "lilac"
+                                          }))`,
+                                          color: `hsl(var(--accent-${idx === 0 ? "mint" : "lilac"}))`,
+                                        }}
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                    {candidate.tags.length > 2 && (
+                                      <Badge variant="outline" className="rounded-full text-xs">
+                                        +{candidate.tags.length - 2}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              );
+                            case "progress":
+                              return (
+                                <TableCell key={column.id}>
+                                  <div className="flex items-center gap-2 min-w-[120px]">
+                                    <Progress
+                                      value={candidate.progress}
+                                      className="h-2 flex-1"
+                                    />
+                                    <span className="text-sm text-muted-foreground">
+                                      {candidate.progress}%
+                                    </span>
+                                  </div>
+                                </TableCell>
+                              );
+                            case "status":
+                              return (
+                                <TableCell key={column.id}>
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className={`h-2 w-2 rounded-full ${getStatusColor(
+                                        candidate.status
+                                      )}`}
+                                    />
+                                    <span className="capitalize">{candidate.status}</span>
+                                  </div>
+                                </TableCell>
+                              );
+                            case "lastUpdated":
+                              return (
+                                <TableCell key={column.id} className="text-muted-foreground">
+                                  {candidate.lastUpdated}
+                                </TableCell>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-lg"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedCandidate(candidate);
                               }}
                             >
-                              {tag}
-                            </Badge>
-                          ))}
-                          {candidate.tags.length > 2 && (
-                            <Badge variant="outline" className="rounded-full text-xs">
-                              +{candidate.tags.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 min-w-[120px]">
-                          <Progress
-                            value={candidate.progress}
-                            className="h-2 flex-1"
-                          />
-                          <span className="text-sm text-muted-foreground">
-                            {candidate.progress}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`h-2 w-2 rounded-full ${getStatusColor(
-                              candidate.status
-                            )}`}
-                          />
-                          <span className="capitalize">{candidate.status}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {candidate.lastUpdated}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-lg"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedCandidate(candidate);
-                            }}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-lg"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-lg text-destructive"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-lg"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-lg text-destructive hover:text-destructive"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </DndContext>
             </div>
 
             {/* Pagination */}
