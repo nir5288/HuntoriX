@@ -476,7 +476,7 @@ export default function HuntVault() {
                           <SortableTableHead key={column.id} column={column} />
                         ))}
                       </SortableContext>
-                      <TableHead className="text-right min-w-[120px]">Actions</TableHead>
+                      <TableHead className="text-right min-w-[120px] sticky right-0 bg-card border-l border-border/40">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -610,7 +610,7 @@ export default function HuntVault() {
                               return null;
                           }
                         })}
-                        <TableCell className="text-right min-w-[120px]">
+                        <TableCell className="text-right min-w-[120px] sticky right-0 bg-card border-l border-border/40">
                           <div className="flex items-center justify-end gap-1">
                             <Button
                               variant="ghost"
