@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Video, VideoOff, Mic, MicOff, PhoneOff, Monitor, MonitorOff, Clock, Subtitles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -53,6 +53,9 @@ export const VideoCall = ({
   const channelRef = useRef<any>(null);
   const recognitionRef = useRef<any>(null);
   const durationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startedRef = useRef(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const isTranscribingRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -136,17 +139,24 @@ export const VideoCall = ({
       pc.ontrack = (event) => {
         setRemoteStream(event.streams[0]);
         setCallStatus("connected");
-        playCallSound('accept');
-        setCallStartTime(Date.now());
-        
-        // Start duration timer
-        durationIntervalRef.current = setInterval(() => {
-          setCallDuration(prev => prev + 1);
-        }, 1000);
-        
-        // Initialize and auto-start speech recognition for transcript
-        setShowSubtitles(true);
-        initializeSpeechRecognition();
+
+        // Ensure we only start once (on first track)
+        if (!startedRef.current) {
+          startedRef.current = true;
+          playCallSound('accept');
+          setCallStartTime(Date.now());
+          
+          // Start duration timer once
+          if (!durationIntervalRef.current) {
+            durationIntervalRef.current = setInterval(() => {
+              setCallDuration(prev => prev + 1);
+            }, 1000);
+          }
+          
+          // Start subtitles
+          setShowSubtitles(true);
+          initializeSpeechRecognition();
+        }
       };
 
       // Set up signaling channel
@@ -258,7 +268,8 @@ export const VideoCall = ({
 
   const initializeSpeechRecognition = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      console.log("Speech recognition not supported");
+      console.log("Speech recognition not supported, using MediaRecorder fallback");
+      startRecorderFallback();
       return;
     }
 
@@ -292,21 +303,23 @@ export const VideoCall = ({
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
-      // Try to restart if it failed
-      if (event.error === 'no-speech' || event.error === 'audio-capture') {
-        setTimeout(() => {
-          try {
-            recognition.start();
-            console.log('Speech recognition restarted');
-          } catch (e) {
-            console.log('Could not restart recognition:', e);
-          }
-        }, 1000);
+      // Fallback to MediaRecorder on persistent errors
+      if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'network') {
+        startRecorderFallback();
       }
+      // Try to restart
+      setTimeout(() => {
+        try {
+          recognition.start();
+          console.log('Speech recognition restarted');
+        } catch (e) {
+          console.log('Could not restart recognition:', e);
+        }
+      }, 1000);
     };
 
     recognition.onend = () => {
-      console.log('Speech recognition ended, restarting...');
+      console.log('Speech recognition ended');
       // Auto-restart if still in call
       if (callStatus === 'connected') {
         try {
@@ -325,6 +338,74 @@ export const VideoCall = ({
       console.log('Speech recognition started');
     } catch (e) {
       console.error('Failed to start recognition:', e);
+      // Fallback
+      startRecorderFallback();
+    }
+  };
+
+  const blobToBase64 = async (blob: Blob): Promise<string> => {
+    const buffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode.apply(null, Array.from(chunk));
+    }
+    return btoa(binary);
+  };
+
+  const startRecorderFallback = () => {
+    try {
+      if (!localStream || mediaRecorderRef.current) return;
+      if (!("MediaRecorder" in window)) return;
+
+      const mimeType = (window as any).MediaRecorder?.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm';
+      const mr = new MediaRecorder(localStream, { mimeType });
+      mediaRecorderRef.current = mr;
+
+      mr.ondataavailable = async (e: BlobEvent) => {
+        if (!e.data || e.data.size === 0) return;
+        if (isTranscribingRef.current) return; // Drop if busy
+        isTranscribingRef.current = true;
+        try {
+          const base64 = await blobToBase64(e.data);
+          const { data, error } = await supabase.functions.invoke('voice-to-text', {
+            body: { audio: base64 }
+          });
+          if (!error && data?.text) {
+            setConversationTranscript(prev => [...prev, data.text]);
+            if (showSubtitles) setCurrentSubtitle(data.text);
+          } else {
+            console.log('Transcription error:', error);
+          }
+        } catch (err) {
+          console.error('Transcription failed:', err);
+        } finally {
+          isTranscribingRef.current = false;
+        }
+      };
+
+      // Emit chunks every 3s
+      mr.start(3000);
+      console.log('MediaRecorder fallback started');
+    } catch (e) {
+      console.error('Failed to start MediaRecorder fallback:', e);
+    }
+  };
+
+  const stopRecorderFallback = () => {
+    try {
+      const mr = mediaRecorderRef.current;
+      if (mr && mr.state !== 'inactive') {
+        mr.stop();
+      }
+    } catch (e) {
+      console.log('MediaRecorder already stopped');
+    } finally {
+      mediaRecorderRef.current = null;
     }
   };
 
@@ -342,13 +423,18 @@ export const VideoCall = ({
           console.log('Could not stop recognition:', e);
         }
       }
+      stopRecorderFallback();
       setCurrentSubtitle("");
-    } else if (recognitionRef.current && callStatus === 'connected') {
-      try {
-        recognitionRef.current.start();
-        console.log('Subtitles enabled, recognition started');
-      } catch (e) {
-        console.log('Could not start recognition:', e);
+    } else if (callStatus === 'connected') {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+          console.log('Subtitles enabled, recognition started');
+        } catch (e) {
+          console.log('Could not start recognition:', e);
+        }
+      } else {
+        startRecorderFallback();
       }
     }
   };
@@ -522,7 +608,12 @@ export const VideoCall = ({
 
   const cleanup = () => {
     console.log("Starting cleanup...");
+
+    // Stop any ongoing transcription fallback
+    stopRecorderFallback();
     
+    // Reset start guard
+    startedRef.current = false;
     // Stop all local tracks aggressively - critical for mobile
     if (localStream) {
       const tracks = localStream.getTracks();
