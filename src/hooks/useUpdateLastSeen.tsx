@@ -13,13 +13,6 @@ export function useUpdateLastSeen() {
     // Update last_seen and status on mount
     const updateLastSeen = async () => {
       try {
-        // Verify session is still valid before updating
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          console.log('No valid session for last_seen update');
-          return;
-        }
-        
         const { error } = await supabase
           .from('profiles')
           .update({ 
@@ -34,7 +27,6 @@ export function useUpdateLastSeen() {
         }
       } catch (error) {
         // Silently catch errors to prevent breaking the app
-        console.error('Caught error in updateLastSeen:', error);
       }
     };
 
