@@ -10,7 +10,8 @@ import { MessageThread } from "@/components/MessageThread";
 import { MessageInput } from "@/components/MessageInput";
 import { VideoCall } from "@/components/VideoCall";
 import { useToast } from "@/hooks/use-toast";
-import { Menu, ArrowLeft, User, Circle, Video, CalendarIcon, MessageSquare } from "lucide-react";
+import { Menu, ArrowLeft, User, Circle, Video, CalendarIcon, MessageSquare, Clock } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { useUpdateLastSeen } from "@/hooks/useUpdateLastSeen";
@@ -82,6 +83,7 @@ const Messages = () => {
   const [scheduleDate, setScheduleDate] = useState<Date>();
   const [scheduleTime, setScheduleTime] = useState<string>("10:00");
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState(false);
+  const [videoCallMenuOpen, setVideoCallMenuOpen] = useState(false);
   const jobId = searchParams.get("job");
   const otherUserId = searchParams.get("with");
 
@@ -372,6 +374,174 @@ const Messages = () => {
     }
     loadMessages(true);
   };
+
+  const handleScheduleCall = async () => {
+    if (!scheduleDate || !user || !otherUserId) return;
+
+    const scheduledDateTime = `${format(scheduleDate, "PPP")} at ${scheduleTime}`;
+    
+    const callInvitation = {
+      type: 'video_call_invitation',
+      callType: 'scheduled',
+      scheduledDateTime,
+      scheduledDate: scheduleDate.toISOString(),
+      scheduledTime: scheduleTime,
+      status: 'pending'
+    };
+
+    await supabase.from("messages").insert({
+      job_id: validJobId,
+      from_user: user.id,
+      to_user: otherUserId,
+      body: `📞 Video call invitation for ${scheduledDateTime}`,
+      attachments: callInvitation
+    } as any);
+
+    const { data: senderProfile } = await supabase.from('profiles').select('name').eq('id', user.id).single();
+    const senderName = senderProfile?.name || 'Someone';
+    
+    await supabase.from('notifications').insert({
+      user_id: otherUserId,
+      type: 'video_call_invitation',
+      title: `Video call invitation from ${senderName}`,
+      message: `Scheduled for ${scheduledDateTime}`,
+      payload: {
+        job_id: validJobId,
+        from_user: user.id,
+        callType: 'scheduled'
+      }
+    } as any);
+
+    setSchedulePopoverOpen(false);
+    setVideoCallMenuOpen(false);
+    toast({
+      title: "Invitation sent",
+      description: `Video call scheduled for ${scheduledDateTime}`,
+    });
+    loadMessages(true);
+  };
+
+  const handleInstantCall = async () => {
+    if (!user || !otherUserId) return;
+
+    const callInvitation = {
+      type: 'video_call_invitation',
+      callType: 'instant',
+      status: 'pending'
+    };
+
+    await supabase.from("messages").insert({
+      job_id: validJobId,
+      from_user: user.id,
+      to_user: otherUserId,
+      body: `📞 Instant video call request`,
+      attachments: callInvitation
+    } as any);
+
+    const { data: senderProfile } = await supabase.from('profiles').select('name').eq('id', user.id).single();
+    const senderName = senderProfile?.name || 'Someone';
+    
+    await supabase.from('notifications').insert({
+      user_id: otherUserId,
+      type: 'video_call_invitation',
+      title: `Video call request from ${senderName}`,
+      message: `Wants to start an instant video call`,
+      payload: {
+        job_id: validJobId,
+        from_user: user.id,
+        callType: 'instant'
+      }
+    } as any);
+
+    setVideoCallMenuOpen(false);
+    toast({
+      title: "Call request sent",
+      description: "Waiting for response...",
+    });
+    loadMessages(true);
+  };
+
+  const handleCallResponse = async (messageId: string, response: 'accept' | 'decline' | 'suggest', suggestedDate?: Date, suggestedTime?: string) => {
+    if (!user || !otherUserId) return;
+
+    // Update the original invitation message
+    const { data: originalMsg } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('id', messageId)
+      .single();
+
+    if (!originalMsg) return;
+
+    const originalInvitation = originalMsg.attachments as any;
+    
+    if (response === 'accept') {
+      // Update invitation status
+      await supabase
+        .from('messages')
+        .update({
+          attachments: { ...originalInvitation, status: 'accepted' }
+        })
+        .eq('id', messageId);
+
+      // If it's an instant call, open the video call dialog
+      if (originalInvitation.callType === 'instant') {
+        setIsVideoCallOpen(true);
+      }
+
+      toast({
+        title: "Call accepted",
+        description: originalInvitation.callType === 'instant' ? "Starting video call..." : "The scheduled call has been confirmed",
+      });
+    } else if (response === 'decline') {
+      await supabase
+        .from('messages')
+        .update({
+          attachments: { ...originalInvitation, status: 'declined' }
+        })
+        .eq('id', messageId);
+
+      toast({
+        title: "Call declined",
+      });
+    } else if (response === 'suggest' && suggestedDate && suggestedTime) {
+      const scheduledDateTime = `${format(suggestedDate, "PPP")} at ${suggestedTime}`;
+      
+      // Send a new invitation with the suggested time
+      const newInvitation = {
+        type: 'video_call_invitation',
+        callType: 'scheduled',
+        scheduledDateTime,
+        scheduledDate: suggestedDate.toISOString(),
+        scheduledTime: suggestedTime,
+        status: 'pending',
+        isCounterProposal: true
+      };
+
+      await supabase.from("messages").insert({
+        job_id: validJobId,
+        from_user: user.id,
+        to_user: otherUserId,
+        body: `📞 Suggested new time: ${scheduledDateTime}`,
+        attachments: newInvitation
+      } as any);
+
+      // Update original invitation
+      await supabase
+        .from('messages')
+        .update({
+          attachments: { ...originalInvitation, status: 'counter_proposed' }
+        })
+        .eq('id', messageId);
+
+      toast({
+        title: "New time suggested",
+        description: scheduledDateTime,
+      });
+    }
+
+    loadMessages(true);
+  };
   return <div className="h-screen flex">
       {/* Show sidebar on desktop OR on mobile when no conversation is selected */}
       {(!isMobile || !otherUserId) && (
@@ -430,14 +600,14 @@ const Messages = () => {
                     </div>
                   </Link>
                   
-                  <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
-                    <PopoverTrigger asChild>
+                  <DropdownMenu open={videoCallMenuOpen} onOpenChange={setVideoCallMenuOpen}>
+                    <DropdownMenuTrigger asChild>
                       {isMobile ? (
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90"
-                          title="Schedule video call"
+                          title="Video Call"
                         >
                           <Video className="h-5 w-5 text-white" />
                         </Button>
@@ -445,77 +615,85 @@ const Messages = () => {
                         <Button
                           variant="default"
                           className="h-10 px-4 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 hover:opacity-90 shadow-lg flex items-center gap-2"
-                          title="Schedule a video call"
+                          title="Video Call Options"
                         >
                           <Video className="h-4 w-4" />
-                          <span className="text-sm font-semibold">Schedule a video call</span>
+                          <span className="text-sm font-semibold">+ Video Call</span>
                         </Button>
                       )}
-                    </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <div className="p-4 space-y-4">
-                      <div className="space-y-2">
-                        <Label>Select Date</Label>
-                        <Calendar
-                          mode="single"
-                          selected={scheduleDate}
-                          onSelect={setScheduleDate}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                          className={cn("pointer-events-auto")}
-                        />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem onClick={() => setSchedulePopoverOpen(true)}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        Schedule a video call
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleInstantCall}>
+                        <Clock className="mr-2 h-4 w-4" />
+                        Start an instant video call
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <Popover open={schedulePopoverOpen} onOpenChange={setSchedulePopoverOpen}>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <div className="p-4 space-y-4">
+                        <div className="space-y-2">
+                          <Label>Select Date</Label>
+                          <Calendar
+                            mode="single"
+                            selected={scheduleDate}
+                            onSelect={setScheduleDate}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                            className={cn("pointer-events-auto")}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Select Time</Label>
+                          <Select value={scheduleTime} onValueChange={setScheduleTime}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 24 }, (_, i) => {
+                                const hour = i.toString().padStart(2, '0');
+                                return [
+                                  <SelectItem key={`${hour}:00`} value={`${hour}:00`}>{`${hour}:00`}</SelectItem>,
+                                  <SelectItem key={`${hour}:30`} value={`${hour}:30`}>{`${hour}:30`}</SelectItem>
+                                ];
+                              }).flat()}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button
+                          className="w-full"
+                          onClick={handleScheduleCall}
+                        >
+                          Send Invitation
+                        </Button>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Select Time</Label>
-                        <Select value={scheduleTime} onValueChange={setScheduleTime}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 24 }, (_, i) => {
-                              const hour = i.toString().padStart(2, '0');
-                              return [
-                                <SelectItem key={`${hour}:00`} value={`${hour}:00`}>{`${hour}:00`}</SelectItem>,
-                                <SelectItem key={`${hour}:30`} value={`${hour}:30`}>{`${hour}:30`}</SelectItem>
-                              ];
-                            }).flat()}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button
-                        className="w-full"
-                        onClick={() => {
-                          if (scheduleDate) {
-                            toast({
-                              title: "Video call scheduled",
-                              description: `Scheduled for ${format(scheduleDate, "PPP")} at ${scheduleTime}`,
-                            });
-                            setSchedulePopoverOpen(false);
-                          } else {
-                            toast({
-                              title: "Please select a date",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                      >
-                        Confirm Schedule
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
               {/* Scrolling Message Thread */}
               <div className="flex-1 overflow-hidden min-h-0">
-                <MessageThread messages={messages} currentUserId={user?.id || ""} currentUserProfile={profile} loading={loading} onEdited={loadMessages} onReply={message => {
-              const isFromMe = message.from_user === user.id;
-              setReplyingTo({
-                id: message.id,
-                body: message.body,
-                senderName: isFromMe ? "yourself" : message.from_profile?.name || "User"
-              });
-            }} />
+                <MessageThread 
+                  messages={messages} 
+                  currentUserId={user?.id || ""} 
+                  currentUserProfile={profile} 
+                  loading={loading} 
+                  onEdited={loadMessages} 
+                  onReply={message => {
+                    const isFromMe = message.from_user === user.id;
+                    setReplyingTo({
+                      id: message.id,
+                      body: message.body,
+                      senderName: isFromMe ? "yourself" : message.from_profile?.name || "User"
+                    });
+                  }}
+                  onCallResponse={handleCallResponse}
+                />
               </div>
 
               {/* Fixed Input */}

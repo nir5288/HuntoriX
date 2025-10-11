@@ -4,9 +4,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
-import { Pencil, Check, X, Paperclip, Reply } from "lucide-react";
+import { Pencil, Check, X, Paperclip, Reply, CalendarIcon, Clock, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -39,6 +43,7 @@ interface MessageThreadProps {
   loading: boolean;
   onReply: (message: Message) => void;
   onEdited?: () => void;
+  onCallResponse?: (messageId: string, response: 'accept' | 'decline' | 'suggest', suggestedDate?: Date, suggestedTime?: string) => void;
 }
 
 const formatName = (fullName: string | undefined) => {
@@ -56,13 +61,16 @@ const formatDateSeparator = (date: Date) => {
   return format(date, "d MMMM yyyy");
 };
 
-export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading, onReply, onEdited }: MessageThreadProps) => {
+export const MessageThread = ({ messages, currentUserId, currentUserProfile, loading, onReply, onEdited, onCallResponse }: MessageThreadProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [suggestPopoverOpen, setSuggestPopoverOpen] = useState<string | null>(null);
+  const [suggestedDate, setSuggestedDate] = useState<Date>();
+  const [suggestedTime, setSuggestedTime] = useState<string>("10:00");
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -124,6 +132,30 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
         variant: "destructive",
       });
     }
+  };
+
+  const isVideoCallInvitation = (message: Message) => {
+    return message.attachments && typeof message.attachments === 'object' && 
+           (message.attachments as any).type === 'video_call_invitation';
+  };
+
+  const getCallInvitationData = (message: Message) => {
+    if (!isVideoCallInvitation(message)) return null;
+    return message.attachments as any;
+  };
+
+  const handleCallAction = (messageId: string, action: 'accept' | 'decline') => {
+    if (onCallResponse) {
+      onCallResponse(messageId, action);
+    }
+  };
+
+  const handleSuggestTime = (messageId: string) => {
+    if (!suggestedDate || !onCallResponse) return;
+    onCallResponse(messageId, 'suggest', suggestedDate, suggestedTime);
+    setSuggestPopoverOpen(null);
+    setSuggestedDate(undefined);
+    setSuggestedTime("10:00");
   };
 
   if (loading) {
@@ -219,7 +251,126 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                         )}
                         <p className="text-sm break-words mb-1">{message.body}</p>
                         
-                        {message.attachments && message.attachments.length > 0 && (
+                        {isVideoCallInvitation(message) && (
+                          <div className="mt-3 pt-3 border-t border-border/40">
+                            {(() => {
+                              const callData = getCallInvitationData(message);
+                              const isPending = callData?.status === 'pending';
+                              const isAccepted = callData?.status === 'accepted';
+                              const isDeclined = callData?.status === 'declined';
+                              const isFromOther = !isFromMe;
+
+                              if (isAccepted) {
+                                return (
+                                  <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <Check className="h-3 w-3" />
+                                    Call accepted
+                                  </div>
+                                );
+                              }
+
+                              if (isDeclined) {
+                                return (
+                                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <X className="h-3 w-3" />
+                                    Call declined
+                                  </div>
+                                );
+                              }
+
+                              if (isPending && isFromOther) {
+                                return (
+                                  <div className="space-y-2">
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleCallAction(message.id, 'accept')}
+                                        className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                                      >
+                                        <Check className="h-3 w-3 mr-1" />
+                                        Accept
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => handleCallAction(message.id, 'decline')}
+                                        className="h-7 text-xs"
+                                      >
+                                        <X className="h-3 w-3 mr-1" />
+                                        Decline
+                                      </Button>
+                                      {callData?.callType === 'scheduled' && (
+                                        <Popover open={suggestPopoverOpen === message.id} onOpenChange={(open) => setSuggestPopoverOpen(open ? message.id : null)}>
+                                          <PopoverTrigger asChild>
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              className="h-7 text-xs"
+                                            >
+                                              <Clock className="h-3 w-3 mr-1" />
+                                              Suggest Time
+                                            </Button>
+                                          </PopoverTrigger>
+                                          <PopoverContent className="w-auto p-0" align="start">
+                                            <div className="p-3 space-y-3">
+                                              <div className="space-y-2">
+                                                <Label className="text-xs">Select Date</Label>
+                                                <Calendar
+                                                  mode="single"
+                                                  selected={suggestedDate}
+                                                  onSelect={setSuggestedDate}
+                                                  disabled={(date) => date < new Date()}
+                                                  className={cn("pointer-events-auto")}
+                                                />
+                                              </div>
+                                              <div className="space-y-2">
+                                                <Label className="text-xs">Select Time</Label>
+                                                <Select value={suggestedTime} onValueChange={setSuggestedTime}>
+                                                  <SelectTrigger className="h-8 text-xs">
+                                                    <SelectValue placeholder="Select time" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {Array.from({ length: 24 }, (_, i) => {
+                                                      const hour = i.toString().padStart(2, '0');
+                                                      return [
+                                                        <SelectItem key={`${hour}:00`} value={`${hour}:00`}>{`${hour}:00`}</SelectItem>,
+                                                        <SelectItem key={`${hour}:30`} value={`${hour}:30`}>{`${hour}:30`}</SelectItem>
+                                                      ];
+                                                    }).flat()}
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                              <Button
+                                                size="sm"
+                                                className="w-full h-8 text-xs"
+                                                onClick={() => handleSuggestTime(message.id)}
+                                              >
+                                                Send Suggestion
+                                              </Button>
+                                            </div>
+                                          </PopoverContent>
+                                        </Popover>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              if (isPending && isFromMe) {
+                                return (
+                                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    Waiting for response...
+                                  </div>
+                                );
+                              }
+
+                              return null;
+                            })()}
+                          </div>
+                        )}
+                        
+                        {message.attachments && !isVideoCallInvitation(message) && Array.isArray(message.attachments) && message.attachments.length > 0 && (
                           <div className="mt-2 space-y-1 mb-1">
                             {message.attachments.map((file: any, idx: number) => (
                               <button
@@ -312,7 +463,126 @@ export const MessageThread = ({ messages, currentUserId, currentUserProfile, loa
                           )}
                           <p className="text-sm break-words">{message.body}</p>
                           
-                          {message.attachments && message.attachments.length > 0 && (
+                          {isVideoCallInvitation(message) && (
+                            <div className="mt-3 pt-3 border-t border-border/40">
+                              {(() => {
+                                const callData = getCallInvitationData(message);
+                                const isPending = callData?.status === 'pending';
+                                const isAccepted = callData?.status === 'accepted';
+                                const isDeclined = callData?.status === 'declined';
+                                const isFromOther = !isFromMe;
+
+                                if (isAccepted) {
+                                  return (
+                                    <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                                      <Check className="h-3 w-3" />
+                                      Call accepted
+                                    </div>
+                                  );
+                                }
+
+                                if (isDeclined) {
+                                  return (
+                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <X className="h-3 w-3" />
+                                      Call declined
+                                    </div>
+                                  );
+                                }
+
+                                if (isPending && isFromOther) {
+                                  return (
+                                    <div className="space-y-2">
+                                      <div className="flex flex-wrap gap-2">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => handleCallAction(message.id, 'accept')}
+                                          className="h-8 text-xs bg-green-600 hover:bg-green-700"
+                                        >
+                                          <Check className="h-3 w-3 mr-1" />
+                                          Accept
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="destructive"
+                                          onClick={() => handleCallAction(message.id, 'decline')}
+                                          className="h-8 text-xs"
+                                        >
+                                          <X className="h-3 w-3 mr-1" />
+                                          Decline
+                                        </Button>
+                                        {callData?.callType === 'scheduled' && (
+                                          <Popover open={suggestPopoverOpen === message.id} onOpenChange={(open) => setSuggestPopoverOpen(open ? message.id : null)}>
+                                            <PopoverTrigger asChild>
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-8 text-xs"
+                                              >
+                                                <Clock className="h-3 w-3 mr-1" />
+                                                Suggest New Time
+                                              </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                              <div className="p-4 space-y-4">
+                                                <div className="space-y-2">
+                                                  <Label>Select Date</Label>
+                                                  <Calendar
+                                                    mode="single"
+                                                    selected={suggestedDate}
+                                                    onSelect={setSuggestedDate}
+                                                    disabled={(date) => date < new Date()}
+                                                    initialFocus
+                                                    className={cn("pointer-events-auto")}
+                                                  />
+                                                </div>
+                                                <div className="space-y-2">
+                                                  <Label>Select Time</Label>
+                                                  <Select value={suggestedTime} onValueChange={setSuggestedTime}>
+                                                    <SelectTrigger>
+                                                      <SelectValue placeholder="Select time" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                      {Array.from({ length: 24 }, (_, i) => {
+                                                        const hour = i.toString().padStart(2, '0');
+                                                        return [
+                                                          <SelectItem key={`${hour}:00`} value={`${hour}:00`}>{`${hour}:00`}</SelectItem>,
+                                                          <SelectItem key={`${hour}:30`} value={`${hour}:30`}>{`${hour}:30`}</SelectItem>
+                                                        ];
+                                                      }).flat()}
+                                                    </SelectContent>
+                                                  </Select>
+                                                </div>
+                                                <Button
+                                                  className="w-full"
+                                                  onClick={() => handleSuggestTime(message.id)}
+                                                >
+                                                  Send Suggestion
+                                                </Button>
+                                              </div>
+                                            </PopoverContent>
+                                          </Popover>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                if (isPending && isFromMe) {
+                                  return (
+                                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      Waiting for response...
+                                    </div>
+                                  );
+                                }
+
+                                return null;
+                              })()}
+                            </div>
+                          )}
+                          
+                          {message.attachments && !isVideoCallInvitation(message) && Array.isArray(message.attachments) && message.attachments.length > 0 && (
                             <div className="mt-2 space-y-1">
                               {message.attachments.map((file: any, idx: number) => (
                                 <button
