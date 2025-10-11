@@ -42,6 +42,7 @@ export const VideoCall = ({
   const [showSubtitles, setShowSubtitles] = useState(false);
   const [currentSubtitle, setCurrentSubtitle] = useState("");
   const [callStartTime, setCallStartTime] = useState<number | null>(null);
+  const [conversationTranscript, setConversationTranscript] = useState<string[]>([]);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -140,7 +141,8 @@ export const VideoCall = ({
           setCallDuration(prev => prev + 1);
         }, 1000);
         
-        // Initialize speech recognition for subtitles
+        // Initialize and auto-start speech recognition for transcript
+        setShowSubtitles(true);
         initializeSpeechRecognition();
       };
 
@@ -265,13 +267,17 @@ export const VideoCall = ({
     recognition.lang = 'en-US';
 
     recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0])
-        .map((result: any) => result.transcript)
-        .join('');
+      const results = Array.from(event.results);
+      const lastResult = results[results.length - 1] as any;
+      const transcript = lastResult[0].transcript;
       
       if (showSubtitles) {
         setCurrentSubtitle(transcript);
+      }
+      
+      // Store final transcripts for summary
+      if (lastResult.isFinal && transcript.trim()) {
+        setConversationTranscript(prev => [...prev, transcript.trim()]);
       }
     };
 
@@ -307,26 +313,36 @@ export const VideoCall = ({
   const generateCallSummary = async () => {
     try {
       const duration = formatDuration(callDuration);
+      const conversationText = conversationTranscript.join(' ');
+      
+      if (!conversationText.trim()) {
+        console.log("No conversation to summarize");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('generate-call-summary', {
         body: {
           callDuration: duration,
-          participants: [currentUserName, otherUserName]
+          participants: [currentUserName, otherUserName],
+          conversation: conversationText
         }
       });
 
       if (error) throw error;
 
-      // Send summary as a message to both users
+      // Send summary as a message in the chat
       await supabase.from('messages').insert({
         from_user: currentUserId,
         to_user: otherUserId,
-        body: `📞 Call Summary:\n${data.summary}`,
+        body: `📞 **Call Summary** (${duration})\n\n${data.summary}`,
         attachments: {
           type: 'call_summary',
           duration: duration,
           timestamp: new Date().toISOString()
         }
       });
+      
+      console.log("Call summary sent successfully");
     } catch (error) {
       console.error("Error generating call summary:", error);
     }
@@ -432,34 +448,47 @@ export const VideoCall = ({
   };
 
   const cleanup = () => {
-    // Stop all local tracks
+    console.log("Starting cleanup...");
+    
+    // Stop all local tracks aggressively
     if (localStream) {
       localStream.getTracks().forEach((track) => {
-        track.stop();
-        console.log('Stopped local track:', track.kind);
+        if (track.readyState === 'live') {
+          track.stop();
+          track.enabled = false;
+          console.log('Stopped local track:', track.kind, track.label);
+        }
       });
     }
     
     // Stop all remote tracks
     if (remoteStream) {
       remoteStream.getTracks().forEach((track) => {
-        track.stop();
-        console.log('Stopped remote track:', track.kind);
+        if (track.readyState === 'live') {
+          track.stop();
+          track.enabled = false;
+          console.log('Stopped remote track:', track.kind);
+        }
       });
     }
 
-    // Clear video elements
+    // Clear and pause video elements
     if (localVideoRef.current) {
+      localVideoRef.current.pause();
       localVideoRef.current.srcObject = null;
+      localVideoRef.current.load();
     }
     if (remoteVideoRef.current) {
+      remoteVideoRef.current.pause();
       remoteVideoRef.current.srcObject = null;
+      remoteVideoRef.current.load();
     }
 
     // Stop speech recognition
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
+        recognitionRef.current.abort();
       } catch (e) {
         console.log('Speech recognition already stopped');
       }
@@ -474,6 +503,11 @@ export const VideoCall = ({
 
     // Close peer connection
     if (peerConnectionRef.current) {
+      peerConnectionRef.current.getSenders().forEach(sender => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
       peerConnectionRef.current.close();
       peerConnectionRef.current = null;
     }
@@ -484,15 +518,20 @@ export const VideoCall = ({
       channelRef.current = null;
     }
 
+    // Reset all state
     setLocalStream(null);
     setRemoteStream(null);
     setCallDuration(0);
     setCallStartTime(null);
     setCurrentSubtitle("");
+    setConversationTranscript([]);
     setIsVideoEnabled(true);
     setIsAudioEnabled(true);
     setIsScreenSharing(false);
+    setShowSubtitles(false);
     setCallStatus("connecting");
+    
+    console.log("Cleanup complete");
   };
 
   return (

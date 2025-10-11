@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { callDuration, participants } = await req.json();
+    const { callDuration, participants, conversation } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -29,11 +29,11 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a professional call summarizer. Create brief, professional summaries of video calls."
+            content: "You are a professional call summarizer. Create concise, clear summaries of video call conversations. Focus on key topics discussed, decisions made, and action items."
           },
           {
             role: "user",
-            content: `Generate a brief professional summary for a video call between ${participants[0]} and ${participants[1]}. The call lasted ${callDuration}. Include: 1) Call participants, 2) Call duration, 3) A brief note about the call. Keep it concise and professional (2-3 sentences max).`
+            content: `Summarize this video call conversation between ${participants[0]} and ${participants[1]} that lasted ${callDuration}:\n\n"${conversation}"\n\nProvide a brief professional summary covering: 1) Main topics discussed, 2) Key points or decisions, 3) Any action items mentioned. Keep it under 4 sentences.`
           }
         ],
       }),
