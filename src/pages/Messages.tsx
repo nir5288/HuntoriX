@@ -136,12 +136,23 @@ const Messages = () => {
         table: "messages",
         filter: validJobId ? `job_id=eq.${validJobId}` : `job_id=is.null`
       }, payload => {
-        const newMessage = payload.new as Message;
+        const newMessage = payload.new as any;
         if (newMessage.from_user === user.id && newMessage.to_user === otherUserId || newMessage.from_user === otherUserId && newMessage.to_user === user.id) {
           loadMessages(true);
+          
           // Mark as read if I'm the recipient
           if (newMessage.to_user === user.id) {
             markMessagesAsRead();
+          }
+
+          // Check if this is an accepted instant video call invitation
+          if (newMessage.attachments && 
+              typeof newMessage.attachments === 'object' &&
+              newMessage.attachments.type === 'video_call_invitation' &&
+              newMessage.attachments.status === 'accepted' &&
+              newMessage.attachments.callType === 'instant') {
+            // Open video call for both sender and receiver
+            setIsVideoCallOpen(true);
           }
         }
       }).subscribe();
