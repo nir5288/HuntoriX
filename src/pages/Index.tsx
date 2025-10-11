@@ -76,13 +76,6 @@ const Index = () => {
           <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[600px] -mt-12">
             {/* Left side - Text content (50%) */}
             <div className="w-full lg:w-1/2 space-y-8 text-center lg:text-left">
-              <div className="animate-fade-in flex justify-center lg:justify-start">
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
-                  <Award className="h-3.5 w-3.5" />
-                  Top Rated Platform
-                </span>
-              </div>
-
               <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-[1.1] animate-fade-in">
                 <span className="block text-foreground">Post a Job.</span>
                 <span className="block mt-2">
@@ -121,17 +114,6 @@ const Index = () => {
                     I'm a Headhunter
                   </Button>
                 </div>
-                
-                <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    AI-Powered Platform
-                  </span>
-                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground">
-                    <Shield className="h-3.5 w-3.5" />
-                    Verified Professionals
-                  </span>
-                </div>
               </div>
             </div>
 
@@ -143,6 +125,22 @@ const Index = () => {
                 alt="Headhunter network connecting employers with talent"
                 className="w-full h-auto object-contain relative z-10 drop-shadow-2xl"
               />
+              
+              {/* Floating Badges */}
+              <div className="absolute left-[15%] top-1/2 -translate-y-1/2 z-20 space-y-6">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-1_6s_ease-in-out_infinite]">
+                  <Award className="h-3.5 w-3.5" />
+                  Top Rated Platform
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-2_7s_ease-in-out_infinite]">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  AI-Powered Platform
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-foreground/10 bg-background/50 backdrop-blur-sm text-xs font-medium text-muted-foreground animate-[float-3_8s_ease-in-out_infinite]">
+                  <Shield className="h-3.5 w-3.5" />
+                  Verified Professionals
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -115,6 +115,18 @@ export default {
             backgroundPosition: "0% 50%",
           },
         },
+        "float-1": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-15px)" },
+        },
+        "float-2": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "float-3": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-12px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -122,6 +134,9 @@ export default {
         shimmer: "shimmer 3s ease-in-out infinite",
         wave: "wave 3s ease-in-out infinite",
         gradient: "gradient 3s ease infinite",
+        "float-1": "float-1 6s ease-in-out infinite",
+        "float-2": "float-2 7s ease-in-out infinite",
+        "float-3": "float-3 8s ease-in-out infinite",
       },
     },
   },
